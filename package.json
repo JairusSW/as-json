@@ -1,0 +1,26 @@
+{
+  "name": "as-kati",
+  "version": "0.0.1",
+  "description": "The God of all JSON. Extremely fast JSON serialize and deserialize.",
+  "types": "assenbly/index.ts",
+  "ascMain": "assenbly/index.ts",
+  "author": "JairusSW",
+  "license": "MIT",
+  "devDependencies": {
+    "@assemblyscript/loader": "^0.18.31",
+    "assemblyscript": "^0.18.31",
+    "benny": "^3.6.15",
+    "flatted": "^3.1.1",
+    "json5": "^2.2.0",
+    "yaml": "^1.10.2"
+  },
+  "dependencies": {
+    "as-string-sink": "^0.1.1"
+  },
+  "scripts": {
+    "asbuild:untouched": "asc assembly/index.ts --target debug",
+    "asbuild:optimized": "asc assembly/index.ts --target release",
+    "asbuild": "yarn asbuild:untouched && yarn asbuild:optimized",
+    "test": "node tests"
+  }
+}
