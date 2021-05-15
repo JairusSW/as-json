@@ -1,6 +1,6 @@
 {
   "name": "as-kati",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The God of all JSON. Extremely fast JSON serialize and deserialize.",
   "types": "assenbly/index.ts",
   "ascMain": "assenbly/index.ts",

@@ -2,8 +2,6 @@
 // TODO: Add Object support
 // TODO: Add AS deserialize (SIMD?)
 
-import { console } from '../node_modules/as-console/assembly/console'
-
 import { StringSink } from '../node_modules/as-string-sink/assembly/index'
 
 // Pre-alloc in memory. (faster)
@@ -39,10 +37,4 @@ export function stringify<T>(data: T): string {
     result.write(nullVal)
   }
   return result.toString()
-}
-
-export function test(): void {
-
-  console.log(stringify('hey'))
-
 }
