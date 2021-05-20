@@ -1,6 +1,6 @@
 {
   "name": "as-kati",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The God of all JSON. Extremely fast JSON serialize and deserialize.",
   "types": "assenbly/index.ts",
   "ascMain": "assenbly/index.ts",
@@ -8,6 +8,7 @@
   "license": "MIT",
   "devDependencies": {
     "@assemblyscript/loader": "^0.18.31",
+    "as-console": "^5.0.1",
     "assemblyscript": "^0.18.31",
     "benny": "^3.6.15",
     "flatted": "^3.1.1",
