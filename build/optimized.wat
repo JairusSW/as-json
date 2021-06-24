@@ -13,7 +13,7 @@
  (import "Date" "now" (func $~lib/bindings/Date/now (result f64)))
  (import "consoleBindings" "_log" (func $~lib/as-console/index/_log (param i32)))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
- (global $assembly/index/data (mut i32) (i32.const 0))
+ (global $assembly/index/bench (mut i32) (i32.const 0))
  (global $assembly/index/start1 (mut i64) (i64.const 0))
  (global $assembly/index/start2 (mut i64) (i64.const 0))
  (global $~started (mut i32) (i32.const 0))
@@ -64,7 +64,7 @@
  (data (i32.const 3420) "\1c")
  (data (i32.const 3432) "\05\00\00\00\0c\00\00\00\e0\04\00\00\00\00\00\00\e0\04")
  (data (i32.const 3452) "<")
- (data (i32.const 3464) "\01\00\00\00\"\00\00\00{\00\"\00H\00e\00l\00l\00o\00\"\00:\00\"\00W\00o\00r\00l\00d\00\"\00}")
+ (data (i32.const 3464) "\01\00\00\00\"\00\00\00{\00\"\00H\00e\00l\00l\00o\00\"\00\"\00\"\00W\00o\00r\00l\00d\00\"\00}")
  (data (i32.const 3516) ",")
  (data (i32.const 3528) "\01\00\00\00\1c\00\00\00I\00n\00v\00a\00l\00i\00d\00 \00l\00e\00n\00g\00t\00h")
  (data (i32.const 3564) ",")
@@ -2492,7 +2492,7 @@
   i32.const 4
   call $~lib/rt/stub/__new
   local.tee $1
-  i32.const 0
+  i32.const 1248
   i32.store
   local.get $1
   i32.const 1248
@@ -2501,7 +2501,7 @@
   i32.const 1216
   i32.store
   local.get $1
-  global.set $assembly/index/data
+  global.set $assembly/index/bench
   call $~lib/bindings/Date/now
   i64.trunc_f64_s
   global.set $assembly/index/start1
@@ -2510,7 +2510,7 @@
    i32.const 500000
    i32.lt_s
    if
-    global.get $assembly/index/data
+    global.get $assembly/index/bench
     local.tee $1
     if
      local.get $1
@@ -2712,7 +2712,7 @@
     i32.const 4
     call $~lib/rt/stub/__new
     local.tee $2
-    i32.const 0
+    i32.const 1248
     i32.store
     local.get $2
     i32.const 1248

@@ -7,7 +7,6 @@
   "author": "JairusSW",
   "license": "MIT",
   "devDependencies": {
-    "@assemblyscript/loader": "^0.18.31",
     "@types/line-column": "^1.0.0",
     "as-console": "^5.0.3",
     "assemblyscript": "^0.18.31"
@@ -22,7 +21,7 @@
   "scripts": {
     "asbuild:untouched": "asc assembly/index.ts --target debug --transform ./transform/lib/transform.js --explicitStart",
     "asbuild:optimized": "asc assembly/index.ts --target release --runtime stub --transform ./transform/lib/transform.js --explicitStart",
-    "asbuild": "yarn asbuild:untouched && yarn asbuild:optimized",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
     "test": "node tests"
   }
 }

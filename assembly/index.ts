@@ -1,7 +1,7 @@
 import { deserializeArray, JSON } from "./JSON";
 
 import { console, stringify } from "as-console";
-
+/*
 // @ts-ignore
 @serializable
 class JSONschema {
@@ -75,11 +75,22 @@ console.log(
       `{"firstName":"Jairus","lastName":"SantaClaus","age":14}`
     ).lastName
 );
- /*
+
+ */
+ // @ts-ignore
+@serializable
+class Benchschema {
+  Hello: string = ""
+}
+
+const bench: Benchschema = {
+  Hello: 'World'
+};
+
 const start1 = Date.now()
 
 for (let i = 0; i < 500_000; i++) {
-  JSON.stringify<Array<string>>(["Hello","World"])
+  JSON.stringify<Benchschema>(bench)
 }
 
 console.log(`JSON (AS) Stringify: ${Date.now() - start1}ms`)
@@ -87,7 +98,7 @@ console.log(`JSON (AS) Stringify: ${Date.now() - start1}ms`)
 const start2 = Date.now()
 
 for (let i = 0; i < 1_000; i++) {
-  JSON.parse<JSON>(`["Hello","World"]`)
+  JSON.parse<Benchschema>(`{"Hello"""World"}`)
 }
 
-console.log(`JSON (AS) Parse: ${Date.now() - start2}ms`)*/
+console.log(`JSON (AS) Parse: ${Date.now() - start2}ms`)
