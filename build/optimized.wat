@@ -3083,11 +3083,9 @@
       i32.load offset=12
       local.set $4
       i32.const 1280
-      i32.const 1312
-      call $~lib/string/String#concat
       i32.const 1536
       call $~lib/string/String#concat
-      i32.const 1312
+      i32.const 1280
       call $~lib/string/String#concat
       i32.const 1392
       call $~lib/string/String#concat

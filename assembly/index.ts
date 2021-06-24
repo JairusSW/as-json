@@ -1,4 +1,4 @@
-import { deserializeArray, deserializeObject, deserializeString, JSON } from "./JSON";
+import { deserializeArray, JSON, deserializeObject } from "./JSON";
 
 import { console, stringify } from "as-console";
 
@@ -14,8 +14,70 @@ const data: JSONschema = {
   firstName: "Jairus",
   lastName: "Tanaka",
   age: 14,
-};
+};/*
 
+console.log("Testing Serialization");
+
+// Serialize String
+
+console.log("String: " + JSON.stringify("Hello, World!"));
+
+// Serialize Number
+
+console.log("Number: " + JSON.stringify(3.14));
+
+// Serialize Boolean
+
+console.log("Boolean: " + JSON.stringify(true));
+
+// Serialize Array
+
+console.log("Array: " + JSON.stringify(["Hello", "World"]));
+
+// Serialize Object
+
+console.log("Object: " + JSON.stringify(data));
+
+console.log("Testing Deserialization");
+
+// Deserialize String
+
+console.log("String: " + JSON.parse<string>('"Hello, World!'));
+
+// Deserialize Number
+
+console.log("Number: " + JSON.parse<f64>("3.14").toString());
+
+// Deserialize Boolean
+
+console.log("Boolean: " + JSON.parse<boolean>("true").toString());
+
+// Deserialize Array
+
+console.log("Array: " + stringify(deserializeArray<Array<string>>('["Hello","Wor\\"ld","hoh,o"]')))
+// Deserialize Object
+
+console.log(
+  "Object: " +
+    JSON.parse<JSONschema>(
+      `{"firstName":"Jairus","lastName":"BunnyBoy","age":14}`
+    ).lastName
+);
+console.log(
+  "Object: " +
+    JSON.parse<JSONschema>(
+      `{"firstName":"Jairus","lastName":"Chubbo","age":14}`
+    ).lastName
+);
+console.log(
+  "Object: " +
+    JSON.parse<JSONschema>(
+      `{"firstName":"Jairus","lastName":"SantaClaus","age":14}`
+    ).lastName
+);
+
+/*
+*/
 const start1 = Date.now()
 
 for (let i = 0; i < 500_000; i++) {
