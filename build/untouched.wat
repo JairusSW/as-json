@@ -3,10 +3,10 @@
  (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
- (type $i32_=>_none (func (param i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $i32_=>_f64 (func (param i32) (result f64)))
  (type $none_=>_none (func))
+ (type $i32_=>_none (func (param i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $f64_=>_i32 (func (param f64) (result i32)))
  (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
@@ -4350,72 +4350,63 @@
   call $~lib/staticarray/StaticArray<~lib/string/String>#join
   return
  )
- (func $assembly/index/JSONschema#__encode (param $0 i32)
+ (func $assembly/index/JSONschema#__encode (param $0 i32) (result i32)
+  (local $1 i32)
+  i32.const 256
+  local.set $1
+  local.get $1
+  i32.const 256
+  i32.const 480
+  call $~lib/string/String.__concat
+  i32.const 2624
+  call $~lib/string/String.__concat
+  i32.const 480
+  call $~lib/string/String.__concat
+  i32.const 2672
+  call $~lib/string/String.__concat
   local.get $0
-  i32.load offset=12
-  call $~lib/string/String#get:length
-  i32.const 0
-  i32.eq
-  if
-   local.get $0
-   local.get $0
-   i32.load offset=12
-   i32.const 256
-   i32.const 480
-   call $~lib/string/String.__concat
-   i32.const 2624
-   call $~lib/string/String.__concat
-   i32.const 480
-   call $~lib/string/String.__concat
-   i32.const 2672
-   call $~lib/string/String.__concat
-   local.get $0
-   i32.load
-   call $assembly/JSON/JSON.stringify<~lib/string/String>
-   call $~lib/string/String.__concat
-   i32.const 2448
-   call $~lib/string/String.__concat
-   call $~lib/string/String.__concat
-   call $assembly/index/JSONschema#set:__encoded
-   local.get $0
-   local.get $0
-   i32.load offset=12
-   i32.const 256
-   i32.const 480
-   call $~lib/string/String.__concat
-   i32.const 2704
-   call $~lib/string/String.__concat
-   i32.const 480
-   call $~lib/string/String.__concat
-   i32.const 2672
-   call $~lib/string/String.__concat
-   local.get $0
-   i32.load offset=4
-   call $assembly/JSON/JSON.stringify<~lib/string/String>
-   call $~lib/string/String.__concat
-   i32.const 2448
-   call $~lib/string/String.__concat
-   call $~lib/string/String.__concat
-   call $assembly/index/JSONschema#set:__encoded
-   local.get $0
-   local.get $0
-   i32.load offset=12
-   i32.const 256
-   i32.const 2752
-   call $~lib/string/String.__concat
-   i32.const 256
-   call $~lib/string/String.__concat
-   i32.const 2672
-   call $~lib/string/String.__concat
-   local.get $0
-   i32.load offset=8
-   call $assembly/JSON/JSON.stringify<i32>
-   call $~lib/string/String.__concat
-   i32.const 2448
-   call $~lib/string/String.__concat
-   call $~lib/string/String.__concat
-   call $assembly/index/JSONschema#set:__encoded
-  end
+  i32.load
+  call $assembly/JSON/JSON.stringify<~lib/string/String>
+  call $~lib/string/String.__concat
+  i32.const 2448
+  call $~lib/string/String.__concat
+  call $~lib/string/String.__concat
+  local.set $1
+  local.get $1
+  i32.const 256
+  i32.const 480
+  call $~lib/string/String.__concat
+  i32.const 2704
+  call $~lib/string/String.__concat
+  i32.const 480
+  call $~lib/string/String.__concat
+  i32.const 2672
+  call $~lib/string/String.__concat
+  local.get $0
+  i32.load offset=4
+  call $assembly/JSON/JSON.stringify<~lib/string/String>
+  call $~lib/string/String.__concat
+  i32.const 2448
+  call $~lib/string/String.__concat
+  call $~lib/string/String.__concat
+  local.set $1
+  local.get $1
+  i32.const 256
+  i32.const 2752
+  call $~lib/string/String.__concat
+  i32.const 256
+  call $~lib/string/String.__concat
+  i32.const 2672
+  call $~lib/string/String.__concat
+  local.get $0
+  i32.load offset=8
+  call $assembly/JSON/JSON.stringify<i32>
+  call $~lib/string/String.__concat
+  i32.const 2448
+  call $~lib/string/String.__concat
+  call $~lib/string/String.__concat
+  local.set $1
+  local.get $1
  )
  (func $~lib/string/String#slice (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
@@ -4505,6 +4496,7 @@
   local.get $6
  )
  (func $assembly/JSON/JSON.stringify<assembly/index/JSONschema> (param $0 i32) (result i32)
+  (local $1 i32)
   i32.const 0
   drop
   i32.const 0
@@ -4526,13 +4518,12 @@
   end
   local.get $0
   call $assembly/index/JSONschema#__encode
+  local.set $1
   i32.const 4256
   i32.const 1
-  local.get $0
-  i32.load offset=12
+  local.get $1
   i32.const 0
-  local.get $0
-  i32.load offset=12
+  local.get $1
   call $~lib/string/String#get:length
   i32.const 1
   i32.sub

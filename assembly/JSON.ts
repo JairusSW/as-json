@@ -46,9 +46,9 @@ export namespace JSON {
 
     // Schema/Class serialization
     // @ts-ignore
-    data.__encode();
+    const encoded: string = data.__encode()
     // @ts-ignore
-    return `{${data.__encoded.slice(0, data.__encoded.length - 1)}}`;
+    return `{${encoded.slice(0, encoded.length - 1)}}`;
   }
   export function parse<T>(data: string): T {
     //let type: T;
