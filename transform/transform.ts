@@ -58,8 +58,6 @@ class MethodInjector extends BaseVisitor {
     this.decodeCode = [];
     this.visit(node.members);
 
-    const encodedMethod = `__encoded: string = '';`;
-
     const encodeMethod = `
     __encode(): string {
       let encoded: string = "";
@@ -76,11 +74,6 @@ class MethodInjector extends BaseVisitor {
       return decoded
     }
     `;
-
-    console.log(decodeMethod)
-
-    const encodedMember = SimpleParser.parseClassMember(encodedMethod, node);
-    node.members.push(encodedMember);
 
     const encodeMember = SimpleParser.parseClassMember(encodeMethod, node);
     node.members.push(encodeMember);
