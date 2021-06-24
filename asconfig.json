@@ -10,8 +10,8 @@
       "binaryFile": "build/optimized.wasm",
       "textFile": "build/optimized.wat",
       "sourceMap": true,
-      "optimizeLevel": 3,
-      "shrinkLevel": 1,
+      "optimizeLevel": 4,
+      "shrinkLevel": 0,
       "converge": false,
       "noAssert": false
     }

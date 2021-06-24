@@ -1,85 +1,93 @@
-// TODO: Handle circular data
-// TODO: Add Object support
-// TODO: Add AS deserialize (SIMD?)
+import { deserializeArray, JSON } from "./JSON";
 
-//import { console } from 'as-console'
+import { console, stringify } from "as-console";
 
-import { StringSink } from 'as-string-sink'
-
-// Pre-alloc in memory. (faster)
-const nullVal = `null`
-
-// Doesn't support Objects. 😭
-export function stringify<T>(data: T): string {
-  let result = new StringSink()
-
-  if (isString(data)) {
-
-    if (data.includes(`"`)) {
-      // Need replaceAll. Figure this out later.
-      result.write(`"${data.replaceAll('"', '\\"')}"`)
-    }
-
-    result.write(`"${data}"`)
-
-  } else if (isFloat(data) || isSigned(data)) {
-
-    result.write(`${data}`)
-
-  } else if (isBoolean(data)) {
-  
-    result.write(data ? `true` : `false`)
-
-  } else if (isArray(data)) {
-
-    result.write('[')
-    // Just loop through all the chunks and stringify them.
-    const lastChunk = data.pop()
-
-    for (let i = 0; i < data.length - 1; i++) {
-      result.write(`${stringify(data[i])},`)
-    }
-
-    result.write(`${stringify(lastChunk)}]`)
-
-  } else {
-
-    result.write(nullVal)
-
-  }
-
-  return result.toString()
-
+// @ts-ignore
+@serializable
+class JSONschema {
+  firstName: string = "";
+  lastName: string = "";
+  age: i32 = 0;
 }
-/*
-const arr = ['firstName', 'Jairus', 'lastName', 'Tanaka', 'age', '14']
 
-const str = 'HelloWorldFireTrucksAirplanesHumveesAndCode.'
+const data: JSONschema = {
+  firstName: "Jairus",
+  lastName: "Tanaka",
+  age: 14,
+};
 
-const num = 134567890.098764321
+console.log("Testing Serialization");
 
-export function test(): void {
+// Serialize String
 
-  const serializedArray = stringify(arr)
+console.log("String: " + JSON.stringify("Hello, World!"));
 
-  console.log('Serialized Array: ' + serializedArray)
-  
-  const serializedString = stringify(str)
-  
-  console.log('Serialized String: ' + serializedString)
- 
-  const serializedNumber = stringify(num)
-  
-  console.log('Serialized Number: ' + serializedNumber)
+// Serialize Number
 
-  const serializedBoolean = stringify(true)
-  
-  console.log('Serialized Boolean: ' + serializedBoolean)
+console.log("Number: " + JSON.stringify(3.14));
 
-  const serializedNull = stringify(null)
-  
-  console.log('Serialized Null: ' + serializedNull)
-  
-  console.log('\nAll tests completed!')
+// Serialize Boolean
 
-}*/
+console.log("Boolean: " + JSON.stringify(true));
+
+// Serialize Array
+
+console.log("Array: " + JSON.stringify(["Hello", "World"]));
+
+// Serialize Object
+
+console.log("Object: " + JSON.stringify(data));
+
+console.log("Testing Deserialization");
+
+// Deserialize String
+
+console.log("String: " + JSON.parse<string>('"Hello, World!'));
+
+// Deserialize Number
+
+console.log("Number: " + JSON.parse<f64>("3.14").toString());
+
+// Deserialize Boolean
+
+console.log("Boolean: " + JSON.parse<boolean>("true").toString());
+
+// Deserialize Array
+
+console.log("Array: " + stringify(deserializeArray<Array<string>>('["Hello","Wor\\"ld","hoh,o"]')))
+// Deserialize Object
+
+console.log(
+  "Object: " +
+    JSON.parse<JSONschema>(
+      `{"firstName":"Jairus","lastName":"BunnyBoy","age":14}`
+    ).lastName
+);
+console.log(
+  "Object: " +
+    JSON.parse<JSONschema>(
+      `{"firstName":"Jairus","lastName":"Chubbo","age":14}`
+    ).lastName
+);
+console.log(
+  "Object: " +
+    JSON.parse<JSONschema>(
+      `{"firstName":"Jairus","lastName":"SantaClaus","age":14}`
+    ).lastName
+);
+ /*
+const start1 = Date.now()
+
+for (let i = 0; i < 500_000; i++) {
+  JSON.stringify<Array<string>>(["Hello","World"])
+}
+
+console.log(`JSON (AS) Stringify: ${Date.now() - start1}ms`)
+
+const start2 = Date.now()
+
+for (let i = 0; i < 1_000; i++) {
+  JSON.parse<JSON>(`["Hello","World"]`)
+}
+
+console.log(`JSON (AS) Parse: ${Date.now() - start2}ms`)*/

@@ -1,0 +1,9 @@
+<script type="module">
+  import * as loader from "./node_modules/@assemblyscript/loader/index.js";
+  const imports = {};
+  loader
+    .instantiateStreaming(fetch("/build/optimized.wasm"), imports)
+    .then((wasmModule) => {
+      wasmModule.exports.test();
+    });
+</script>
