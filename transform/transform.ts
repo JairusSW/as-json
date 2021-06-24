@@ -68,8 +68,6 @@ class MethodInjector extends BaseVisitor {
     }
     `;
 
-    const codeSlice = this.decodeCode.join("");
-
     const decodeMethod = `
     __decode(values: Array<string>): ${name} {
       const decoded: ${name} = {

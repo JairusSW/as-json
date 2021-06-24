@@ -14,7 +14,7 @@ const data: JSONschema = {
   firstName: "Jairus",
   lastName: "Tanaka",
   age: 14,
-};/*
+};
 
 console.log("Testing Serialization");
 
@@ -77,7 +77,7 @@ console.log(
 );
 
 /*
-*/
+
 const start1 = Date.now()
 
 for (let i = 0; i < 500_000; i++) {
@@ -94,4 +94,4 @@ for (let i = 0; i < 500_000; i++) {
   deserializeObject<JSONschema>( `{"firstName":"Jairus","lastName":"Tanaka","age":14}`)
 }
 
-console.log(`JSON (AS) Parse: ${Date.now() - start2}ms`)
+console.log(`JSON (AS) Parse: ${Date.now() - start2}ms`)*/

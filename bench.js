@@ -1,4 +1,3 @@
-const kati = require("../../NodeJS/Kati");
 const wasmModule = require('./index')
 function benchParseJSON() {
   const start = Date.now();

@@ -39,7 +39,7 @@ class MethodInjector extends visitor_as_1.BaseVisitor {
         this.encodeStmts = [];
         this.decodeCode = [];
         this.visit(node.members);
-        const encodedMethod = `__encoded: string = '';`;
+        const encodedMethod = `static __encoded: string = '';`;
         const encodeMethod = `
     __encode(): void {
       if (this.__encoded.length === 0) {
@@ -47,7 +47,6 @@ class MethodInjector extends visitor_as_1.BaseVisitor {
       }
     }
     `;
-        const codeSlice = this.decodeCode.join("");
         const decodeMethod = `
     __decode(values: Array<string>): ${name} {
       const decoded: ${name} = {
