@@ -164,5 +164,5 @@ export function deserializeObject<T>(data: string): T {
   const lastChunk = data.slice(lastPos, data.length - 1);
   if (lastChunk) values.push(lastChunk);
   // @ts-ignore
-  return schema.__decode(values);
+  return schema.__decode(unchecked(values));
 }

@@ -19,7 +19,7 @@
     "@assemblyscript/loader": "^0.18.32"
   },
   "scripts": {
-    "asbuild:untouched": "asc assembly/index.ts --target debug --transform ./transform/lib/transform.js --explicitStart",
+    "asbuild:untouched": "asc assembly/index.ts --target debug --runtime stub --transform ./transform/lib/transform.js --explicitStart",
     "asbuild:optimized": "asc assembly/index.ts --target release --runtime stub --transform ./transform/lib/transform.js --explicitStart",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
     "test": "node tests"
