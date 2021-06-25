@@ -1,6 +1,7 @@
 node_modules
 yarn.lock
-package-lock.json
 transform/lib
 tests/output
 build
+pnpm-lock.yaml
+package-lock.json
