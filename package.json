@@ -1,7 +1,7 @@
 {
-  "name": "as-kati",
-  "version": "0.0.3",
-  "description": "The God of all JSON. Extremely fast JSON serialize and deserialize.",
+  "name": "as-json",
+  "version": "0.1.0",
+  "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assenbly/index.ts",
   "ascMain": "assenbly/index.ts",
   "author": "JairusSW",
@@ -9,19 +9,19 @@
   "devDependencies": {
     "@types/line-column": "^1.0.0",
     "as-console": "^5.0.3",
-    "assemblyscript": "^0.18.31"
-  },
-  "dependencies": {
-    "as-inliner": "^0.0.3",
-    "as-string-sink": "^0.1.1",
-    "line-column": "^1.0.2",
-    "visitor-as": "^0.6.0",
+    "assemblyscript": "^0.18.31",
     "@assemblyscript/loader": "^0.18.32"
   },
+  "dependencies": {
+    "as-string-sink": "^0.1.1",
+    "line-column": "^1.0.2",
+    "visitor-as": "^0.6.0"
+  },
   "scripts": {
-    "asbuild:untouched": "asc assembly/index.ts --target debug --runtime stub --transform ./transform/lib/transform.js --explicitStart",
-    "asbuild:optimized": "asc assembly/index.ts --target release --runtime stub --transform ./transform/lib/transform.js --explicitStart",
+    "asbuild:untouched": "asc assembly/index.ts --target debug --runtime stub --transform ./transform/lib/transform.js --exportRuntime --explicitStart",
+    "asbuild:optimized": "asc assembly/index.ts --target release --runtime stub --transform ./transform/lib/transform.js --exportRuntime --explicitStart",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
-    "test": "node tests"
+    "test:build": "asc assembly/test.ts --transform ./transform/lib/transform.js --target test --explicitStart --exportRuntime",
+    "test": "node ./tests/test"
   }
 }

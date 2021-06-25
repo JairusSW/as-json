@@ -21,13 +21,7 @@ class MethodInjector extends visitor_as_1.BaseVisitor {
             throw new Error(`Field ${name} is missing a type declaration`);
         }
         const type = getTypeName(node.type);
-        // Keys can only be keys/number I think...
-        if (type == "string") {
-            this.encodeStmts.push(`encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
-        }
-        else if (type == "number" || type == "i8" || type == "u8" || type == "i16" || type == "u16" || type == "i32" || type == "u32" || type == "i64" || type == "u64") {
-            this.encodeStmts.push(`encoded += '' + '${name}' + '' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
-        }
+        this.encodeStmts.push(`encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
         this.decodeCode.push(`${name}: JSON.parse<${type}>(values[${this.decodeCode.length}]),\n`);
     }
     visitClassDeclaration(node) {
@@ -68,11 +62,10 @@ class Encoder extends visitor_as_1.Decorator {
         MethodInjector.visit(node);
     }
     get name() {
-        return "serializable";
+        return "json";
     }
     get sourceFilter() {
         return (_) => true;
     }
 }
 module.exports = visitor_as_1.registerDecorator(new Encoder());
-//# sourceMappingURL=transform.js.map

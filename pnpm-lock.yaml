@@ -1,5 +1,4 @@
 dependencies:
-  as-inliner: 0.0.3_assemblyscript@0.18.32
   as-string-sink: 0.1.1
   line-column: 1.0.2
   visitor-as: 0.6.0_assemblyscript@0.18.32
@@ -26,15 +25,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-M0T4QFGaHxndxbfJeswwCX9ySVJh1mk58Ugh3EjuaD7Nkq5jpOOrwzvkr80jDOwIsUdiFmp4vqjbvTTpH85U/w==
-  /as-inliner/0.0.3_assemblyscript@0.18.32:
-    dependencies:
-      assemblyscript: 0.18.32
-      visitor-as: 0.4.0_assemblyscript@0.18.32
-    dev: false
-    peerDependencies:
-      assemblyscript: '*'
-    resolution:
-      integrity: sha512-CgiEVe6fltVkn35Sc2x+IBmiyOXDmJ86Vb3E4I2GgwjZjDrOOV5GkJ2tirhSHGDL4bLYCBGD7vL8DwYl7YRdHA==
   /as-string-sink/0.1.1:
     dev: false
     resolution:
@@ -87,16 +77,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-Zo9HgPCtNouDgJ+LGtrzVOjSg8+7WGQktIKLwAfaNrlOK1mWGlz1ejsAF/YqUEqAGjUTeB5fEg8gH9Aui6w9xA==
-  /visitor-as/0.4.0_assemblyscript@0.18.32:
-    dependencies:
-      assemblyscript: 0.18.32
-      lodash.clonedeep: 4.5.0
-      ts-mixer: 5.4.1
-    dev: false
-    peerDependencies:
-      assemblyscript: ^0.13.3
-    resolution:
-      integrity: sha512-ey5It5E/CE7xl+PLaHaFqMIOZK8pLwM9m1lHjWZg8//afJ0acBde4aQbpT2+UnJdwPul6738cLYR/HM3Acz90w==
   /visitor-as/0.6.0_assemblyscript@0.18.32:
     dependencies:
       assemblyscript: 0.18.32
@@ -108,10 +88,9 @@ packages:
     resolution:
       integrity: sha512-4WcnwCLXWjhNkwJj9gSqh46sdIv9CyIvnSuwr61OOfrGCtN2mKcW5KE828OeEr1rYjEy0Z/CIdPBJKJRLsUgDA==
 specifiers:
-  '@assemblyscript/loader': ^0.18.31
+  '@assemblyscript/loader': ^0.18.32
   '@types/line-column': ^1.0.0
   as-console: ^5.0.3
-  as-inliner: ^0.0.3
   as-string-sink: ^0.1.1
   assemblyscript: ^0.18.31
   line-column: ^1.0.2

@@ -1,27 +1,76 @@
-# AS-Kati ⚡
-**Extremely fast JSON serializer and deserializer for AssemblyScript**
+# AS-JSON
+**JSON encoder/decoder for AssemblyScript**
 
 ## Installation
 
-```js
-~ npm install as-kati
+```bash
+~ npm install as-json
 ```
-
-## Features
-- Extremely fast 🔥
-- Works in the browser 🍻
-- Works with JSON 🦠
-- Built with AssemblyScript 🚀
-- Uses as-string-sink for maximum performance 😱
+```bash
+--transform as-json/transform
+```
 
 ## Usage
 
 ```js
-import * as kati from 'as-kati'
+import { JSON } from 'as-json'
+```
 
-const serialized = kati.stringify([
-    ['hello', 'world']
-])
+**Object (schema)**
 
-console.log('Serialized: ' + stringified)
+```js
+@json
+class JSONSchema {
+    firstName: string
+    lastName: string
+    age: i32
+}
+
+const data: JSONSchema {
+    firstName: 'Jairus',
+    lastName: 'Tanaka',
+    age: 14
+}
+
+const stringified = JSON.stringify(data)
+// '{"firstName":"Jairus","lastName":"Tanaka","age":14}'
+
+const parsed = JSON.parse<JSONSchema>(stringified)
+// { "firstName": "Jairus", "lastName": "Tanaka", "age": 14 }
+```
+
+**Array**
+
+```js
+const stringified = JSON.stringify(["hello","world"])
+// '["hello","world"]'
+const parsed = JSON.parse<Array<string>>(stringified)
+// ["hello", "world"]
+```
+
+**String**
+
+```js
+const stringified = JSON.stringify('hello world')
+// '"hello world"'
+const parsed = JSON.parse<string>(stringified)
+// hello world
+```
+
+**Numbers**
+
+```js
+const stringified = JSON.stringify(3.14)
+// '3.14'
+const parsed = JSON.parse<f64>(stringified)
+// 3.14
+```
+
+**Booleans**
+
+```js
+const stringified = JSON.stringify(true)
+// 'true'
+const parsed = JSON.parse<boolean>(stringified)
+// true
 ```

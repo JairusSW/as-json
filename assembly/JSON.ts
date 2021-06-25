@@ -1,32 +1,26 @@
 // @ts-ignore
 import { StringSink } from "as-string-sink";
 
-import { console, stringify } from "as-console";
-
-class JSONtypes {
-  unknown: i32;
-  str: i32;
-  arr: i32;
-  obj: i32;
-}
-
-const jsonTypes: JSONtypes = {
-  unknown: 0,
-  str: 1,
-  arr: 2,
-  obj: 3,
-};
-
-function isNull<T>(value: T): boolean {
-  return changetype<usize>(value) == 0;
-}
-
+import { console } from 'as-console'
+/**
+ * JSON encoder/decoder for AssemblyScript
+ */
 export namespace JSON {
+  /**
+   * Stringifies valid JSON data.
+   * ```js
+   * JSON.stringify<T>(data)
+   * ```
+   * @param data any
+   * @returns string
+   */
   export function stringify<T>(data: T): string {
     if (isString(data)) {
       return `"${data}"`;
       //return `"${data.replaceAll('"', '\\"')}"`
-    } else if (isFloat(data) || isSigned(data)) {
+    }/* else if (isNull(data)) {
+      return `null`
+    }*/ else if (isFloat(data) || isSigned(data) || isInteger(data)) {
       return `${data}`;
     } else if (isBoolean(data)) {
       return data ? `true` : `false`;
@@ -40,8 +34,6 @@ export namespace JSON {
       }
       result.write(`${stringify(unchecked(data[len]))}]`);
       return result.toString();
-    } else if (isNull<T>(data)) {
-      return `null`;
     }
 
     // Schema/Class serialization
@@ -50,6 +42,15 @@ export namespace JSON {
     // @ts-ignore
     return `{${encoded.slice(0, encoded.length - 1)}}`;
   }
+  /**
+   * Parses valid JSON strings into their original format.
+   * Useful for exchanging data and cloning.
+   * ```js
+   * JSON.parse<T>(data)
+   * ```
+   * @param data string
+   * @returns any
+   */
   export function parse<T>(data: string): T {
     //let type: T;
     // @ts-ignore
@@ -97,72 +98,119 @@ export function deserializeNumber<T>(data: string): T {
   return f64(parseFloat(data));
 }
 
-export function deserializeArray<T extends Array<any>>(data: string): T {
-  // Declare T
-  let result: T;
-  // Empty Array
-  //if (data.charAt(1) == "[") return instantiate<T>(0);
-  // Create new T
-  result = instantiate<T>();
-  // Decoding Loop
-  let lastPos = 1;
-  let token: i32 = jsonTypes.unknown;
-  for (let i = 1; i < data.length - 1; i++) {
-    const char = data.charAt(i);
-    // Unknown
-    if (token === jsonTypes.unknown) {
-      // String
-      if (char == '"') {
-        //console.log(`Found String Start: ${i}`);
-        lastPos = i;
-        token = jsonTypes.str;
-      }
-      // Array
-      else if (char == "[") {
-        //console.log(`Found Array Start: ${i}`);
-        lastPos = i;
-        token = jsonTypes.arr;
-      }
-    }
-    // Strings
-    else if (token === jsonTypes.str) {
-      if (char == '"' && data.charAt(i - 1) != "\\") {
-        //console.log(`Found String: ${data.slice(lastPos, i + 1)}`);
-        result.push(deserializeString(data.slice(lastPos, i + 1)));
-        lastPos = i;
-        token = jsonTypes.unknown;
-      }
-    }
-    // Arrays
-    else if (token === jsonTypes.arr) {
-      if (char == "]") {
-        //console.log(`Found Array: ${data.slice(lastPos, i + 1)})}`);
-        result.push(data.slice(lastPos, i + 1));
-        lastPos = i;
-        token = jsonTypes.unknown;
-      }
-    }
-  }
-  //console.log("Result: " + stringify(result));
-  return result
+// Array Deserialization
+// TODO: Add objects
+// TODO: Maybe add null array?
+function deserializeArray<T extends Array<any>>(data: string): T {
+  // @ts-ignore
+  if (isString<valueof<T>>()) return parseStringArray(data);
+  // @ts-ignore
+  else if (isBoolean<valueof<T>>()) return parseBooleanArray(data);
+  // @ts-ignore
+  else if (isArray<valueof<T>>()) return parseArrayArray<T>(data);
+  // @ts-ignore
+  return parseNumberArray<valueof<T>>(data);
 }
 
+// String Array
+function parseStringArray(data: string): Array<string> {
+  const result = new Array<string>();
+  let lastPos = 0;
+  let char: string;
+  for (let i = 2; i < data.length - 1; i++) {
+    char = data.charAt(i);
+    // @ts-ignore
+    if (char == ",") {
+      console.log(`Got string: ${data.slice(lastPos + 2, i - 2)}`)
+      result.push(data.slice(lastPos + 2, i - 2));
+      lastPos = i;
+    }
+  }
+  console.log(`Got Final String: ${data.slice(lastPos + 2, data.length - 2)}`)
+  result.push(data.slice(lastPos + 2, data.length - 2));
+  return result;
+}
+
+// Boolean Array
+function parseBooleanArray(data: string): Array<boolean> {
+  const result = new Array<boolean>();
+  let char: string;
+  for (let i = 1; i < data.length - 1; i++) {
+    char = unchecked(data.charAt(i));
+    if (char == "t") {
+      unchecked(result.push(true));
+    } else if (char == "f") {
+      unchecked(result.push(false));
+    }
+  }
+  return result;
+}
+
+// Number Array
+
+function parseNumberArray<T>(data: string): Array<T> {
+  const result = new Array<T>();
+  let lastPos = 0;
+  let char: string;
+  for (let i = 1; i < data.length - 1; i++) {
+    char = unchecked(data.charAt(i));
+    if (char == ",") {
+      unchecked(result.push(deserializeNumber<T>(data.slice(lastPos + 1, i))));
+      lastPos = i;
+    }
+  }
+  unchecked(result.push(deserializeNumber<T>(data.slice(lastPos + 1, data.length - 1))));
+  return result;
+}
+
+// Array Array
+function parseArrayArray<T extends Array<any>>(data: string): T {
+  const result = instantiate<T>();
+  let lastPos = -1;
+  let char: string;
+  let depth = 0;
+  let fdepth = 0;
+  let instr = 0
+  for (let i = 1; i < data.length - 1; i++) {
+    char = unchecked(data.charAt(i));
+    // Remove whitespace only if it isn't in a string. (strings can have whitespace)
+    if (instr === 0 && char == ' ') break
+    // This ignores [ and ] if they are inside a string.
+    if (unchecked(data.charAt(i-1)) != '\\' && char == '"') instr = instr === 0 ? 1 : 0
+    // This gets the depth of the array.
+    if (instr === 0 && char == "[") depth++;
+    if (instr === 0 && char == "]") fdepth++;
+    // If the depth and found depth are equal, that is an array. Push it.
+    if (instr === 0 && depth > 0 && depth === fdepth) {
+      unchecked(result.push(deserializeArray<valueof<T>>(data.slice(lastPos + 2, i+1))))
+      // Reset the depth
+      depth = 0
+      fdepth = 0
+      // Set new lastPos
+      lastPos = i
+    }
+  }
+  // Return the final array
+  return result;
+}
+
+// TODO: Rewrite and finish up.
 export function deserializeObject<T>(data: string): T {
   let schema: T;
   const values = new Array<string>();
   let lastPos = 1;
   for (let i = 0; i < data.length - 1; i++) {
-    const char = data.charAt(i);
+    const char = unchecked(data.charAt(i));
     if (char == ",") {
-      values.push(data.slice(lastPos, i));
+      unchecked(values.push(data.slice(lastPos, i)));
       lastPos = i + 1;
     }
     if (char == ":") {
       lastPos = i + 1;
     }
   }
-  const lastChunk = data.slice(lastPos, data.length - 1);
-  if (lastChunk) values.push(lastChunk);
+  const lastChunk = unchecked(data.slice(lastPos, data.length - 1));
+  if (lastChunk) unchecked(values.push(lastChunk))
   // @ts-ignore
   return schema.__decode(unchecked(values));
 }
