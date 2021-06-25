@@ -1,4 +1,4 @@
-import { JSON, deserializeObject } from "./JSON";
+import { JSON, deserializeObject } from ".";
 
 import { console, stringify } from "as-console";
 
