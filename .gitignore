@@ -6,3 +6,4 @@ build
 pnpm-lock.yaml
 package-lock.json
 assembly/tsconfig.json
+.vscode
