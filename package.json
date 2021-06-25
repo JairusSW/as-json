@@ -15,7 +15,8 @@
   "dependencies": {
     "as-string-sink": "^0.1.1",
     "line-column": "^1.0.2",
-    "visitor-as": "^0.6.0"
+    "visitor-as": "^0.6.0",
+    "@assemblyscript/loader": "^0.18.32"
   },
   "scripts": {
     "asbuild:untouched": "asc assembly/index.ts --target debug --runtime stub --transform ./transform/lib/transform.js --exportRuntime --explicitStart",
