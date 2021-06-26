@@ -23,6 +23,15 @@
       "shrinkLevel": 0,
       "converge": false,
       "noAssert": false
+    },
+    "bench": {
+      "binaryFile": "bench/output/bench.wasm",
+      "textFile": "bench/output/bench.wat",
+      "sourceMap": true,
+      "optimizeLevel": 4,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
     }
   },
   "options": {}

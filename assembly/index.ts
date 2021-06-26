@@ -1,6 +1,7 @@
 // @ts-ignore
 import { StringSink } from "as-string-sink";
 
+const quote = '"'
 /**
  * JSON encoder/decoder for AssemblyScript
  */
@@ -15,7 +16,7 @@ export namespace JSON {
    */
   export function stringify<T>(data: T): string {
     if (isString(data)) {
-      return `"${data.replaceAll('"', '\\"')}"`
+      return quote + data + quote
     } else if (data == null) {
       return `null`
     } else if (isFloat(data) || isSigned(data) || isInteger(data)) {
@@ -36,9 +37,10 @@ export namespace JSON {
 
     // Schema/Class serialization
     // @ts-ignore
-    const encoded: string = data.__encode()
+    if (data.__encoded == '') data.__encode()
     // @ts-ignore
-    return `{${encoded.slice(0, encoded.length - 1)}}`;
+    // @ts-ignore
+    return `{${data.__encoded}}`;
   }
   /**
    * Parses valid JSON strings into their original format.

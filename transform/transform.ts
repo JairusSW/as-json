@@ -30,7 +30,7 @@ class MethodInjector extends BaseVisitor {
     const type = getTypeName(node.type);
 
     this.encodeStmts.push(
-      `encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
+      `this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
     );
 
     this.decodeCode.push(
@@ -51,11 +51,15 @@ class MethodInjector extends BaseVisitor {
     this.decodeCode = [];
     this.visit(node.members);
 
+    const encodedProp = `__encoded: string = ''`
+
     const encodeMethod = `
-    __encode(): string {
-      let encoded: string = "";
-      ${this.encodeStmts.join(";\n\t")};
-      return encoded
+    __encode(): void {
+      // Pre-compile (faster)
+      if (!this.__encoded) {
+        ${this.encodeStmts.join("\n")};
+        this.__encoded = unchecked(this.__encoded.slice(0, this.__encoded.length - 1))
+      }
     }
     `;
 
@@ -68,6 +72,9 @@ class MethodInjector extends BaseVisitor {
     }
     `;
 
+    const encodedPropMember = SimpleParser.parseClassMember(encodedProp, node);
+    node.members.push(encodedPropMember);
+    
     const encodeMember = SimpleParser.parseClassMember(encodeMethod, node);
     node.members.push(encodeMember);
 
