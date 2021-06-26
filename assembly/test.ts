@@ -60,7 +60,7 @@ console.log(` - [[[[[[[[[[[[[[[[ "King Of The Mountain Array 👑 " ]]]]]]]]]]]]
 
 console.log('\nSerialize Object:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
-console.log(` - { hello: "world" } -> ${JSON.stringify(helloworld)}\n`)
+console.log(` - { hello: 'world' } -> ${JSON.stringify(helloworld)}\n`)
 
 console.log(` - { name: 'Jairus', age: 14 } -> ${JSON.stringify(nameage)}\n`)
 
@@ -68,21 +68,21 @@ console.log('Checking Deserialization\n')
 
 console.log('\nDeserialize String:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
-console.log(` - ${JSON.parse<string>('"Hello World"')} -> "Hello World"`)
+console.log(` - "Hello World" -> ${JSON.parse<string>('"Hello World"')}`)
 
-console.log(` - ${JSON.parse<string>('"Hello Wo\\"rld"')} -> "Hello Wo\"rld"`)
+console.log(` - "Hello Wo\\"rld" -> ${JSON.parse<string>('"Hello Wo\"rld"')}`)
 
 console.log('\nDeserialize Number:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
-console.log(` - ${JSON.parse<i32>('123')} -> 123`)
+console.log(` - 123 -> ${JSON.parse<i32>('123')}`)
 
-console.log(` - ${JSON.parse<f32>('1.25')} -> 1.25`)
+console.log(` - 1.25 -> ${JSON.parse<f32>('1.25')}`)
 
 console.log('\nDeserialize Boolean:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
-console.log(` - ${JSON.parse<boolean>('true')} ->  true`)
+console.log(` - true -> ${JSON.parse<boolean>('true')}`)
 
-console.log(` - ${JSON.parse<boolean>('false')} -> false`)
+console.log(` - false -> ${JSON.parse<boolean>('false')}`)
 
 console.log('\nDeserialize Array:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
@@ -92,7 +92,7 @@ console.log(` - [["person1"],["person2"]] -> [['person1'], ['person2']]`)
 JSON.parse<Array<Array<string>>>('[["key1","value1"],["key2","value2"]]')
 console.log(` - [["key1","value1"],["key2","value2"]] -> [['key1', 'value1'], ['key2','value2']]\n`)
 JSON.parse<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<string>>>>>>>>>>>>>>>>>>('[[[[[[[[[[[[[[[[ "King Of The Mountain Array 👑 " ]]]]]]]]]]]]]]]]')
-console.log(` - [[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]]] -> [[[[[[[[[[[[[[[['King Of The Mountain Array 👑 ']]]]]]]]]]]]]]]]\n`)
+console.log(` - [[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]]]' -> [[[[[[[[[[[[[[[['King Of The Mountain Array 👑 ']]]]]]]]]]]]]]]]\n`)
 
 console.log('\nDeserialize Object:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 JSON.parse<HelloWorld>('{"hello":"world"}')
