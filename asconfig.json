@@ -17,7 +17,7 @@
     },
     "test": {
       "binaryFile": "tests/output/test.wasm",
-      "textFile": "test/output/test.wat",
+      "textFile": "tests/output/test.wat",
       "sourceMap": true,
       "optimizeLevel": 0,
       "shrinkLevel": 0,
