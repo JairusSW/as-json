@@ -10,17 +10,19 @@
     "asbuild:untouched": "asc assembly/index.ts --target debug --runtime stub --transform ./transform/lib/transform.js --exportRuntime --explicitStart",
     "asbuild:optimized": "asc assembly/index.ts --target release --runtime stub --transform ./transform/lib/transform.js --exportRuntime --explicitStart",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
-    "test:build": "asc assembly/test.ts --transform ./transform/lib/transform.js --target test --explicitStart --exportRuntime",
+    "build:transform": "npx tsc -p ./transform",
+    "build:test": "asc assembly/test.ts --transform ./transform/lib/transform.js --target test --explicitStart --exportRuntime",
     "test": "node ./tests/test"
   },
   "devDependencies": {
     "@assemblyscript/loader": "^0.18.32",
     "@types/line-column": "^1.0.0",
     "as-console": "^5.0.3",
-    "assemblyscript": "^0.18.31",
+    "assemblyscript": "^0.19.4",
     "typescript": "^4.3.4"
   },
   "dependencies": {
+    "@assemblyscript/loader": "^0.18.32",
     "as-string-sink": "^0.1.1",
     "line-column": "^1.0.2",
     "visitor-as": "^0.6.0"
