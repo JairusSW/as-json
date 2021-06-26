@@ -1,7 +1,11 @@
-// @ts-ignore
-import { StringSink } from "as-string-sink";
-
 const quote = '"'
+const comma = ','
+const right_square_bracket = ']'
+const empty_array = '[]'
+
+const trueStr = 'true'
+const falseStr = 'false'
+const nullStr = 'null'
 /**
  * JSON encoder/decoder for AssemblyScript
  */
@@ -18,27 +22,26 @@ export namespace JSON {
     if (isString(data)) {
       return quote + data + quote
     } else if (data == null) {
-      return `null`
+      return nullStr
     } else if (isFloat(data) || isSigned(data) || isInteger(data)) {
       return `${data}`;
     } else if (isBoolean(data)) {
-      return data ? `true` : `false`;
+      return data ? trueStr : falseStr;
     } else if (isArray(data)) {
       const len = data.length - 1;
-      // TODO: Handle empty arrays
-      // if (len === 0) return '[]'
-      const result = new StringSink("[");
+      if (len === 0) return empty_array
+      let result = '[';
       for (let i = 0; i < len; i++) {
-        result.write(`${stringify(unchecked(data[i]))},`);
+        // Using + is a bit faster.
+        result += stringify(unchecked(data[i])) + comma;
       }
-      result.write(`${stringify(unchecked(data[len]))}]`);
-      return result.toString();
+      result += stringify(unchecked(data[len])) + right_square_bracket;
+      return result
     }
 
     // Schema/Class serialization
     // @ts-ignore
     if (data.__encoded == '') data.__encode()
-    // @ts-ignore
     // @ts-ignore
     return `{${data.__encoded}}`;
   }
