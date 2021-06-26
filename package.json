@@ -13,7 +13,7 @@
     "build:transform": "npx tsc -p ./transform",
     "build:test": "asc assembly/test.ts --transform ./transform/lib/transform.js --target test --explicitStart --exportRuntime",
     "test": "node ./tests/test"
-  }
+  },
   "devDependencies": {
     "@assemblyscript/loader": "^0.18.32",
     "@types/line-column": "^1.0.0",
@@ -26,5 +26,5 @@
     "as-string-sink": "^0.1.1",
     "line-column": "^1.0.2",
     "visitor-as": "^0.6.0"
-  },
+  }
 }
