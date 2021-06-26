@@ -3,6 +3,8 @@ yarn.lock
 transform/lib
 tests/output
 test/output
+bench/output
+benches/output
 build
 pnpm-lock.yaml
 package-lock.json
