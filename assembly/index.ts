@@ -1,7 +1,6 @@
 // @ts-ignore
 import { StringSink } from "as-string-sink";
 
-import { console } from 'as-console'
 /**
  * JSON encoder/decoder for AssemblyScript
  */
@@ -16,11 +15,10 @@ export namespace JSON {
    */
   export function stringify<T>(data: T): string {
     if (isString(data)) {
-      return `"${data}"`;
-      //return `"${data.replaceAll('"', '\\"')}"`
-    }/* else if (isNull(data)) {
+      return `"${data.replaceAll('"', '\\"')}"`
+    } else if (data == null) {
       return `null`
-    }*/ else if (isFloat(data) || isSigned(data) || isInteger(data)) {
+    } else if (isFloat(data) || isSigned(data) || isInteger(data)) {
       return `${data}`;
     } else if (isBoolean(data)) {
       return data ? `true` : `false`;
@@ -121,12 +119,10 @@ function parseStringArray(data: string): Array<string> {
     char = data.charAt(i);
     // @ts-ignore
     if (char == ",") {
-      console.log(`Got string: ${data.slice(lastPos + 2, i - 2)}`)
       result.push(data.slice(lastPos + 2, i - 2));
       lastPos = i;
     }
   }
-  console.log(`Got Final String: ${data.slice(lastPos + 2, data.length - 2)}`)
   result.push(data.slice(lastPos + 2, data.length - 2));
   return result;
 }

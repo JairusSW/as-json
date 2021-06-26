@@ -1,6 +1,6 @@
 const fs = require("fs");
 const loader = require("@assemblyscript/loader");
-const ConsoleImports = require('as-console/imports')
+const ConsoleImports = require('../Console/imports')
 const Console = new ConsoleImports()
 const imports = {
     ...Console.wasmImports

@@ -1,6 +1,6 @@
 import { JSON, deserializeObject } from ".";
 
-import { console, stringify } from "as-console";
+import { console, stringify } from "../../Console/assembly/index";
 
 // @ts-ignore
 @json
@@ -44,10 +44,9 @@ console.log(` - true -> ${JSON.stringify(true)}`)
 
 console.log(` - false -> ${JSON.stringify(false)}`)
 
-//console.log('Serialize Null:')
+console.log('\nSerialize Null:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
-// TODO: Add null serialization
-//console.log(` - null -> ${JSON.stringify(null)}`)
+console.log(` - null -> ${JSON.stringify(null)}`)
 
 console.log('\nSerialize Array:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
