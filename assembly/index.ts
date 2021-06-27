@@ -1,11 +1,12 @@
-const quote = '"'
-const comma = ','
-const right_square_bracket = ']'
-const empty_array = '[]'
+const quote = '"';
+const comma = ",";
+const rbracket = "]";
+const lbracket = "[";
 
-const trueStr = 'true'
-const falseStr = 'false'
-const nullStr = 'null'
+const trueVal = "true";
+const falseVal = "false";
+const nullVal = "null";
+
 /**
  * JSON encoder/decoder for AssemblyScript
  */
@@ -20,28 +21,21 @@ export namespace JSON {
    */
   export function stringify<T>(data: T): string {
     if (isString(data)) {
-      return quote + data + quote
+      // @ts-ignore
+      return serializeString(data);
     } else if (data == null) {
-      return nullStr
-    } else if (isFloat(data) || isSigned(data) || isInteger(data)) {
-      return `${data}`;
+      return nullVal;
+    } else if (isFloat(data) || isInteger(data)) {
+      return serializeNumber<T>(data);
     } else if (isBoolean(data)) {
-      return data ? trueStr : falseStr;
+      return serializeBoolean(data);
     } else if (isArray(data)) {
-      const len = data.length - 1;
-      if (len === 0) return empty_array
-      let result = '[';
-      for (let i = 0; i < len; i++) {
-        // Using + is a bit faster.
-        result += stringify(unchecked(data[i])) + comma;
-      }
-      result += stringify(unchecked(data[len])) + right_square_bracket;
-      return result
+      // @ts-ignore
+      return serializeArray<T>(data);
     }
 
-    // Schema/Class serialization
     // @ts-ignore
-    if (data.__encoded == '') data.__encode()
+    if (data.__encoded == "") data.__encode();
     // @ts-ignore
     return `{${data.__encoded}}`;
   }
@@ -69,15 +63,66 @@ export namespace JSON {
   }
 }
 
-export function deserializeBoolean(data: string): boolean {
+function serializeNumber<T>(data: T): string {
+  // @ts-ignore
+  return data.toString();
+}
+
+function serializeString(data: string): string {
+  return quote + data + quote;
+}
+
+function serializeBoolean(data: number): string {
+  return data ? trueVal : falseVal;
+}
+
+function serializeArray<T extends Array<any>>(data: T): string {
+  const len = data.length - 1;
+  if (len === -1) return lbracket + lbracket;
+  let result = lbracket;
+  if (isString<valueof<T>>()) {
+    for (let i = 0; i < len; i++) {
+      result += serializeString(data[i]) + comma;
+    }
+    result += serializeString(data[len]) + rbracket;
+    return result;
+  } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
+    for (let i = 0; i < len; i++) {
+      result += serializeNumber<valueof<T>>(data[i]) + comma;
+    }
+    result += serializeNumber<valueof<T>>(data[len]) + rbracket;
+    return result;
+  } else if (isBoolean<valueof<T>>()) {
+    for (let i = 0; i < len; i++) {
+      result += serializeBoolean(data[i]) + comma;
+    }
+    result += serializeBoolean(data[len]) + rbracket;
+    return result;
+  } else if (isArray<valueof<T>>()) {
+    for (let i = 0; i < len; i++) {
+      result += serializeArray<valueof<T>>(data[i]) + comma;
+    }
+    result += serializeArray<valueof<T>>(data[len]) + rbracket;
+    return result;
+  }
+
+  for (let i = 0; i < len; i++) {
+    const elem = data[i];
+    // @ts-ignore
+    if (elem.__encoded == "") elem.__encode();
+  }
+  // @ts-ignore
+  return `{${elem.__encoded}}`;
+}
+function deserializeBoolean(data: string): boolean {
   return data === "true" ? true : false;
 }
 
-export function deserializeString(data: string): string {
+function deserializeString(data: string): string {
   return data.slice(1, data.length - 1);
 }
 
-export function deserializeNumber<T>(data: string): T {
+function deserializeNumber<T>(data: string): T {
   let type: T;
   // @ts-ignore
   if (type instanceof u8) return u8(parseInt(data));
@@ -137,11 +182,11 @@ function parseBooleanArray(data: string): Array<boolean> {
   const result = new Array<boolean>();
   let char: string;
   for (let i = 1; i < data.length - 1; i++) {
-    char = unchecked(data.charAt(i));
+    char = data.charAt(i);
     if (char == "t") {
-      unchecked(result.push(true));
+      result.push(true);
     } else if (char == "f") {
-      unchecked(result.push(false));
+      result.push(false);
     }
   }
   return result;
@@ -154,13 +199,13 @@ function parseNumberArray<T>(data: string): Array<T> {
   let lastPos = 0;
   let char: string;
   for (let i = 1; i < data.length - 1; i++) {
-    char = unchecked(data.charAt(i));
+    char = data.charAt(i);
     if (char == ",") {
-      unchecked(result.push(deserializeNumber<T>(data.slice(lastPos + 1, i))));
+      result.push(deserializeNumber<T>(data.slice(lastPos + 1, i)));
       lastPos = i;
     }
   }
-  unchecked(result.push(deserializeNumber<T>(data.slice(lastPos + 1, data.length - 1))));
+    result.push(deserializeNumber<T>(data.slice(lastPos + 1, data.length - 1)))
   return result;
 }
 
@@ -171,24 +216,27 @@ function parseArrayArray<T extends Array<any>>(data: string): T {
   let char: string;
   let depth = 0;
   let fdepth = 0;
-  let instr = 0
+  let instr = 0;
   for (let i = 1; i < data.length - 1; i++) {
-    char = unchecked(data.charAt(i));
+    char = data.charAt(i);
     // Remove whitespace only if it isn't in a string. (strings can have whitespace)
-    if (instr === 0 && char == ' ') break
+    if (instr === 0 && char == " ") break;
     // This ignores [ and ] if they are inside a string.
-    if (unchecked(data.charAt(i-1)) != '\\' && char == '"') instr = instr === 0 ? 1 : 0
+    if (data.charAt(i - 1) != "\\" && char == '"')
+      instr = instr === 0 ? 1 : 0;
     // This gets the depth of the array.
     if (instr === 0 && char == "[") depth++;
     if (instr === 0 && char == "]") fdepth++;
     // If the depth and found depth are equal, that is an array. Push it.
     if (instr === 0 && depth > 0 && depth === fdepth) {
-      unchecked(result.push(deserializeArray<valueof<T>>(data.slice(lastPos + 2, i+1))))
+        result.push(
+          deserializeArray<valueof<T>>(data.slice(lastPos + 2, i + 1))
+        )
       // Reset the depth
-      depth = 0
-      fdepth = 0
+      depth = 0;
+      fdepth = 0;
       // Set new lastPos
-      lastPos = i
+      lastPos = i;
     }
   }
   // Return the final array
@@ -201,17 +249,17 @@ export function deserializeObject<T>(data: string): T {
   const values = new Array<string>();
   let lastPos = 1;
   for (let i = 0; i < data.length - 1; i++) {
-    const char = unchecked(data.charAt(i));
+    const char = data.charAt(i);
     if (char == ",") {
-      unchecked(values.push(data.slice(lastPos, i)));
+      values.push(data.slice(lastPos, i));
       lastPos = i + 1;
     }
     if (char == ":") {
       lastPos = i + 1;
     }
   }
-  const lastChunk = unchecked(data.slice(lastPos, data.length - 1));
-  if (lastChunk) unchecked(values.push(lastChunk))
+  const lastChunk = data.slice(lastPos, data.length - 1);
+  if (lastChunk) values.push(lastChunk);
   // @ts-ignore
-  return schema.__decode(unchecked(values));
+  return schema.__decode(values);
 }

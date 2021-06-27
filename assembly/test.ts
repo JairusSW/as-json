@@ -1,4 +1,4 @@
-import { JSON, deserializeObject } from ".";
+import { JSON } from ".";
 
 import { console, stringify } from "../../Console/assembly/index";
 
@@ -54,7 +54,7 @@ console.log(` - ["hello", "world"] -> ${JSON.stringify(["hello","world"])}\n`)
 
 console.log(` - [["person1"], ["person2"]] -> ${JSON.stringify([["person1"],["person2"]])}\n`)
 
-console.log(` - [["key1", "value1"], ["ke[y2", "valu]e2"]] -> ${JSON.stringify([["key1","value1"],["key2","value2"]])}\n`)
+console.log(` - [["key1", "value1"], ["ke[y2", "valu]e2"]] -> ${JSON.stringify([["key1","value1"],["ke[y2","valu]e2"]])}\n`)
 
 console.log(` - [[[[[[[[[[[[[[[[ "King Of The Mountain Array 👑 " ]]]]]]]]]]]]]]]] -> ${JSON.stringify([[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]]])}\n`)
 

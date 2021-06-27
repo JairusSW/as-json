@@ -9,7 +9,6 @@ function benchStringify<T>(name: string, data: T): void {
     JSON.stringify<T>(data);
   }
   // Bench
-  let run1 = 0
   const start = Date.now()
   let runs = 100_000;
   while (runs--) {
