@@ -2,6 +2,7 @@ const quote = '"';
 const comma = ",";
 const rbracket = "]";
 const lbracket = "[";
+const colon = ":"
 
 const trueVal = "true";
 const falseVal = "false";
@@ -63,15 +64,21 @@ export namespace JSON {
   }
 }
 
+// @ts-ignore
+@inline
 function serializeNumber<T>(data: T): string {
   // @ts-ignore
   return data.toString();
 }
 
+// @ts-ignore
+@inline
 function serializeString(data: string): string {
   return quote + data + quote;
 }
 
+// @ts-ignore
+@inline
 function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal;
 }
@@ -114,6 +121,7 @@ function serializeArray<T extends Array<any>>(data: T): string {
   // @ts-ignore
   return `{${elem.__encoded}}`;
 }
+
 function deserializeBoolean(data: string): boolean {
   return data === "true" ? true : false;
 }
@@ -244,22 +252,21 @@ function parseArrayArray<T extends Array<any>>(data: string): T {
 }
 
 // TODO: Rewrite and finish up.
-export function deserializeObject<T>(data: string): T {
+function deserializeObject<T>(data: string): T {
   let schema: T;
+  const len = data.length - 1
   const values = new Array<string>();
-  let lastPos = 1;
-  for (let i = 0; i < data.length - 1; i++) {
-    const char = data.charAt(i);
-    if (char == ",") {
+  let lastPos: u32 = 2;
+  let char: string = ''
+  for (let i: i32 = 0; i < len; i++) {
+    char = data.charAt(i);
+    if (char == colon) lastPos = i + 1
+    else if (char == comma) {
       values.push(data.slice(lastPos, i));
-      lastPos = i + 1;
-    }
-    if (char == ":") {
-      lastPos = i + 1;
+      lastPos = i
     }
   }
-  const lastChunk = data.slice(lastPos, data.length - 1);
-  if (lastChunk) values.push(lastChunk);
+  values.push(data.slice(lastPos, len));
   // @ts-ignore
   return schema.__decode(values);
 }
