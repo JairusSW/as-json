@@ -14,13 +14,13 @@ wasmModule.exports._start();
 
 function benchStringify(name, data) {
   // Pre-run
-  let preRuns = 100_000;
+  let preRuns = 250_000;
   while (preRuns--) {
     JSON.stringify(data);
   }
   // Bench
   const start = Date.now();
-  let runs = 100_000;
+  let runs = 250_000;
   while (runs--) {
     JSON.stringify(data);
   }
@@ -29,13 +29,13 @@ function benchStringify(name, data) {
 
 function benchParse(name, data) {
   // Pre-run
-  let preRuns = 100_000;
+  let preRuns = 250_000;
   while (preRuns--) {
     JSON.parse(data);
   }
   // Bench
   const start = Date.now();
-  let runs = 100_000;
+  let runs = 250_000;
   while (runs--) {
     JSON.parse(data);
   }

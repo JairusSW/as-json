@@ -3,10 +3,15 @@ const comma = ",";
 const rbracket = "]";
 const lbracket = "[";
 const colon = ":"
-
 const trueVal = "true";
 const falseVal = "false";
 const nullVal = "null";
+const escapeQuote = '\\"'
+const empty_string = " "
+const fwd_slash = "\\"
+const true_char = "t"
+const false_char = "f"
+const nullStr = ""
 
 /**
  * JSON encoder/decoder for AssemblyScript
@@ -74,6 +79,9 @@ function serializeNumber<T>(data: T): string {
 // @ts-ignore
 @inline
 function serializeString(data: string): string {
+  if (data.includes('"')) {
+    return quote + data.replaceAll(quote, escapeQuote) + quote
+  }
   return quote + data + quote;
 }
 
@@ -116,14 +124,14 @@ function serializeArray<T extends Array<any>>(data: T): string {
   for (let i = 0; i < len; i++) {
     const elem = data[i];
     // @ts-ignore
-    if (elem.__encoded == "") elem.__encode();
+    if (elem.__encoded == nullStr) elem.__encode();
   }
   // @ts-ignore
   return `{${elem.__encoded}}`;
 }
 
 function deserializeBoolean(data: string): boolean {
-  return data === "true" ? true : false;
+  return data === trueVal ? true : false;
 }
 
 function deserializeString(data: string): string {
@@ -176,7 +184,7 @@ function parseStringArray(data: string): Array<string> {
   for (let i = 2; i < data.length - 1; i++) {
     char = data.charAt(i);
     // @ts-ignore
-    if (char == ",") {
+    if (char == comma) {
       result.push(data.slice(lastPos + 2, i - 2));
       lastPos = i;
     }
@@ -191,9 +199,9 @@ function parseBooleanArray(data: string): Array<boolean> {
   let char: string;
   for (let i = 1; i < data.length - 1; i++) {
     char = data.charAt(i);
-    if (char == "t") {
+    if (char == true_char) {
       result.push(true);
-    } else if (char == "f") {
+    } else if (char == false_char) {
       result.push(false);
     }
   }
@@ -208,7 +216,7 @@ function parseNumberArray<T>(data: string): Array<T> {
   let char: string;
   for (let i = 1; i < data.length - 1; i++) {
     char = data.charAt(i);
-    if (char == ",") {
+    if (char == comma) {
       result.push(deserializeNumber<T>(data.slice(lastPos + 1, i)));
       lastPos = i;
     }
@@ -228,13 +236,13 @@ function parseArrayArray<T extends Array<any>>(data: string): T {
   for (let i = 1; i < data.length - 1; i++) {
     char = data.charAt(i);
     // Remove whitespace only if it isn't in a string. (strings can have whitespace)
-    if (instr === 0 && char == " ") break;
+    if (instr === 0 && char == empty_string) break;
     // This ignores [ and ] if they are inside a string.
-    if (data.charAt(i - 1) != "\\" && char == '"')
+    if (data.charAt(i - 1) != fwd_slash && char == quote)
       instr = instr === 0 ? 1 : 0;
     // This gets the depth of the array.
-    if (instr === 0 && char == "[") depth++;
-    if (instr === 0 && char == "]") fdepth++;
+    if (instr === 0 && char == lbracket) depth++;
+    if (instr === 0 && char == rbracket) fdepth++;
     // If the depth and found depth are equal, that is an array. Push it.
     if (instr === 0 && depth > 0 && depth === fdepth) {
         result.push(

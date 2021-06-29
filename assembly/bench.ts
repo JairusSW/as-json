@@ -4,13 +4,13 @@ import { console } from "as-console";
 
 function benchStringify<T>(name: string, data: T): void {
   // Pre-run
-  let preRuns = 100_000;
+  let preRuns = 250_000;
   while (preRuns--) {
     JSON.stringify<T>(data);
   }
   // Bench
   const start = Date.now()
-  let runs = 100_000;
+  let runs = 250_000;
   while (runs--) {
     JSON.stringify<T>(data);
   }
@@ -19,13 +19,13 @@ function benchStringify<T>(name: string, data: T): void {
 
 function benchParse<T>(name: string, data: string): void {
   // Pre-run
-  let preRuns = 100_000;
+  let preRuns = 250_000;
   while (preRuns--) {
     JSON.parse<T>(data);
   }
   // Bench
   const start = Date.now()
-  let runs = 100_000;
+  let runs = 250_000;
   while (runs--) {
     JSON.parse<T>(data);
   }

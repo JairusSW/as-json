@@ -1,5 +1,5 @@
 {
-  "name": "as-json",
+  "name": "json-as",
   "version": "0.1.0",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assenbly/index.ts",
