@@ -7,7 +7,7 @@
 ~ npm install as-json
 ```
 ```bash
---transform as-json/transform
+--transform as-json/transform.js
 ```
 
 ## Usage
