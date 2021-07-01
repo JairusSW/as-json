@@ -7,9 +7,10 @@
   "author": "JairusSW",
   "license": "MIT",
   "scripts": {
-    "build:transform": "npx tsc -p ./transform",
-    "build:test": "asc assembly/test.ts --transform ./transform/lib/transform.js --target test --explicitStart --exportRuntime",
-    "test": "node ./tests/test",
+    "build:schemaTransform": "npx tsc -p ./transform/schemaTransform",
+    "build:anyTransform": "npx tsc -p ./transform/anyTransform",
+    "build:test": "asc assembly/test.ts --transform ./transform/schemaTransform/lib/index.js --transform ./transform/anyTransform/lib/index.js --target test --explicitStart --exportRuntime",
+    "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
     "bench:build": "asc assembly/bench.ts --target bench --explicitStart",
     "bench": "node --experimental-wasi-unstable-preview1 ./bench/bench"
   },

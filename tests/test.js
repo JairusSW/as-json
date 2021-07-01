@@ -1,10 +1,13 @@
 const fs = require("fs");
 const loader = require("@assemblyscript/loader");
-const ConsoleImports = require('as-console/imports')
-const Console = new ConsoleImports()
+const { WASI } = require('wasi')
+const wasiOptions = {
+    args: process.argv,
+    env: process.env
+}
+const wasi = new WASI(wasiOptions)
 const imports = {
-    ...Console.wasmImports
+  wasi_snapshot_preview1: wasi.wasiImport
 };
 const wasmModule = loader.instantiateSync(fs.readFileSync(__dirname + "/output/test.wasm"), imports);
-Console.wasmExports = wasmModule.exports
-wasmModule.exports._start()
+wasi.start(wasmModule)

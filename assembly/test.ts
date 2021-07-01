@@ -1,105 +1,11 @@
-import { JSON } from ".";
+import { anyType } from "./anyType"
 
-import {stringify } from "as-console";
+const arr = new Array<anyType>()
 
-// @ts-ignore
-@json
-class HelloWorld {
-  hello: string
-}
+const strAny = new anyType()
 
-const helloworld: HelloWorld = {
-  hello: 'world'
-};
+strAny.set<string>('Hello!')
 
-// @ts-ignore
-@json
-class NameAge {
-  name: string
-  age: i32
-}
+arr.push(strAny)
 
-const nameage: NameAge = {
-  name: 'Jairus',
-  age: 14
-};
-
-console.log('Checking Serialization\n')
-
-console.log('\nSerialize String:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - "Hello World" -> ${JSON.stringify("Hello World")}`)
-
-console.log(` - "Hello Wo"rld" -> ${JSON.stringify('Hello Wo"rld')}`)
-
-console.log('\nSerialize Number:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - 123 -> ${JSON.stringify(123).toString()}`)
-
-console.log(` - 1.25 -> ${JSON.stringify(1.25).toString()}`)
-
-console.log('\nSerialize Boolean:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - true -> ${JSON.stringify(true)}`)
-
-console.log(` - false -> ${JSON.stringify(false)}`)
-
-console.log('\nSerialize Null:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - null -> ${JSON.stringify(null)}`)
-
-console.log('\nSerialize Array:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - ["hello", "world"] -> ${JSON.stringify(["hello","world"])}\n`)
-
-console.log(` - [["person1"], ["person2"]] -> ${JSON.stringify([["person1"],["person2"]])}\n`)
-
-console.log(` - [["key1", "value1"], ["ke[y2", "valu]e2"]] -> ${JSON.stringify([["key1","value1"],["ke[y2","valu]e2"]])}\n`)
-
-console.log(` - [[[[[[[[[[[[[[[[ "King Of The Mountain Array 👑 " ]]]]]]]]]]]]]]]] -> ${JSON.stringify([[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]]])}\n`)
-
-console.log('\nSerialize Object:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - { hello: 'world' } -> ${JSON.stringify(helloworld)}\n`)
-
-console.log(` - { name: 'Jairus', age: 14 } -> ${JSON.stringify(nameage)}\n`)
-
-console.log('Checking Deserialization\n')
-
-console.log('\nDeserialize String:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - "Hello World" -> ${JSON.parse<string>('"Hello World"')}`)
-
-console.log(` - "Hello Wo\\"rld" -> ${JSON.parse<string>('"Hello Wo\"rld"')}`)
-
-console.log('\nDeserialize Number:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - 123 -> ${JSON.parse<i32>('123')}`)
-
-console.log(` - 1.25 -> ${JSON.parse<f32>('1.25')}`)
-
-console.log('\nDeserialize Boolean:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - true -> ${JSON.parse<boolean>('true')}`)
-
-console.log(` - false -> ${JSON.parse<boolean>('false')}`)
-
-console.log('\nDeserialize Array:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-
-console.log(` - ["h[el]lo" ,   "wor\\"ld"] -> ${stringify(JSON.parse<Array<string>>('["h[el]lo","wor\"ld"]'))}\n`)
-JSON.parse<Array<Array<string>>>('[["person1"],["person2"]]')
-console.log(` - [["person1"],["person2"]] -> [['person1'], ['person2']]`)
-JSON.parse<Array<Array<string>>>('[["key1","value1"],["key2","value2"]]')
-console.log(` - [["key1","value1"],["key2","value2"]] -> [['key1', 'value1'], ['key2','value2']]\n`)
-JSON.parse<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<string>>>>>>>>>>>>>>>>>>('[[[[[[[[[[[[[[[[ "King Of The Mountain Array 👑 " ]]]]]]]]]]]]]]]]')
-console.log(` - [[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]]]' -> [[[[[[[[[[[[[[[['King Of The Mountain Array 👑 ']]]]]]]]]]]]]]]]\n`)
-
-console.log('\nDeserialize Object:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
-JSON.parse<HelloWorld>('{"hello":"world"}')
-console.log(` - {"hello":"world"} -> { hello: "world" }\n`)
-JSON.parse<NameAge>('{"name":"Jairus","age":14}')
-console.log(` - {"name":"Jairus","age":14} -> { name: 'Jairus', age: 14 }\n`)
-
-// console.log(` -  -> ${JSON.stringify()}`)
-
-// node test
+console.log(arr[0].get<string>())
