@@ -1,6 +1,6 @@
 import { JSON } from "./index";
 
-import { Date } from "../../node/node_modules/as-wasi/index"
+import { Date } from "as-wasi"
 
 function benchStringify<T>(name: string, data: T): void {
   // Pre-run
