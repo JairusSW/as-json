@@ -1,6 +1,8 @@
 const fs = require("fs");
 const { WASI } = require('wasi')
 
+const loader = require('@assemblyscript/loader')
+
 const wasiOptions = {
     args: process.argv,
     env: process.env
@@ -10,7 +12,7 @@ const wasi = new WASI(wasiOptions)
 const imports = {
   wasi_snapshot_preview1: wasi.wasiImport
 };
-WebAssembly.instantiate(
+loader.instantiate(
   fs.readFileSync(__dirname + "/output/bench.wasm"),
   imports
 ).then(wasmModule => {
