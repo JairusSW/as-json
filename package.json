@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build:schemaTransform": "npx tsc -p ./transform/schemaTransform",
-    "build:anyTransform": "npx tsc -p ./transform/anyTransform",
+    "build:anyTransform": "npx tsc -w  -p ./transform/anyTransform",
     "build:test": "asc assembly/test.ts --transform ./transform/schemaTransform/lib/index.js --transform ./transform/anyTransform/lib/index.js --target test --explicitStart --exportRuntime",
     "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
     "bench:build": "asc assembly/bench.ts --target bench --explicitStart",
