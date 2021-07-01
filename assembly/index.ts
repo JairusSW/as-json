@@ -69,15 +69,11 @@ export namespace JSON {
   }
 }
 
-// @ts-ignore
-@inline
 function serializeNumber<T>(data: T): string {
   // @ts-ignore
-  return data.toString();
+  return data.toString()
 }
 
-// @ts-ignore
-@inline
 function serializeString(data: string): string {
   if (data.includes('"')) {
     return quote + data.replaceAll(quote, escapeQuote) + quote
@@ -85,8 +81,6 @@ function serializeString(data: string): string {
   return quote + data + quote;
 }
 
-// @ts-ignore
-@inline
 function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal;
 }

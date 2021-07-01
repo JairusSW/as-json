@@ -10,18 +10,19 @@
     "build:transform": "npx tsc -p ./transform",
     "build:test": "asc assembly/test.ts --transform ./transform/lib/transform.js --target test --explicitStart --exportRuntime",
     "test": "node ./tests/test",
-    "bench:build": "asc assembly/bench.ts --transform ./transform/lib/transform.js --runtime stub --target bench --explicitStart --exportRuntime",
-    "bench": "node ./bench/bench"
+    "bench:build": "asc assembly/bench.ts --target bench --explicitStart",
+    "bench": "node --experimental-wasi-unstable-preview1 ./bench/bench"
   },
   "devDependencies": {
-    "@assemblyscript/loader": "^0.19.4",
+    "@assemblyscript/loader": "^0.19.5",
     "@types/line-column": "^1.0.0",
     "as-console": "^5.0.3",
     "as-string-sink": "^0.2.2",
-    "assemblyscript": "^0.19.4",
+    "assemblyscript": "^0.19.5",
     "typescript": "^4.3.4"
   },
   "dependencies": {
+    "as-wasi": "^0.4.5",
     "line-column": "^1.0.2",
     "visitor-as": "^0.6.0"
   }

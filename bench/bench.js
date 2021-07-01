@@ -1,26 +1,31 @@
 const fs = require("fs");
-const loader = require("@assemblyscript/loader");
-const ConsoleImports = require("as-console/imports");
-const Console = new ConsoleImports();
+const { WASI } = require('wasi')
+
+const wasiOptions = {
+    args: process.argv,
+    env: process.env
+}
+
+const wasi = new WASI(wasiOptions)
 const imports = {
-  ...Console.wasmImports,
+  wasi_snapshot_preview1: wasi.wasiImport
 };
-const wasmModule = loader.instantiateSync(
+WebAssembly.instantiate(
   fs.readFileSync(__dirname + "/output/bench.wasm"),
   imports
-);
-Console.wasmExports = wasmModule.exports;
-wasmModule.exports._start();
+).then(wasmModule => {
+  wasi.start(wasmModule)
+})
 
 function benchStringify(name, data) {
   // Pre-run
-  let preRuns = 250_000;
+  let preRuns = 100_000;
   while (preRuns--) {
     JSON.stringify(data);
   }
   // Bench
   const start = Date.now();
-  let runs = 250_000;
+  let runs = 100_000;
   while (runs--) {
     JSON.stringify(data);
   }
@@ -29,13 +34,13 @@ function benchStringify(name, data) {
 
 function benchParse(name, data) {
   // Pre-run
-  let preRuns = 250_000;
+  let preRuns = 100_000;
   while (preRuns--) {
     JSON.parse(data);
   }
   // Bench
   const start = Date.now();
-  let runs = 250_000;
+  let runs = 100_000;
   while (runs--) {
     JSON.parse(data);
   }
@@ -55,7 +60,6 @@ benchStringify("object", {
   age: 14,
 });
 
-
 benchParse("string", '"Hello World"');
 
 benchParse("number", '123');
@@ -64,4 +68,4 @@ benchParse("boolean", 'true');
 
 benchParse("array", '[1,2,3,4,5]');
 
-benchParse("object", '{"name":"Jairus","age":14}');
+benchParse("object", '{"age":14}');

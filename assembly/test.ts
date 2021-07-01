@@ -30,7 +30,7 @@ console.log('\nSerialize String:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾�
 
 console.log(` - "Hello World" -> ${JSON.stringify("Hello World")}`)
 
-console.log(` - "Hello Wo\\"rld" -> ${JSON.stringify('Hello Wo"rld')}`)
+console.log(` - "Hello Wo"rld" -> ${JSON.stringify('Hello Wo"rld')}`)
 
 console.log('\nSerialize Number:\n‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
