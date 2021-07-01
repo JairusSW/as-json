@@ -1,6 +1,6 @@
 import { JSON } from ".";
 
-import { console, stringify } from "../../Console/assembly/index";
+import {stringify } from "as-console";
 
 // @ts-ignore
 @json
