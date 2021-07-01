@@ -1,6 +1,5 @@
 node_modules
 yarn.lock
-transform/lib
 tests/output
 test/output
 bench/output

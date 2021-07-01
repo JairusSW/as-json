@@ -8,8 +8,10 @@ export = class MyTransform extends Transform {
     afterInitialize(program: Program): void {
         program.filesByName.forEach((file) => {
             program.managedClasses.forEach((c) => {
-                console.log(c.name)
-                if (c.name == "anyType") {
+                // console.log(c.name == "anyType")
+                if (c.name.startsWith("anyType")) {
+
+                    console.log("got to anyType")
                     console.log(c.prototype.instanceMembers?.size);
                 }
             })
