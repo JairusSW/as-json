@@ -1,13 +1,11 @@
-import { anyType } from "./anyType"
+import { JSON, jsonType } from "."
 
-const arr = new Array<anyType>()
+let dynamicArray = JSON.parse<jsonType[]>('["Hello",12345,"haha",true]')
 
-const strAny = new anyType()
+console.log(dynamicArray[0].get<string>())
 
-strAny.set<string>('Hello!')
+console.log(dynamicArray[1].get<i32>().toString())
 
-arr.push(strAny)
+console.log(dynamicArray[2].get<string>())
 
-console.log(arr[0].get<string>())
-
-//My internet turns off in 14 min. I'll push and you can make a fork and continue locally. Ok?
+console.log(dynamicArray[3].get<boolean>().toString())

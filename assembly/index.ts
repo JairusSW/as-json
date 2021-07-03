@@ -1,3 +1,11 @@
+export class jsonType {
+  constructor(private data: string) {}
+  get<T>(): T {
+      // @ts-ignore
+      return JSON.parse<T>(this.data)
+  }
+}
+
 const quote = '"';
 const comma = ",";
 const rbracket = "]";
@@ -12,6 +20,7 @@ const fwd_slash = "\\"
 const true_char = "t"
 const false_char = "f"
 const nullStr = ""
+const jsonTypeID = idof<jsonType>()
 
 /**
  * JSON encoder/decoder for AssemblyScript
@@ -167,9 +176,33 @@ function deserializeArray<T extends Array<any>>(data: string): T {
   // @ts-ignore
   else if (isArray<valueof<T>>()) return parseArrayArray<T>(data);
   // @ts-ignore
-  return parseNumberArray<valueof<T>>(data);
+  else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) return parseNumberArray<valueof<T>>(data);
+  // @ts-ignore
+ return parseDynamicArray(data);
 }
 
+// Dynamic Array
+export function parseDynamicArray(data: string): Array<jsonType> {
+  let result = new Array<jsonType>()
+  let char: string
+  let lastPos = 1
+  let inStr = false
+  for (let i = 1; i < data.length - 1; i++) {
+    char = data.charAt(i);
+    if (char != empty_string) {
+      if (char == comma) {
+        console.log(`Found: ${data.slice(lastPos, i)}`)
+        result.push(new jsonType(data.slice(lastPos, i)))
+        lastPos = i + 1
+      } else if (char == quote && data.charAt(i) != fwd_slash) {
+        inStr = inStr ? false : true
+      }
+    }
+  }
+  console.log(`Found: ${data.slice(lastPos, data.length - 1)}`)
+  result.push(new jsonType(data.slice(lastPos, data.length - 1)))
+  return result
+}
 // String Array
 function parseStringArray(data: string): Array<string> {
   const result = new Array<string>();
