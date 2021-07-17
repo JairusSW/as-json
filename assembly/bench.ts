@@ -42,22 +42,22 @@ const data: schema = {
     age: 14
 }*/
 
-benchStringify<string>('string', 'Hello World')
+benchStringify<string>('string', 'Hello\" World')
 
 benchStringify<u32>('number', 123)
 
 benchStringify<boolean>('boolean', true)
 
-benchStringify<Array<u32>>('array', [1,2,3,4,5])
+benchStringify<Array<boolean>>('array', [true, false, true])
 
 //benchStringify<schema>('object', data)
 
-benchParse<string>('string', '"Hello World"')
+benchParse<string>('string', '"Hello\\" World"')
 
 benchParse<u32>('number', '123')
 
 benchParse<boolean>('boolean', 'true')
 
-benchParse<Array<u32>>('array', '[1,2,3,4,5]')
+benchParse<Array<boolean>>('array', '[true,false,true]')
 
 //benchParse<schema>('object', '{"age":14}')

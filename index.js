@@ -8,3 +8,5 @@ const imports = {
 const wasmModule = loader.instantiateSync(fs.readFileSync(__dirname + "/build/untouched.wasm"), imports);
 Console.wasmExports = wasmModule.exports
 module.exports = wasmModule.exports;
+
+// node "C:\Users\jairu\Documents\Modules\Frontend\ASpkg\aspkg-cli\cli.js" publish

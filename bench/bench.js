@@ -34,13 +34,13 @@ function benchStringify(name, data) {
   console.log(`Stringify (JS) ${name}: ~${Date.now() - start}ms`);
 }
 
-benchStringify("string", "Hello World");
+benchStringify("string", "Hello\" World");
 
 benchStringify("number", 123);
 
 benchStringify("boolean", true);
 
-benchStringify("array", [1, 2, 3, 4, 5]);
+benchStringify("array", [true,false,true]);
 
 benchStringify("object", {
   name: "Jairus",

@@ -1,11 +1,3 @@
-export class jsonType {
-  constructor(private data: string) {}
-  get<T>(): T {
-      // @ts-ignore
-      return JSON.parse<T>(this.data)
-  }
-}
-
 const quote = '"';
 const comma = ",";
 const rbracket = "]";
@@ -20,7 +12,6 @@ const fwd_slash = "\\"
 const true_char = "t"
 const false_char = "f"
 const nullStr = ""
-const jsonTypeID = idof<jsonType>()
 
 /**
  * JSON encoder/decoder for AssemblyScript
@@ -36,14 +27,16 @@ export namespace JSON {
    */
   export function stringify<T>(data: T): string {
     if (isString(data)) {
-      // @ts-ignore
-      return serializeString(data);
+      if (data.includes('"')) {
+        return quote + data.replaceAll(quote, escapeQuote) + quote
+      }
+      return quote + data + quote;
+    } else if (isBoolean(data)) {
+      return data ? trueVal : falseVal;
     } else if (data == null) {
       return nullVal;
     } else if (isFloat(data) || isInteger(data)) {
-      return serializeNumber<T>(data);
-    } else if (isBoolean(data)) {
-      return serializeBoolean(data);
+      return data.toString();
     } else if (isArray(data)) {
       // @ts-ignore
       return serializeArray<T>(data);
@@ -78,11 +71,15 @@ export namespace JSON {
   }
 }
 
+// @ts-ignore
+@inline
 function serializeNumber<T>(data: T): string {
   // @ts-ignore
-  return data.toString()
+  return data.toString();
 }
 
+// @ts-ignore
+@inline
 function serializeString(data: string): string {
   if (data.includes('"')) {
     return quote + data.replaceAll(quote, escapeQuote) + quote
@@ -90,6 +87,8 @@ function serializeString(data: string): string {
   return quote + data + quote;
 }
 
+// @ts-ignore
+@inline
 function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal;
 }
@@ -176,47 +175,22 @@ function deserializeArray<T extends Array<any>>(data: string): T {
   // @ts-ignore
   else if (isArray<valueof<T>>()) return parseArrayArray<T>(data);
   // @ts-ignore
-  else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) return parseNumberArray<valueof<T>>(data);
-  // @ts-ignore
- return parseDynamicArray(data);
+  return parseNumberArray<valueof<T>>(data);
 }
 
-// Dynamic Array
-export function parseDynamicArray(data: string): Array<jsonType> {
-  let result = new Array<jsonType>()
-  let char: string
-  let lastPos = 1
-  let inStr = false
-  for (let i = 1; i < data.length - 1; i++) {
-    char = data.charAt(i);
-    if (char != empty_string) {
-      if (char == comma) {
-        console.log(`Found: ${data.slice(lastPos, i)}`)
-        result.push(new jsonType(data.slice(lastPos, i)))
-        lastPos = i + 1
-      } else if (char == quote && data.charAt(i) != fwd_slash) {
-        inStr = inStr ? false : true
-      }
-    }
-  }
-  console.log(`Found: ${data.slice(lastPos, data.length - 1)}`)
-  result.push(new jsonType(data.slice(lastPos, data.length - 1)))
-  return result
-}
 // String Array
 function parseStringArray(data: string): Array<string> {
   const result = new Array<string>();
-  let lastPos = 0;
+  let lastPos: u32 = 2;
   let char: string;
-  for (let i = 2; i < data.length - 1; i++) {
+  for (let i = 1; i < data.length - 1; i++) {
     char = data.charAt(i);
-    // @ts-ignore
     if (char == comma) {
-      result.push(data.slice(lastPos + 2, i - 2));
-      lastPos = i;
+      result.push(data.slice(lastPos, i - 1).replaceAll(escapeQuote, quote));
+      lastPos = i + 2;
     }
   }
-  result.push(data.slice(lastPos + 2, data.length - 2));
+  result.push(data.slice(lastPos, data.length - 2));
   return result;
 }
 
@@ -228,7 +202,7 @@ function parseBooleanArray(data: string): Array<boolean> {
     char = data.charAt(i);
     if (char == true_char) {
       result.push(true);
-    } else if (char == false_char) {
+    } else {
       result.push(false);
     }
   }
@@ -239,7 +213,7 @@ function parseBooleanArray(data: string): Array<boolean> {
 
 function parseNumberArray<T>(data: string): Array<T> {
   const result = new Array<T>();
-  let lastPos = 0;
+  let lastPos: u32 = 0;
   let char: string;
   for (let i = 1; i < data.length - 1; i++) {
     char = data.charAt(i);
@@ -248,33 +222,31 @@ function parseNumberArray<T>(data: string): Array<T> {
       lastPos = i;
     }
   }
-    result.push(deserializeNumber<T>(data.slice(lastPos + 1, data.length - 1)))
+  result.push(deserializeNumber<T>(data.slice(lastPos + 1, data.length - 1)))
   return result;
 }
 
 // Array Array
 function parseArrayArray<T extends Array<any>>(data: string): T {
   const result = instantiate<T>();
-  let lastPos = -1;
+  let lastPos: i32 = -1;
   let char: string;
-  let depth = 0;
-  let fdepth = 0;
-  let instr = 0;
+  let depth: u32 = 0;
+  let fdepth: u32 = 0;
+  let instr: boolean = false;
   for (let i = 1; i < data.length - 1; i++) {
     char = data.charAt(i);
-    // Remove whitespace only if it isn't in a string. (strings can have whitespace)
-    if (instr === 0 && char == empty_string) break;
     // This ignores [ and ] if they are inside a string.
     if (data.charAt(i - 1) != fwd_slash && char == quote)
-      instr = instr === 0 ? 1 : 0;
+      instr = (instr ? false : true);
     // This gets the depth of the array.
-    if (instr === 0 && char == lbracket) depth++;
-    if (instr === 0 && char == rbracket) fdepth++;
+    if (instr === false && char == lbracket) depth++;
+    if (instr === false && char == rbracket) fdepth++;
     // If the depth and found depth are equal, that is an array. Push it.
-    if (instr === 0 && depth > 0 && depth === fdepth) {
-        result.push(
-          deserializeArray<valueof<T>>(data.slice(lastPos + 2, i + 1))
-        )
+    if (instr === false && depth > 0 && depth === fdepth) {
+      result.push(
+        deserializeArray<valueof<T>>(data.slice(lastPos + 2, i + 1))
+      )
       // Reset the depth
       depth = 0;
       fdepth = 0;
