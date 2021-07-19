@@ -1,4 +1,4 @@
-import { deserializeObject, JSON } from ".";
+import { deserializeObject, JSON, removeJSONWhitespace } from ".";
 
 import { console, stringify } from "../node_modules/as-console/assembly/wasi";
 
@@ -34,7 +34,7 @@ const data: JSONSchema = {
   location: [-43.130850291, 32.926401705]
 }
 
-const encoded = JSON.stringify(data)
+const encoded = '{"firstName" :"Jairus","lastName" :  "Tanaka","human":true,"age":14, "meta":{"country": "US","awesome":true},"language":"english"  , "location":  [-43.130850291,32.926401705]}'//JSON.stringify(data)
 
 console.log(`\nEncoded:\n`)
 console.log(JSON.stringify(data))

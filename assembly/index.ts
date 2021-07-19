@@ -59,6 +59,7 @@ export namespace JSON {
    * @returns any
    */
   export function parse<T>(data: string): T {
+    data = removeJSONWhitespace(data)
     //let type: T;
     // @ts-ignore
     if (isString<T>()) return deserializeString(data);
@@ -264,14 +265,14 @@ function deserializeArrayArray<T extends Array<any>>(data: string): T {
 export function deserializeObject<T>(data: string): T {
   let schema: T;
   const result = new Map<string, string>();
-  let lastPos = 1
-  let key = ''
-  let instr = 0
-  let char = ''
-  let depth = 0
-  let fdepth = 0
-  let inData = 0
-  for (let i = 1; i < data.length; i++) {
+  let lastPos: u32 = 1
+  let key: string = ''
+  let instr: u32 = 0
+  let char: string = ''
+  let depth: u32 = 0
+  let fdepth: u32 = 0
+  let inData: u32 = 0
+  for (let i: u32 = 1; i < u32(data.length); i++) {
     char = data.charAt(i)
     if (char == '"') instr = (instr ? 0 : 1)
     if (instr === 0 && (char == "{" || char == "[")) {
@@ -324,4 +325,22 @@ function getType(data: string): string {
   else if (start == '[') return 'array'
   else if (start == 'n') return 'null'
   else return 'number'
+}
+
+export function removeJSONWhitespace(data: string): string {
+  let result: string = ''
+  let instr: u32 = 0
+  // 0 = off
+  // 1 = on
+  // Numbers are faster in JS than bools
+  let char: string = ''
+  for (let i = 0; i < data.length; i++) {
+    char = data.charAt(i);
+    // Assign character to `char` variable.
+    // It helps to pre-define a variable.
+    if (char == '"' && data.charAt(i-1) != "\\\"") instr = (instr ? 0 : 1);
+    if (instr === 0 && char != ' ') result += char
+    else if (instr === 1) result += char
+  }
+  return result
 }
