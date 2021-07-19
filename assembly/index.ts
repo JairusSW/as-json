@@ -135,7 +135,7 @@ function serializeArray<T extends Array<any>>(data: T): string {
 }
 
 function deserializeBoolean(data: string): boolean {
-  return data === trueVal ? true : false;
+  return data.charAt(0) == "t" ? true : false;
 }
 
 function deserializeString(data: string): string {
@@ -171,17 +171,17 @@ function deserializeNumber<T>(data: string): T {
 // TODO: Maybe add null array?
 function deserializeArray<T extends Array<any>>(data: string): T {
   // @ts-ignore
-  if (isString<valueof<T>>()) return parseStringArray(data);
+  if (isString<valueof<T>>()) return deserializeStringArray(data);
   // @ts-ignore
-  else if (isBoolean<valueof<T>>()) return parseBooleanArray(data);
+  else if (isBoolean<valueof<T>>()) return deserializeBooleanArray(data);
   // @ts-ignore
-  else if (isArray<valueof<T>>()) return parseArrayArray<T>(data);
+  else if (isArray<valueof<T>>()) return deserializeArrayArray<T>(data);
   // @ts-ignore
-  return parseNumberArray<valueof<T>>(data);
+  return deserializeNumberArray<valueof<T>>(data);
 }
 
 // String Array
-function parseStringArray(data: string): Array<string> {
+function deserializeStringArray(data: string): Array<string> {
   const result = new Array<string>();
   let lastPos: u32 = 2;
   let char: string;
@@ -197,7 +197,7 @@ function parseStringArray(data: string): Array<string> {
 }
 
 // Boolean Array
-function parseBooleanArray(data: string): Array<boolean> {
+function deserializeBooleanArray(data: string): Array<boolean> {
   const result = new Array<boolean>();
   let char: string;
   for (let i = 1; i < data.length - 1; i++) {
@@ -213,7 +213,7 @@ function parseBooleanArray(data: string): Array<boolean> {
 
 // Number Array
 
-function parseNumberArray<T>(data: string): Array<T> {
+function deserializeNumberArray<T>(data: string): Array<T> {
   const result = new Array<T>();
   let lastPos: u32 = 0;
   let char: string;
@@ -229,7 +229,7 @@ function parseNumberArray<T>(data: string): Array<T> {
 }
 
 // Array Array
-function parseArrayArray<T extends Array<any>>(data: string): T {
+function deserializeArrayArray<T extends Array<any>>(data: string): T {
   const result = instantiate<T>();
   let lastPos: i32 = -1;
   let char: string;
@@ -263,24 +263,52 @@ function parseArrayArray<T extends Array<any>>(data: string): T {
 // TODO: Rewrite and finish up.
 export function deserializeObject<T>(data: string): T {
   let schema: T;
-  const len = data.length - 1
-  const values = new Map<string, string>();
-  let lastPos: u32 = 1;
-  let char: string = ''
-  let key: string = ''
-  for (let i: i32 = 0; i < len; i++) {
-    char = data.charAt(i);
-    if (char == colon) {
-      key = data.slice(lastPos+1, i-1)
-      lastPos = i + 1
-    } else if (char == comma) {
-      values.set(key, data.slice(lastPos, i));
-      lastPos = i + 1
+  const result = new Map<string, string>();
+  let lastPos = 1
+  let key = ''
+  let instr = 0
+  let char = ''
+  let depth = 0
+  let fdepth = 0
+  let inData = 0
+  for (let i = 1; i < data.length; i++) {
+    char = data.charAt(i)
+    if (char == '"') instr = (instr ? 0 : 1)
+    if (instr === 0 && (char == "{" || char == "[")) {
+      inData = (inData === 0 && depth > 0 && depth === fdepth) ? 0 : 1
+      depth++
+    }
+    if (instr === 0 && (char == "}" || char == "]")) fdepth++;
+    if (depth !== 0 && depth === fdepth) {
+      result.set(key, data.slice(lastPos + 1, i + 1))
+      // Reset the depth
+      depth = 0
+      fdepth = 0
+      // Set new lastPos
+      lastPos = (i + 1);
+      inData = 0
+    }
+    else if (inData === 0) {
+      if (char == ":") {
+        key = data.slice(lastPos + 1, i - 1)
+        lastPos = (i)
+      }
+      else if (char == "}") {
+        char = data.slice(lastPos + 1, i)
+        if (char && char !== "") result.set(key, char)
+        key = ''
+        lastPos = (i + 1)
+      }
+      else if (char == ",") {
+        char = data.slice(lastPos + 1, i)
+        if (char && char !== "") result.set(key, char)
+        key = ''
+        lastPos = (i + 1)
+      }
     }
   }
-  values.set(key, data.slice(lastPos, len));
   // @ts-ignore
-  return schema.__decode(values);
+  return schema.__decode(result);
 }
 
 /**

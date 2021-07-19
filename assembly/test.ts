@@ -4,111 +4,57 @@ import { console, stringify } from "../node_modules/as-console/assembly/wasi";
 
 // @ts-ignore
 @json
-class HelloWorld {
-  hello: string
+class JSONSchema {
+    firstName: string
+    lastName: string
+    human: boolean
+    age: i32
+    meta: Meta
+    language: string
+    location: f64[]
 }
-
-const helloworld: HelloWorld = {
-  hello: 'world'
-};
 
 // @ts-ignore
 @json
-class NameAge {
-  name: string
-  age: i32
+class Meta {
+    country: string
+    awesome: boolean
 }
 
-const nameage: NameAge = {
-  name: 'Jairus',
-  age: 14
-};
-
-// @ts-ignore
-@json
-class rano {
-  hahaaaaaaaaa: string
-  boinkkkkkkkkkkkkkkkk: i32
+const data: JSONSchema = {
+  firstName: 'Jairus',
+  lastName: 'Tanaka',
+  age: 14,
+  human: true,
+  meta: {
+    country: 'US',
+    awesome: true
+  },
+  language: "english",
+  location: [-43.130850291, 32.926401705]
 }
-/*
-console.log('Checking Serialization\n')
 
-console.log('\nSerialize String:\n')
+const encoded = JSON.stringify(data)
 
-console.log(` - "Hello World" -> ${JSON.stringify("Hello World").toString()}`)
+console.log(`\nEncoded:\n`)
+console.log(JSON.stringify(data))
 
-console.log(` - "Hello Wo\\"rld" -> ${JSON.stringify('Hello Wo"rld').toString()}`)
+const decoded = JSON.parse<JSONSchema>(encoded)
 
-console.log('\nSerialize Number:\n')
+console.log('\nDecoded:\n')
+console.log(`{`)
+console.log(` firstName: ${decoded.firstName},`)
+console.log(` lastName: ${decoded.lastName},`)
+console.log(` age: ${decoded.age},`)
+console.log(` human: ${decoded.human},`)
+console.log(` meta: {`)
+console.log(`   country: ${decoded.meta.country},`)
+console.log(`   awesome: ${decoded.meta.awesome}`)
+console.log(` },`)
+console.log(` language: ${decoded.language}`)
+console.log(` location: [${decoded.location[0]}, ${decoded.location[1]}]`)
+console.log(`}`)
 
-console.log(` - 123 -> ${JSON.stringify(123).toString()}`)
-
-console.log(` - 1.25 -> ${JSON.stringify(1.25).toString()}`)
-
-console.log('\nSerialize Boolean:\n')
-
-console.log(` - true -> ${JSON.stringify(true).toString()}`)
-
-console.log(` - false -> ${JSON.stringify(false).toString()}`)
-
-console.log('\nSerialize Null:\n')
-
-console.log(` - null -> ${JSON.stringify(null).toString()}`)
-
-console.log('\nSerialize Array:\n')
-
-console.log(` - ["hello", "world"] -> ${JSON.stringify(["hello","world"]).toString()}\n`)
-
-console.log(` - [["person1"], ["person2"]] -> ${JSON.stringify([["person1"],["person2"]]).toString()}\n`)
-
-console.log(` - [["key1", "value1"], ["ke[y2", "valu]e2"]] -> ${JSON.stringify([["key1","value1"],["ke[y2","valu]e2"]]).toString()}\n`)
-
-console.log(` - [[[[[[[[[[[[[[[[ "King Of The Mountain Array 👑 " ]]]]]]]]]]]]]]]] -> ${JSON.stringify([[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]]]).toString()}\n`)
-
-console.log('\nSerialize Object:\n')
-
-console.log(` - { hello: 'world' } -> ${JSON.stringify(helloworld).toString()}\n`)
-
-console.log(` - { name: 'Jairus', age: 14 } -> ${JSON.stringify(nameage).toString()}\n`)
-
-console.log('Checking Deserialization\n')
-
-console.log('\nDeserialize String:\n')
-
-console.log(` - "Hello World" -> ${JSON.parse<string>('"Hello World"').toString()}`)
-
-console.log(` - "Hello Wo\\"rld" -> ${JSON.parse<string>('"Hello Wo\\"rld"').toString()}`)
-
-console.log('\nDeserialize Number:\n')
-
-console.log(` - 123 -> ${JSON.parse<i32>('123').toString()}`)
-
-console.log(` - 1.25 -> ${JSON.parse<f32>('1.25').toString()}`)
-
-console.log('\nDeserialize Boolean:\n')
-
-console.log(` - true -> ${JSON.parse<boolean>('true').toString()}`)
-
-console.log(` - false -> ${JSON.parse<boolean>('false').toString()}`)
-
-console.log('\nDeserialize Array:\n')
-
-console.log(` - ["hello","wor\\"ld","dinosaurs"] -> ${stringify(JSON.parse<Array<string>>('["hello","wor\\"ld","dinosaurs"]')).toString()}\n`)
-JSON.parse<Array<Array<string>>>('[["perso]n1"],["person2"]]')
-console.log(` - [["perso]n1"],["person2"]] -> [['perso]n1'], ['person2']]`)
-JSON.parse<Array<Array<string>>>('[["key1","value1"],["key2","value2"]]')
-console.log(` - [["key1","value1"],["key2","value2"]] -> [['key1', 'value1'], ['key2','value2']]\n`)
-JSON.parse<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<Array<string>>>>>>>>>>>>>>>>>>('[[[[[[[[[[[[[[[[ "King Of The Mountain Array 👑 " ]]]]]]]]]]]]]]]]').toString()
-console.log(` - [[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]]]' -> [[[[[[[[[[[[[[[['King Of The Mountain Array 👑 ']]]]]]]]]]]]]]]]\n`)
-
-console.log('\nDeserialize Object:\n')
-JSON.parse<HelloWorld>('{"hello":"world"}')
-console.log(` - {"hello":"world"} -> { hello: "world" }\n`)*/
-
-const obj = JSON.parse<NameAge>('{"name":"Jairus","age":14}')
-
-console.log(` - {"name":"Jairus","age":14} -> { name: 'Jairus', age: 14 }\n`)
-
-console.log(`name: ${obj.name}`)
-
-console.log(`age: ${obj.age}`)
+const success = decoded instanceof JSONSchema
+if (success) console.log(`Success: ${success}`)
+else throw new Error('Ahhh! It broke!')
