@@ -1,5 +1,3 @@
-import { stringify } from "as-console";
-
 const quote = '"';
 const comma = ",";
 const rbracket = "]";

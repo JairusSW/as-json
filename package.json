@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build:transform": "npx tsc -w -p ./transform",
-    "build:test": "asc assembly/test.ts --transform json-as/transform --target test --explicitStart",
+    "build:test": "asc assembly/test.ts --transform ./transform/lib --target test --explicitStart",
     "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
     "bench:build": "asc assembly/bench.ts --runtime stub --target bench --explicitStart",
     "bench": "node --experimental-wasi-unstable-preview1 ./bench/bench"
@@ -30,14 +30,7 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "as-wasi": "^0.4.5",
-    "json-as": "aspkg/as-json",
-    "line-column": "^1.0.2",
     "visitor-as": "^0.6.0"
-  },
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
   },
   "repository": {
     "type": "git",

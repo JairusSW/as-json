@@ -1,6 +1,4 @@
-import { JSON } from "json-as";
-
-import { console, stringify } from "../node_modules/as-console/assembly/wasi";
+import { JSON } from ".";
 
 // @ts-ignore
 @json
