@@ -1,4 +1,4 @@
-import { deserializeObject, JSON, removeJSONWhitespace } from ".";
+import { JSON } from "json-as";
 
 import { console, stringify } from "../node_modules/as-console/assembly/wasi";
 

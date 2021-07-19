@@ -262,7 +262,7 @@ function deserializeArrayArray<T extends Array<any>>(data: string): T {
 }
 
 // TODO: Rewrite and finish up.
-export function deserializeObject<T>(data: string): T {
+function deserializeObject<T>(data: string): T {
   let schema: T;
   const result = new Map<string, string>();
   let lastPos: u32 = 1
@@ -327,7 +327,7 @@ function getType(data: string): string {
   else return 'number'
 }
 
-export function removeJSONWhitespace(data: string): string {
+function removeJSONWhitespace(data: string): string {
   let result: string = ''
   let instr: u32 = 0
   // 0 = off
