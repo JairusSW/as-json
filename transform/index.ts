@@ -17,9 +17,9 @@ function getTypeName(type: TypeNode): string {
 }
 
 class MethodInjector extends BaseVisitor {
-  currentClass?: ClassDeclaration;
-  public encodeStmts: string[] = [];
-  public decodeCode: string[] = [];
+  public currentClass?: ClassDeclaration;
+  public encodeStmts = new Map<string, string[]>()
+  public decodeCode = new Map<string, string[]>()
 
   visitFieldDeclaration(node: FieldDeclaration): void {
     const name = toString(node.name);
@@ -29,13 +29,19 @@ class MethodInjector extends BaseVisitor {
 
     const type = getTypeName(node.type);
 
-    this.encodeStmts.push(
+    const className = this.currentClass!.name.text
+    if (!this.encodeStmts.has(className)) this.encodeStmts.set(className, [])
+    if (!this.decodeCode.has(className)) this.decodeCode.set(className, [])
+    // @ts-ignore
+    this.encodeStmts.get(className).push(
       `this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
     );
 
-    this.decodeCode.push(
-      `${name}: JSON.parse<${type}>(values[${this.decodeCode.length}]),\n`
+    // @ts-ignore
+    this.decodeCode.get(className).push(
+      `${name}: JSON.parse<${type}>(values.get('${name}')),\n`
     );
+
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {
@@ -47,8 +53,8 @@ class MethodInjector extends BaseVisitor {
 
     const name = getName(node);
 
-    this.encodeStmts = [];
-    this.decodeCode = [];
+    this.encodeStmts.clear();
+    this.decodeCode.clear();
     this.visit(node.members);
 
     const encodedProp = `__encoded: string = ''`
@@ -57,16 +63,18 @@ class MethodInjector extends BaseVisitor {
     __encode(): void {
       // Pre-compile (faster)
       if (!this.__encoded) {
-        ${this.encodeStmts.join("\n")};
+        ${// @ts-ignore
+          this.encodeStmts.get(name).join("\n")};
         this.__encoded = unchecked(this.__encoded.slice(0, this.__encoded.length - 1))
       }
     }
     `;
 
     const decodeMethod = `
-    __decode(values: Array<string>): ${name} {
+    __decode(values: Map<string, string>): ${name} {
       const decoded: ${name} = {
-        ${this.decodeCode.join("")}
+        ${// @ts-ignore
+          this.decodeCode.get(name).join("")}
       }
       return decoded
     }
@@ -74,7 +82,7 @@ class MethodInjector extends BaseVisitor {
 
     const encodedPropMember = SimpleParser.parseClassMember(encodedProp, node);
     node.members.push(encodedPropMember);
-    
+
     const encodeMember = SimpleParser.parseClassMember(encodeMethod, node);
     node.members.push(encodeMember);
 

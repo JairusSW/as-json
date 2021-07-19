@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build:transform": "npx tsc -w -p ./transform",
-    "build:test": "asc assembly/test.ts --transform ./transform --target test --explicitStart",
+    "build:test": "asc assembly/test.ts --transform ./transform/lib --target test --explicitStart",
     "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
     "bench:build": "asc assembly/bench.ts --runtime stub --target bench --explicitStart",
     "bench": "node --experimental-wasi-unstable-preview1 ./bench/bench"

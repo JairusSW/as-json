@@ -11,16 +11,23 @@ function getTypeName(type) {
 }
 class MethodInjector extends visitor_as_1.BaseVisitor {
     currentClass;
-    encodeStmts = [];
-    decodeCode = [];
+    encodeStmts = new Map();
+    decodeCode = new Map();
     visitFieldDeclaration(node) {
         const name = utils_1.toString(node.name);
         if (!node.type) {
             throw new Error(`Field ${name} is missing a type declaration`);
         }
         const type = getTypeName(node.type);
-        this.encodeStmts.push(`this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
-        this.decodeCode.push(`${name}: JSON.parse<${type}>(values[${this.decodeCode.length}]),\n`);
+        const className = this.currentClass.name.text;
+        if (!this.encodeStmts.has(className))
+            this.encodeStmts.set(className, []);
+        if (!this.decodeCode.has(className))
+            this.decodeCode.set(className, []);
+        // @ts-ignore
+        this.encodeStmts.get(className).push(`this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
+        // @ts-ignore
+        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(values.get('${name}')),\n`);
     }
     visitClassDeclaration(node) {
         if (!node.members) {
@@ -28,23 +35,25 @@ class MethodInjector extends visitor_as_1.BaseVisitor {
         }
         this.currentClass = node;
         const name = utils_1.getName(node);
-        this.encodeStmts = [];
-        this.decodeCode = [];
+        this.encodeStmts.clear();
+        this.decodeCode.clear();
         this.visit(node.members);
         const encodedProp = `__encoded: string = ''`;
         const encodeMethod = `
     __encode(): void {
       // Pre-compile (faster)
       if (!this.__encoded) {
-        ${this.encodeStmts.join("\n")};
+        ${ // @ts-ignore
+        this.encodeStmts.get(name).join("\n")};
         this.__encoded = unchecked(this.__encoded.slice(0, this.__encoded.length - 1))
       }
     }
     `;
         const decodeMethod = `
-    __decode(values: Array<string>): ${name} {
+    __decode(values: Map<string, string>): ${name} {
       const decoded: ${name} = {
-        ${this.decodeCode.join("")}
+        ${ // @ts-ignore
+        this.decodeCode.get(name).join("")}
       }
       return decoded
     }

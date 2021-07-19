@@ -1,4 +1,4 @@
-import { JSON } from ".";
+import { deserializeObject, JSON } from ".";
 
 import { console, stringify } from "../node_modules/as-console/assembly/wasi";
 
@@ -24,6 +24,13 @@ const nameage: NameAge = {
   age: 14
 };
 
+// @ts-ignore
+@json
+class rano {
+  hahaaaaaaaaa: string
+  boinkkkkkkkkkkkkkkkk: i32
+}
+/*
 console.log('Checking Serialization\n')
 
 console.log('\nSerialize String:\n')
@@ -96,6 +103,12 @@ console.log(` - [[[[[[[[[[[[[[[["King Of The Mountain Array 👑 "]]]]]]]]]]]]]]
 
 console.log('\nDeserialize Object:\n')
 JSON.parse<HelloWorld>('{"hello":"world"}')
-console.log(` - {"hello":"world"} -> { hello: "world" }\n`)
-JSON.parse<NameAge>('{"name":"Jairus","age":14}')
+console.log(` - {"hello":"world"} -> { hello: "world" }\n`)*/
+
+const obj = JSON.parse<NameAge>('{"name":"Jairus","age":14}')
+
 console.log(` - {"name":"Jairus","age":14} -> { name: 'Jairus', age: 14 }\n`)
+
+console.log(`name: ${obj.name}`)
+
+console.log(`age: ${obj.age}`)

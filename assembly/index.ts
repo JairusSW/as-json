@@ -1,3 +1,5 @@
+import { stringify } from "as-console";
+
 const quote = '"';
 const comma = ",";
 const rbracket = "]";
@@ -259,21 +261,39 @@ function parseArrayArray<T extends Array<any>>(data: string): T {
 }
 
 // TODO: Rewrite and finish up.
-function deserializeObject<T>(data: string): T {
+export function deserializeObject<T>(data: string): T {
   let schema: T;
   const len = data.length - 1
-  const values = new Array<string>();
-  let lastPos: u32 = 2;
+  const values = new Map<string, string>();
+  let lastPos: u32 = 1;
   let char: string = ''
+  let key: string = ''
   for (let i: i32 = 0; i < len; i++) {
     char = data.charAt(i);
-    if (char == colon) lastPos = i + 1
-    else if (char == comma) {
-      values.push(data.slice(lastPos, i));
-      lastPos = i
+    if (char == colon) {
+      key = data.slice(lastPos+1, i-1)
+      lastPos = i + 1
+    } else if (char == comma) {
+      values.set(key, data.slice(lastPos, i));
+      lastPos = i + 1
     }
   }
-  values.push(data.slice(lastPos, len));
+  values.set(key, data.slice(lastPos, len));
   // @ts-ignore
   return schema.__decode(values);
+}
+
+/**
+ * Get the type of a JSON string.
+ * @param data string
+ * @returns string
+ */
+function getType(data: string): string {
+  const start: string = data.charAt(0)
+  if (start == quote) return 'string'
+  else if (start == 't' || start == 'f') return 'boolean'
+  else if (start == '{') return 'object'
+  else if (start == '[') return 'array'
+  else if (start == 'n') return 'null'
+  else return 'number'
 }
