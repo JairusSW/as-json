@@ -4,16 +4,16 @@
 ## Installation
 
 ```bash
-~ npm install as-json
+~ npm install json-as
 ```
 ```bash
---transform as-json/transform
+--transform json-as/transform
 ```
 
 ## Usage
 
 ```js
-import { JSON } from 'as-json'
+import { JSON } from 'json-as'
 ```
 
 **Object (schema)**
