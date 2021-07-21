@@ -1,6 +1,0 @@
-Todo:
- - Finish Object deserialization
- - Optimize all functions
-
-Ideas:
- - Add binary format? Get the WTF-16 string from memory.

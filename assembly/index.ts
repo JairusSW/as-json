@@ -261,44 +261,46 @@ function deserializeArrayArray<T extends Array<any>>(data: string): T {
 
 // TODO: Rewrite and finish up.
 function deserializeObject<T>(data: string): T {
+  console.log('Data ' + data)
   let schema: T;
   const result = new Map<string, string>();
   let lastPos: u32 = 1
   let key: string = ''
-  let instr: u32 = 0
+  let instr: boolean = false
   let char: string = ''
   let depth: u32 = 0
   let fdepth: u32 = 0
-  let inData: u32 = 0
   for (let i: u32 = 1; i < u32(data.length); i++) {
     char = data.charAt(i)
-    if (char == '"') instr = (instr ? 0 : 1)
-    if (instr === 0 && (char == "{" || char == "[")) {
-      inData = (inData === 0 && depth > 0 && depth === fdepth) ? 0 : 1
+    if (char == '"' && data.charAt(i - 1) != fwd_slash) instr = (instr ? false : true)
+    if (instr === false && (char == "{" || char == "[")) {
       depth++
     }
-    if (instr === 0 && (char == "}" || char == "]")) fdepth++;
+    if (instr === false && (char == "}" || char == "]")) fdepth++;
     if (depth !== 0 && depth === fdepth) {
+      console.log('Got Deep: ' + data.slice(lastPos + 1, i + 1))
       result.set(key, data.slice(lastPos + 1, i + 1))
       // Reset the depth
       depth = 0
       fdepth = 0
       // Set new lastPos
       lastPos = (i + 1);
-      inData = 0
     }
-    else if (inData === 0) {
+    if (depth === 0) {
       if (char == ":") {
+        console.log('Got Key ' + data.slice(lastPos + 1, i - 1))
         key = data.slice(lastPos + 1, i - 1)
         lastPos = (i)
       }
       else if (char == "}") {
+        console.log('Got Last Value ' + data.slice(lastPos + 1, i))
         char = data.slice(lastPos + 1, i)
         if (char && char !== "") result.set(key, char)
         key = ''
         lastPos = (i + 1)
       }
       else if (char == ",") {
+        console.log('Got Value ' + data.slice(lastPos + 1, i))
         char = data.slice(lastPos + 1, i)
         if (char && char !== "") result.set(key, char)
         key = ''
