@@ -1,17 +1,57 @@
-const quote = '"';
-const comma = ",";
-const rbracket = "]";
-const lbracket = "[";
-const colon = ":"
-const trueVal = "true";
-const falseVal = "false";
-const nullVal = "null";
+const quote = '"'
+const comma = ","
+const rbracket = "]"
+const lbracket = "["
+const rcbracket = "}"
+const lcbracket = "{"
+const trueVal = "true"
+const falseVal = "false"
+const nullVal = "null"
 const escapeQuote = '\\"'
 const empty_string = " "
-const fwd_slash = "\\"
-const true_char = "t"
-const false_char = "f"
-const nullStr = ""
+
+const quoteCode = '"'.charCodeAt(0)
+const commaCode = ",".charCodeAt(0)
+const rbracketCode = "]".charCodeAt(0)
+const lbracketCode = "[".charCodeAt(0)
+const rcbracketCode = "}".charCodeAt(0)
+const lcbracketCode = "{".charCodeAt(0)
+const colonCode = ":".charCodeAt(0)
+const empty_stringCode = " ".charCodeAt(0)
+const fwd_slashCode = "\\".charCodeAt(0)
+const true_charCode = "t".charCodeAt(0)
+const nullStrCode = "".charCodeAt(0)
+
+
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+// @ts-ignore
+@inline
+export function removeJSONWhitespace(data: string): string {
+  const binaryData: Uint8Array = unchecked(Uint8Array.wrap(unchecked(String.UTF8.encode(data))))
+  let instr: u32 = 0
+  // 0 = off
+  // 1 = on
+  // Numbers are faster in JS than bools
+  let char: u32 = 0
+  let pos: u32 = 0
+  for (let i = 0; i < binaryData.length; i++) {
+    unchecked(char = binaryData[i])
+    // This reverses and catches the 'instring' property.
+    if (char === quoteCode && unchecked(binaryData[i - 1] !== fwd_slashCode)) instr = (instr ? 0 : 1)
+    if (instr === 1) {
+      unchecked(binaryData[pos] = char)
+      pos++
+    } else if (instr === 0 && char !== empty_stringCode) {
+      unchecked(binaryData[pos] = char)
+      pos++
+      // We reuse the same Uint8Array here. We'll slice later.
+    }
+  }
+  return unchecked(String.UTF8.decodeUnsafe(changetype<usize>(binaryData.buffer), pos))
+  // This performs a fast .slice method
+}
+
+//trace(`StripWhitespace: ${removeJSONWhitespace(`{"firstName"  :  "Jairus",  "lastName":  "Tanaka"  ,  "human":true,"age":14,"meta":{"country":"US","awesome":true},"language":"english","location":[-43.130850291,32.926401705]}`)}\nLength: ${removeJSONWhitespace(`{"firstName"  :  "Jairus",  "lastName":  "Tanaka"  ,  "human":true,"age":14,"meta":{"country":"US","awesome":true},"language":"english","location":[-43.130850291,32.926401705]}`).length}`)
 
 /**
  * JSON encoder/decoder for AssemblyScript
@@ -24,28 +64,30 @@ export namespace JSON {
    * ```
    * @param data any
    * @returns string
-   */
+  */
+  // @ts-ignore
+  @inline
   export function stringify<T>(data: T): string {
     if (isString(data)) {
-      if (data.includes('"')) {
-        return quote + data.replaceAll(quote, escapeQuote) + quote
+      if (data.includes(quote)) {
+        return unchecked(quote + data.replaceAll(quote, escapeQuote) + quote)
       }
-      return quote + data + quote;
+      return unchecked(quote + data + quote)
     } else if (isBoolean(data)) {
-      return data ? trueVal : falseVal;
+      return data ? trueVal : falseVal
     } else if (data == null) {
       return nullVal;
     } else if (isFloat(data) || isInteger(data)) {
-      return data.toString();
+      return data.toString()
     } else if (isArray(data)) {
       // @ts-ignore
-      return serializeArray<T>(data);
+      return serializeArray<T>(data)
     }
 
     // @ts-ignore
-    if (data.__encoded == "") data.__encode();
+    if (data.__encoded.charCodeAt(0) === nullStrCode) data.__encode()
     // @ts-ignore
-    return `{${data.__encoded}}`;
+    return unchecked(lcbracket + data.__encoded + rcbracket)
   }
   /**
    * Parses valid JSON strings into their original format.
@@ -56,291 +98,291 @@ export namespace JSON {
    * @param data string
    * @returns any
    */
+  // @ts-ignore
+  @inline
   export function parse<T>(data: string): T {
     data = removeJSONWhitespace(data)
-    //let type: T;
+    // ^ More than doubles time... Need to optimize
     // @ts-ignore
-    if (isString<T>()) return deserializeString(data);
+    if (isString<T>()) return parseString(data)
     // @ts-ignore
-    if (isBoolean<T>()) return deserializeBoolean(data);
+    if (isBoolean<T>()) return parseBoolean(data)
     // @ts-ignore
-    if (isArray<T>()) return deserializeArray<T>(data);
+    if (isArray<T>()) return parseArray<T>(data)
     // @ts-ignore
-    if (isInteger<T>() || isFloat<T>()) return deserializeNumber<T>(data);
+    if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data)
     // @ts-ignore
-    return deserializeObject<T>(data);
+    return parseObject<T>(data)
   }
 }
 
-// @ts-ignore
-@inline
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function serializeNumber<T>(data: T): string {
   // @ts-ignore
-  return data.toString();
+  return unchecked(data.toString())
 }
 
-// @ts-ignore
-@inline
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function serializeString(data: string): string {
-  if (data.includes('"')) {
-    return quote + data.replaceAll(quote, escapeQuote) + quote
+  // TODO: How fast is it without the includes? Just plain replaceAll?
+  if (data.includes(quote)) {
+    return unchecked(quote + data.replaceAll(quote, escapeQuote) + quote)
   }
-  return quote + data + quote;
+  return unchecked(quote + data + quote)
 }
 
-// @ts-ignore
-@inline
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function serializeBoolean(data: number): string {
-  return data ? trueVal : falseVal;
+  return data ? trueVal : falseVal
 }
-
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function serializeArray<T extends Array<any>>(data: T): string {
   const len = data.length - 1;
-  if (len === -1) return lbracket + lbracket;
+  if (len === -1) return unchecked(lbracket + lbracket)
   let result = lbracket;
   if (isString<valueof<T>>()) {
     for (let i = 0; i < len; i++) {
-      result += serializeString(data[i]) + comma;
+      unchecked(result += serializeString(unchecked(data[i])) + comma)
     }
-    result += serializeString(data[len]) + rbracket;
-    return result;
+    unchecked(result += serializeString(unchecked(data[len])) + rbracket)
+    return result
   } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
     for (let i = 0; i < len; i++) {
-      result += serializeNumber<valueof<T>>(data[i]) + comma;
+      unchecked(result += serializeNumber<valueof<T>>(unchecked(data[i])) + comma)
     }
-    result += serializeNumber<valueof<T>>(data[len]) + rbracket;
-    return result;
+    unchecked(result += serializeNumber<valueof<T>>(unchecked(data[len])) + rbracket)
+    return result
   } else if (isBoolean<valueof<T>>()) {
     for (let i = 0; i < len; i++) {
-      result += serializeBoolean(data[i]) + comma;
+      unchecked(result += serializeBoolean(unchecked(data[i])) + comma)
     }
-    result += serializeBoolean(data[len]) + rbracket;
-    return result;
+    unchecked(result += serializeBoolean(unchecked(data[len])) + rbracket)
+    return result
   } else if (isArray<valueof<T>>()) {
     for (let i = 0; i < len; i++) {
-      result += serializeArray<valueof<T>>(data[i]) + comma;
+      unchecked(result += serializeArray<valueof<T>>(unchecked(data[i])) + comma)
     }
-    result += serializeArray<valueof<T>>(data[len]) + rbracket;
-    return result;
+    unchecked(result += serializeArray<valueof<T>>(unchecked(data[len])) + rbracket)
+    return result
   }
 
   for (let i = 0; i < len; i++) {
-    const elem = data[i];
+    const elem = unchecked(data[i])
     // @ts-ignore
-    if (elem.__encoded == nullStr) elem.__encode();
+    if (elem.__encoded.charCodeAt(0) === nullStrCode) elem.__encode()
   }
   // @ts-ignore
-  return `{${elem.__encoded}}`;
+  return unchecked(lcbracket + elem.__encoded + rcbracket)
 }
 
-function deserializeBoolean(data: string): boolean {
-  return data.charAt(0) == "t" ? true : false;
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseBoolean(data: string): boolean {
+  return unchecked(data.charAt(0) == "t") ? true : false
 }
 
-function deserializeString(data: string): string {
-  return data.slice(1, data.length - 1);
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseString(data: string): string {
+  return unchecked(data.slice(1, data.length - 1))
 }
 
-function deserializeNumber<T>(data: string): T {
-  let type: T;
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseNumber<T>(data: string): T {
+  let type: T
   // @ts-ignore
-  if (type instanceof u8) return u8(parseInt(data));
+  if (type instanceof f64) return f64(parseFloat(data))
   // @ts-ignore
-  if (type instanceof i8) return i8(parseInt(data));
+  else if (type instanceof f32) return f32(parseFloat(data))
   // @ts-ignore
-  if (type instanceof u16) return u16(parseInt(data));
+  else if (type instanceof i32) return i32(parseInt(data))
   // @ts-ignore
-  if (type instanceof i16) return i16(parseInt(data));
+  else if (type instanceof u32) return u32(parseInt(data))
   // @ts-ignore
-  if (type instanceof u32) return u32(parseInt(data));
+  else if (type instanceof u64) return u64(parseInt(data))
   // @ts-ignore
-  if (type instanceof i32) return i32(parseInt(data));
+  else if (type instanceof i64) return i64(parseInt(data))
   // @ts-ignore
-  if (type instanceof u64) return u64(parseInt(data));
+  else if (type instanceof u8) return u8(parseInt(data))
   // @ts-ignore
-  if (type instanceof i64) return i64(parseInt(data));
+  else if (type instanceof u16) return u16(parseInt(data))
   // @ts-ignore
-  if (type instanceof f32) return f32(parseFloat(data));
+  else if (type instanceof i16) return i16(parseInt(data))
   // @ts-ignore
-  return f64(parseFloat(data));
+  return i8(parseInt(data))
 }
 
-// Array Deserialization
-// TODO: Add objects
-// TODO: Maybe add null array?
-function deserializeArray<T extends Array<any>>(data: string): T {
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseArray<T extends Array<any>>(data: string): T {
   // @ts-ignore
-  if (isString<valueof<T>>()) return deserializeStringArray(data);
+  if (isString<valueof<T>>()) return parseStringArray(data)
   // @ts-ignore
-  else if (isBoolean<valueof<T>>()) return deserializeBooleanArray(data);
+  else if (isBoolean<valueof<T>>()) return parseBooleanArray(data)
   // @ts-ignore
-  else if (isArray<valueof<T>>()) return deserializeArrayArray<T>(data);
+  else if (isArray<valueof<T>>()) return parseArrayArray<T>(data)
   // @ts-ignore
-  return deserializeNumberArray<valueof<T>>(data);
+  return parseNumberArray<valueof<T>>(data)
 }
 
 // String Array
-function deserializeStringArray(data: string): Array<string> {
-  const result = new Array<string>();
-  let lastPos: u32 = 2;
-  let char: string;
-  for (let i = 1; i < data.length - 1; i++) {
-    char = data.charAt(i);
-    if (char == comma) {
-      result.push(data.slice(lastPos, i - 1).replaceAll(escapeQuote, quote));
-      lastPos = i + 2;
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseStringArray(data: string): Array<string> {
+  const result = new Array<string>()
+  let lastPos: u32 = 2
+  let char: u32 = 0
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    unchecked(char = data.charCodeAt(i))
+    if (char === commaCode) {
+      unchecked(result.push(unchecked(unchecked(data.slice(lastPos, i - 1)).replaceAll(escapeQuote, quote))))
+      lastPos = i + 2
     }
   }
-  result.push(data.slice(lastPos, data.length - 2));
-  return result;
+  unchecked(result.push(unchecked(data.slice(lastPos, data.length - 2))))
+  return result
 }
 
 // Boolean Array
-function deserializeBooleanArray(data: string): Array<boolean> {
-  const result = new Array<boolean>();
-  let char: string;
-  for (let i = 1; i < data.length - 1; i++) {
-    char = data.charAt(i);
-    if (char == true_char) {
-      result.push(true);
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseBooleanArray(data: string): Array<boolean> {
+  const result = new Array<boolean>()
+  let char: u32 = 0
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    unchecked(char = data.charCodeAt(i))
+    if (char === true_charCode) {
+      unchecked(result.push(true))
     } else {
-      result.push(false);
+      unchecked(result.push(false))
     }
   }
-  return result;
+  return result
 }
 
 // Number Array
-
-function deserializeNumberArray<T>(data: string): Array<T> {
-  const result = new Array<T>();
-  let lastPos: u32 = 0;
-  let char: string;
-  for (let i = 1; i < data.length - 1; i++) {
-    char = data.charAt(i);
-    if (char == comma) {
-      result.push(deserializeNumber<T>(data.slice(lastPos + 1, i)));
-      lastPos = i;
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseNumberArray<T>(data: string): Array<T> {
+  const result = new Array<T>()
+  let lastPos: u32 = 0
+  let char: u32 = 0
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    unchecked(char = data.charCodeAt(i))
+    if (char === commaCode) {
+      unchecked(result.push(parseNumber<T>(unchecked(data.slice(lastPos + 1, i)))))
+      lastPos = i
     }
   }
-  result.push(deserializeNumber<T>(data.slice(lastPos + 1, data.length - 1)))
-  return result;
+  unchecked(result.push(parseNumber<T>(unchecked(data.slice(lastPos + 1, data.length - 1)))))
+  return result
 }
 
 // Array Array
-function deserializeArrayArray<T extends Array<any>>(data: string): T {
-  const result = instantiate<T>();
-  let lastPos: i32 = -1;
-  let char: string;
-  let depth: u32 = 0;
-  let fdepth: u32 = 0;
-  let instr: boolean = false;
-  for (let i = 1; i < data.length - 1; i++) {
-    char = data.charAt(i);
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseArrayArray<T extends Array<any>>(data: string): T {
+  const result = instantiate<T>()
+  let lastPos: i32 = -1
+  let char: u32 = 0
+  let depth: u32 = 0
+  let fdepth: u32 = 0
+  let instr: u32 = 0
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    unchecked(char = data.charCodeAt(i))
     // This ignores [ and ] if they are inside a string.
-    if (data.charAt(i - 1) != fwd_slash && char == quote)
-      instr = (instr ? false : true);
+    if (char === quoteCode && unchecked(data.charCodeAt(i - 1) !== fwd_slashCode)) instr = instr ? 0 : 1
     // This gets the depth of the array.
-    if (instr === false && char == lbracket) depth++;
-    if (instr === false && char == rbracket) fdepth++;
-    // If the depth and found depth are equal, that is an array. Push it.
-    if (instr === false && depth > 0 && depth === fdepth) {
-      result.push(
-        deserializeArray<valueof<T>>(data.slice(lastPos + 2, i + 1))
-      )
-      // Reset the depth
-      depth = 0;
-      fdepth = 0;
-      // Set new lastPos
-      lastPos = i;
+    if (instr === 0) {
+      if (char === lbracketCode) depth++
+      if (char === rbracketCode) fdepth++
+      // If the depth and found depth are equal, that is an array. Push it.
+      if (depth > 0 && depth === fdepth) {
+        result.push(
+          parseArray<valueof<T>>(unchecked(data.slice(lastPos + 2, i + 1)))
+        )
+        // Reset the depth
+        depth = 0
+        fdepth = 0
+        // Set new lastPos
+        lastPos = i
+      }
     }
   }
   // Return the final array
-  return result;
+  return result
 }
 
-// TODO: Rewrite and finish up.
-function deserializeObject<T>(data: string): T {
-  console.log('Data ' + data)
-  let schema: T;
-  const result = new Map<string, string>();
+// TODO: Add @DogWhich's Objects
+// TODO: ^ Add `instanceof Object` check
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function parseObject<T>(data: string): T {
+  //console.log('Data ' + data)
+  const len: u32 = data.length - 1
+  let schema: T
+  const result = new Map<string, string>()
   let lastPos: u32 = 1
   let key: string = ''
-  let instr: boolean = false
-  let char: string = ''
+  let instr: u32 = 0
+  let char: u32 = 0
   let depth: u32 = 0
   let fdepth: u32 = 0
-  for (let i: u32 = 1; i < u32(data.length); i++) {
-    char = data.charAt(i)
-    if (char == '"' && data.charAt(i - 1) != fwd_slash) instr = (instr ? false : true)
-    if (instr === false && (char == "{" || char == "[")) {
-      depth++
+  for (let i: u32 = 1; i < len; i++) {
+    unchecked(char = data.charCodeAt(i))
+    if (char === quoteCode && unchecked(data.charCodeAt(i - 1) !== fwd_slashCode)) instr = (instr ? 0 : 1)
+    else if (instr === 0) {
+      if (char === lcbracketCode || char === lbracketCode) depth++
+      if (char === rcbracketCode || char === rbracketCode) fdepth++
     }
-    if (instr === false && (char == "}" || char == "]")) fdepth++;
     if (depth !== 0 && depth === fdepth) {
-      console.log('Got Deep: ' + data.slice(lastPos + 1, i + 1))
-      result.set(key, data.slice(lastPos + 1, i + 1))
+      unchecked(result.set(key, data.slice(lastPos + 1, i + 1)))
       // Reset the depth
       depth = 0
       fdepth = 0
       // Set new lastPos
-      lastPos = (i + 1);
+      lastPos = i + 1
     }
     if (depth === 0) {
-      if (char == ":") {
-        console.log('Got Key ' + data.slice(lastPos + 1, i - 1))
-        key = data.slice(lastPos + 1, i - 1)
-        lastPos = (i)
+      if (char === colonCode) {
+        unchecked(key = data.slice(lastPos + 1, i - 1))
+        lastPos = i
       }
-      else if (char == "}") {
-        console.log('Got Last Value ' + data.slice(lastPos + 1, i))
-        char = data.slice(lastPos + 1, i)
-        if (char && char !== "") result.set(key, char)
-        key = ''
-        lastPos = (i + 1)
-      }
-      else if (char == ",") {
-        console.log('Got Value ' + data.slice(lastPos + 1, i))
-        char = data.slice(lastPos + 1, i)
-        if (char && char !== "") result.set(key, char)
-        key = ''
-        lastPos = (i + 1)
+      else if (char === commaCode) {
+        if ((i - lastPos) > 0) unchecked(result.set(key, unchecked(data.slice(lastPos + 1, i))))
+        lastPos = i + 1
       }
     }
   }
+  //console.log(`Trailing:${prependType(data.slice(lastPos + 1, data.length - 1))}\nValid: ${data.slice(lastPos + 1, data.length - 1).length > 0}`)
+
+  if ((len - lastPos) > 0) unchecked(result.set(key, unchecked(data.slice(lastPos + 1, len))))
   // @ts-ignore
-  return schema.__decode(result);
+  return schema.__decode(result)
+}
+
+/**
+ * Prepend the type to a JSON string.
+ * @param data string
+ * @returns string
+ */
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+function prependType(data: string): string {
+  const start: string = data.charAt(0)
+  if (start == quote) return `<string>${data}`
+  else if (start == 't' || start == 'f') return `<boolean>${data}`
+  else if (start == '{') return `<object>${data}`
+  else if (start == '[') return `<array>${data}`
+  else if (start == 'n') return `<null>${data}`
+  else return `<number>${data}`
 }
 
 /**
  * Get the type of a JSON string.
+ * For JSON-AS >v0.2.0
  * @param data string
  * @returns string
  */
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function getType(data: string): string {
   const start: string = data.charAt(0)
-  if (start == quote) return 'string'
-  else if (start == 't' || start == 'f') return 'boolean'
-  else if (start == '{') return 'object'
-  else if (start == '[') return 'array'
-  else if (start == 'n') return 'null'
-  else return 'number'
-}
-
-function removeJSONWhitespace(data: string): string {
-  let result: string = ''
-  let instr: u32 = 0
-  // 0 = off
-  // 1 = on
-  // Numbers are faster in JS than bools
-  let char: string = ''
-  for (let i = 0; i < data.length; i++) {
-    char = data.charAt(i);
-    // Assign character to `char` variable.
-    // It helps to pre-define a variable.
-    if (char == '"' && data.charAt(i-1) != "\\\"") instr = (instr ? 0 : 1);
-    if (instr === 0 && char != ' ') result += char
-    else if (instr === 1) result += char
-  }
-  return result
+  if (start == quote) return `string`
+  else if (start == 't' || start == 'f') return `boolean`
+  else if (start == '{') return `Object`
+  else if (start == '[') return `Array<unknown>`
+  else if (start == 'n') return `null`
+  else if (data.includes('.')) return `f64`
+  else return `i64`
 }

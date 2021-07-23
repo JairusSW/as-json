@@ -37,9 +37,11 @@ class MethodInjector extends BaseVisitor {
       `this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
     );
 
+    console.log('type: ', type)
+    console.log('name: ', name)
     // @ts-ignore
     this.decodeCode.get(className).push(
-      `${name}: JSON.parse<${type}>(values.get('${name}')),\n`
+      `${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`
     );
 
   }

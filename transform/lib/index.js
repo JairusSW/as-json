@@ -26,8 +26,10 @@ class MethodInjector extends visitor_as_1.BaseVisitor {
             this.decodeCode.set(className, []);
         // @ts-ignore
         this.encodeStmts.get(className).push(`this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
+        console.log('type: ', type);
+        console.log('name: ', name);
         // @ts-ignore
-        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(values.get('${name}')),\n`);
+        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`);
     }
     visitClassDeclaration(node) {
         if (!node.members) {

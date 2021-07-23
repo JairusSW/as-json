@@ -17,7 +17,7 @@ loader.instantiate(
   imports
 ).then(wasmModule => {
   wasi.start(wasmModule)
-})
+})/*
 
 function benchStringify(name, data) {
   // Pre-run
@@ -45,4 +45,4 @@ benchStringify("array", [true,false,true]);
 benchStringify("object", {
   name: "Jairus",
   age: 14,
-});
+});*/

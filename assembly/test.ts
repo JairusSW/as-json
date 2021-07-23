@@ -36,6 +36,7 @@ const data: JSONSchema = {
 
 // Now, encode and decode
 const encoded: string = JSON.stringify(data)
+console.log(`Encoded: ${encoded}`)
 const decoded = JSON.parse<JSONSchema>(encoded)
 // We perform an equality check
 if (encoded == JSON.stringify(decoded)) {
@@ -43,3 +44,15 @@ if (encoded == JSON.stringify(decoded)) {
 } else {
   console.log('Oof. JSON-AS died.😖')
 }
+console.log(`{`)
+console.log(` firstName: ${decoded.firstName},`)
+console.log(` lastName: ${decoded.lastName},`)
+console.log(` age: ${decoded.age},`)
+console.log(` human: ${decoded.human},`)
+console.log(` meta: {`)
+console.log(`   country: ${decoded.meta.country},`)
+console.log(`   awesome: ${decoded.meta.awesome}`)
+console.log(` },`)
+console.log(` language: ${decoded.language},`)
+console.log(` location: [${decoded.location[0]}, ${decoded.location[1]}]`)
+console.log(`}`)
