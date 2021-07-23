@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "ascMain": "assembly/index.ts",
