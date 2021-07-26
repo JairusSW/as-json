@@ -19,7 +19,7 @@
       "binaryFile": "tests/output/test.wasm",
       "textFile": "tests/output/test.wat",
       "sourceMap": true,
-      "optimizeLevel": 3,
+      "optimizeLevel": 0,
       "shrinkLevel": 0,
       "converge": false,
       "noAssert": false

@@ -63,13 +63,13 @@ let ops4: u32 = 100_000
 
 let ops5: u32 = 100_000
 
-let jsonASTimeStringify = 0
+let jsonASTimeStringify: i64 = 0
 
-let jsonASTimeParse = 0
+let jsonASTimeParse: i64 = 0
 
-let nearASTimeStringify = 0
+let nearASTimeStringify: i64 = 0
 
-let nearASTimeParse = 0
+let nearASTimeParse: i64 = 0
 
 const jsonASstart = Date.now()
 
@@ -173,4 +173,14 @@ while (ops5--) {
 
 trace(`StripWhite (100,000 ops): ${Date.now() - stripWhite}ms`);
 
-(jsonASTimeParse > nearASTimeParse) ? trace(`Fastest: (JSON-AS)\nOps Faster: ${jsonASTimeParse - nearASTimeParse} ops`) : trace(`Fastest: (AssemblyScript-JSON)\nOps Faster: ${nearASTimeParse - jsonASTimeParse} ops`)
+if (jsonASTimeParse < nearASTimeParse) {
+    trace(`Fastest Parse: (JSON-AS)\nOps Faster: ${nearASTimeParse - jsonASTimeParse} ops`)
+} else {
+    trace(`Fastest Parse: (AssemblyScript-JSON)\nOps Faster: ${jsonASTimeParse - nearASTimeParse} ops`)
+}
+
+if (jsonASTimeStringify < nearASTimeStringify) {
+    trace(`Fastest Stringify: (JSON-AS)\nOps Faster: ${nearASTimeStringify - jsonASTimeStringify} ops`)
+} else {
+    trace(`Fastest Stringify: (AssemblyScript-JSON)\nOps Faster: ${jsonASTimeStringify - nearASTimeStringify} ops`)
+}

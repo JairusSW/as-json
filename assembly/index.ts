@@ -1,3 +1,7 @@
+import { StringSink } from 'as-string-sink'
+
+// TODO: Remove string equality checks and replace them with number checks
+// TODO: Use String.UTF8.encode() and decode. Serialize takes place for binary data.
 const quote = '"'
 const comma = ","
 const rbracket = "]"
@@ -8,20 +12,17 @@ const trueVal = "true"
 const falseVal = "false"
 const nullVal = "null"
 const escapeQuote = '\\"'
-const empty_string = " "
 
-const quoteCode = '"'.charCodeAt(0)
-const commaCode = ",".charCodeAt(0)
-const rbracketCode = "]".charCodeAt(0)
-const lbracketCode = "[".charCodeAt(0)
-const rcbracketCode = "}".charCodeAt(0)
-const lcbracketCode = "{".charCodeAt(0)
-const colonCode = ":".charCodeAt(0)
-const empty_stringCode = " ".charCodeAt(0)
-const fwd_slashCode = "\\".charCodeAt(0)
-const true_charCode = "t".charCodeAt(0)
-const nullStrCode = "".charCodeAt(0)
-
+const quoteCode: u32 = 34// '"'
+const commaCode: u32 = 44// ","
+const rbracketCode: u32 = 93// "]"
+const lbracketCode: u32 = 91// "["
+const rcbracketCode: u32 = 125// "}"
+const lcbracketCode: u32 = 123// "{"
+const colonCode: u32 = 58// ":"
+const empty_stringCode: u32 = 32// " "
+const fwd_slashCode: u32 = "\\".charCodeAt(0)
+const true_charCode: u32 = 116// "t"
 
 // <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 // @ts-ignore
@@ -69,12 +70,9 @@ export namespace JSON {
   @inline
   export function stringify<T>(data: T): string {
     if (isString(data)) {
-      if (data.includes(quote)) {
-        return unchecked(quote + data.replaceAll(quote, escapeQuote) + quote)
-      }
-      return unchecked(quote + data + quote)
+      return serializeString(<string>data)
     } else if (isBoolean(data)) {
-      return data ? trueVal : falseVal
+      return serializeBoolean(data)
     } else if (data == null) {
       return nullVal;
     } else if (isFloat(data) || isInteger(data)) {
@@ -85,7 +83,7 @@ export namespace JSON {
     }
 
     // @ts-ignore
-    if (data.__encoded.charCodeAt(0) === nullStrCode) data.__encode()
+    if (data.__encoded.length === 0) data.__encode()
     // @ts-ignore
     return unchecked(lcbracket + data.__encoded + rcbracket)
   }
@@ -98,21 +96,23 @@ export namespace JSON {
    * @param data string
    * @returns any
    */
+  // TODO: Us as-runtype to remove the need for the <T>?
   // @ts-ignore
   @inline
   export function parse<T>(data: string): T {
     data = removeJSONWhitespace(data)
-    // ^ More than doubles time... Need to optimize
+    // ^ Need to optimize
     // @ts-ignore
     if (isString<T>()) return parseString(data)
     // @ts-ignore
-    if (isBoolean<T>()) return parseBoolean(data)
+    else if (isBoolean<T>()) return parseBoolean(data)
     // @ts-ignore
-    if (isArray<T>()) return parseArray<T>(data)
+    else if (isArray<T>()) return parseArray<T>(data)
     // @ts-ignore
-    if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data)
+    else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data)
     // @ts-ignore
     return parseObject<T>(data)
+    // TODO: Add dynamic types.
   }
 }
 
@@ -124,7 +124,22 @@ function serializeNumber<T>(data: T): string {
 
 // <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function serializeString(data: string): string {
+  /*const binaryData = Uint8Array.wrap(String.UTF8.encode(data))
+  const resultData = new StringSink(quote)
+  let char: u32 = 0
+  for (let i = 0; i < binaryData.length; i++) {
+    unchecked(char = binaryData[i])
+    if (char === quoteCode) {
+      resultData.writeCodePoint(fwd_slashCode)
+      resultData.writeCodePoint(quoteCode)
+    } else {
+      resultData.writeCodePoint(char)
+    }
+  }
+  resultData.writeCodePoint(quoteCode)
+  console.log(`Output: ${resultData.toString()}`)*/
   // TODO: How fast is it without the includes? Just plain replaceAll?
+
   if (data.includes(quote)) {
     return unchecked(quote + data.replaceAll(quote, escapeQuote) + quote)
   }
@@ -169,7 +184,7 @@ function serializeArray<T extends Array<any>>(data: T): string {
   for (let i = 0; i < len; i++) {
     const elem = unchecked(data[i])
     // @ts-ignore
-    if (elem.__encoded.charCodeAt(0) === nullStrCode) elem.__encode()
+    if (elem.__encoded.length === 0) elem.__encode()
   }
   // @ts-ignore
   return unchecked(lcbracket + elem.__encoded + rcbracket)
@@ -182,7 +197,7 @@ function parseBoolean(data: string): boolean {
 
 // <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function parseString(data: string): string {
-  return unchecked(data.slice(1, data.length - 1))
+  return unchecked(data.slice(1, data.length - 1).replaceAll(escapeQuote, quote))
 }
 
 // <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
@@ -272,6 +287,24 @@ function parseNumberArray<T>(data: string): Array<T> {
   return result
 }
 
+// Dynamic Array
+// <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
+/*
+function parseDynamicArray(data: string): Array<unknown> {
+  const result = new Array<unknown>()
+  let lastPos: u32 = 0
+  let char: u32 = 0
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    unchecked(char = data.charCodeAt(i))
+    if (char === commaCode) {
+      unchecked(result.push(parseDynamic(unchecked(data.slice(lastPos + 1, i)))))
+      lastPos = i
+    }
+  }
+  unchecked(result.push(parseDynamic(unchecked(data.slice(lastPos + 1, data.length - 1)))))
+  return result
+}*/
+
 // Array Array
 // <inline> (Placeholder for when I want to swap it out for inline testing. I just use the replace in VScode)
 function parseArrayArray<T extends Array<any>>(data: string): T {
@@ -328,6 +361,7 @@ function parseObject<T>(data: string): T {
       if (char === rcbracketCode || char === rbracketCode) fdepth++
     }
     if (depth !== 0 && depth === fdepth) {
+      //console.log(`Deep: ${prependType(data.slice(lastPos + 1, i + 1))}`)
       unchecked(result.set(key, data.slice(lastPos + 1, i + 1)))
       // Reset the depth
       depth = 0
@@ -337,16 +371,18 @@ function parseObject<T>(data: string): T {
     }
     if (depth === 0) {
       if (char === colonCode) {
+        //console.log(`Key: ${prependType(data.slice(lastPos + 1, i - 1))}`)
         unchecked(key = data.slice(lastPos + 1, i - 1))
         lastPos = i
       }
       else if (char === commaCode) {
+        //console.log(`Value: ${prependType(data.slice(lastPos + 1, i))}`)
         if ((i - lastPos) > 0) unchecked(result.set(key, unchecked(data.slice(lastPos + 1, i))))
         lastPos = i + 1
       }
     }
   }
-  //console.log(`Trailing:${prependType(data.slice(lastPos + 1, data.length - 1))}\nValid: ${data.slice(lastPos + 1, data.length - 1).length > 0}`)
+  //console.log(`Trailing: ${prependType(data.slice(lastPos + 1, len))}\n\t\sValid: ${data.slice(lastPos + 1, len).length > 0}`)
 
   if ((len - lastPos) > 0) unchecked(result.set(key, unchecked(data.slice(lastPos + 1, len))))
   // @ts-ignore

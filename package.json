@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "ascMain": "assembly/index.ts",
@@ -16,9 +16,9 @@
   },
   "scripts": {
     "build:transform": "npx tsc -w -p ./transform",
-    "build:test": "asc assembly/benchmark.ts --transform ./transform --target test --explicitStart",
+    "build:test": "asc assembly/test.ts --transform ./transform --target test --explicitStart",
     "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
-    "bench:build": "asc assembly/bench.ts --runtime stub --target bench --explicitStart",
+    "bench:build": "asc assembly/bench.ts --transform ./transform --target bench --explicitStart",
     "bench": "node --experimental-wasi-unstable-preview1 ./bench/bench"
   },
   "devDependencies": {
@@ -26,9 +26,11 @@
     "@types/line-column": "^1.0.0",
     "as-console": "^6.0.0",
     "as-string-sink": "^0.2.2",
+    "as-variant": "^0.2.1",
     "as-wasi": "^0.4.6",
     "assemblyscript": "^0.19.5",
     "assemblyscript-json": "^1.1.0",
+    "kati": "^0.5.1",
     "typescript": "^4.3.4"
   },
   "dependencies": {
