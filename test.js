@@ -1,3 +1,2 @@
-const wasmModule = require('./index')
-
-wasmModule._start()
+const username = 'Jairus'
+console.log(username)

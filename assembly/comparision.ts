@@ -1,4 +1,4 @@
-import { JSON } from '.'
+import { JSON, removeJSONWhitespace } from '.'
 
 import * as asJSON from "assemblyscript-json";
 
@@ -50,61 +50,140 @@ const data2: JSONSchema = {
     location: [1.0, 2.0]
 };
 
-// Now, encode and decode
 const encodedJSON: string = JSON.stringify(data)
-console.log('JSON-AS: ' + encodedJSON)
-// We perform an equality check
-if (encodedJSON == JSON.stringify(JSON.parse<JSONSchema>(encodedJSON))) {
-    console.log('Yay! JSON-AS works!')
-} else {
-    console.log('Oof. JSON-AS died.')
+
+// Benchmark (Parse)
+let ops1: u32 = 100_000
+
+let ops2: u32 = 100_000
+
+let ops3: u32 = 100_000
+
+let ops4: u32 = 100_000
+
+let ops5: u32 = 100_000
+
+let jsonASTimeStringify: i64 = 0
+
+let jsonASTimeParse: i64 = 0
+
+let nearASTimeStringify: i64 = 0
+
+let nearASTimeParse: i64 = 0
+
+const jsonASstart = Date.now()
+
+while (ops1--) {
+    JSON.parse<JSONSchema>(encodedJSON)
 }
 
-// AssemblyScript-JSON test
+jsonASTimeParse = Date.now() - jsonASstart
 
-let decodedASJSON: asJSON.JSON.Obj = <asJSON.JSON.Obj>(asJSON.JSON.parse(encodedJSON));
-const firstNameVal = decodedASJSON.getString('firstName')
-if (firstNameVal) {
-    data2.firstName = firstNameVal!.valueOf()
-}
-const lastNameVal = decodedASJSON.getString('lastName')
-if (lastNameVal) {
-    data2.lastName = lastNameVal!.valueOf()
-}
-const ageVal = decodedASJSON.getInteger('age')
-if (ageVal) {
-    data2.age = i32(ageVal!.valueOf())
-}
-const humanVal = decodedASJSON.getBool('human')
-if (humanVal) {
-    data2.human = humanVal ? humanVal!.valueOf() ? true : false : false
-}
-const metaVal = decodedASJSON.getObj('meta')
-if (metaVal) {
-    const metaCountryVal = metaVal!.getString('country')
-    const metaAwesomeVal = metaVal!.getBool('awesome')
-    if (metaCountryVal) {
-        data2.meta.country = metaCountryVal.valueOf()
+trace(`JSON-AS Deserialize (100,000 ops): ${jsonASTimeParse}ms`)
+trace(`JSON-AS Deserialize (100,000 ops): ${((100_000 * 1000) / jsonASTimeParse)}ops/s`)
+
+const nearJsonstart = Date.now()
+
+while (ops2--) {
+    let decodedASJSON: asJSON.JSON.Obj = <asJSON.JSON.Obj>(asJSON.JSON.parse(encodedJSON));
+    const firstNameVal = decodedASJSON.getString('firstName')
+    if (firstNameVal) {
+        data2.firstName = firstNameVal!.valueOf()
     }
-
-    if (metaAwesomeVal) {
-        data2.meta.awesome = metaAwesomeVal.valueOf() ? true : false
+    const lastNameVal = decodedASJSON.getString('lastName')
+    if (lastNameVal) {
+        data2.lastName = lastNameVal!.valueOf()
+    }
+    const ageVal = decodedASJSON.getInteger('age')
+    if (ageVal) {
+        data2.age = i32(ageVal!.valueOf())
+    }
+    const humanVal = decodedASJSON.getBool('human')
+    if (humanVal) {
+        data2.human = humanVal ? humanVal!.valueOf() ? true : false : false
+    }
+    const metaVal = decodedASJSON.getObj('meta')
+    if (metaVal) {
+        const metaCountryVal = metaVal!.getString('country')
+        const metaAwesomeVal = metaVal!.getBool('awesome')
+        if (metaCountryVal) {
+            data2.meta.country = metaCountryVal.valueOf()
+        }
+        if (metaAwesomeVal) {
+            data2.meta.awesome = metaAwesomeVal.valueOf() ? true : false
+        }
+    }
+    const languageVal = decodedASJSON.getString('language')
+    if (languageVal) {
+        data2.language = languageVal!.valueOf()
+    }
+    const locationVal = decodedASJSON.getArr('location')
+    if (locationVal) {
+        data2.location[0] = parseFloat(locationVal!.valueOf().at(0).toString())
+        data2.location[1] = parseFloat(locationVal!.valueOf().at(1).toString())
     }
 }
-const languageVal = decodedASJSON.getString('language')
-if (languageVal) {
-    data2.language = languageVal!.valueOf()
+
+nearASTimeParse = Date.now() - nearJsonstart
+
+trace(`NEAR-JSON Deserialize (100,000 ops): ${nearASTimeParse}ms`)
+trace(`NEAR-JSON Deserialize (100,000 ops): ${((100_000 * 1000) / nearASTimeParse)}ops/s`)
+// Benchmark (Stringify)
+
+const jsonASstart1 = Date.now()
+
+while (ops3--) {
+    JSON.stringify(data)
 }
 
-const locationVal = decodedASJSON.getArr('location')
-if (locationVal) {
-    data2.location[0] = parseFloat(locationVal!.valueOf().at(0).toString())
-    data2.location[1] = parseFloat(locationVal!.valueOf().at(1).toString())
+jsonASTimeStringify = Date.now() - jsonASstart1
+
+trace(`JSON-AS Serialize (100,000 ops): ${jsonASTimeStringify}ms`)
+trace(`JSON-AS Serialize (100,000 ops): ${((100_000 * 1000) / jsonASTimeStringify)}ops/s`)
+
+const nearJsonstart1 = Date.now()
+
+while (ops4--) {
+    const encoder = new asJSON.JSONEncoder()
+    encoder.setString('firstName', 'Jair"us')
+    encoder.setString('lastName', 'T}an""aka')
+    encoder.setInteger('age', 14)
+    encoder.setBoolean('human', false)
+    encoder.pushObject('meta')
+    encoder.setString('country', 'U{S')
+    encoder.setBoolean('awesome', false)
+    encoder.popObject()
+    encoder.setString('language', 'en[glis]h')
+    encoder.pushArray('location')
+    encoder.setFloat(null, -43.130850291)
+    encoder.setFloat(null, 32.926401705)
+    encoder.popArray()
+    String.UTF8.decode(encoder.serialize().buffer)
+    // Have to decode into string because JSON-AS returns a string.
+    // Were comparing with perfect equality here. :)
 }
 
-console.log('Near JSON: ' + JSON.stringify(data2))
-if (encodedJSON == JSON.stringify(data2)) {
-    console.log('Yay! NEAR JSON works!')
+nearASTimeStringify = Date.now() - nearJsonstart1
+
+trace(`NEAR-JSON Serialize (100,000 ops): ${nearASTimeStringify}ms`)
+trace(`NEAR-JSON Serialize (100,000 ops): ${((100_000 * 1000) / nearASTimeStringify)}ops/s`)
+
+const stripWhite = Date.now()
+
+while (ops5--) {
+    removeJSONWhitespace(encodedJSON)
+}
+
+trace(`StripWhite (100,000 ops): ${Date.now() - stripWhite}ms`);
+
+if (jsonASTimeParse < nearASTimeParse) {
+    trace(`Fastest Parse: (JSON-AS)\nOps Faster: ${nearASTimeParse - jsonASTimeParse} ops`)
 } else {
-    console.log('Oof. NEAR JSON died')
+    trace(`Fastest Parse: (AssemblyScript-JSON)\nOps Faster: ${jsonASTimeParse - nearASTimeParse} ops`)
+}
+
+if (jsonASTimeStringify < nearASTimeStringify) {
+    trace(`Fastest Stringify: (JSON-AS)\nOps Faster: ${nearASTimeStringify - jsonASTimeStringify} ops`)
+} else {
+    trace(`Fastest Stringify: (AssemblyScript-JSON)\nOps Faster: ${jsonASTimeStringify - nearASTimeStringify} ops`)
 }

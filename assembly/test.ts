@@ -16,6 +16,7 @@ class JSONSchema {
 class Meta {
   country: string;
   awesome: boolean;
+  spooky: boolean;
 }
 
 // Create the JSON object
@@ -26,7 +27,8 @@ const data: JSONSchema = {
   human: true,
   meta: {
     country: 'US',
-    awesome: true
+    awesome: true,
+    spooky: false
   }
 };
 
@@ -48,6 +50,7 @@ console.log(` age: ${decoded.age},`)
 console.log(` human: ${decoded.human},`)
 console.log(` meta: {`)
 console.log(`   country: ${decoded.meta.country},`)
-console.log(`   awesome: ${decoded.meta.awesome}`)
+console.log(`   awesome: ${decoded.meta.awesome},`)
+console.log(`   spooky: ${decoded.meta.spooky}`)
 console.log(` }`)
 console.log(`}`)
