@@ -19,7 +19,9 @@
     "build:test": "asc assembly/test.ts --transform ./transform --target test --explicitStart",
     "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
     "bench:build": "asc assembly/bench.ts --transform ./transform --target bench --explicitStart",
-    "bench": "node --experimental-wasi-unstable-preview1 ./bench/bench"
+    "bench:node": "node --experimental-wasi-unstable-preview1 ./bench/bench",
+    "bench:wasmtime": "wasmtime ./bench/output/bench.wasm",
+    "bench:lunatic": "lunatic ./bench/output/bench.wasm"
   },
   "devDependencies": {
     "@assemblyscript/loader": "^0.19.5",

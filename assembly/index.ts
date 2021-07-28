@@ -11,29 +11,18 @@ const falseVal = "false"
 const nullVal = "null"
 const escapeQuote = '\\"'
 
-const quoteCode: u32 = 34// '"'
-const commaCode: u32 = 44// ","
-const rbracketCode: u32 = 93// "]"
-const lbracketCode: u32 = 91// "["
-const rcbracketCode: u32 = 125// "}"
-const lcbracketCode: u32 = 123// "{"
-const colonCode: u32 = 58// ":"
-const empty_stringCode: u32 = 32// " "
-const fwd_slashCode: u32 = "\\".charCodeAt(0)
-const true_charCode: u32 = 116// "t"
+const quoteCode: u16 = 34// '"'
+const commaCode: u16 = 44// ","
+const rbracketCode: u16 = 93// "]"
+const lbracketCode: u16 = 91// "["
+const rcbracketCode: u16 = 125// "}"
+const lcbracketCode: u16 = 123// "{"
+const colonCode: u16 = 58// ":"
+const empty_stringCode: u16  = 32// " "
+const fwd_slashCode: u16 = 92// "/"
+const true_charCode: u16 = 116// "t"
 
-const quoteCode16: u16 = load<u16>(changetype<usize>('"'))
-const commaCode16: u16 = load<u16>(changetype<usize>(","))
-const rbracketCode16: u16 = load<u16>(changetype<usize>("]"))
-const lbracketCode16: u16 = load<u16>(changetype<usize>("["))
-const rcbracketCode16: u16 = load<u16>(changetype<usize>("}"))
-const lcbracketCode16: u16 = load<u16>(changetype<usize>("{"))
-const colonCode16: u16 = load<u16>(changetype<usize>(":"))
-const empty_stringCode16: u16 = load<u16>(changetype<usize>(" "))
-const fwd_slashCode16: u16 = load<u16>(changetype<usize>("\\"))
-const true_charCode16: u16 = load<u16>(changetype<usize>("t"))
-
-// TODO: This really, really, slows it down.
+// TODO: This really slows it down.
 // @ts-ignore
 @inline
 export function removeJSONWhitespace(data: string): string {
@@ -47,11 +36,11 @@ export function removeJSONWhitespace(data: string): string {
   for (let i: u32 = 0; i < u32(binaryData.length); i++) {
     char = unchecked(binaryData[i])
     // This reverses and catches the 'instring' property.
-    if (char === quoteCode16 && unchecked(binaryData[i - 1]) !== fwd_slashCode16) instr = (instr ? 0 : 1)
+    if (char === quoteCode && unchecked(binaryData[i - 1]) !== fwd_slashCode) instr = (instr ? 0 : 1)
     if (instr === 1) {
       unchecked(binaryData[pos] = char)
       pos++
-    } else if (instr === 0 && char !== empty_stringCode16) {
+    } else if (instr === 0 && char !== empty_stringCode) {
       unchecked(binaryData[pos] = char)
       pos++
       // We reuse the same Uint8Array here. We'll slice later.
@@ -105,7 +94,7 @@ export namespace JSON {
    */
   // TODO: Us as-runtype to remove the need for the <T>?
   export function parse<T>(data: string): T {
-    data = removeJSONWhitespace(data)
+    //data = removeJSONWhitespace(data)
     // ^ Need to optimize
     // @ts-ignore
     if (isString<T>()) return parseString(data)
@@ -125,26 +114,12 @@ export namespace JSON {
 @inline
 function serializeNumber<T>(data: T): string {
   // @ts-ignore
-  return unchecked(data.toString())
+  return data.toString()
 }
 // @ts-ignore
 @inline
 function serializeString(data: string): string {
-  const resultData = new StringSink(quote)/*
-  const binaryData = Uint8Array.wrap(String.UTF8.encode(data))
-  let char: u32 = 0
-  for (let i = 0; i < binaryData.length; i++) {
-    unchecked(char = binaryData[i])
-    if (char === quoteCode) {
-      resultData.writeCodePoint(fwd_slashCode)
-      resultData.writeCodePoint(quoteCode)
-    } else {
-      resultData.writeCodePoint(char)
-    }
-  }
-  resultData.writeCodePoint(quoteCode)
-  return resultData.toString()*/
-  
+  const resultData = new StringSink(quote)
   resultData.write(data.replaceAll(quote, escapeQuote))
   resultData.writeCodePoint(quoteCode)
   return resultData.toString()
@@ -261,13 +236,14 @@ function parseArray<T extends Array<any>>(data: string): T {
 // @ts-ignore
 @inline
 function parseStringArray(data: string): Array<string> {
+  data = data.replaceAll(escapeQuote, quote)
   const result = new Array<string>()
   let lastPos: u32 = 2
   let char: u32 = 0
   for (let i: u32 = 1; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
     if (char === commaCode) {
-      result.push(data.slice(lastPos, i - 1).replaceAll(escapeQuote, quote))
+      result.push(data.slice(lastPos, i - 1))
       lastPos = i + 2
     }
   }
@@ -317,7 +293,7 @@ function parseDynamicArray(data: string): Array<unknown> {
   let lastPos: u32 = 0
   let char: u32 = 0
   for (let i: u32 = 1; i < u32(data.length - 1); i++) {
-    unchecked(char = data.charCodeAt(i))
+    char = data.charCodeAt(i)
     if (char === commaCode) {
       unchecked(result.push(parseDynamic(unchecked(data.slice(lastPos + 1, i)))))
       lastPos = i

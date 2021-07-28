@@ -43,6 +43,7 @@ if (encoded == JSON.stringify(decoded)) {
 } else {
   console.log('Oof. JSON-AS died.😖')
 }
+
 console.log(`{`)
 console.log(` firstName: ${decoded.firstName},`)
 console.log(` lastName: ${decoded.lastName},`)

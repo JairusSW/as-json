@@ -1,6 +1,10 @@
+import 'wasi'
+
+import { Date } from 'as-wasi'
+
 import { JSON, removeJSONWhitespace } from '.'
 
-import * as asJSON from "assemblyscript-json";
+import * as asssemblyscript_json from "assemblyscript-json";
 
 const str = "Hello Wor\"[]{}ld!"
 
@@ -70,20 +74,21 @@ const data2: JSONSchema = {
 const strobj = JSON.stringify(obj)
 
 function bench(title: string, code: () => void): void {
-    let ops = 100_000
-    const start = Date.now()
+    let ops: u32 = 100_000
+    const start: f64 = Date.now()
     while (ops--) {
         code()
     }
-    const time = Date.now() - start
-    if (time === 0) {
-        trace(`${title}: ~${100_000 * 1000} ops/s | ${time}ms`)
+    const time: f64 = Date.now() - start
+    if (time <= 0) {
+        console.log(`${title}: ~${100_000 * 1000}.00 ops/s | ${Math.round((time * 100)) / 100}ms`)
     } else {
-        trace(`${title}: ~${(100_000 * 1000) / time} ops/s | ${time}ms`)
+        console.log(`${title}: ~${Math.round(((100_000 * 1000) / time) * 100) / 100} ops/s | ${Math.round((time * 100)) / 100}ms`)
     }
 }
 
-trace(`Benchmarking... (x1,000,000 ops)`)
+console.log(`Benchmarking... (x1,000,000 ops)`)
+
 
 // JSON-AS Stringify
 bench('JSON-AS Stringify (string)', () => {
@@ -109,25 +114,25 @@ bench('JSON-AS Stringify (object)', () => {
 // AssemblyScript-JSON Stringify
 
 bench('AssemblyScript-JSON Stringify (string)', () => {
-    const encoder = new asJSON.JSONEncoder()
+    const encoder = new asssemblyscript_json.JSONEncoder()
     encoder.setString(null, str)
     String.UTF8.decode(encoder.serialize().buffer)
 })
 
 bench('AssemblyScript-JSON Stringify (number)', () => {
-    const encoder = new asJSON.JSONEncoder()
+    const encoder = new asssemblyscript_json.JSONEncoder()
     encoder.setInteger(null, num)
     String.UTF8.decode(encoder.serialize().buffer)
 })
 
 bench('AssemblyScript-JSON Stringify (boolean)', () => {
-    const encoder = new asJSON.JSONEncoder()
+    const encoder = new asssemblyscript_json.JSONEncoder()
     encoder.setBoolean(null, bool)
     String.UTF8.decode(encoder.serialize().buffer)
 })
 
 bench('AssemblyScript-JSON Stringify (array)', () => {
-    const encoder = new asJSON.JSONEncoder()
+    const encoder = new asssemblyscript_json.JSONEncoder()
     encoder.pushArray(null)
     encoder.setString(null, arr[0])
     encoder.setString(null, arr[1])
@@ -137,7 +142,7 @@ bench('AssemblyScript-JSON Stringify (array)', () => {
 })
 
 bench('AssemblyScript-JSON Stringify (object)', () => {
-    const encoder = new asJSON.JSONEncoder()
+    const encoder = new asssemblyscript_json.JSONEncoder()
     encoder.setString('firstName', 'Jair"us')
     encoder.setString('lastName', 'T}an""aka')
     encoder.setInteger('age', 14)
@@ -152,7 +157,7 @@ bench('AssemblyScript-JSON Stringify (object)', () => {
     encoder.setFloat(null, -43.130850291)
     encoder.setFloat(null, 32.926401705)
     encoder.popArray()
-    String.UTF8.decode(encoder.serialize().buffer)
+    encoder.serialize()
 })
 
 // JSON-AS Parse
@@ -179,23 +184,23 @@ bench('JSON-AS Parse (object)', () => {
 // AssemblyScript-JSON Parse
 
 bench('AssemblyScript-JSON Parse (string)', () => {
-    const decoder: asJSON.JSON.Str = <asJSON.JSON.Str>(asJSON.JSON.parse(strstr));
+    const decoder: asssemblyscript_json.JSON.Str = <asssemblyscript_json.JSON.Str>(asssemblyscript_json.JSON.parse(strstr));
     decoder!.valueOf()
 })
 
 bench('AssemblyScript-JSON Parse (number)', () => {
-    const decoder: asJSON.JSON.Integer = <asJSON.JSON.Integer>(asJSON.JSON.parse(strnum));
+    const decoder: asssemblyscript_json.JSON.Integer = <asssemblyscript_json.JSON.Integer>(asssemblyscript_json.JSON.parse(strnum));
     decoder!.valueOf()
 })
 
 bench('AssemblyScript-JSON Parse (boolean)', () => {
-    const decoder: asJSON.JSON.Bool = <asJSON.JSON.Bool>(asJSON.JSON.parse(strbool));
+    const decoder: asssemblyscript_json.JSON.Bool = <asssemblyscript_json.JSON.Bool>(asssemblyscript_json.JSON.parse(strbool));
     decoder!.valueOf()
 })
 
 bench('AssemblyScript-JSON Parse (array)', () => {
     const result: string[] = []
-    const decoder: asJSON.JSON.Arr = <asJSON.JSON.Arr>(asJSON.JSON.parse(strarr));
+    const decoder: asssemblyscript_json.JSON.Arr = <asssemblyscript_json.JSON.Arr>(asssemblyscript_json.JSON.parse(strarr));
     const val = decoder.valueOf()
     result.push(val.at(0).toString())
     result.push(val.at(1).toString())
@@ -203,7 +208,7 @@ bench('AssemblyScript-JSON Parse (array)', () => {
 })
 
 bench('AssemblyScript-JSON Parse (object)', () => {
-    let decodedASJSON: asJSON.JSON.Obj = <asJSON.JSON.Obj>(asJSON.JSON.parse(strobj));
+    let decodedASJSON: asssemblyscript_json.JSON.Obj = <asssemblyscript_json.JSON.Obj>(asssemblyscript_json.JSON.parse(strobj));
     const firstNameVal = decodedASJSON.getString('firstName')
     if (firstNameVal) {
         data2.firstName = firstNameVal!.valueOf()
