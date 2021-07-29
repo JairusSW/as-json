@@ -32,6 +32,24 @@
       "shrinkLevel": 0,
       "converge": false,
       "noAssert": false
+    },
+    "dynamic:bench": {
+      "binaryFile": "dynamic/bench/output/bench.wasm",
+      "textFile": "dynamic/bench/output/bench.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    },
+    "dynamic:test": {
+      "binaryFile": "dynamic/test/output/test.wasm",
+      "textFile": "dynamic/test/output/test.wat",
+      "sourceMap": true,
+      "optimizeLevel": 0,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
     }
   },
   "options": {}

@@ -1,5 +1,7 @@
 import { StringSink } from 'as-string-sink'
 
+import { Object } from '../../as-runtype/assembly/object'
+
 // TODO: Remove string equality checks and replace them with number checks
 // TODO: Use String.UTF8.encode() and decode. Serialize takes place for binary data.
 const quote = '"'
@@ -76,7 +78,9 @@ export namespace JSON {
     } else if (isArray(data)) {
       // @ts-ignore
       return serializeArray<T>(data)
-    }
+    }/* else if (data instanceof Object) {
+      return serializeDynamicObject(data)
+    }*/
 
     // @ts-ignore
     if (data.__encoded.length === 0) data.__encode()
@@ -179,8 +183,20 @@ function serializeArray<T extends Array<any>>(data: T): string {
     result.writeCodePoint(rcbracketCode)
   }
   return result.toString()
-}
+}/*
 
+// @ts-ignore
+@inline
+function serializeDynamicObject(data: Object): string{
+  const keys = Object.keys(data)
+  let key: string = ''
+  for (let i = 0; i < keys.length; i++) {
+    key = keys[i]
+    console.log(key)
+    // @ts-ignore
+    console.log(data[key])
+  }
+}*/
 // @ts-ignore
 @inline
 function parseBoolean(data: string): boolean {
