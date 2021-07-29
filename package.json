@@ -15,11 +15,6 @@
     ]
   },
   "scripts": {
-    "dynamic:transform": "tsc -w -p ./dynamic/transform",
-    "dynamic:build:test": "asc ./dynamic/test.ts --transform ./dynamic/transform/lib --target dynamic:test --explicitStart",
-    "dynamic:build:bench": "asc ./dynamic/bench.ts --transform ./dynamic/transform/lib --target dynamic:bench --explicitStart",
-    "dynamic:test": "wasmtime ./dynamic/test/output/test.wasm",
-    "dynamic:bench": "wasmtime ./dynamic/bench/output/bench.wasm",
     "build:transform": "tsc -w -p ./transform",
     "build:test": "asc assembly/test.ts --transform ./transform --target test --explicitStart",
     "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
