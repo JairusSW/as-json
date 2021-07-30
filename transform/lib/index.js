@@ -9,7 +9,7 @@ function getTypeName(type) {
     }
     return _type;
 }
-class MethodInjector extends visitor_as_1.BaseVisitor {
+class JSONTransformer extends visitor_as_1.BaseVisitor {
     currentClass;
     encodeStmts = new Map();
     decodeCode = new Map();
@@ -66,12 +66,15 @@ class MethodInjector extends visitor_as_1.BaseVisitor {
         node.members.push(decodeMember);
     }
     static visit(node) {
-        new MethodInjector().visit(node);
+        new JSONTransformer().visit(node);
+    }
+    visitSource(source) {
+        super.visitSource(source);
     }
 }
 class Encoder extends visitor_as_1.Decorator {
     visitClassDeclaration(node) {
-        MethodInjector.visit(node);
+        JSONTransformer.visit(node);
     }
     get name() {
         return "json";

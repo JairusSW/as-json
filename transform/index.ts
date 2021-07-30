@@ -1,4 +1,4 @@
-import { TypeNode, ClassDeclaration, FieldDeclaration } from "visitor-as/as";
+import { TypeNode, ClassDeclaration, FieldDeclaration, Transform, FunctionDeclaration, Parser, Source, FunctionExpression, FunctionTypeNode } from "visitor-as/as";
 import {
   SimpleParser,
   BaseVisitor,
@@ -16,7 +16,7 @@ function getTypeName(type: TypeNode): string {
   return _type;
 }
 
-class MethodInjector extends BaseVisitor {
+class JSONTransformer extends BaseVisitor {
   public currentClass?: ClassDeclaration;
   public encodeStmts = new Map<string, string[]>()
   public decodeCode = new Map<string, string[]>()
@@ -64,7 +64,7 @@ class MethodInjector extends BaseVisitor {
       // Pre-compile (faster)
       if (!this.__encoded) {
         ${// @ts-ignore
-          this.encodeStmts.get(name).join("\n")};
+      this.encodeStmts.get(name).join("\n")};
         this.__encoded = unchecked(this.__encoded.slice(0, this.__encoded.length - 1))
       }
     }
@@ -74,7 +74,7 @@ class MethodInjector extends BaseVisitor {
     __decode(values: Map<string, string>): ${name} {
       const decoded: ${name} = {
         ${// @ts-ignore
-          this.decodeCode.get(name).join("")}
+      this.decodeCode.get(name).join("")}
       }
       return decoded
     }
@@ -91,13 +91,16 @@ class MethodInjector extends BaseVisitor {
   }
 
   static visit(node: ClassDeclaration): void {
-    new MethodInjector().visit(node);
+    new JSONTransformer().visit(node);
+  }
+  visitSource(source: Source) {
+    super.visitSource(source)
   }
 }
 
 class Encoder extends Decorator {
   visitClassDeclaration(node: ClassDeclaration): void {
-    MethodInjector.visit(node);
+    JSONTransformer.visit(node);
   }
 
   get name(): string {

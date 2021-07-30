@@ -1,9 +1,10 @@
 import { StringSink } from 'as-string-sink'
 
-import { Object } from '../../as-runtype/assembly/object'
+import { unknown } from './unknown'
 
-// TODO: Remove string equality checks and replace them with number checks
-// TODO: Use String.UTF8.encode() and decode. Serialize takes place for binary data.
+const unknown_idof = idof<unknown>()
+class DynamicSchema { }
+
 const quote = '"'
 const lbracket = "["
 const rcbracket = "}"
@@ -20,13 +21,10 @@ const lbracketCode: u16 = 91// "["
 const rcbracketCode: u16 = 125// "}"
 const lcbracketCode: u16 = 123// "{"
 const colonCode: u16 = 58// ":"
-const empty_stringCode: u16  = 32// " "
+const empty_stringCode: u16 = 32// " "
 const fwd_slashCode: u16 = 92// "/"
 const true_charCode: u16 = 116// "t"
 
-// TODO: This really slows it down.
-// @ts-ignore
-@inline
 export function removeJSONWhitespace(data: string): string {
   const binaryData: Uint8Array = Uint8Array.wrap(String.UTF16.encode(data))
   let instr: u8 = 0
@@ -67,20 +65,22 @@ export namespace JSON {
    * @returns string
   */
   export function stringify<T>(data: T): string {
+    // @ts-ignore
     if (isString(data)) {
       return serializeString(<string>data)
     } else if (isBoolean(data)) {
       return serializeBoolean(data)
     } else if (data == null) {
-      return nullVal;
+      return nullVal
     } else if (isFloat(data) || isInteger(data)) {
       return data.toString()
     } else if (isArray(data)) {
       // @ts-ignore
       return serializeArray<T>(data)
-    }/* else if (data instanceof Object) {
-      return serializeDynamicObject(data)
-    }*/
+      // @ts-ignore
+    } else if (data instanceof unknown) {
+      return serializeUnknown(data)
+    }
 
     // @ts-ignore
     if (data.__encoded.length === 0) data.__encode()
@@ -96,32 +96,117 @@ export namespace JSON {
    * @param data string
    * @returns any
    */
-  // TODO: Us as-runtype to remove the need for the <T>?
   export function parse<T>(data: string): T {
-    //data = removeJSONWhitespace(data)
-    // ^ Need to optimize
-    // @ts-ignore
-    if (isString<T>()) return parseString(data)
-    // @ts-ignore
-    else if (isBoolean<T>()) return parseBoolean(data)
-    // @ts-ignore
-    else if (isArray<T>()) return parseArray<T>(data)
-    // @ts-ignore
-    else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data)
-    // @ts-ignore
-    return parseObject<T>(data)
-    // TODO: Add dynamic types.
+    data = removeJSONWhitespace(data)
+    if (idof<T>() === unknown_idof) {
+      const first = data.charCodeAt(0)
+      if (first === quoteCode) {
+        // @ts-ignore
+        return unknown.from(parseString(data))
+      } else if (first === true_charCode) {
+        // @ts-ignore
+        return unknown.from(true)
+      } else if (first === 'f'.charCodeAt(0)) {
+        // @ts-ignore
+        return unknown.from(false)
+      } else if (first === lbracketCode) {
+        // @ts-ignore
+        return unknown.from(parseUnknownArray(data))
+      }
+      else if (data.includes('.')) {
+        // @ts-ignore
+        return unknown.from(parseNumber<f64>(data))
+      } else {
+        // @ts-ignore
+        return unknown.from(parseNumber<i64>(data))
+      }
+    } else {
+      // @ts-ignore
+      if (isString<T>()) return parseString(data)
+      // @ts-ignore
+      else if (isBoolean<T>()) return parseBoolean(data)
+      // @ts-ignore
+      else if (isArray<T>()) return parseArray<T>(data)
+      // @ts-ignore
+      else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data)
+      // @ts-ignore
+      return parseObject<T>(data)
+      // TODO: Add dynamic types.
+    }
   }
 }
 
-// @ts-ignore
-@inline
 function serializeNumber<T>(data: T): string {
   // @ts-ignore
   return data.toString()
 }
-// @ts-ignore
-@inline
+
+function serializeUnknown(data: unknown): string {
+  // @ts-ignore
+  if (data.is<string>()) {
+    // @ts-ignore
+    return serializeString(data.get<string>())
+    // @ts-ignore
+  } else if (data.is<boolean>()) {
+    // @ts-ignore
+    return serializeBoolean(data.get<boolean>())
+    // @ts-ignore
+  } else if (data.is<i8>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<i8>())
+    // @ts-ignore
+  } else if (data.is<u8>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<u8>())
+    // @ts-ignore
+  } else if (data.is<u8>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<i16>())
+    // @ts-ignore
+  } else if (data.is<i16>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<u16>())
+    // @ts-ignore
+  } else if (data.is<u16>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<i32>())
+    // @ts-ignore
+  } else if (data.is<i32>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<u32>())
+    // @ts-ignore
+  } else if (data.is<u32>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<i64>())
+    // @ts-ignore
+  } else if (data.is<i64>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<u64>())
+    // @ts-ignore
+  } else if (data.is<u64>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<f32>())
+    // @ts-ignore
+  } else if (data.is<unknown>()) {
+    // @ts-ignore
+    return serializeUnknown(data.get<unknown>())
+    // @ts-ignore
+  } else if (data.is<f64>()) {
+    // @ts-ignore
+    return serializeNumber(data.get<f64>())
+    // @ts-ignore
+  } else if (data.type.toLowerCase().includes('array')) {
+    // @ts-ignore
+    return serializeArray<Array<unknown>>(data.get<Array<unknown>>())
+  } else {
+    // @ts-ignore
+    const grabbed = data.get<DynamicSchema>()
+    // @ts-ignore
+    console.log(`grabbed.__encoded: ${isDefined(grabbed.__encoded)}`)
+    return ''
+  }
+}
+
 function serializeString(data: string): string {
   const resultData = new StringSink(quote)
   resultData.write(data.replaceAll(quote, escapeQuote))
@@ -129,13 +214,10 @@ function serializeString(data: string): string {
   return resultData.toString()
 }
 
-// @ts-ignore
-@inline
 function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal
 }
-// @ts-ignore
-@inline
+
 function serializeArray<T extends Array<any>>(data: T): string {
   const len = data.length - 1;
   if (len === -1) return lbracket + lbracket
@@ -164,6 +246,14 @@ function serializeArray<T extends Array<any>>(data: T): string {
     result.write(serializeBoolean(unchecked(data[len])))
     result.writeCodePoint(rbracketCode)
     return result.toString()
+  } else if (idof<valueof<T>>() === idof<unknown>()) {
+    for (let i = 0; i < len; i++) {
+      result.write(serializeUnknown(unchecked(data[i])))
+      result.writeCodePoint(commaCode)
+    }
+    result.write(serializeUnknown(unchecked(data[len])))
+    result.writeCodePoint(rbracketCode)
+    return result.toString()
   } else if (isArray<valueof<T>>()) {
     for (let i = 0; i < len; i++) {
       result.write(serializeArray<valueof<T>>(unchecked(data[i])))
@@ -183,34 +273,20 @@ function serializeArray<T extends Array<any>>(data: T): string {
     result.writeCodePoint(rcbracketCode)
   }
   return result.toString()
-}/*
+}
 
-// @ts-ignore
-@inline
-function serializeDynamicObject(data: Object): string{
-  const keys = Object.keys(data)
-  let key: string = ''
-  for (let i = 0; i < keys.length; i++) {
-    key = keys[i]
-    console.log(key)
-    // @ts-ignore
-    console.log(data[key])
-  }
-}*/
-// @ts-ignore
-@inline
 function parseBoolean(data: string): boolean {
   return data.charCodeAt(0) === true_charCode ? true : false
 }
 
-// @ts-ignore
-@inline
 function parseString(data: string): string {
   return data.slice(1, data.length - 1).replaceAll(escapeQuote, quote)
 }
 
-// @ts-ignore
-@inline
+export function parseNull<T>(): T | null {
+  return null
+}
+
 function parseNumber<T>(data: string): T {
   let type: T
   // @ts-ignore
@@ -235,8 +311,6 @@ function parseNumber<T>(data: string): T {
   return i8(parseInt(data))
 }
 
-// @ts-ignore
-@inline
 function parseArray<T extends Array<any>>(data: string): T {
   // @ts-ignore
   if (isString<valueof<T>>()) return parseStringArray(data)
@@ -248,9 +322,47 @@ function parseArray<T extends Array<any>>(data: string): T {
   return parseNumberArray<valueof<T>>(data)
 }
 
+// Unknown Array
+export function parseUnknownArray(data: string): Array<unknown> {
+  data = data.replaceAll(escapeQuote, quote)
+  const result = new Array<unknown>()
+  let lastPos: u32 = 1
+  let key: string = ''
+  let instr: u32 = 0
+  let char: u32 = 0
+  let depth: u32 = 0
+  let fdepth: u32 = 0
+  const len: u32 = data.length - 1
+  for (let i: u32 = 1; i < len; i++) {
+    char = data.charCodeAt(i)
+    if (char === quoteCode && data.charCodeAt(i - 1) !== fwd_slashCode) instr = (instr ? 0 : 1)
+    else if (instr === 0) {
+      if (char === lcbracketCode || char === lbracketCode) depth++
+      if (char === rcbracketCode || char === rbracketCode) fdepth++
+    }
+    if (depth !== 0 && depth === fdepth) {
+      //console.log(`Deep: ${prependType(data.slice(lastPos, i + 1))}`)
+      result.push(JSON.parse<unknown>(data.slice(lastPos, i + 1)))
+      // Reset the depth
+      depth = 0
+      fdepth = 0
+      // Set new lastPos
+      lastPos = i + 1
+    }
+    if (depth === 0) {
+      if (char === commaCode) {
+        //console.log(`Value: ${data.slice(lastPos, i)}`)
+        result.push(JSON.parse<unknown>(data.slice(lastPos, i)))
+        lastPos = i + 1
+      }
+    }
+  }
+  //console.log(`Trailing: ${data.slice(lastPos, data.length - 1)} ${(lastPos - len)}`)
+  if ((lastPos - len) !== 0) result.push(JSON.parse<unknown>(data.slice(lastPos, len)))
+  return result
+}
+
 // String Array
-// @ts-ignore
-@inline
 function parseStringArray(data: string): Array<string> {
   data = data.replaceAll(escapeQuote, quote)
   const result = new Array<string>()
@@ -268,8 +380,6 @@ function parseStringArray(data: string): Array<string> {
 }
 
 // Boolean Array
-// @ts-ignore
-@inline
 function parseBooleanArray(data: string): Array<boolean> {
   const result = new Array<boolean>()
   let char: u32 = 0
@@ -285,8 +395,6 @@ function parseBooleanArray(data: string): Array<boolean> {
 }
 
 // Number Array
-// @ts-ignore
-@inline
 function parseNumberArray<T>(data: string): Array<T> {
   const result = new Array<T>()
   let lastPos: u32 = 0
@@ -320,8 +428,6 @@ function parseDynamicArray(data: string): Array<unknown> {
 }*/
 
 // Array Array
-// @ts-ignore
-@inline
 function parseArrayArray<T extends Array<any>>(data: string): T {
   const result = instantiate<T>()
   let lastPos: i32 = -1
@@ -356,8 +462,6 @@ function parseArrayArray<T extends Array<any>>(data: string): T {
 
 // TODO: Add @DogWhich's Objects
 // TODO: ^ Add `instanceof Object` check
-// @ts-ignore
-@inline
 function parseObject<T>(data: string): T {
   //console.log('Data ' + data)
   const len: u32 = data.length - 1
@@ -410,8 +514,6 @@ function parseObject<T>(data: string): T {
  * @param data string
  * @returns string
  */
-// @ts-ignore
-@inline
 function prependType(data: string): string {
   const start: string = data.charAt(0)
   if (start == quote) return `<string>${data}`
@@ -428,8 +530,6 @@ function prependType(data: string): string {
  * @param data string
  * @returns string
  */
-// @ts-ignore
-@inline
 function getType(data: string): string {
   const start: string = data.charAt(0)
   if (start == quote) return `string`

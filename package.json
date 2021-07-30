@@ -2,8 +2,8 @@
   "name": "json-as",
   "version": "0.1.4",
   "description": "JSON encoder/decoder for AssemblyScript",
-  "types": "assembly/index.ts",
-  "ascMain": "assembly/index.ts",
+  "types": "assembly/json.ts",
+  "ascMain": "assembly/json.ts",
   "author": "JairusSW",
   "license": "MIT",
   "aspkg": {
@@ -21,7 +21,10 @@
     "bench:build": "asc assembly/bench.ts --transform ./transform --target bench --explicitStart",
     "bench:node": "node --experimental-wasi-unstable-preview1 ./bench/bench",
     "bench:wasmtime": "wasmtime ./bench/output/bench.wasm",
-    "bench:lunatic": "lunatic ./bench/output/bench.wasm"
+    "bench:lunatic": "lunatic ./bench/output/bench.wasm",
+    "asbuild:untouched": "asc assembly/index.ts --target debug",
+    "asbuild:optimized": "asc assembly/index.ts --target release",
+    "asbuild": "yarn asbuild:untouched && yarn asbuild:optimized"
   },
   "devDependencies": {
     "@assemblyscript/loader": "^0.19.5",
@@ -37,7 +40,8 @@
   "dependencies": {
     "line-column": "^1.0.2",
     "typescript": "^4.3.5",
-    "visitor-as": "^0.6.0"
+    "visitor-as": "^0.6.0",
+    "@assemblyscript/loader": "^0.19.5"
   },
   "repository": {
     "type": "git",
