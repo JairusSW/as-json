@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.1.6",
+  "version": "0.1.5",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/json.ts",
   "ascMain": "assembly/json.ts",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@as-pect/cli": "^6.2.4",
-    "@assemblyscript/loader": "^0.19.5",
+    "@assemblyscript/loader": "^0.19.10",
     "@types/jest": "^26.0.24",
     "@types/line-column": "^1.0.0",
     "as-base64": "^0.2.0",
@@ -38,7 +38,7 @@
     "as-variant": "^0.2.1",
     "as-wasi": "^0.4.6",
     "asbuild": "^0.2.0",
-    "assemblyscript": "^0.19.9",
+    "assemblyscript": "^0.19.10",
     "assemblyscript-json": "^1.1.0",
     "jest": "^27.0.6",
     "kati": "^0.5.1",
