@@ -1,4 +1,0 @@
-Add null parsing
-Add dynamic arrays
-Add <T = unknown> for defaulting to dynamic unknowns
-Add dynamic types

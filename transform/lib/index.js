@@ -13,6 +13,56 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     currentClass;
     encodeStmts = new Map();
     decodeCode = new Map();
+    lastType = '';
+    sources = [];
+    /*
+      visitTypeDeclaration(node: TypeDeclaration): void {
+        const type = node.range.source.text.slice(node.range.start, node.range.end)
+        console.log(`Type: ${type}`)
+        this.lastType = type
+      }
+    
+      visitObjectLiteralExpression(node: ObjectLiteralExpression): void {
+        const keys = new Array<string>()
+        const values = new Array<any>()
+        let schemaClass = `class __schema${nanoid().replaceAll('-', '').replaceAll('_', '')} {\n`
+        let keysLength = node.names.length
+        while (keysLength--) {
+          const key = node.names[keysLength]?.text!
+          keys.unshift(key)
+        }
+        let valuesLength = node.values.length
+        while (valuesLength--) {
+          // @ts-ignore
+          const value = removeJSONWhitespace(toString(node.values[valuesLength]))
+          values.unshift(value)
+        }
+        for (let i = 0; i < keys.length; i++) {
+          const key = keys[i]
+          const value = values[i]
+          schemaClass += `\t${key}: ${getType(value)}\n`
+        }
+        schemaClass += '}'
+        console.log('Values: ', values)
+        console.log('Keys: ', keys)
+        console.log('Class: ', schemaClass)
+      }
+    
+      visitVariableStatement(node: VariableStatement): void {
+        //console.log(node)
+        if (toString(node.declarations[0]?.name!).includes('__schema')) return
+        const replaceStatement = SimpleParser.parseStatement(`const testObject: __schema = {
+        string: 'A string!',
+        float: 3.14,
+        integer: 314
+        }`) as VariableStatement
+    
+        node = replaceStatement
+    
+        console.log(node.range.source.text.slice(node.range.start, node.range.end))
+        this.sources.push(node.range.source)
+      }
+    */
     visitFieldDeclaration(node) {
         const name = utils_1.toString(node.name);
         if (!node.type) {
@@ -35,26 +85,33 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
         }
         this.currentClass = node;
         const name = utils_1.getName(node);
-        this.encodeStmts.clear();
-        this.decodeCode.clear();
+        this.encodeStmts.delete(name);
+        this.decodeCode.delete(name);
         this.visit(node.members);
         const encodedProp = `__encoded: string = ''`;
-        const encodeMethod = `
-    __encode(): void {
-      // Pre-compile (faster)
-      if (!this.__encoded) {
-        ${ // @ts-ignore
-        this.encodeStmts.get(name).join("\n")};
-        this.__encoded = unchecked(this.__encoded.slice(0, this.__encoded.length - 1))
+        let encodeMethod = ``;
+        if (this.encodeStmts.has(name) && this.encodeStmts.get(name)) {
+            encodeMethod = `
+      __encode(): void {
+        if (!this.__encoded) {
+          ${ // @ts-ignore
+            this.encodeStmts.get(name).join("\n")};
+          this.__encoded = this.__encoded.slice(0, this.__encoded.length - 1)
+        }
       }
-    }
-    `;
+      `;
+        }
+        else {
+            encodeMethod = `
+      __encode(): void {}
+      `;
+        }
         const decodeMethod = `
     __decode(values: Map<string, string>): ${name} {
-      const decoded: ${name} = {
-        ${ // @ts-ignore
-        this.decodeCode.get(name).join("")}
-      }
+        const decoded: ${name} = {
+          ${ // @ts-ignore
+        this.decodeCode.get(name) ? this.decodeCode.get(name).join("") : ''}
+        }
       return decoded
     }
     `;
