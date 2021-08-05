@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/json.ts",
   "ascMain": "assembly/json.ts",
@@ -47,13 +47,7 @@
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0"
   },
-  "dependencies": {
-    "@assemblyscript/loader": "^0.19.9",
-    "line-column": "^1.0.2",
-    "nanoid": "^3.1.23",
-    "typescript": "^4.3.5",
-    "visitor-as": "^0.6.0"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aspkg/as-json.git"

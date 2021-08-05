@@ -1,3 +1,7 @@
 {
-    "main": "./lib/index.js"
+    "main": "./lib/index.js",
+    "devDependencies": {
+        "@assemblyscript/loader": "^0.19.10",
+        "visitor-as": "^0.6.0"
+    }
 }

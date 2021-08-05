@@ -5,7 +5,6 @@ import {
   registerDecorator,
   Decorator,
 } from "visitor-as";
-import { nanoid } from 'nanoid'
 import { toString, getName } from "visitor-as/dist/utils";
 function getTypeName(type: TypeNode): string {
   let _type = getName(type);
