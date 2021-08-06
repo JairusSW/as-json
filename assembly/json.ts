@@ -4,7 +4,6 @@ import { StringSink } from 'as-string-sink'
 export class Nullable { }
 
 const quote = '"'
-const quote2 = '"\0'
 const lbracket = "["
 const rbracket = "]"
 const rcbracket = "}"
@@ -90,7 +89,7 @@ export namespace JSON {
    * @param data string
    * @returns any
    */
-  export function parse<T = Nullable | null>(data: string): T {
+  export function parse<T = Nullable>(data: string): T {
     data = removeJSONWhitespace(data)
     const char = data.charCodeAt(0)
     // @ts-ignore
@@ -100,7 +99,7 @@ export namespace JSON {
     // @ts-ignore
     else if (isArrayLike<T>()) return parseArray<T>(removeJSONWhitespace(data))
     // @ts-ignore
-    else if (isNullable<T>() && char === nCode) return parseNull()
+    else if (isNullable<T>() && char === nCode) return parseNull<T>()
     // @ts-ignore
     else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data.trim())
     // @ts-ignore
@@ -109,22 +108,30 @@ export namespace JSON {
   }
 }
 
+// @ts-ignore
+@inline
 function serializeNumber<T>(data: T): string {
   // @ts-ignore
   return data.toString()
 }
 
+// @ts-ignore
+@inline
 function serializeString(data: string): string {
   const resultData = new StringSink(quote)
-  resultData.write(data.replaceAll(quote2, escapeQuote))
+  resultData.write(data.replaceAll(quote, escapeQuote))
   resultData.writeCodePoint(quoteCode)
   return resultData.toString()
 }
 
+// @ts-ignore
+@inline
 function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal
 }
 
+// @ts-ignore
+@inline
 function serializeArray<T extends Array<any>>(data: T): string {
   const len = data.length - 1;
   if (len === -1) return lbracket + rbracket
@@ -174,18 +181,26 @@ function serializeArray<T extends Array<any>>(data: T): string {
   return result.toString()
 }
 
+// @ts-ignore
+@inline
 function parseBoolean(data: string): boolean {
   return data.charCodeAt(0) === true_charCode ? true : false
 }
 
+// @ts-ignore
+@inline
 function parseString(data: string): string {
-  return sliceQuotes(data).replaceAll(escapeQuote, quote2)
+  return sliceQuotes(data).replaceAll(escapeQuote, quote)
 }
 
-function parseNull(): Nullable | null {
+// @ts-ignore
+@inline
+function parseNull<T>(): T | null {
   return null
 }
 
+// @ts-ignore
+@inline
 function parseNumber<T>(data: string): T {
   let type: T
   // @ts-ignore
@@ -210,6 +225,8 @@ function parseNumber<T>(data: string): T {
   return I8.parseInt(data)
 }
 
+// @ts-ignore
+@inline
 function parseArray<T extends Array<any>>(data: string): T {
   // @ts-ignore
   if (isString<valueof<T>>()) return parseStringArray(data)
@@ -221,9 +238,10 @@ function parseArray<T extends Array<any>>(data: string): T {
   return parseNumberArray<valueof<T>>(data)
 }
 
-// String Array
+// @ts-ignore
+@inline
 function parseStringArray(data: string): Array<string> {
-  data = data.replaceAll(escapeQuote, quote2)
+  data = data.replaceAll(escapeQuote, quote)
   const result = new Array<string>()
   if (data.length === 2) return result
   let lastPos: u32 = 2
@@ -239,7 +257,8 @@ function parseStringArray(data: string): Array<string> {
   return result
 }
 
-// Boolean Array
+// @ts-ignore
+@inline
 function parseBooleanArray(data: string): Array<boolean> {
   const result = new Array<boolean>()
   if (data.length === 2) return result
@@ -257,7 +276,8 @@ function parseBooleanArray(data: string): Array<boolean> {
   return result
 }
 
-// Number Array
+// @ts-ignore
+@inline
 function parseNumberArray<T>(data: string): Array<T> {
   const result = new Array<T>()
   if (data.length === 2) return result
@@ -274,7 +294,8 @@ function parseNumberArray<T>(data: string): Array<T> {
   return result
 }
 
-// Array Array
+// @ts-ignore
+@inline
 function parseArrayArray<T extends Array<any>>(data: string): T {
   const result = instantiate<T>()
   if (data.length === 2) return result
@@ -308,8 +329,8 @@ function parseArrayArray<T extends Array<any>>(data: string): T {
   return result
 }
 
-// TODO: Add @DogWhich's Objects
-// TODO: ^ Add `instanceof Object` check
+// @ts-ignore
+@inline
 function parseObject<T>(data: string): T {
   //console.log('Data ' + data)
   const len: u32 = data.length - 1
@@ -389,6 +410,8 @@ function getType(data: string): string {
   else return `i64`
 }
 
+// @ts-ignore
+@inline
 export function sliceQuotes(data: string): string {
   var len = data.length - 2
   if (len <= 0) return changetype<string>("");

@@ -4,6 +4,16 @@ import { Date } from 'as-wasi'
 
 import { JSON } from './json'
 
+// @ts-ignore
+@json
+class JSONSchema {
+    bool: boolean
+}
+
+const jsonData: JSONSchema = {
+    bool: true
+}
+
 export function bench(title: string, code: () => void): void {
     let ops: u32 = 100_000
     const start: f64 = Date.now()
@@ -50,10 +60,18 @@ bench('Parse Boolean', () => {
     JSON.parse<boolean>('true')
 })
 
-bench('Stringify Bool', () => {
-    JSON.stringify<bool>(true)
+bench('Stringify Array', () => {
+    JSON.stringify<boolean[]>([true, false, true])
 })
 
-bench('Parse Bool', () => {
-    JSON.parse<bool>('true')
+bench('Parse Array', () => {
+    JSON.parse<boolean[]>('[true,false,true]')
+})
+
+bench('Stringify Object', () => {
+    JSON.stringify<JSONSchema>(jsonData)
+})
+
+bench('Parse Object', () => {
+    JSON.parse<JSONSchema>('{"bool":true}')
 })
