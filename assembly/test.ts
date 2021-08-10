@@ -2,7 +2,6 @@ import { any } from './any'
 import { console } from "../node_modules/as-console/assembly/wasi"
 
 import { JSON, serializeany } from './json'
-import { getType, parseName } from './getType'
 
 import { Object } from './Object'
 

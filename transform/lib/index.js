@@ -59,7 +59,6 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
             throw new Error(`Field ${name} is missing a type declaration`);
         }
         const type = getTypeName(node.type);
-        if (!this.currentClass) return
         const className = this.currentClass.name.text;
         if (!this.encodeStmts.has(className))
             this.encodeStmts.set(className, []);
@@ -68,7 +67,7 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
         // @ts-ignore
         this.encodeStmts.get(className).push(`this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
         // @ts-ignore
-        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(values.get('${name}')),\n`);
+        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`);
     }
     visitClassDeclaration(node) {
         super.visitClassDeclaration(node);
@@ -159,8 +158,8 @@ module.exports = class MyTransform extends as_1.Transform {
         }
         let i = 0;
         for (const source of transformer.sources) {
-            //source.internalPath += `${i++}.ts`
-            //console.log(source.internalPath)
+            source.internalPath += `${i++}.ts`;
+            console.log(source.internalPath);
             parser.sources.push(source);
         }
     }

@@ -186,8 +186,8 @@ export = class MyTransform extends Transform {
     }
     let i = 0
     for (const source of transformer.sources) {
-      //source.internalPath += `${i++}.ts`
-      //console.log(source.internalPath)
+      source.internalPath += `${i++}.ts`
+      console.log(source.internalPath)
       parser.sources.push(source)
     }
   }
