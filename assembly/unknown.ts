@@ -1,4 +1,4 @@
-export enum anyTypes {
+export enum UnknownTypes {
     u8,
     u16,
     u32,
@@ -14,7 +14,8 @@ export enum anyTypes {
     null,
 }
 
-export class any {
+// @ts-ignore
+export class Unknown {
     public value: usize = 0
     public type: usize = 0
     public typeName: string = ''
@@ -23,50 +24,50 @@ export class any {
     set<T>(data: T): void {
         if (isBoolean<T>()) {
             this.value = data ? 1 : 0
-            this.type = anyTypes.boolean
+            this.type = UnknownTypes.boolean
         } else if (isFloat<T>()) {
             if (data instanceof f32) {
                 // @ts-ignore
                 this.f32 = data
-                this.type = anyTypes.f32
+                this.type = UnknownTypes.f32
             } else {
                 // @ts-ignore
                 this.f64 = data
-                this.type = anyTypes.f64
+                this.type = UnknownTypes.f64
             }
         } else if (isInteger<T>()) {
             if (isSigned<T>()) {
                 if (data instanceof i8) {
                     this.value = usize(data)
-                    this.type = anyTypes.i8
+                    this.type = UnknownTypes.i8
                 } else if (data instanceof i16) {
                     this.value = usize(data)
-                    this.type = anyTypes.i16
+                    this.type = UnknownTypes.i16
                 } else if (data instanceof i32) {
                     this.value = usize(data)
-                    this.type = anyTypes.i32
+                    this.type = UnknownTypes.i32
                 } else if (data instanceof i64) {
                     this.value = usize(data)
-                    this.type = anyTypes.i64
+                    this.type = UnknownTypes.i64
                 }
             } else {
                 if (data instanceof u8) {
                     this.value = usize(data)
-                    this.type = anyTypes.u8
+                    this.type = UnknownTypes.u8
                 } else if (data instanceof u16) {
                     this.value = usize(data)
-                    this.type = anyTypes.u16
+                    this.type = UnknownTypes.u16
                 } else if (data instanceof u32) {
                     this.value = usize(data)
-                    this.type = anyTypes.u32
+                    this.type = UnknownTypes.u32
                 } else if (data instanceof u64) {
                     this.value = usize(data)
-                    this.type = anyTypes.u64
+                    this.type = UnknownTypes.u64
                 }
             }
         } else if (data === null) {
             this.value = usize(0)
-            this.type = anyTypes.null
+            this.type = UnknownTypes.null
         } else {
             this.value = changetype<usize>(data)
             this.type = idof<T>()
@@ -126,8 +127,8 @@ export class any {
             return changetype<T>(this.value)
         }
     }
-    static wrap<T>(data: T): any {
-        const unk = new any()
+    static wrap<T>(data: T): Unknown {
+        const unk = new Unknown()
         unk.set(data)
         return unk
     }

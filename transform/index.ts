@@ -25,7 +25,6 @@ class JSONTransformer extends BaseVisitor {
   public lastType: string = ''
   public sources: Source[] = []
 
-  private linecol: any = 0
   private globalStatements: Statement[] = []
   public replaceNextLines = new Set<number>()
 
@@ -50,11 +49,11 @@ class JSONTransformer extends BaseVisitor {
   }
   visitArrayLiteralExpression(node: ArrayLiteralExpression): void {
     super.visitArrayLiteralExpression(node)
-    if (isanyArray(node)) {
+    if (isUnknownArray(node)) {
       for (let i = 0; i < node.elementExpressions.length; i++) {
         const expr = node.elementExpressions[i];
         // @ts-ignore
-        const replacement = SimpleParser.parseExpression(`any.wrap(${toString(expr)})`)
+        const replacement = SimpleParser.parseExpression(`Unknown.wrap(${toString(expr)})`)
         node.elementExpressions[i] = replacement
         this.sources.push(replacement.range.source)
       }
@@ -69,19 +68,20 @@ class JSONTransformer extends BaseVisitor {
     }
 
     const type = getTypeName(node.type);
+    if (this.currentClass) {
+      const className = this.currentClass!.name.text
+      if (!this.encodeStmts.has(className)) this.encodeStmts.set(className, [])
+      if (!this.decodeCode.has(className)) this.decodeCode.set(className, [])
+      // @ts-ignore
+      this.encodeStmts.get(className).push(
+        `this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
+      );
 
-    const className = this.currentClass!.name.text
-    if (!this.encodeStmts.has(className)) this.encodeStmts.set(className, [])
-    if (!this.decodeCode.has(className)) this.decodeCode.set(className, [])
-    // @ts-ignore
-    this.encodeStmts.get(className).push(
-      `this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
-    );
-
-    // @ts-ignore
-    this.decodeCode.get(className).push(
-      `${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`
-    );
+      // @ts-ignore
+      this.decodeCode.get(className).push(
+        `${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`
+      );
+    }
 
   }
 
@@ -166,7 +166,7 @@ class Encoder extends Decorator {
   }
 
   get sourceFilter() {
-    return (_: any) => true;
+    return (_: Unknown) => true;
   }
 }
 
@@ -186,14 +186,17 @@ export = class MyTransform extends Transform {
     }
     let i = 0
     for (const source of transformer.sources) {
-      source.internalPath += `${i++}.ts`
+      //source.internalPath += `${i++}.ts`
       console.log(source.internalPath)
-      parser.sources.push(source)
+      if (i === 0) {
+        parser.sources.push(source)
+        i++
+      }
     }
   }
 }
 
-function isanyArray(node: ArrayLiteralExpression): boolean {
+function isUnknownArray(node: ArrayLiteralExpression): boolean {
   if (node.elementExpressions.length === 0) return false
   const firstKind = node.elementExpressions[0]?.kind
   const isBoolean = (toString(node.elementExpressions[0]!) === 'true' || toString(node.elementExpressions[0]!) === 'false')

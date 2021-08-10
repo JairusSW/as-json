@@ -1,7 +1,7 @@
-import { any } from './any'
+import { Unknown } from './Unknown'
 import { console } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON, serializeany } from './json'
+import { JSON, serializeUnknown } from './json'
 
 import { Object } from './Object'
 
@@ -178,14 +178,14 @@ check<JSONSchema>('Encode/Decode object', obj)
 check<EmptySchema>('Encode/Decode object', emptyObj)*/
 
 // Variant
-//console.log(JSON.stringify<any[]>([any.wrap(3.14), any.wrap('strings too!'), any.wrap<u32>(14), any.wrap(false), any.wrap(true), any.wrap(['Deep arrays too!'])]))
+//console.log(JSON.stringify<Unknown[]>([Unknown.wrap(3.14), Unknown.wrap('strings too!'), Unknown.wrap<u32>(14), Unknown.wrap(false), Unknown.wrap(true), Unknown.wrap(['Deep arrays too!'])]))
 
 const o = new Object()
 
 o['haha'] = 'ha'
 
-o['haha']
+console.log(o['haha'].get<string>())
 
-// const anyArray = ["Hello Dynamic Arrays", 3.14, true, false, ["haha"]]
+// const UnknownArray = ["Hello Dynamic Arrays", 3.14, true, false, ["haha"]]
 
-// console.log(anyArray[0].get<string>())
+// console.log(UnknownArray[0].get<string>())

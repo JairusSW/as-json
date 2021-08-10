@@ -1,6 +1,6 @@
 import { StringSink } from 'as-string-sink'
 
-import { any, anyTypes } from './any'
+import { Unknown, UnknownTypes } from './Unknown'
 
 @global
 export class Nullable { }
@@ -28,7 +28,7 @@ const fwd_slashCode: u16 = 92// "/"
 const true_charCode: u16 = 116// "t"
 const nCode: u16 = 110// "n"
 
-const anyId = idof<any>()
+const UnknownId = idof<Unknown>()
 const stringId = idof<string>()
 const arrayStringId = idof<string[]>()
 const arrayBooleanId = idof<boolean[]>()
@@ -43,7 +43,7 @@ const arrayI32Id = idof<i32[]>()
 const arrayI64Id = idof<i64[]>()
 const arrayF32Id = idof<f32[]>()
 const arrayF64Id = idof<f64[]>()
-const arrayanyId = idof<any[]>()
+const arrayUnknownId = idof<Unknown[]>()
 
 const WS1 = " "
 const WS2 = '\u0020'
@@ -78,7 +78,7 @@ export namespace JSON {
    * ```js
    * JSON.stringify<T>(data)
    * ```
-   * @param data any
+   * @param data Unknown
    * @returns string
   */
   export function stringify<T = Nullable | null>(data: T): string {
@@ -95,8 +95,8 @@ export namespace JSON {
     } else if (isArrayLike(data)) {
       // @ts-ignore
       return serializeArray<T>(data)
-    } else if (data instanceof any) {
-      return serializeany(data)
+    } else if (data instanceof Unknown) {
+      return serializeUnknown(data)
     }
 
     // @ts-ignore
@@ -132,9 +132,9 @@ export namespace JSON {
   }
 }
 
-export function serializeany(data: any): string {
-  if (data.type === anyId) {
-    return serializeany(data.get<any>())
+export function serializeUnknown(data: Unknown): string {
+  if (data.type === UnknownId) {
+    return serializeUnknown(data.get<Unknown>())
   }
   if (data.type === stringId) {
     return serializeString(data.get<string>())
@@ -178,44 +178,44 @@ export function serializeany(data: any): string {
   if (data.type === arrayF64Id) {
     return serializeArray(data.get<f64[]>())
   }
-  if (data.type === arrayanyId) {
-    return serializeArray(data.get<any[]>())
+  if (data.type === arrayUnknownId) {
+    return serializeArray(data.get<Unknown[]>())
   }*/
-  if (data.type === anyTypes.boolean) {
+  if (data.type === UnknownTypes.boolean) {
     // @ts-ignore
     return serializeBoolean(data.get<boolean>())
   }
-  if (data.type === anyTypes.i8) {
+  if (data.type === UnknownTypes.i8) {
     return data.get<i8>().toString()
   }
-  if (data.type === anyTypes.i16) {
+  if (data.type === UnknownTypes.i16) {
     return data.get<i16>().toString()
   }
-  if (data.type === anyTypes.i32) {
+  if (data.type === UnknownTypes.i32) {
     return data.get<i32>().toString()
   }
-  if (data.type === anyTypes.i64) {
+  if (data.type === UnknownTypes.i64) {
     return data.get<i64>().toString()
   }
-  if (data.type === anyTypes.u8) {
+  if (data.type === UnknownTypes.u8) {
     return data.get<u8>().toString()
   }
-  if (data.type === anyTypes.u16) {
+  if (data.type === UnknownTypes.u16) {
     return data.get<u16>().toString()
   }
-  if (data.type === anyTypes.u32) {
+  if (data.type === UnknownTypes.u32) {
     return data.get<u32>().toString()
   }
-  if (data.type === anyTypes.u64) {
+  if (data.type === UnknownTypes.u64) {
     return data.get<u64>().toString()
   }
-  if (data.type === anyTypes.f32) {
+  if (data.type === UnknownTypes.f32) {
     return data.get<f32>().toString()
   }
-  if (data.type === anyTypes.f64) {
+  if (data.type === UnknownTypes.f64) {
     return data.get<f64>().toString()
   }
-  if (data.type === anyTypes.null) {
+  if (data.type === UnknownTypes.null) {
     return nullVal
   }
   return 'idk!'
@@ -245,7 +245,7 @@ function serializeBoolean(data: number): string {
 
 // @ts-ignore
 @inline
-function serializeArray<T extends Array<any>>(data: T): string {
+function serializeArray<T extends Array<Unknown>>(data: T): string {
   let type!: valueof<T>
   const len = data.length - 1;
   if (len === -1) return lbracket + rbracket
@@ -275,12 +275,12 @@ function serializeArray<T extends Array<any>>(data: T): string {
     result.writeCodePoint(rbracketCode)
     return result.toString()
     // @ts-ignore
-  } else if (type instanceof any) {
+  } else if (type instanceof Unknown) {
     for (let i = 0; i < len; i++) {
-      result.write(serializeany(unchecked(data[i])))
+      result.write(serializeUnknown(unchecked(data[i])))
       result.writeCodePoint(commaCode)
     }
-    result.write(serializeany(unchecked(data[len])))
+    result.write(serializeUnknown(unchecked(data[len])))
     result.writeCodePoint(rbracketCode)
     return result.toString()
   } else if (isArray<valueof<T>>()) {
@@ -350,7 +350,7 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-function parseArray<T extends Array<any>>(data: string): T {
+function parseArray<T extends Array<Unknown>>(data: string): T {
   // @ts-ignore
   if (isString<valueof<T>>()) return parseStringArray(data)
   // @ts-ignore
@@ -419,7 +419,7 @@ function parseNumberArray<T>(data: string): Array<T> {
 
 // @ts-ignore
 @inline
-function parseArrayArray<T extends Array<any>>(data: string): T {
+function parseArrayArray<T extends Array<Unknown>>(data: string): T {
   const result = instantiate<T>()
   if (data.length === 2) return result
   let lastPos: i32 = -1
@@ -506,7 +506,7 @@ function parseObject<T>(data: string): T {
 export function sliceQuotes(data: string): string {
   const len = data.length - 2
   if (len <= 0) return changetype<string>("");
-  const out = changetype<string>(__new(len << 1, idof<string>()));
-  memory.copy(changetype<usize>(out), changetype<usize>(data) + (<usize>1 << 1), <usize>len << 1);
+  const out = changetype<string>(__new(len << 1, stringId));
+  memory.copy(changetype<usize>(out), changetype<usize>(data) + (<usize>2), <usize>len << 1);
   return out;
 }

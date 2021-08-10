@@ -18,7 +18,6 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     decodeCode = new Map();
     lastType = '';
     sources = [];
-    linecol = 0;
     globalStatements = [];
     replaceNextLines = new Set();
     /*visitBinaryExpression(node: BinaryExpression): void {
@@ -41,11 +40,11 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     }
     visitArrayLiteralExpression(node) {
         super.visitArrayLiteralExpression(node);
-        if (isanyArray(node)) {
+        if (isUnknownArray(node)) {
             for (let i = 0; i < node.elementExpressions.length; i++) {
                 const expr = node.elementExpressions[i];
                 // @ts-ignore
-                const replacement = visitor_as_1.SimpleParser.parseExpression(`any.wrap(${utils_1.toString(expr)})`);
+                const replacement = visitor_as_1.SimpleParser.parseExpression(`Unknown.wrap(${utils_1.toString(expr)})`);
                 node.elementExpressions[i] = replacement;
                 this.sources.push(replacement.range.source);
             }
@@ -59,15 +58,17 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
             throw new Error(`Field ${name} is missing a type declaration`);
         }
         const type = getTypeName(node.type);
-        const className = this.currentClass.name.text;
-        if (!this.encodeStmts.has(className))
-            this.encodeStmts.set(className, []);
-        if (!this.decodeCode.has(className))
-            this.decodeCode.set(className, []);
-        // @ts-ignore
-        this.encodeStmts.get(className).push(`this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
-        // @ts-ignore
-        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`);
+        if (this.currentClass) {
+            const className = this.currentClass.name.text;
+            if (!this.encodeStmts.has(className))
+                this.encodeStmts.set(className, []);
+            if (!this.decodeCode.has(className))
+                this.decodeCode.set(className, []);
+            // @ts-ignore
+            this.encodeStmts.get(className).push(`this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
+            // @ts-ignore
+            this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`);
+        }
     }
     visitClassDeclaration(node) {
         super.visitClassDeclaration(node);
@@ -129,7 +130,7 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
         super.visitSource(source);
     }
 }
-function isanyArray(node) {
+function isUnknownArray(node) {
     if (node.elementExpressions.length === 0)
         return false;
     const firstKind = node.elementExpressions[0]?.kind;
@@ -158,9 +159,12 @@ module.exports = class MyTransform extends as_1.Transform {
         }
         let i = 0;
         for (const source of transformer.sources) {
-            source.internalPath += `${i++}.ts`;
+            //source.internalPath += `${i++}.ts`
             console.log(source.internalPath);
-            parser.sources.push(source);
+            if (i === 0) {
+                parser.sources.push(source);
+                i++;
+            }
         }
     }
 };

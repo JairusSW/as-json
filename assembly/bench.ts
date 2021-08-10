@@ -4,6 +4,10 @@ import { Date } from 'as-wasi'
 
 import { JSON } from './json'
 
+import * as asJSON from "assemblyscript-json"
+
+import * as serialJSON from '../serial-as/json/assembly/index'
+
 // @ts-ignore
 @json
 class JSONSchema {
@@ -28,50 +32,186 @@ export function bench(title: string, code: () => void): void {
     }
 }
 
-bench('Stringify String', () => {
+bench('AS-JSON Stringify String', () => {
     JSON.stringify<string>('Hello World')
 })
 
-bench('Parse String', () => {
+bench('AS-JSON Parse String', () => {
     JSON.parse<string>('"Hello World"')
 })
 
-bench('Stringify Integer', () => {
+bench('AS-JSON Stringify Integer', () => {
     JSON.stringify<i32>(14)
 })
 
-bench('Parse Integer', () => {
+bench('AS-JSON Parse Integer', () => {
     JSON.parse<i32>('14')
 })
 
-bench('Stringify Float', () => {
+bench('AS-JSON Stringify Float', () => {
     JSON.stringify<f64>(7.3)
 })
 
-bench('Parse Float', () => {
+bench('AS-JSON Parse Float', () => {
     JSON.parse<f64>('7.3')
 })
 
-bench('Stringify Boolean', () => {
+bench('AS-JSON Stringify Boolean', () => {
     JSON.stringify<boolean>(true)
 })
 
-bench('Parse Boolean', () => {
+bench('AS-JSON Parse Boolean', () => {
     JSON.parse<boolean>('true')
 })
 
-bench('Stringify Array', () => {
+bench('AS-JSON Stringify Array', () => {
     JSON.stringify<boolean[]>([true, false, true])
 })
 
-bench('Parse Array', () => {
+bench('AS-JSON Parse Array', () => {
     JSON.parse<boolean[]>('[true,false,true]')
 })
 
-bench('Stringify Object', () => {
+bench('AS-JSON Stringify Object', () => {
     JSON.stringify<JSONSchema>(jsonData)
 })
 
-bench('Parse Object', () => {
+bench('AS-JSON Parse Object', () => {
     JSON.parse<JSONSchema>('{"bool":true}')
+})
+
+bench('@serial-as/json Stringify String', () => {
+    serialJSON.JSON.encode("Hello World")
+})
+
+bench('@serial-as/json Parse String', () => {
+    serialJSON.JSON.decode<string>('"Hello World"')
+})
+
+bench('@serial-as/json Stringify Integer', () => {
+    serialJSON.JSON.encode<i32>(14)
+})
+
+bench('@serial-as/json Parse Integer', () => {
+    serialJSON.JSON.decode<i32>('14')
+})
+
+bench('@serial-as/json Stringify Float', () => {
+    serialJSON.JSON.encode<f64>(7.3)
+})
+
+bench('@serial-as/json Parse Float', () => {
+    serialJSON.JSON.decode<f64>('7.3')
+})
+
+bench('@serial-as/json Stringify Boolean', () => {
+    serialJSON.JSON.encode<boolean>(true)
+})
+
+bench('@serial-as/json Parse Boolean', () => {
+    serialJSON.JSON.decode<boolean>('true')
+})
+
+bench('@serial-as/json Stringify Array', () => {
+    serialJSON.JSON.encode<boolean[]>([true, false, true])
+})
+
+bench('@serial-as/json Parse Array', () => {
+    serialJSON.JSON.decode<boolean[]>('[true,false,true]')
+})
+
+bench('@serial-as/json Stringify Object', () => {
+    serialJSON.JSON.encode<JSONSchema>(jsonData)
+})
+
+bench('@serial-as/json Parse Object', () => {
+    serialJSON.JSON.decode<JSONSchema>('{"bool":true}')
+})
+
+bench('AssemblyScript-JSON Stringify String', () => {
+    const encoder = new asJSON.JSONEncoder()
+    encoder.setString(null, "Hello World")
+    const binary = encoder.serialize()
+    String.UTF8.decode(binary.buffer)
+    // Its odd. Not encoded in UTF16 Strings.
+    // Since AS-JSON returns a string, so does assemblyscript-json in this bench.
+    // Or else, the bench is biased. 
+})
+
+bench('AssemblyScript-JSON Parse String', () => {
+    const decoder: asJSON.JSON.Str = <asJSON.JSON.Str>(asJSON.JSON.parse(Uint8Array.wrap(String.UTF8.encode('"Hello World"'))))
+    decoder.valueOf()
+})
+
+bench('AssemblyScript-JSON Stringify Integer', () => {
+    const encoder = new asJSON.JSONEncoder()
+    encoder.setInteger(null, 14)
+    const binary = encoder.serialize()
+    String.UTF8.decode(binary.buffer)
+})
+
+bench('AssemblyScript-JSON Parse Integer', () => {
+    const decoder: asJSON.JSON.Integer = <asJSON.JSON.Integer>(asJSON.JSON.parse(Uint8Array.wrap(String.UTF8.encode('14'))))
+    decoder.valueOf()
+})
+
+bench('AssemblyScript-JSON Stringify Float', () => {
+    const encoder = new asJSON.JSONEncoder()
+    encoder.setFloat(null, 7.3)
+    const binary = encoder.serialize()
+    String.UTF8.decode(binary.buffer)
+})
+
+bench('AssemblyScript-JSON Parse Float', () => {
+    const decoder: asJSON.JSON.Float = <asJSON.JSON.Float>(asJSON.JSON.parse(Uint8Array.wrap(String.UTF8.encode('7.3'))))
+    decoder.valueOf()
+})
+
+bench('AssemblyScript-JSON Stringify Boolean', () => {
+    const encoder = new asJSON.JSONEncoder()
+    encoder.setBoolean(null, true)
+    const binary = encoder.serialize()
+    String.UTF8.decode(binary.buffer)
+})
+
+bench('AssemblyScript-JSON Parse Boolean', () => {
+    const decoder: asJSON.JSON.Bool = <asJSON.JSON.Bool>(asJSON.JSON.parse(Uint8Array.wrap(String.UTF8.encode('true'))))
+    decoder.valueOf()
+})
+
+bench('AssemblyScript-JSON Stringify Array', () => {
+    const encoder = new asJSON.JSONEncoder()
+    encoder.pushArray(null)
+    encoder.setBoolean(null, true)
+    encoder.setBoolean(null, false)
+    encoder.setBoolean(null, true)
+    encoder.popArray()
+    const binary = encoder.serialize()
+    String.UTF8.decode(binary.buffer)
+})
+
+bench('AssemblyScript-JSON Parse Array', () => {
+    const decoder: asJSON.JSON.Arr = <asJSON.JSON.Arr>(asJSON.JSON.parse(Uint8Array.wrap(String.UTF8.encode('[true,false,true]'))))
+    const result = decoder.valueOf()
+    const pos0: asJSON.JSON.Bool = <asJSON.JSON.Bool>result.at(0)
+    pos0.valueOf()
+    const pos1: asJSON.JSON.Bool = <asJSON.JSON.Bool>result.at(1)
+    pos1.valueOf()
+    const pos2: asJSON.JSON.Bool = <asJSON.JSON.Bool>result.at(2)
+    pos2.valueOf()
+})
+
+bench('AssemblyScript-JSON Stringify Object', () => {
+    const encoder = new asJSON.JSONEncoder()
+    encoder.pushObject(null)
+    encoder.setBoolean('bool', true)
+    encoder.popObject()
+    const binary = encoder.serialize()
+    String.UTF8.decode(binary.buffer)
+})
+
+bench('AssemblyScript-JSON Parse Object', () => {
+    const decoder: asJSON.JSON.Obj = <asJSON.JSON.Obj>(asJSON.JSON.parse(Uint8Array.wrap(String.UTF8.encode('{"bool":true}'))))
+    const result = decoder.getBool('bool')
+    if (result !== null) result.valueOf()
 })
