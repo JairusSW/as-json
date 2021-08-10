@@ -1,7 +1,7 @@
 import { unknown } from './unknown'
 import { console } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON, serializeunknown } from './json'
+import { JSON, serializeUnknown } from './json'
 
 import { Object } from './Object'
 
@@ -115,7 +115,7 @@ const obj: JSONSchema = {
     }
 }
 
-const emptyObj: EmptySchema = {}/*
+const emptyObj: EmptySchema = {}
 // Strings
 check<string>('Encode/Decode String', 'Hello World')
 check<string>('Encode/Decode String', 'Hell[}o Wo[rld}{')
@@ -175,17 +175,7 @@ check<string[][]>('Encode/Decode string[][]', [['Hey'], ['ha'], ['ho']])
 // Object
 check<JSONSchema>('Encode/Decode object', obj)
 
-check<EmptySchema>('Encode/Decode object', emptyObj)*/
+check<EmptySchema>('Encode/Decode object', emptyObj)
 
-// Variant
-//console.log(JSON.stringify<unknown[]>([unknown.wrap(3.14), unknown.wrap('strings too!'), unknown.wrap<u32>(14), unknown.wrap(false), unknown.wrap(true), unknown.wrap(['Deep arrays too!'])]))
-
-const o = new Object()
-
-o['haha'] = 'ha'
-
-console.log(o['haha'].get<string>())
-
-const unknownArray = ["Hello Dynamic Arrays", 3.14, true, false, ["haha", 3.14]]
-
-console.log((unknownArray[4].get<unknown[]>())[1].get<f64>())
+// Unknown
+console.log(JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true]))

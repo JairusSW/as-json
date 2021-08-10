@@ -43,7 +43,7 @@ const arrayI32Id = idof<i32[]>()
 const arrayI64Id = idof<i64[]>()
 const arrayF32Id = idof<f32[]>()
 const arrayF64Id = idof<f64[]>()
-const arrayunknownId = idof<unknown[]>()
+const arrayUnknownId = idof<unknown[]>()
 
 const WS1 = " "
 const WS2 = '\u0020'
@@ -96,7 +96,7 @@ export namespace JSON {
       // @ts-ignore
       return serializeArray<T>(data)
     } else if (data instanceof unknown) {
-      return serializeunknown(data)
+      return serializeUnknown(data)
     }
 
     // @ts-ignore
@@ -132,102 +132,78 @@ export namespace JSON {
   }
 }
 
-export function serializeunknown(data: unknown): string {
+export function serializeUnknown(data: unknown): string {
+  // @ts-ignore
   if (data.type === unknownId) {
     // @ts-ignore
-    return serializeunknown(data.get<unknown>())
+    return serializeUnknown(data.get<unknown>())
   }
+  // @ts-ignore
   if (data.type === stringId) {
     // @ts-ignore
     return serializeString(data.get<string>())
   }
-  if (data.type === arrayStringId) {
+  // @ts-ignore
+  if (data.type === arrayUnknownId) {
     // @ts-ignore
-    return serializeArray(data.get<string[]>())
-  }/*
-  if (data.type === arrayBooleanId) {
-    return serializeArray(data.get<boolean[]>())
-  }
-  if (data.type === arrayBoolId) {
-    return serializeArray(data.get<bool[]>())
-  }
-  if (data.type === arrayU8Id) {
-    return serializeArray(data.get<u8[]>())
-  }
-  if (data.type === arrayU16Id) {
-    return serializeArray(data.get<u16[]>())
-  }
-  if (data.type === arrayU32Id) {
-    return serializeArray(data.get<u32[]>())
-  }
-  if (data.type === arrayU64Id) {
-    return serializeArray(data.get<u64[]>())
-  }
-    if (data.type === arrayI8Id) {
-    return serializeArray(data.get<i8[]>())
-  }
-    if (data.type === arrayI16Id) {
-    return serializeArray(data.get<i16[]>())
-  }
-    if (data.type === arrayI32Id) {
-    return serializeArray(data.get<i32[]>())
-  }
-    if (data.type === arrayI64Id) {
-    return serializeArray(data.get<i64[]>())
-  }
-  if (data.type === arrayF32Id) {
-    return serializeArray(data.get<f32[]>())
-  }
-  if (data.type === arrayF64Id) {
-    return serializeArray(data.get<f64[]>())
-  }
-  if (data.type === arrayunknownId) {
     return serializeArray(data.get<unknown[]>())
-  }*/
+  }
+  // @ts-ignore
   if (data.type === unknownTypes.boolean) {
     // @ts-ignore
     return serializeBoolean(data.get<boolean>())
   }
+  // @ts-ignore
   if (data.type === unknownTypes.i8) {
     // @ts-ignore
     return data.get<i8>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.i16) {
     // @ts-ignore
     return data.get<i16>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.i32) {
     // @ts-ignore
     return data.get<i32>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.i64) {
     // @ts-ignore
     return data.get<i64>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.u8) {
     // @ts-ignore
     return data.get<u8>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.u16) {
     // @ts-ignore
     return data.get<u16>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.u32) {
     // @ts-ignore
     return data.get<u32>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.u64) {
     // @ts-ignore
     return data.get<u64>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.f32) {
     // @ts-ignore
     return data.get<f32>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.f64) {
     // @ts-ignore
     return data.get<f64>().toString()
   }
+  // @ts-ignore
   if (data.type === unknownTypes.null) {
     return nullVal
   }
@@ -290,10 +266,10 @@ function serializeArray<T extends Array<unknown>>(data: T): string {
     // @ts-ignore
   } else if (type instanceof unknown) {
     for (let i = 0; i < len; i++) {
-      result.write(serializeunknown(unchecked(data[i])))
+      result.write(serializeUnknown(unchecked(data[i])))
       result.writeCodePoint(commaCode)
     }
-    result.write(serializeunknown(unchecked(data[len])))
+    result.write(serializeUnknown(unchecked(data[len])))
     result.writeCodePoint(rbracketCode)
     return result.toString()
   } else if (isArray<valueof<T>>()) {
