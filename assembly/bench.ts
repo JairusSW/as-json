@@ -6,8 +6,6 @@ import { JSON } from './json'
 
 import * as asJSON from "assemblyscript-json"
 
-import * as serialJSON from '../serial-as/json/assembly/index'
-
 // @ts-ignore
 @json
 class JSONSchema {
@@ -78,54 +76,6 @@ bench('AS-JSON Stringify Object', () => {
 
 bench('AS-JSON Parse Object', () => {
     JSON.parse<JSONSchema>('{"bool":true}')
-})
-
-bench('@serial-as/json Stringify String', () => {
-    serialJSON.JSON.encode("Hello World")
-})
-
-bench('@serial-as/json Parse String', () => {
-    serialJSON.JSON.decode<string>('"Hello World"')
-})
-
-bench('@serial-as/json Stringify Integer', () => {
-    serialJSON.JSON.encode<i32>(14)
-})
-
-bench('@serial-as/json Parse Integer', () => {
-    serialJSON.JSON.decode<i32>('14')
-})
-
-bench('@serial-as/json Stringify Float', () => {
-    serialJSON.JSON.encode<f64>(7.3)
-})
-
-bench('@serial-as/json Parse Float', () => {
-    serialJSON.JSON.decode<f64>('7.3')
-})
-
-bench('@serial-as/json Stringify Boolean', () => {
-    serialJSON.JSON.encode<boolean>(true)
-})
-
-bench('@serial-as/json Parse Boolean', () => {
-    serialJSON.JSON.decode<boolean>('true')
-})
-
-bench('@serial-as/json Stringify Array', () => {
-    serialJSON.JSON.encode<boolean[]>([true, false, true])
-})
-
-bench('@serial-as/json Parse Array', () => {
-    serialJSON.JSON.decode<boolean[]>('[true,false,true]')
-})
-
-bench('@serial-as/json Stringify Object', () => {
-    serialJSON.JSON.encode<JSONSchema>(jsonData)
-})
-
-bench('@serial-as/json Parse Object', () => {
-    serialJSON.JSON.decode<JSONSchema>('{"bool":true}')
 })
 
 bench('AssemblyScript-JSON Stringify String', () => {

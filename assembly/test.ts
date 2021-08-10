@@ -187,4 +187,5 @@ const o = new Object()
 
 o['haha'] = 'mama'
 
+// @ts-ignore
 console.log(o['haha'].get<string>())

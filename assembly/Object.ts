@@ -1,19 +1,8 @@
 import { unknown } from "./unknown"
 
 export class Object {
-    [key: string]: unknown
-    protected dataStore: Map<string, unknown> = new Map<string, unknown>()/*
-    constructor() { }
-    setKey<T>(key: string, value: T): void {
-        this.dataStore.set(changetype<usize>(key), unknown.wrap(value))
-    }
-    getKey(key: string): unknown {
-        if (this.dataStore.has(changetype<usize>(key))) {
-            return this.dataStore.get(changetype<usize>(key))
-        } else {
-            return unknown.wrap(null)
-        }
-    }*/
+    [key: string]: any
+    protected dataStore: Map<string, unknown> = new Map<string, unknown>()
     @operator('[]')
     private __getKeyOp(key: usize): unknown {
         if (this.dataStore.has(changetype<string>(key))) {
