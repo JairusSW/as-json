@@ -28,23 +28,13 @@ class JSONTransformer extends BaseVisitor {
   private globalStatements: Statement[] = []
   public replaceNextLines = new Set<number>()
 
-  /*visitBinaryExpression(node: BinaryExpression): void {
-    super.visitBinaryExpression(node)
-    const leftText = node.range.source.text.slice(node.left.range.start, node.left.range.end)
-    if (node.operator === Token.EQUALS && leftText.includes('[') && leftText[leftText.length - 1] === ']') {
-      const replaceExpression = SimpleParser.parseExpression(`${leftText.split('[')[0]}[u32(changetype<usize>(${leftText.slice(leftText.indexOf('[') + 1, leftText.length - 1)}))]`)
-      node.left = replaceExpression
-      this.sources.push(replaceExpression.range.source)
-    }
-  }*/
-
   visitElementAccessExpression(node: ElementAccessExpression): void {
     super.visitElementAccessExpression(node)
     if (toString(node.expression) === 'o') {
       const replacer = SimpleParser.parseExpression(`u32(changetype<usize>(${toString(node.elementExpression)}))`)
       node.elementExpression = replacer
       this.sources.push(replacer.range.source)
-      console.log(toString(node))
+      console.log(node.expression)
     }
   }
   visitArrayLiteralExpression(node: ArrayLiteralExpression): void {
@@ -75,12 +65,13 @@ class JSONTransformer extends BaseVisitor {
       // @ts-ignore
       if (expr.elementExpressions) {
         // @ts-ignore
-        this.convertToAnyArray(expr.exprs)
+        this.convertToAnyArray(expr.elementExpressions)
       }
       // @ts-ignore
       replacement = SimpleParser.parseExpression(`unknown.wrap(${toString(expr)})`)
       exprs[i] = replacement
       this.sources.push(replacement.range.source)
+
     }
   }
   visitFieldDeclaration(node: FieldDeclaration): void {
@@ -166,15 +157,7 @@ class JSONTransformer extends BaseVisitor {
     new JSONTransformer().visit(node);
   }
   visitSource(source: Source) {
-    const text = source.text
     this.globalStatements = []
-    const foundRPNL = text.matchAll(replaceNextLineRegex)
-    for (const ignored of foundRPNL) {
-      // Calculate line coordinates from linecol
-      const line = this.linecol.fromIndex(ignored.index!).line + 1
-      // Add it into the set.
-      this.replaceNextLines.add(line)
-    }
     super.visitSource(source)
   }
 }

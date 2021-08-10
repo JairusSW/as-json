@@ -20,22 +20,13 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     sources = [];
     globalStatements = [];
     replaceNextLines = new Set();
-    /*visitBinaryExpression(node: BinaryExpression): void {
-      super.visitBinaryExpression(node)
-      const leftText = node.range.source.text.slice(node.left.range.start, node.left.range.end)
-      if (node.operator === Token.EQUALS && leftText.includes('[') && leftText[leftText.length - 1] === ']') {
-        const replaceExpression = SimpleParser.parseExpression(`${leftText.split('[')[0]}[u32(changetype<usize>(${leftText.slice(leftText.indexOf('[') + 1, leftText.length - 1)}))]`)
-        node.left = replaceExpression
-        this.sources.push(replaceExpression.range.source)
-      }
-    }*/
     visitElementAccessExpression(node) {
         super.visitElementAccessExpression(node);
         if (utils_1.toString(node.expression) === 'o') {
             const replacer = visitor_as_1.SimpleParser.parseExpression(`u32(changetype<usize>(${utils_1.toString(node.elementExpression)}))`);
             node.elementExpression = replacer;
             this.sources.push(replacer.range.source);
-            console.log(utils_1.toString(node));
+            console.log(node.expression);
         }
     }
     visitArrayLiteralExpression(node) {
@@ -65,7 +56,7 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
             // @ts-ignore
             if (expr.elementExpressions) {
                 // @ts-ignore
-                this.convertToAnyArray(expr.exprs);
+                this.convertToAnyArray(expr.elementExpressions);
             }
             // @ts-ignore
             replacement = visitor_as_1.SimpleParser.parseExpression(`unknown.wrap(${utils_1.toString(expr)})`);
@@ -140,15 +131,7 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
         new JSONTransformer().visit(node);
     }
     visitSource(source) {
-        const text = source.text;
         this.globalStatements = [];
-        const foundRPNL = text.matchAll(replaceNextLineRegex);
-        for (const ignored of foundRPNL) {
-            // Calculate line coordinates from linecol
-            const line = this.linecol.fromIndex(ignored.index).line + 1;
-            // Add it into the set.
-            this.replaceNextLines.add(line);
-        }
         super.visitSource(source);
     }
 }

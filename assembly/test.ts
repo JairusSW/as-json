@@ -1,7 +1,7 @@
 import { unknown } from './unknown'
 import { console } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON, serializeUnknown } from './json'
+import { JSON, parseString, parseUnknown, serializeUnknown } from './json'
 
 import { Object } from './Object'
 
@@ -178,4 +178,13 @@ check<JSONSchema>('Encode/Decode object', obj)
 check<EmptySchema>('Encode/Decode object', emptyObj)
 
 // Unknown
-console.log(JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true]))
+const encoded = JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true])
+console.log(encoded)
+
+// Object 
+
+const o = new Object()
+
+o['haha'] = 'mama'
+
+console.log(o['haha'].get<string>())

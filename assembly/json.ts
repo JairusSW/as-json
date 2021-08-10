@@ -1,4 +1,5 @@
 import { StringSink } from 'as-string-sink'
+import { Object } from './Object'
 
 import { unknown, unknownTypes } from './unknown'
 
@@ -25,7 +26,8 @@ const rcbracketCode: u16 = 125// "}"
 const lcbracketCode: u16 = 123// "{"
 const colonCode: u16 = 58// ":"
 const fwd_slashCode: u16 = 92// "/"
-const true_charCode: u16 = 116// "t"
+const t_charCode: u16 = 116// "t"
+const f_charCode: u16 = 116// "t"
 const nCode: u16 = 110// "n"
 
 const unknownId = idof<unknown>()
@@ -134,6 +136,10 @@ export namespace JSON {
 
 export function serializeUnknown(data: unknown): string {
   // @ts-ignore
+  if (data.type === unknownTypes.null) {
+    return nullVal
+  }
+  // @ts-ignore
   if (data.type === unknownId) {
     // @ts-ignore
     return serializeUnknown(data.get<unknown>())
@@ -212,14 +218,14 @@ export function serializeUnknown(data: unknown): string {
 
 // @ts-ignore
 @inline
-function serializeNumber<T>(data: T): string {
+export function serializeNumber<T>(data: T): string {
   // @ts-ignore
   return data.toString()
 }
 
 // @ts-ignore
 @inline
-function serializeString(data: string): string {
+export function serializeString(data: string): string {
   const resultData = new StringSink(quote)
   resultData.write(data.replaceAll(quote, escapeQuote))
   resultData.writeCodePoint(quoteCode)
@@ -228,13 +234,13 @@ function serializeString(data: string): string {
 
 // @ts-ignore
 @inline
-function serializeBoolean(data: number): string {
+export function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal
 }
 
 // @ts-ignore
 @inline
-function serializeArray<T extends Array<unknown>>(data: T): string {
+export function serializeArray<T extends Array<any>>(data: T): string {
   let type!: valueof<T>
   const len = data.length - 1;
   if (len === -1) return lbracket + rbracket
@@ -295,25 +301,39 @@ function serializeArray<T extends Array<unknown>>(data: T): string {
 
 // @ts-ignore
 @inline
-function parseBoolean(data: string): boolean {
-  return data.charCodeAt(0) === true_charCode ? true : false
+export function parseUnknown(data: string): unknown {
+  const first = data.trimLeft().charCodeAt(0)
+  if (first === quoteCode) return unknown.wrap(parseString(data.trimRight()))
+  else if (first === lbracketCode) return unknown.wrap(parseArray<unknown[]>(removeJSONWhitespace(data)))
+  else if (first === rcbracketCode) return unknown.wrap(parseObject<Object>(removeJSONWhitespace(data)))
+  else if (first === t_charCode) return unknown.wrap(true)
+  else if (first === f_charCode) return unknown.wrap(false)
+  else if (data.indexOf('.')) return unknown.wrap(parseNumber<f64>(data.trim()))
+  else return unknown.wrap(parseNumber<i64>(data.trim()))
+}
+
+
+// @ts-ignore
+@inline
+export function parseBoolean(data: string): boolean {
+  return data.charCodeAt(0) === t_charCode ? true : false
 }
 
 // @ts-ignore
 @inline
-function parseString(data: string): string {
+export function parseString(data: string): string {
   return sliceQuotes(data).replaceAll(escapeQuote, quote)
 }
 
 // @ts-ignore
 @inline
-function parseNull<T>(): T | null {
+export function parseNull<T>(): T | null {
   return null
 }
 
 // @ts-ignore
 @inline
-function parseNumber<T>(data: string): T {
+export function parseNumber<T>(data: string): T {
   let type: T
   // @ts-ignore
   if (type instanceof f64) return F64.parseFloat(data)
@@ -339,7 +359,7 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-function parseArray<T extends Array<unknown>>(data: string): T {
+export function parseArray<T extends Array<unknown>>(data: string): T {
   // @ts-ignore
   if (isString<valueof<T>>()) return parseStringArray(data)
   // @ts-ignore
@@ -352,7 +372,7 @@ function parseArray<T extends Array<unknown>>(data: string): T {
 
 // @ts-ignore
 @inline
-function parseStringArray(data: string): Array<string> {
+export function parseStringArray(data: string): Array<string> {
   data = data.replaceAll(escapeQuote, quote)
   const result = new Array<string>()
   if (data.length === 2) return result
@@ -371,13 +391,13 @@ function parseStringArray(data: string): Array<string> {
 
 // @ts-ignore
 @inline
-function parseBooleanArray(data: string): Array<boolean> {
+export function parseBooleanArray(data: string): Array<boolean> {
   const result = new Array<boolean>()
   if (data.length === 2) return result
   let char: u32 = 0
   for (let i: u32 = 1; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
-    if (char === true_charCode) {
+    if (char === t_charCode) {
       result.push(true)
       i += 4
     } else {
@@ -390,7 +410,7 @@ function parseBooleanArray(data: string): Array<boolean> {
 
 // @ts-ignore
 @inline
-function parseNumberArray<T>(data: string): Array<T> {
+export function parseNumberArray<T>(data: string): Array<T> {
   const result = new Array<T>()
   if (data.length === 2) return result
   let lastPos: u32 = 0
@@ -408,7 +428,7 @@ function parseNumberArray<T>(data: string): Array<T> {
 
 // @ts-ignore
 @inline
-function parseArrayArray<T extends Array<unknown>>(data: string): T {
+export function parseArrayArray<T extends Array<unknown>>(data: string): T {
   const result = instantiate<T>()
   if (data.length === 2) return result
   let lastPos: i32 = -1
@@ -427,6 +447,7 @@ function parseArrayArray<T extends Array<unknown>>(data: string): T {
       // If the depth and found depth are equal, that is an array. Push it.
       if (depth > 0 && depth === fdepth) {
         result.push(
+          // @ts-ignore
           parseArray<valueof<T>>(data.slice(lastPos + 2, i + 1))
         )
         // Reset the depth
@@ -443,7 +464,7 @@ function parseArrayArray<T extends Array<unknown>>(data: string): T {
 
 // @ts-ignore
 @inline
-function parseObject<T>(data: string): T {
+export function parseObject<T>(data: string): T {
   //console.log('Data ' + data)
   const len: u32 = data.length - 1
   let schema: T
