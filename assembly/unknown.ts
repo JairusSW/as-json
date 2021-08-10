@@ -19,8 +19,8 @@ export class unknown {
     public value: usize = 0
     public type: usize = 0
     public typeName: string = ''
-    public f64: f64 = 0
-    public f32: f32 = 0
+    private f64: f64 = 0
+    private f32: f32 = 0
     set<T>(data: T): void {
         if (isBoolean<T>()) {
             this.value = data ? 1 : 0
@@ -125,6 +125,47 @@ export class unknown {
             if (this.value === 0) return null
         } else {
             return changetype<T>(this.value)
+        }
+    }
+    // @ts-ignore
+    is<T>(): boolean {
+        let type!: T
+        if (isBoolean<T>()) {
+            return this.type === unknownTypes.boolean
+        } else if (isFloat<T>()) {
+            if (type instanceof f32) {
+                // @ts-ignore
+                return this.type = unknownTypes.f32
+            } else {
+                // @ts-ignore
+                return this.type === unknownTypes.f64
+            }
+        } else if (isInteger<T>()) {
+            if (isSigned<T>()) {
+                if (type instanceof i8) {
+                    return this.type === unknownTypes.i8
+                } else if (type instanceof i16) {
+                    return this.type === unknownTypes.i16
+                } else if (type instanceof i32) {
+                    return this.type === unknownTypes.i32
+                } else if (type instanceof i64) {
+                    return this.type === unknownTypes.i64
+                }
+            } else {
+                if (type instanceof u8) {
+                    return this.type === unknownTypes.u8
+                } else if (type instanceof u16) {
+                    return this.type === unknownTypes.u16
+                } else if (type instanceof u32) {
+                    return this.type === unknownTypes.u32
+                } else if (type instanceof u64) {
+                    return this.type === unknownTypes.u64
+                }
+            }
+        } else if (isNullable<T>() && this.type === unknownTypes.null) {
+            return this.type === unknownTypes.null
+        } else {
+            return this.type === idof<T>()
         }
     }
     static wrap<T>(data: T): unknown {
