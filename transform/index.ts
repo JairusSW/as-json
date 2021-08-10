@@ -1,4 +1,4 @@
-import { TypeNode, ClassDeclaration, Token, IndexSignature, ElementAccessExpression, ClassExpression, ExpressionStatement, ArrayLiteralExpression, FieldDeclaration, Statement, BinaryExpression, VariableStatement, TypeParameterNode, TypeName, TypeDeclaration, Transform, ObjectLiteralExpression, FunctionDeclaration, Parser, Source, FunctionExpression, FunctionTypeNode } from "visitor-as/as";
+import { TypeNode, ClassDeclaration, Expression, Token, IndexSignature, ElementAccessExpression, ClassExpression, ExpressionStatement, ArrayLiteralExpression, FieldDeclaration, Statement, BinaryExpression, VariableStatement, TypeParameterNode, TypeName, TypeDeclaration, Transform, ObjectLiteralExpression, FunctionDeclaration, Parser, Source, FunctionExpression, FunctionTypeNode } from "visitor-as/as";
 import {
   SimpleParser,
   BaseVisitor,
@@ -49,15 +49,38 @@ class JSONTransformer extends BaseVisitor {
   }
   visitArrayLiteralExpression(node: ArrayLiteralExpression): void {
     super.visitArrayLiteralExpression(node)
-    if (isUnknownArray(node)) {
+    if (isanyArray(node)) {
       for (let i = 0; i < node.elementExpressions.length; i++) {
-        const expr = node.elementExpressions[i];
+        const expr = node.elementExpressions[i]
         // @ts-ignore
-        const replacement = SimpleParser.parseExpression(`Unknown.wrap(${toString(expr)})`)
+        let replacement
+        // @ts-ignore
+        if (expr.elementExpressions) {
+          // @ts-ignore
+          this.convertToAnyArray(expr.elementExpressions)
+        }
+        // @ts-ignore
+        replacement = SimpleParser.parseExpression(`unknown.wrap(${toString(expr)})`)
         node.elementExpressions[i] = replacement
         this.sources.push(replacement.range.source)
+
       }
-      console.log(node.range.source.text.slice(node.range.start, node.range.end))
+    }
+  }
+  convertToAnyArray(exprs: Expression[]): void {
+    for (let i = 0; i < exprs.length; i++) {
+      const expr = exprs[i]
+      // @ts-ignore
+      let replacement
+      // @ts-ignore
+      if (expr.elementExpressions) {
+        // @ts-ignore
+        this.convertToAnyArray(expr.exprs)
+      }
+      // @ts-ignore
+      replacement = SimpleParser.parseExpression(`unknown.wrap(${toString(expr)})`)
+      exprs[i] = replacement
+      this.sources.push(replacement.range.source)
     }
   }
   visitFieldDeclaration(node: FieldDeclaration): void {
@@ -166,7 +189,7 @@ class Encoder extends Decorator {
   }
 
   get sourceFilter() {
-    return (_: Unknown) => true;
+    return (_: any) => true;
   }
 }
 
@@ -196,7 +219,7 @@ export = class MyTransform extends Transform {
   }
 }
 
-function isUnknownArray(node: ArrayLiteralExpression): boolean {
+function isanyArray(node: ArrayLiteralExpression): boolean {
   if (node.elementExpressions.length === 0) return false
   const firstKind = node.elementExpressions[0]?.kind
   const isBoolean = (toString(node.elementExpressions[0]!) === 'true' || toString(node.elementExpressions[0]!) === 'false')

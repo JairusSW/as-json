@@ -40,9 +40,7 @@
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0"
   },
-  "dependencies": {
-    "benchmark": "^2.1.4"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aspkg/as-json.git"

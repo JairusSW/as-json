@@ -40,15 +40,37 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     }
     visitArrayLiteralExpression(node) {
         super.visitArrayLiteralExpression(node);
-        if (isUnknownArray(node)) {
+        if (isanyArray(node)) {
             for (let i = 0; i < node.elementExpressions.length; i++) {
                 const expr = node.elementExpressions[i];
                 // @ts-ignore
-                const replacement = visitor_as_1.SimpleParser.parseExpression(`Unknown.wrap(${utils_1.toString(expr)})`);
+                let replacement;
+                // @ts-ignore
+                if (expr.elementExpressions) {
+                    // @ts-ignore
+                    this.convertToAnyArray(expr.elementExpressions);
+                }
+                // @ts-ignore
+                replacement = visitor_as_1.SimpleParser.parseExpression(`unknown.wrap(${utils_1.toString(expr)})`);
                 node.elementExpressions[i] = replacement;
                 this.sources.push(replacement.range.source);
             }
-            console.log(node.range.source.text.slice(node.range.start, node.range.end));
+        }
+    }
+    convertToAnyArray(exprs) {
+        for (let i = 0; i < exprs.length; i++) {
+            const expr = exprs[i];
+            // @ts-ignore
+            let replacement;
+            // @ts-ignore
+            if (expr.elementExpressions) {
+                // @ts-ignore
+                this.convertToAnyArray(expr.exprs);
+            }
+            // @ts-ignore
+            replacement = visitor_as_1.SimpleParser.parseExpression(`unknown.wrap(${utils_1.toString(expr)})`);
+            exprs[i] = replacement;
+            this.sources.push(replacement.range.source);
         }
     }
     visitFieldDeclaration(node) {
@@ -130,7 +152,7 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
         super.visitSource(source);
     }
 }
-function isUnknownArray(node) {
+function isanyArray(node) {
     if (node.elementExpressions.length === 0)
         return false;
     const firstKind = node.elementExpressions[0]?.kind;
