@@ -1,4 +1,5 @@
 "use strict";
+const as_1 = require("visitor-as/as");
 const visitor_as_1 = require("visitor-as");
 const utils_1 = require("visitor-as/dist/utils");
 function getTypeName(type) {
@@ -9,66 +10,56 @@ function getTypeName(type) {
     }
     return _type;
 }
+// Replace Next Line
+const replaceNextLineRegex = /^\W*\/\/ <replace next line>.*$/gm;
 class JSONTransformer extends visitor_as_1.BaseVisitor {
     currentClass;
     encodeStmts = new Map();
     decodeCode = new Map();
     lastType = '';
     sources = [];
-    /*
-      visitTypeDeclaration(node: TypeDeclaration): void {
-        const type = node.range.source.text.slice(node.range.start, node.range.end)
-        console.log(`Type: ${type}`)
-        this.lastType = type
+    linecol = 0;
+    globalStatements = [];
+    replaceNextLines = new Set();
+    /*visitBinaryExpression(node: BinaryExpression): void {
+      super.visitBinaryExpression(node)
+      const leftText = node.range.source.text.slice(node.left.range.start, node.left.range.end)
+      if (node.operator === Token.EQUALS && leftText.includes('[') && leftText[leftText.length - 1] === ']') {
+        const replaceExpression = SimpleParser.parseExpression(`${leftText.split('[')[0]}[u32(changetype<usize>(${leftText.slice(leftText.indexOf('[') + 1, leftText.length - 1)}))]`)
+        node.left = replaceExpression
+        this.sources.push(replaceExpression.range.source)
       }
-    
-      visitObjectLiteralExpression(node: ObjectLiteralExpression): void {
-        const keys = new Array<string>()
-        const values = new Array<any>()
-        let schemaClass = `class __schema${nanoid().replaceAll('-', '').replaceAll('_', '')} {\n`
-        let keysLength = node.names.length
-        while (keysLength--) {
-          const key = node.names[keysLength]?.text!
-          keys.unshift(key)
+    }*/
+    visitElementAccessExpression(node) {
+        super.visitElementAccessExpression(node);
+        if (utils_1.toString(node.expression) === 'o') {
+            const replacer = visitor_as_1.SimpleParser.parseExpression(`u32(changetype<usize>(${utils_1.toString(node.elementExpression)}))`);
+            node.elementExpression = replacer;
+            this.sources.push(replacer.range.source);
+            console.log(utils_1.toString(node));
         }
-        let valuesLength = node.values.length
-        while (valuesLength--) {
-          // @ts-ignore
-          const value = removeJSONWhitespace(toString(node.values[valuesLength]))
-          values.unshift(value)
+    }
+    visitArrayLiteralExpression(node) {
+        super.visitArrayLiteralExpression(node);
+        if (isanyArray(node)) {
+            for (let i = 0; i < node.elementExpressions.length; i++) {
+                const expr = node.elementExpressions[i];
+                // @ts-ignore
+                const replacement = visitor_as_1.SimpleParser.parseExpression(`any.wrap(${utils_1.toString(expr)})`);
+                node.elementExpressions[i] = replacement;
+                this.sources.push(replacement.range.source);
+            }
+            console.log(node.range.source.text.slice(node.range.start, node.range.end));
         }
-        for (let i = 0; i < keys.length; i++) {
-          const key = keys[i]
-          const value = values[i]
-          schemaClass += `\t${key}: ${getType(value)}\n`
-        }
-        schemaClass += '}'
-        console.log('Values: ', values)
-        console.log('Keys: ', keys)
-        console.log('Class: ', schemaClass)
-      }
-    
-      visitVariableStatement(node: VariableStatement): void {
-        //console.log(node)
-        if (toString(node.declarations[0]?.name!).includes('__schema')) return
-        const replaceStatement = SimpleParser.parseStatement(`const testObject: __schema = {
-        string: 'A string!',
-        float: 3.14,
-        integer: 314
-        }`) as VariableStatement
-    
-        node = replaceStatement
-    
-        console.log(node.range.source.text.slice(node.range.start, node.range.end))
-        this.sources.push(node.range.source)
-      }
-    */
+    }
     visitFieldDeclaration(node) {
+        super.visitFieldDeclaration(node);
         const name = utils_1.toString(node.name);
         if (!node.type) {
             throw new Error(`Field ${name} is missing a type declaration`);
         }
         const type = getTypeName(node.type);
+        if (!this.currentClass) return
         const className = this.currentClass.name.text;
         if (!this.encodeStmts.has(className))
             this.encodeStmts.set(className, []);
@@ -77,9 +68,10 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
         // @ts-ignore
         this.encodeStmts.get(className).push(`this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`);
         // @ts-ignore
-        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`);
+        this.decodeCode.get(className).push(`${name}: JSON.parse<${type}>(values.get('${name}')),\n`);
     }
     visitClassDeclaration(node) {
+        super.visitClassDeclaration(node);
         if (!node.members) {
             return;
         }
@@ -126,18 +118,50 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
         new JSONTransformer().visit(node);
     }
     visitSource(source) {
+        const text = source.text;
+        this.globalStatements = [];
+        const foundRPNL = text.matchAll(replaceNextLineRegex);
+        for (const ignored of foundRPNL) {
+            // Calculate line coordinates from linecol
+            const line = this.linecol.fromIndex(ignored.index).line + 1;
+            // Add it into the set.
+            this.replaceNextLines.add(line);
+        }
         super.visitSource(source);
     }
 }
-class Encoder extends visitor_as_1.Decorator {
-    visitClassDeclaration(node) {
-        JSONTransformer.visit(node);
+function isanyArray(node) {
+    if (node.elementExpressions.length === 0)
+        return false;
+    const firstKind = node.elementExpressions[0]?.kind;
+    const isBoolean = (utils_1.toString(node.elementExpressions[0]) === 'true' || utils_1.toString(node.elementExpressions[0]) === 'false');
+    for (const chunk of node.elementExpressions) {
+        if (isBoolean) {
+            if (utils_1.toString(chunk) !== 'true' || utils_1.toString(chunk) !== 'false')
+                true;
+        }
+        else if (chunk.kind !== firstKind)
+            return true;
     }
-    get name() {
-        return "json";
-    }
-    get sourceFilter() {
-        return (_) => true;
-    }
+    return false;
 }
-module.exports = visitor_as_1.registerDecorator(new Encoder());
+module.exports = class MyTransform extends as_1.Transform {
+    // Trigger the transform after parse.
+    afterParse(parser) {
+        // Create new transform
+        const transformer = new JSONTransformer();
+        // Loop over every source
+        for (const source of parser.sources) {
+            // Ignore all lib (std lib). Visit everything else.
+            if (!source.isLibrary && !source.internalPath.startsWith(`~lib/`)) {
+                transformer.visit(source);
+            }
+        }
+        let i = 0;
+        for (const source of transformer.sources) {
+            //source.internalPath += `${i++}.ts`
+            //console.log(source.internalPath)
+            parser.sources.push(source);
+        }
+    }
+};

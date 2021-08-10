@@ -6,14 +6,6 @@
   "ascMain": "assembly/json.ts",
   "author": "JairusSW",
   "license": "MIT",
-  "aspkg": {
-    "type": "git",
-    "platforms": [
-      "wasm",
-      "node",
-      "web"
-    ]
-  },
   "scripts": {
     "build:transform": "tsc -w -p ./transform",
     "build:test": "asc assembly/test.ts --transform ./transform --target test --explicitStart",
@@ -29,6 +21,7 @@
   "devDependencies": {
     "@as-pect/cli": "^6.2.4",
     "@assemblyscript/loader": "^0.19.10",
+    "@serial-as/json": "^1.0.2",
     "@types/jest": "^26.0.24",
     "@types/line-column": "^1.0.0",
     "as-base64": "^0.2.0",
@@ -47,7 +40,9 @@
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "benchmark": "^2.1.4"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aspkg/as-json.git"

@@ -1,6 +1,10 @@
+import { any } from './any'
 import { console } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON } from './json'
+import { JSON, serializeany } from './json'
+import { getType, parseName } from './getType'
+
+import { Object } from './Object'
 
 function check<T>(message: string, data: T): void {
     const encoded = JSON.stringify<T>(data)
@@ -14,7 +18,7 @@ function check<T>(message: string, data: T): void {
 
 // @ts-ignore
 @json
-class EmptySchema {}
+class EmptySchema { }
 
 // @ts-ignore
 @json
@@ -109,10 +113,10 @@ const obj: JSONSchema = {
     stringArrArr: [['Hey'], ['ha'], ['ho']],
     object: {
         string1: 'Hello World'
-    }    
+    }
 }
 
-const emptyObj: EmptySchema = {}
+const emptyObj: EmptySchema = {}/*
 // Strings
 check<string>('Encode/Decode String', 'Hello World')
 check<string>('Encode/Decode String', 'Hell[}o Wo[rld}{')
@@ -172,4 +176,17 @@ check<string[][]>('Encode/Decode string[][]', [['Hey'], ['ha'], ['ho']])
 // Object
 check<JSONSchema>('Encode/Decode object', obj)
 
-check<EmptySchema>('Encode/Decode object', emptyObj)
+check<EmptySchema>('Encode/Decode object', emptyObj)*/
+
+// Variant
+//console.log(JSON.stringify<any[]>([any.wrap(3.14), any.wrap('strings too!'), any.wrap<u32>(14), any.wrap(false), any.wrap(true), any.wrap(['Deep arrays too!'])]))
+
+const o = new Object()
+
+o['haha'] = 'ha'
+
+o['haha']
+
+// const anyArray = ["Hello Dynamic Arrays", 3.14, true, false, ["haha"]]
+
+// console.log(anyArray[0].get<string>())

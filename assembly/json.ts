@@ -1,5 +1,7 @@
 import { StringSink } from 'as-string-sink'
 
+import { any, anyTypes } from './any'
+
 @global
 export class Nullable { }
 
@@ -22,13 +24,35 @@ const lbracketCode: u16 = 91// "["
 const rcbracketCode: u16 = 125// "}"
 const lcbracketCode: u16 = 123// "{"
 const colonCode: u16 = 58// ":"
-const empty_stringCode: u16 = 32// " "
 const fwd_slashCode: u16 = 92// "/"
 const true_charCode: u16 = 116// "t"
 const nCode: u16 = 110// "n"
 
+const anyId = idof<any>()
+const stringId = idof<string>()
+const arrayStringId = idof<string[]>()
+const arrayBooleanId = idof<boolean[]>()
+const arrayBoolId = idof<bool[]>()
+const arrayU8Id = idof<u8[]>()
+const arrayU16Id = idof<u16[]>()
+const arrayU32Id = idof<u32[]>()
+const arrayU64Id = idof<u64[]>()
+const arrayI8Id = idof<i8[]>()
+const arrayI16Id = idof<i16[]>()
+const arrayI32Id = idof<i32[]>()
+const arrayI64Id = idof<i64[]>()
+const arrayF32Id = idof<f32[]>()
+const arrayF64Id = idof<f64[]>()
+const arrayanyId = idof<any[]>()
+
+const WS1 = " "
+const WS2 = '\u0020'
+const WS3 = '\u000A'
+const WS4 = '\u000D'
+const WS5 = '\u0009'
+
 export function removeJSONWhitespace(data: string): string {
-  let result =''
+  let result = ''
   let instr = false
   let char: string = ''
   for (let i = 0; i < data.length; i++) {
@@ -38,17 +62,15 @@ export function removeJSONWhitespace(data: string): string {
     }
     if (instr === true) {
       result += char
-    } else if (instr === false && char !== empty_string) {
+    } else if (instr === false && char !== WS1 && char !== WS2 && char !== WS3 && char !== WS4 && char !== WS5) {
       result += char
     }
   }
   return result
 }
 
-//trace(`StripWhitespace: ${removeJSONWhitespace(`{"firstName"  :  "Jairus",  "lastName":  "Tanaka"  ,  "human":true,"age":14,"meta":{"country":"US","awesome":true},"language":"english","location":[-43.130850291,32.926401705]}`)}\nLength: ${removeJSONWhitespace(`{"firstName"  :  "Jairus",  "lastName":  "Tanaka"  ,  "human":true,"age":14,"meta":{"country":"US","awesome":true},"language":"english","location":[-43.130850291,32.926401705]}`).length}`)
-
 /**
- * JSON encoder/decoder for AssemblyScript
+ * JSON Encoder/Decoder for AssemblyScript
  */
 export namespace JSON {
   /**
@@ -73,6 +95,8 @@ export namespace JSON {
     } else if (isArrayLike(data)) {
       // @ts-ignore
       return serializeArray<T>(data)
+    } else if (data instanceof any) {
+      return serializeany(data)
     }
 
     // @ts-ignore
@@ -87,7 +111,7 @@ export namespace JSON {
    * JSON.parse<T>(data)
    * ```
    * @param data string
-   * @returns any
+   * @returns T
    */
   export function parse<T = Nullable>(data: string): T {
     data = removeJSONWhitespace(data)
@@ -106,6 +130,95 @@ export namespace JSON {
     return parseObject<T>(removeJSONWhitespace(data))
     // TODO: Add dynamic types.
   }
+}
+
+export function serializeany(data: any): string {
+  if (data.type === anyId) {
+    return serializeany(data.get<any>())
+  }
+  if (data.type === stringId) {
+    return serializeString(data.get<string>())
+  }
+  if (data.type === arrayStringId) {
+    return serializeArray(data.get<string[]>())
+  }/*
+  if (data.type === arrayBooleanId) {
+    return serializeArray(data.get<boolean[]>())
+  }
+  if (data.type === arrayBoolId) {
+    return serializeArray(data.get<bool[]>())
+  }
+  if (data.type === arrayU8Id) {
+    return serializeArray(data.get<u8[]>())
+  }
+  if (data.type === arrayU16Id) {
+    return serializeArray(data.get<u16[]>())
+  }
+  if (data.type === arrayU32Id) {
+    return serializeArray(data.get<u32[]>())
+  }
+  if (data.type === arrayU64Id) {
+    return serializeArray(data.get<u64[]>())
+  }
+    if (data.type === arrayI8Id) {
+    return serializeArray(data.get<i8[]>())
+  }
+    if (data.type === arrayI16Id) {
+    return serializeArray(data.get<i16[]>())
+  }
+    if (data.type === arrayI32Id) {
+    return serializeArray(data.get<i32[]>())
+  }
+    if (data.type === arrayI64Id) {
+    return serializeArray(data.get<i64[]>())
+  }
+  if (data.type === arrayF32Id) {
+    return serializeArray(data.get<f32[]>())
+  }
+  if (data.type === arrayF64Id) {
+    return serializeArray(data.get<f64[]>())
+  }
+  if (data.type === arrayanyId) {
+    return serializeArray(data.get<any[]>())
+  }*/
+  if (data.type === anyTypes.boolean) {
+    // @ts-ignore
+    return serializeBoolean(data.get<boolean>())
+  }
+  if (data.type === anyTypes.i8) {
+    return data.get<i8>().toString()
+  }
+  if (data.type === anyTypes.i16) {
+    return data.get<i16>().toString()
+  }
+  if (data.type === anyTypes.i32) {
+    return data.get<i32>().toString()
+  }
+  if (data.type === anyTypes.i64) {
+    return data.get<i64>().toString()
+  }
+  if (data.type === anyTypes.u8) {
+    return data.get<u8>().toString()
+  }
+  if (data.type === anyTypes.u16) {
+    return data.get<u16>().toString()
+  }
+  if (data.type === anyTypes.u32) {
+    return data.get<u32>().toString()
+  }
+  if (data.type === anyTypes.u64) {
+    return data.get<u64>().toString()
+  }
+  if (data.type === anyTypes.f32) {
+    return data.get<f32>().toString()
+  }
+  if (data.type === anyTypes.f64) {
+    return data.get<f64>().toString()
+  }
+  if (data.type === anyTypes.null) {
+    return nullVal
+  }
+  return 'idk!'
 }
 
 // @ts-ignore
@@ -133,6 +246,7 @@ function serializeBoolean(data: number): string {
 // @ts-ignore
 @inline
 function serializeArray<T extends Array<any>>(data: T): string {
+  let type!: valueof<T>
   const len = data.length - 1;
   if (len === -1) return lbracket + rbracket
   let result = new StringSink(lbracket);
@@ -158,6 +272,15 @@ function serializeArray<T extends Array<any>>(data: T): string {
       result.writeCodePoint(commaCode)
     }
     result.write(serializeBoolean(unchecked(data[len])))
+    result.writeCodePoint(rbracketCode)
+    return result.toString()
+    // @ts-ignore
+  } else if (type instanceof any) {
+    for (let i = 0; i < len; i++) {
+      result.write(serializeany(unchecked(data[i])))
+      result.writeCodePoint(commaCode)
+    }
+    result.write(serializeany(unchecked(data[len])))
     result.writeCodePoint(rbracketCode)
     return result.toString()
   } else if (isArray<valueof<T>>()) {
@@ -378,44 +501,12 @@ function parseObject<T>(data: string): T {
   return schema.__decode(result)
 }
 
-/**
- * Prepend the type to a JSON string.
- * @param data string
- * @returns string
- */
-function prependType(data: string): string {
-  const start: string = data.charAt(0)
-  if (start == quote) return `<string>${data}`
-  else if (start == 't' || start == 'f') return `<boolean>${data}`
-  else if (start == '{') return `<object>${data}`
-  else if (start == '[') return `<array>${data}`
-  else if (start == 'n') return `<null>${data}`
-  else return `<number>${data}`
-}
-
-/**
- * Get the type of a JSON string.
- * For JSON-AS >v0.2.0
- * @param data string
- * @returns string
- */
-function getType(data: string): string {
-  const start: string = data.charAt(0)
-  if (start == quote) return `string`
-  else if (start == 't' || start == 'f') return `boolean`
-  else if (start == '{') return `Object`
-  else if (start == '[') return `Array<unknown>`
-  else if (start == 'n') return `null`
-  else if (data.includes('.')) return `f64`
-  else return `i64`
-}
-
 // @ts-ignore
 @inline
 export function sliceQuotes(data: string): string {
-  var len = data.length - 2
+  const len = data.length - 2
   if (len <= 0) return changetype<string>("");
-  var out = changetype<string>(__new(len << 1, idof<string>()));
+  const out = changetype<string>(__new(len << 1, idof<string>()));
   memory.copy(changetype<usize>(out), changetype<usize>(data) + (<usize>1 << 1), <usize>len << 1);
   return out;
 }

@@ -1,4 +1,4 @@
-import { TypeNode, ClassDeclaration, FieldDeclaration, VariableStatement, TypeParameterNode, TypeName, TypeDeclaration, Transform, ObjectLiteralExpression, FunctionDeclaration, Parser, Source, FunctionExpression, FunctionTypeNode } from "visitor-as/as";
+import { TypeNode, ClassDeclaration, Token, IndexSignature, ElementAccessExpression, ClassExpression, ExpressionStatement, ArrayLiteralExpression, FieldDeclaration, Statement, BinaryExpression, VariableStatement, TypeParameterNode, TypeName, TypeDeclaration, Transform, ObjectLiteralExpression, FunctionDeclaration, Parser, Source, FunctionExpression, FunctionTypeNode } from "visitor-as/as";
 import {
   SimpleParser,
   BaseVisitor,
@@ -15,61 +15,54 @@ function getTypeName(type: TypeNode): string {
   return _type;
 }
 
+// Replace Next Line
+const replaceNextLineRegex = /^\W*\/\/ <replace next line>.*$/gm;
+
 class JSONTransformer extends BaseVisitor {
   public currentClass?: ClassDeclaration;
   public encodeStmts = new Map<string, string[]>()
   public decodeCode = new Map<string, string[]>()
   public lastType: string = ''
   public sources: Source[] = []
-  /*
-    visitTypeDeclaration(node: TypeDeclaration): void {
-      const type = node.range.source.text.slice(node.range.start, node.range.end)
-      console.log(`Type: ${type}`)
-      this.lastType = type
+
+  private linecol: any = 0
+  private globalStatements: Statement[] = []
+  public replaceNextLines = new Set<number>()
+
+  /*visitBinaryExpression(node: BinaryExpression): void {
+    super.visitBinaryExpression(node)
+    const leftText = node.range.source.text.slice(node.left.range.start, node.left.range.end)
+    if (node.operator === Token.EQUALS && leftText.includes('[') && leftText[leftText.length - 1] === ']') {
+      const replaceExpression = SimpleParser.parseExpression(`${leftText.split('[')[0]}[u32(changetype<usize>(${leftText.slice(leftText.indexOf('[') + 1, leftText.length - 1)}))]`)
+      node.left = replaceExpression
+      this.sources.push(replaceExpression.range.source)
     }
-  
-    visitObjectLiteralExpression(node: ObjectLiteralExpression): void {
-      const keys = new Array<string>()
-      const values = new Array<any>()
-      let schemaClass = `class __schema${nanoid().replaceAll('-', '').replaceAll('_', '')} {\n`
-      let keysLength = node.names.length
-      while (keysLength--) {
-        const key = node.names[keysLength]?.text!
-        keys.unshift(key)
-      }
-      let valuesLength = node.values.length
-      while (valuesLength--) {
+  }*/
+
+  visitElementAccessExpression(node: ElementAccessExpression): void {
+    super.visitElementAccessExpression(node)
+    if (toString(node.expression) === 'o') {
+      const replacer = SimpleParser.parseExpression(`u32(changetype<usize>(${toString(node.elementExpression)}))`)
+      node.elementExpression = replacer
+      this.sources.push(replacer.range.source)
+      console.log(toString(node))
+    }
+  }
+  visitArrayLiteralExpression(node: ArrayLiteralExpression): void {
+    super.visitArrayLiteralExpression(node)
+    if (isanyArray(node)) {
+      for (let i = 0; i < node.elementExpressions.length; i++) {
+        const expr = node.elementExpressions[i];
         // @ts-ignore
-        const value = removeJSONWhitespace(toString(node.values[valuesLength]))
-        values.unshift(value)
+        const replacement = SimpleParser.parseExpression(`any.wrap(${toString(expr)})`)
+        node.elementExpressions[i] = replacement
+        this.sources.push(replacement.range.source)
       }
-      for (let i = 0; i < keys.length; i++) {
-        const key = keys[i]
-        const value = values[i]
-        schemaClass += `\t${key}: ${getType(value)}\n`
-      }
-      schemaClass += '}'
-      console.log('Values: ', values)
-      console.log('Keys: ', keys)
-      console.log('Class: ', schemaClass)
-    }
-  
-    visitVariableStatement(node: VariableStatement): void {
-      //console.log(node)
-      if (toString(node.declarations[0]?.name!).includes('__schema')) return
-      const replaceStatement = SimpleParser.parseStatement(`const testObject: __schema = {
-      string: 'A string!',
-      float: 3.14,
-      integer: 314
-      }`) as VariableStatement
-  
-      node = replaceStatement
-  
       console.log(node.range.source.text.slice(node.range.start, node.range.end))
-      this.sources.push(node.range.source)
     }
-  */
+  }
   visitFieldDeclaration(node: FieldDeclaration): void {
+    super.visitFieldDeclaration(node)
     const name = toString(node.name);
     if (!node.type) {
       throw new Error(`Field ${name} is missing a type declaration`);
@@ -93,6 +86,7 @@ class JSONTransformer extends BaseVisitor {
   }
 
   visitClassDeclaration(node: ClassDeclaration): void {
+    super.visitClassDeclaration(node)
     if (!node.members) {
       return;
     }
@@ -149,10 +143,19 @@ class JSONTransformer extends BaseVisitor {
     new JSONTransformer().visit(node);
   }
   visitSource(source: Source) {
+    const text = source.text
+    this.globalStatements = []
+    const foundRPNL = text.matchAll(replaceNextLineRegex)
+    for (const ignored of foundRPNL) {
+      // Calculate line coordinates from linecol
+      const line = this.linecol.fromIndex(ignored.index!).line + 1
+      // Add it into the set.
+      this.replaceNextLines.add(line)
+    }
     super.visitSource(source)
   }
 }
-
+/*
 class Encoder extends Decorator {
   visitClassDeclaration(node: ClassDeclaration): void {
     JSONTransformer.visit(node);
@@ -167,7 +170,7 @@ class Encoder extends Decorator {
   }
 }
 
-export = registerDecorator(new Encoder());/*
+export = registerDecorator(new Encoder());*/
 
 export = class MyTransform extends Transform {
   // Trigger the transform after parse.
@@ -181,39 +184,23 @@ export = class MyTransform extends Transform {
         transformer.visit(source);
       }
     }
-    let i = 0;
+    let i = 0
     for (const source of transformer.sources) {
-      source.internalPath += `${i++}.ts`;
-      parser.sources.push(source);
-      console.log(source.internalPath)
+      //source.internalPath += `${i++}.ts`
+      //console.log(source.internalPath)
+      parser.sources.push(source)
     }
   }
 }
 
-function getType(data: string): string {
-  const start: string = data.charAt(0)
-  if (start == '"' || start == '\'' || start == '`') return `string`
-  else if (start == 't' || start == 'f') return `boolean`
-  else if (start == '{') return `object`
-  else if (start == '[') return `array`
-  else if (start == 'n') return `null`
-  else if (data.includes('.')) return `f64`
-  else return `i32`
-}
-
-function removeJSONWhitespace(data: string): string {
-  let result = ''
-  let instr = false
-  for (let i = 0; i < data.length; i++) {
-    const char = data[i]
-    if (char === '"' && data[i - 1] === '\\') {
-      instr = instr ? false : true
-    }
-    if (instr === true) {
-      result += char
-    } else if (instr === false && char !== ' ' && char !== '\\' && char !== 'n') {
-      result += char
-    }
+function isanyArray(node: ArrayLiteralExpression): boolean {
+  if (node.elementExpressions.length === 0) return false
+  const firstKind = node.elementExpressions[0]?.kind
+  const isBoolean = (toString(node.elementExpressions[0]!) === 'true' || toString(node.elementExpressions[0]!) === 'false')
+  for (const chunk of node.elementExpressions) {
+    if (isBoolean) {
+      if (toString(chunk) !== 'true' || toString(chunk) !== 'false') true
+    } else if (chunk.kind !== firstKind) return true
   }
-  return result
-}*/
+  return false
+}
