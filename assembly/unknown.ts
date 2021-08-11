@@ -22,7 +22,7 @@ export class unknown {
     private f64: f64 = 0
     private f32: f32 = 0
     set<T>(data: T): void {
-        if (data === null) {
+        if (isNullable<T>() && data === null) {
             this.value = usize(0)
             this.type = unknownTypes.null
         } else if (isBoolean<T>()) {

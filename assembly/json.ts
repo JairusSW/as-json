@@ -94,11 +94,11 @@ export namespace JSON {
       return nullVal
     } else if (isFloat(data) || isInteger(data)) {
       return data.toString()
-    } else if (data instanceof unknown) {
-      return serializeUnknown(data)
     } else if (isArrayLike(data)) {
       // @ts-ignore
       return serializeArray<T>(data)
+    } else if (data instanceof unknown) {
+      return serializeUnknown(data)
     }
 
     // @ts-ignore

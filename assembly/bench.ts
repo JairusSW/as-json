@@ -185,3 +185,7 @@ bench('Unknown get', () => {
 bench('Unknown wrap', () => {
     unknown.wrap('Hello world')
 })
+
+bench('Unknown is', () => {
+    unk.is<string>()
+})

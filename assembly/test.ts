@@ -182,7 +182,6 @@ check<EmptySchema>('Encode/Decode object', emptyObj)
 const encoded = JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true])
 console.log(encoded)
 
-// Object 
 
 const o = new Object()
 
@@ -192,3 +191,11 @@ o['haha'] = 'mama'
 console.log(o['haha'].get<string>())
 
 console.log(Object.keys(o))
+
+const unk = unknown.wrap<f64>(3.14)
+
+console.log(unk.get<f64>())
+
+const unk2 = unknown.wrap<f32>(7.3)
+
+console.log(unk2.get<f32>())
