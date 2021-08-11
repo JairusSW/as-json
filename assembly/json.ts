@@ -94,11 +94,11 @@ export namespace JSON {
       return nullVal
     } else if (isFloat(data) || isInteger(data)) {
       return data.toString()
+    } else if (data instanceof unknown) {
+      return serializeUnknown(data)
     } else if (isArrayLike(data)) {
       // @ts-ignore
       return serializeArray<T>(data)
-    } else if (data instanceof unknown) {
-      return serializeUnknown(data)
     }
 
     // @ts-ignore
@@ -115,8 +115,7 @@ export namespace JSON {
    * @param data string
    * @returns T
    */
-  export function parse<T = Nullable>(data: string): T {
-    data = removeJSONWhitespace(data)
+  export function parse<T = Nullable | null>(data: string): T {    
     const char = data.charCodeAt(0)
     // @ts-ignore
     if (isString<T>()) return parseString(data.trim())
@@ -130,7 +129,6 @@ export namespace JSON {
     else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data.trim())
     // @ts-ignore
     return parseObject<T>(removeJSONWhitespace(data))
-    // TODO: Add dynamic types.
   }
 }
 
@@ -140,80 +138,79 @@ export function serializeUnknown(data: unknown): string {
     return nullVal
   }
   // @ts-ignore
-  if (data.type === unknownId) {
+  else if (data.type === unknownId) {
     // @ts-ignore
     return serializeUnknown(data.get<unknown>())
   }
   // @ts-ignore
-  if (data.type === stringId) {
+  else if (data.type === stringId) {
     // @ts-ignore
     return serializeString(data.get<string>())
   }
   // @ts-ignore
-  if (data.type === arrayUnknownId) {
+  else if (data.type === arrayUnknownId) {
     // @ts-ignore
     return serializeArray(data.get<unknown[]>())
   }
   // @ts-ignore
-  if (data.type === unknownTypes.boolean) {
+  else if (data.type === unknownTypes.boolean) {
     // @ts-ignore
     return serializeBoolean(data.get<boolean>())
   }
   // @ts-ignore
-  if (data.type === unknownTypes.i8) {
+  else if (data.type === unknownTypes.i8) {
     // @ts-ignore
     return data.get<i8>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.i16) {
+  else if (data.type === unknownTypes.i16) {
     // @ts-ignore
     return data.get<i16>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.i32) {
+  else if (data.type === unknownTypes.i32) {
     // @ts-ignore
     return data.get<i32>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.i64) {
+  else if (data.type === unknownTypes.i64) {
     // @ts-ignore
     return data.get<i64>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.u8) {
+  else if (data.type === unknownTypes.u8) {
     // @ts-ignore
     return data.get<u8>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.u16) {
+  else if (data.type === unknownTypes.u16) {
     // @ts-ignore
     return data.get<u16>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.u32) {
+  else if (data.type === unknownTypes.u32) {
     // @ts-ignore
     return data.get<u32>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.u64) {
+  else if (data.type === unknownTypes.u64) {
     // @ts-ignore
     return data.get<u64>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.f32) {
+  else if (data.type === unknownTypes.f32) {
     // @ts-ignore
     return data.get<f32>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.f64) {
+  else if (data.type === unknownTypes.f64) {
     // @ts-ignore
     return data.get<f64>().toString()
   }
   // @ts-ignore
-  if (data.type === unknownTypes.null) {
+  else {
     return nullVal
   }
-  return 'idk!'
 }
 
 // @ts-ignore
@@ -322,12 +319,13 @@ export function parseBoolean(data: string): boolean {
 // @ts-ignore
 @inline
 export function parseString(data: string): string {
-  return sliceQuotes(data).replaceAll(escapeQuote, quote)
+  return data.slice(1, data.length - 1).replaceAll(escapeQuote, quote)
 }
 
 // @ts-ignore
 @inline
-export function parseNull<T>(): T | null {
+export function parseNull<T>(): T {
+  // @ts-ignore
   return null
 }
 

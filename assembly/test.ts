@@ -1,4 +1,5 @@
 import { unknown } from './unknown'
+
 import { console } from "../node_modules/as-console/assembly/wasi"
 
 import { JSON, parseString, parseUnknown, serializeUnknown } from './json'
@@ -189,3 +190,5 @@ o['haha'] = 'mama'
 
 // @ts-ignore
 console.log(o['haha'].get<string>())
+
+console.log(Object.keys(o))

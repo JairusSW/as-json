@@ -6,6 +6,8 @@ import { JSON } from './json'
 
 import * as asJSON from "assemblyscript-json"
 
+import { unknown } from './unknown'
+
 // @ts-ignore
 @json
 class JSONSchema {
@@ -76,6 +78,10 @@ bench('AS-JSON Stringify Object', () => {
 
 bench('AS-JSON Parse Object', () => {
     JSON.parse<JSONSchema>('{"bool":true}')
+})
+
+bench('AS-JSON Stringify Dynamic Array', () => {
+    JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true])
 })
 
 bench('AssemblyScript-JSON Stringify String', () => {
@@ -164,4 +170,18 @@ bench('AssemblyScript-JSON Parse Object', () => {
     const decoder: asJSON.JSON.Obj = <asJSON.JSON.Obj>(asJSON.JSON.parse(Uint8Array.wrap(String.UTF8.encode('{"bool":true}'))))
     const result = decoder.getBool('bool')
     if (result !== null) result.valueOf()
+})
+
+const unk = new unknown()
+
+bench('Unknown set', () => {
+    unk.set('Hello world')
+})
+
+bench('Unknown get', () => {
+    unk.get<string>()
+})
+
+bench('Unknown wrap', () => {
+    unknown.wrap('Hello world')
 })

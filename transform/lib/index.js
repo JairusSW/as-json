@@ -20,13 +20,23 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     sources = [];
     globalStatements = [];
     replaceNextLines = new Set();
+    visitObjectLiteralExpression(node) {
+        console.log(utils_1.toString(node));
+        const keys = node.names;
+        const values = node.values;
+        const replacer = visitor_as_1.SimpleParser.parseExpression(`new Object()`);
+        console.log(node);
+        for (const key of keys) {
+        }
+    }
     visitElementAccessExpression(node) {
         super.visitElementAccessExpression(node);
         if (utils_1.toString(node.expression) === 'o') {
+            // Should be like if (node.expression.type.text === "Object") {
             const replacer = visitor_as_1.SimpleParser.parseExpression(`u32(changetype<usize>(${utils_1.toString(node.elementExpression)}))`);
             node.elementExpression = replacer;
             this.sources.push(replacer.range.source);
-            console.log(node.expression);
+            //console.log(node.expression)
         }
     }
     visitArrayLiteralExpression(node) {

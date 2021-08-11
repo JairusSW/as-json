@@ -10,7 +10,7 @@
     "build:transform": "tsc -w -p ./transform",
     "build:test": "asc assembly/test.ts --transform ./transform --target test --explicitStart",
     "test": "node --experimental-wasi-unstable-preview1 ./tests/test",
-    "bench:build": "asc assembly/bench.ts --runtime incremental --transform ./transform --transform ./serial-as/transform --target bench --explicitStart",
+    "bench:build": "asc assembly/bench.ts --runtime incremental --transform ./transform --target bench --explicitStart",
     "bench:node": "node --experimental-wasi-unstable-preview1 ./bench/bench",
     "bench:wasmtime": "wasmtime ./bench/output/bench.wasm",
     "bench:lunatic": "lunatic ./bench/output/bench.wasm",

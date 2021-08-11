@@ -28,13 +28,25 @@ class JSONTransformer extends BaseVisitor {
   private globalStatements: Statement[] = []
   public replaceNextLines = new Set<number>()
 
+  visitObjectLiteralExpression(node: ObjectLiteralExpression): void {
+    console.log(toString(node))
+    const keys = node.names
+    const values = node.values
+    const replacer = SimpleParser.parseExpression(`new Object()`)
+    console.log(node)
+    for (const key of keys) {
+      
+    }
+  }
+
   visitElementAccessExpression(node: ElementAccessExpression): void {
     super.visitElementAccessExpression(node)
     if (toString(node.expression) === 'o') {
+      // Should be like if (node.expression.type.text === "Object") {
       const replacer = SimpleParser.parseExpression(`u32(changetype<usize>(${toString(node.elementExpression)}))`)
       node.elementExpression = replacer
       this.sources.push(replacer.range.source)
-      console.log(node.expression)
+      //console.log(node.expression)
     }
   }
   visitArrayLiteralExpression(node: ArrayLiteralExpression): void {
