@@ -116,7 +116,8 @@ export namespace JSON {
    * @returns T
    */
   export function parse<T = Nullable | null>(data: string): T {    
-    const char = data.charCodeAt(0)
+    const char = data.trimLeft().charCodeAt(0)
+    let type!: T
     // @ts-ignore
     if (isString<T>()) return parseString(data.trim())
     // @ts-ignore
@@ -127,6 +128,8 @@ export namespace JSON {
     else if (isNullable<T>() && char === nCode) return parseNull<T>()
     // @ts-ignore
     else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data.trim())
+    // @ts-ignore
+    else if (type instanceof unknown) return parseUnknown(data)
     // @ts-ignore
     return parseObject<T>(removeJSONWhitespace(data))
   }
@@ -150,7 +153,7 @@ export function serializeUnknown(data: unknown): string {
   // @ts-ignore
   else if (data.type === arrayUnknownId) {
     // @ts-ignore
-    return serializeArray(data.get<unknown[]>())
+    return serializeArray<unknown[]>(data.get<unknown[]>())
   }
   // @ts-ignore
   else if (data.type === unknownTypes.boolean) {
@@ -299,14 +302,20 @@ export function serializeArray<T extends Array<any>>(data: T): string {
 // @ts-ignore
 @inline
 export function parseUnknown(data: string): unknown {
-  const first = data.trimLeft().charCodeAt(0)
-  if (first === quoteCode) return unknown.wrap(parseString(data.trimRight()))
-  else if (first === lbracketCode) return unknown.wrap(parseArray<unknown[]>(removeJSONWhitespace(data)))
-  else if (first === rcbracketCode) return unknown.wrap(parseObject<Object>(removeJSONWhitespace(data)))
-  else if (first === t_charCode) return unknown.wrap(true)
-  else if (first === f_charCode) return unknown.wrap(false)
-  else if (data.indexOf('.')) return unknown.wrap(parseNumber<f64>(data.trim()))
-  else return unknown.wrap(parseNumber<i64>(data.trim()))
+  data = data.trimLeft()
+  const char = data.charCodeAt(0)
+  // @ts-ignore
+  if (char === quoteCode) return unknown.wrap(parseString(data.trimRight()))
+  // @ts-ignore
+  else if (char === t_charCode || char === f_charCode) return unknown.wrap(parseBoolean(data.trimLeft()))
+  // @ts-ignore
+  //else if (char === lbracketCode) return unknown.wrap(parseArray(removeJSONWhitespace(data)))
+  // @ts-ignore
+  else if (char === nCode) return unknown.wrap(null)
+  // @ts-ignore
+  //else if (char === lcbracketCode) return parseObject<T>(removeJSONWhitespace(data))
+  // @ts-ignore
+  return parseUnknownNumber(data.trim())
 }
 
 
@@ -353,6 +362,15 @@ export function parseNumber<T>(data: string): T {
   else if (type instanceof i16) return I16.parseInt(data)
   // @ts-ignore
   return I8.parseInt(data)
+}
+
+// @ts-ignore
+@inline
+export function parseUnknownNumber(data: string): unknown {
+  // @ts-ignore
+  if (data.includes('.')) return unknown.wrap(F64.parseFloat(data))
+  // @ts-ignore
+  return unknown.wrap(I64.parseInt(data))
 }
 
 // @ts-ignore
@@ -421,6 +439,24 @@ export function parseNumberArray<T>(data: string): Array<T> {
     }
   }
   result.push(parseNumber<T>(data.slice(lastPos + 1, data.length - 1)))
+  return result
+}
+
+// @ts-ignore
+@inline
+export function parseUnknownArray(data: string): Array<unknown> {
+  const result = new Array<unknown>()
+  if (data.length === 2) return result
+  let lastPos: u32 = 0
+  let char: u32 = 0
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i)
+    if (char === commaCode) {
+      result.push(parseUnknown(data.slice(lastPos + 1, i)))
+      lastPos = i
+    }
+  }
+  result.push(parseUnknown(data.slice(lastPos + 1, data.length - 1)))
   return result
 }
 

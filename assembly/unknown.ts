@@ -22,8 +22,7 @@ export class unknown {
     private f64: f64 = 0
     private f32: f32 = 0
     set<T>(data: T): void {
-        if (isNullable<T>() && data === null) {
-            this.value = usize(0)
+        if (data instanceof usize && data === null) {
             this.type = unknownTypes.null
         } else if (isBoolean<T>()) {
             this.value = data ? 1 : 0
@@ -77,7 +76,10 @@ export class unknown {
     // @ts-ignore
     get<T>(): T {
         let type!: T
-        if (isBoolean<T>()) {
+        if (isNullable<T>() && this.type === unknownTypes.null) {
+            // @ts-ignore
+            return null
+        } if (isBoolean<T>()) {
             // @ts-ignore
             if (this.value === 1) return true
             // @ts-ignore
@@ -120,9 +122,6 @@ export class unknown {
                     return u64(this.value)
                 }
             }
-        } else if (isNullable<T>() && this.type === unknownTypes.null) {
-            // @ts-ignore
-            return null
         } else {
             return changetype<T>(this.value)
         }
