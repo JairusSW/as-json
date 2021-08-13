@@ -26,7 +26,7 @@
 ## Usage
 
 ```js
-import { JSON } from 'json-as'
+import { JSON, unknown } from 'json-as'
 ```
 
 **Object**

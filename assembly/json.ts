@@ -3,6 +3,8 @@ import { Object } from './Object'
 
 import { unknown, unknownTypes } from './unknown'
 
+export { unknown, unknownTypes } from './unknown'
+
 @global
 export class Nullable { }
 
