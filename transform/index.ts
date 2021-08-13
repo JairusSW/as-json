@@ -29,11 +29,9 @@ class JSONTransformer extends BaseVisitor {
   public replaceNextLines = new Set<number>()
 
   visitObjectLiteralExpression(node: ObjectLiteralExpression): void {
-    console.log(toString(node))
     const keys = node.names
     const values = node.values
     const replacer = SimpleParser.parseExpression(`new Object()`)
-    console.log(node)
     for (const key of keys) {
       
     }
@@ -46,7 +44,6 @@ class JSONTransformer extends BaseVisitor {
       const replacer = SimpleParser.parseExpression(`u32(changetype<usize>(${toString(node.elementExpression)}))`)
       node.elementExpression = replacer
       this.sources.push(replacer.range.source)
-      //console.log(node.expression)
     }
   }
   visitArrayLiteralExpression(node: ArrayLiteralExpression): void {
@@ -205,7 +202,6 @@ export = class MyTransform extends Transform {
     let i = 0
     for (const source of transformer.sources) {
       //source.internalPath += `${i++}.ts`
-      console.log(source.internalPath)
       if (i === 0) {
         parser.sources.push(source)
         i++

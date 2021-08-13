@@ -21,11 +21,9 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     globalStatements = [];
     replaceNextLines = new Set();
     visitObjectLiteralExpression(node) {
-        console.log(utils_1.toString(node));
         const keys = node.names;
         const values = node.values;
         const replacer = visitor_as_1.SimpleParser.parseExpression(`new Object()`);
-        console.log(node);
         for (const key of keys) {
         }
     }
@@ -36,7 +34,6 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
             const replacer = visitor_as_1.SimpleParser.parseExpression(`u32(changetype<usize>(${utils_1.toString(node.elementExpression)}))`);
             node.elementExpression = replacer;
             this.sources.push(replacer.range.source);
-            //console.log(node.expression)
         }
     }
     visitArrayLiteralExpression(node) {
@@ -175,7 +172,6 @@ module.exports = class MyTransform extends as_1.Transform {
         let i = 0;
         for (const source of transformer.sources) {
             //source.internalPath += `${i++}.ts`
-            console.log(source.internalPath);
             if (i === 0) {
                 parser.sources.push(source);
                 i++;

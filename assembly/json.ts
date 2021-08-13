@@ -53,6 +53,16 @@ const WS3 = '\u000A'
 const WS4 = '\u000D'
 const WS5 = '\u0009'
 
+const WS1code = " ".charCodeAt(0)
+const WS2code = '\u0020'.charCodeAt(0)
+const WS3code = '\u000A'.charCodeAt(0)
+const WS4code = '\u000D'.charCodeAt(0)
+const WS5code = '\u0009'.charCodeAt(0)
+
+const unknownTrue = unknown.wrap(true)
+const unknownFalse = unknown.wrap(false)
+const unknownNull = unknown.wrap(null)
+
 export function removeJSONWhitespace(data: string): string {
   let result = ''
   let instr = false
@@ -115,23 +125,23 @@ export namespace JSON {
    * @param data string
    * @returns T
    */
-  export function parse<T = Nullable | null>(data: string): T {    
-    const char = data.trimLeft().charCodeAt(0)
+  export function parse<T = Nullable | null>(data: string): T {
+    const char = data.charCodeAt(0)
     let type!: T
     // @ts-ignore
     if (isString<T>()) return parseString(data.trim())
     // @ts-ignore
-    else if (isBoolean<T>()) return parseBoolean(data.trimStart())
+    else if (isBoolean<T>()) return parseBoolean(data.trimLeft())
     // @ts-ignore
-    else if (isArrayLike<T>()) return parseArray<T>(removeJSONWhitespace(data))
+    else if (isArrayLike<T>()) return parseArray<T>(data)
     // @ts-ignore
-    else if (isNullable<T>() && char === nCode) return parseNull<T>()
+    else if (isNullable<T>() && char === nCode) return null
     // @ts-ignore
     else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data.trim())
     // @ts-ignore
     else if (type instanceof unknown) return parseUnknown(data)
     // @ts-ignore
-    return parseObject<T>(removeJSONWhitespace(data))
+    return parseObject<T>(data)
   }
 }
 
@@ -216,15 +226,11 @@ export function serializeUnknown(data: unknown): string {
   }
 }
 
-// @ts-ignore
-@inline
 export function serializeNumber<T>(data: T): string {
   // @ts-ignore
   return data.toString()
 }
 
-// @ts-ignore
-@inline
 export function serializeString(data: string): string {
   const resultData = new StringSink(quote)
   resultData.write(data.replaceAll(quote, escapeQuote))
@@ -232,14 +238,10 @@ export function serializeString(data: string): string {
   return resultData.toString()
 }
 
-// @ts-ignore
-@inline
 export function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal
 }
 
-// @ts-ignore
-@inline
 export function serializeArray<T extends Array<any>>(data: T): string {
   let type!: valueof<T>
   const len = data.length - 1;
@@ -299,47 +301,32 @@ export function serializeArray<T extends Array<any>>(data: T): string {
   return result.toString()
 }
 
-// @ts-ignore
-@inline
 export function parseUnknown(data: string): unknown {
-  data = data.trimLeft()
   const char = data.charCodeAt(0)
   // @ts-ignore
-  if (char === quoteCode) return unknown.wrap(parseString(data.trimRight()))
+  if (char === quoteCode) return unknown.wrap(parseString(data))
   // @ts-ignore
-  else if (char === t_charCode || char === f_charCode) return unknown.wrap(parseBoolean(data.trimLeft()))
+  else if (char === t_charCode) return unknownTrue
+  else if (char === f_charCode) return unknownFalse
   // @ts-ignore
-  //else if (char === lbracketCode) return unknown.wrap(parseArray(removeJSONWhitespace(data)))
+  else if (char === lbracketCode) return unknown.wrap(parseUnknownArray(data))
   // @ts-ignore
-  else if (char === nCode) return unknown.wrap(null)
+  else if (char === nCode) return unknownNull
   // @ts-ignore
-  //else if (char === lcbracketCode) return parseObject<T>(removeJSONWhitespace(data))
+  //else if (char === lcbracketCode) return parseObject<T>(data)
   // @ts-ignore
-  return parseUnknownNumber(data.trim())
+  return parseUnknownNumber(data)
 }
 
 
-// @ts-ignore
-@inline
 export function parseBoolean(data: string): boolean {
   return data.charCodeAt(0) === t_charCode ? true : false
 }
 
-// @ts-ignore
-@inline
 export function parseString(data: string): string {
   return data.slice(1, data.length - 1).replaceAll(escapeQuote, quote)
 }
 
-// @ts-ignore
-@inline
-export function parseNull<T>(): T {
-  // @ts-ignore
-  return null
-}
-
-// @ts-ignore
-@inline
 export function parseNumber<T>(data: string): T {
   let type: T
   // @ts-ignore
@@ -364,8 +351,6 @@ export function parseNumber<T>(data: string): T {
   return I8.parseInt(data)
 }
 
-// @ts-ignore
-@inline
 export function parseUnknownNumber(data: string): unknown {
   // @ts-ignore
   if (data.includes('.')) return unknown.wrap(F64.parseFloat(data))
@@ -373,9 +358,8 @@ export function parseUnknownNumber(data: string): unknown {
   return unknown.wrap(I64.parseInt(data))
 }
 
-// @ts-ignore
-@inline
 export function parseArray<T extends Array<unknown>>(data: string): T {
+  let type!: valueof<T>
   // @ts-ignore
   if (isString<valueof<T>>()) return parseStringArray(data)
   // @ts-ignore
@@ -383,85 +367,114 @@ export function parseArray<T extends Array<unknown>>(data: string): T {
   // @ts-ignore
   else if (isArray<valueof<T>>()) return parseArrayArray<T>(data)
   // @ts-ignore
+  else if (type instanceof unknown) return parseUnknownArray(data)
+  // @ts-ignore
   return parseNumberArray<valueof<T>>(data)
 }
 
-// @ts-ignore
-@inline
 export function parseStringArray(data: string): Array<string> {
-  data = data.replaceAll(escapeQuote, quote)
   const result = new Array<string>()
   if (data.length === 2) return result
-  let lastPos: u32 = 2
+  let lastPos: u32 = 1
   let char: u32 = 0
+  let instr: boolean = false
   for (let i: u32 = 1; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
-    if (char === commaCode) {
-      result.push(data.slice(lastPos, i - 1))
-      lastPos = i + 2
+    // This ignores [ and ] or { and } if they are inside a string.
+    if (char === quoteCode && data.charCodeAt(i - 1) !== fwd_slashCode) instr = instr ? false : true
+    if (instr === false) {
+      // Handles whitespace after a comma
+      if (char === WS1code || char === WS2code || char === WS3code || char === WS4code || char === WS5code) lastPos++
+      if (char === quoteCode) {
+        result.push(parseString(data.slice(lastPos, i + 1)))
+        lastPos = i + 2
+      }
     }
   }
-  result.push(data.slice(lastPos, data.length - 2))
   return result
 }
 
-// @ts-ignore
-@inline
 export function parseBooleanArray(data: string): Array<boolean> {
   const result = new Array<boolean>()
   if (data.length === 2) return result
   let char: u32 = 0
+  let instr: boolean = false
   for (let i: u32 = 1; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
-    if (char === t_charCode) {
-      result.push(true)
-      i += 4
-    } else {
-      result.push(false)
-      i += 5
+    if (instr === false) {
+      if (char === t_charCode) {
+        result.push(true)
+        i += 4
+      } else {
+        result.push(false)
+        i += 5
+      }
     }
   }
   return result
 }
 
-// @ts-ignore
-@inline
 export function parseNumberArray<T>(data: string): Array<T> {
   const result = new Array<T>()
   if (data.length === 2) return result
   let lastPos: u32 = 0
   let char: u32 = 0
-  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+  let i: u32 = 1
+  for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
     if (char === commaCode) {
+      //console.log('Found number: ' + data.slice(lastPos + 1, i))
       result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
       lastPos = i
     }
   }
-  result.push(parseNumber<T>(data.slice(lastPos + 1, data.length - 1)))
+ // console.log('Found number: ' + data.slice(lastPos + 1, i))
+  result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
   return result
 }
 
-// @ts-ignore
-@inline
 export function parseUnknownArray(data: string): Array<unknown> {
   const result = new Array<unknown>()
   if (data.length === 2) return result
-  let lastPos: u32 = 0
+  let lastPos: i32 = 0
   let char: u32 = 0
-  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+  let depth: u32 = 0
+  let fdepth: u32 = 0
+  let instr: boolean = false
+  let i: u32 = 1
+  for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
-    if (char === commaCode) {
-      result.push(parseUnknown(data.slice(lastPos + 1, i)))
-      lastPos = i
+    // This ignores [ and ] if they are inside a string.
+    if (char === quoteCode && data.charCodeAt(i - 1) !== fwd_slashCode) {
+      if (instr === true) {
+        instr = false
+      } else {
+        instr = true
+      }
+    }
+    if (instr === false) {
+      if (char === commaCode && depth === 0 && fdepth === 0) {
+        //console.log('Normal chunk: ' + data.slice(lastPos + 1, i))
+        result.push(parseUnknown(data.slice(lastPos + 1, i).trim()))
+        lastPos = i
+      } else if (char === lbracketCode) depth++
+      else if (char === rbracketCode) fdepth++
+      else if (depth !== 0 && depth === fdepth) {
+        //console.log('Deep chunk: ' + data.slice(lastPos + 1, i))
+        result.push(unknown.wrap(parseUnknownArray(data.slice(lastPos + 1, i).trim())))
+        // Reset the depth
+        depth = 0
+        fdepth = 0
+        // Set new lastPos
+        lastPos = i
+      }
     }
   }
-  result.push(parseUnknown(data.slice(lastPos + 1, data.length - 1)))
+ // console.log('Last chunk: ' + data.slice(lastPos + 1, data.length - 1).trim())
+  result.push(parseUnknown(data.slice(lastPos + 1, data.length - 1).trim()))
   return result
 }
 
-// @ts-ignore
-@inline
 export function parseArrayArray<T extends Array<unknown>>(data: string): T {
   const result = instantiate<T>()
   if (data.length === 2) return result
@@ -479,7 +492,7 @@ export function parseArrayArray<T extends Array<unknown>>(data: string): T {
       if (char === lbracketCode) depth++
       if (char === rbracketCode) fdepth++
       // If the depth and found depth are equal, that is an array. Push it.
-      if (depth > 0 && depth === fdepth) {
+      if (depth !== 0 && depth === fdepth) {
         result.push(
           // @ts-ignore
           parseArray<valueof<T>>(data.slice(lastPos + 2, i + 1))
@@ -496,8 +509,6 @@ export function parseArrayArray<T extends Array<unknown>>(data: string): T {
   return result
 }
 
-// @ts-ignore
-@inline
 export function parseObject<T>(data: string): T {
   //console.log('Data ' + data)
   const len: u32 = data.length - 1
@@ -518,7 +529,7 @@ export function parseObject<T>(data: string): T {
     }
     if (depth !== 0 && depth === fdepth) {
       //console.log(`Deep: ${prependType(data.slice(lastPos + 1, i + 1))}`)
-      result.set(key, data.slice(lastPos + 1, i + 1))
+      result.set(key, data.slice(lastPos + 1, i + 1).trim())
       // Reset the depth
       depth = 0
       fdepth = 0
@@ -528,29 +539,19 @@ export function parseObject<T>(data: string): T {
     if (depth === 0) {
       if (char === colonCode) {
         //console.log(`Key: ${prependType(data.slice(lastPos + 1, i - 1))}`)
-        key = data.slice(lastPos + 1, i - 1)
+        key = data.slice(lastPos + 1, i - 1).trim()
         lastPos = i
       }
       else if (char === commaCode) {
         //console.log(`Value: ${prependType(data.slice(lastPos + 1, i))}`)
-        if ((i - lastPos) > 0) result.set(key, unchecked(data.slice(lastPos + 1, i)))
+        if ((i - lastPos) > 0) result.set(key, data.slice(lastPos + 1, i).trim())
         lastPos = i + 1
       }
     }
   }
   //console.log(`Trailing: ${prependType(data.slice(lastPos + 1, len))}\n\t\sValid: ${data.slice(lastPos + 1, len).length > 0}`)
 
-  if ((len - lastPos) > 0) result.set(key, unchecked(data.slice(lastPos + 1, len)))
+  if ((len - lastPos) > 0) result.set(key, data.slice(lastPos + 1, len).trim())
   // @ts-ignore
   return schema.__decode(result)
-}
-
-// @ts-ignore
-@inline
-export function sliceQuotes(data: string): string {
-  const len = data.length - 2
-  if (len <= 0) return changetype<string>("");
-  const out = changetype<string>(__new(len << 1, stringId));
-  memory.copy(changetype<usize>(out), changetype<usize>(data) + (<usize>2), <usize>len << 1);
-  return out;
 }

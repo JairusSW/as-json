@@ -1,11 +1,14 @@
-import { unknown } from './unknown'
+import { unknown, unknownTypes } from './unknown'
 
-import { console } from "../node_modules/as-console/assembly/wasi"
+import { console, stringify } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON, parseUnknown } from './json'
+import { JSON, parseUnknown, parseUnknownArray } from './json'
 
 import { Object } from './Object'
 
+// Not inlining results in an error for some reason
+// @ts-ignore
+@inline
 function check<T>(message: string, data: T): void {
     const encoded = JSON.stringify<T>(data)
     const decoded = JSON.parse<T>(encoded)
@@ -179,18 +182,4 @@ check<JSONSchema>('Encode/Decode object', obj)
 check<EmptySchema>('Encode/Decode object', emptyObj)
 
 // Unknown
-const encoded = JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Very",["Deep",["Arrays",["Too!"]]]], true, "It also supports nulls", null])
-console.log(encoded)
-
-const o = new Object()
-
-o['haha'] = 'mama'
-
-// @ts-ignore
-console.log(o['haha'].get<string>())
-
-console.log(Object.keys(o))
-
-const unk = parseUnknown('17')
-
-console.log(unk.get<u32>())
+check<unknown[]>('Encode/Decode unknown[]', ["Welcome to dynamic arrays", 3.14, ["Deep"], true, "It also supports nulls", null])

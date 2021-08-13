@@ -83,6 +83,9 @@ bench('AS-JSON Parse Object', () => {
 bench('AS-JSON Stringify Dynamic Array', () => {
     JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true])
 })
+bench('AS-JSON Parse Dynamic Array', () => {
+    JSON.stringify('["Welcome to dynamic arrays",3.14,["Deep arrays too!"],true]')
+})
 
 bench('AssemblyScript-JSON Stringify String', () => {
     const encoder = new asJSON.JSONEncoder()

@@ -16,10 +16,12 @@
 - ✅ Numbers
 - ✅ Integers
 - ✅ Null
-- ❌ Dynamic Arrays
-- ❌ Dynamic Types
-- ❌ Dynamic Objects
-Note: Dynamic types are planned in the near future.
+- ✅ Dynamic Arrays
+- ✅ Dynamic Types
+- ❌ Dynamic Objects (Soon!)
+- ✅ Whitespace
+
+## WARNING: Possible breaking changes coming for v2.0.0
 
 ## Usage
 
@@ -49,7 +51,7 @@ const parsed = JSON.parse<JSONSchema>(stringified)
 // { firstName: "Jairus", lastName: "Tanaka", age: 14 }
 ```
 
-**Array**
+**Array (Typed)**
 
 ```js
 const stringified = JSON.stringify(['Hello', 'World'])
@@ -57,6 +59,16 @@ const stringified = JSON.stringify(['Hello', 'World'])
 
 const parsed = JSON.parse<JSONSchema>(stringified)
 // ["Hello", "World"]
+```
+
+**Array (Dynamic)**
+
+```js
+const stringified = JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep"], true, "It also supports nulls", null])
+// '["Welcome to dynamic arrays",3.14,["Deep"],true,"It also supports nulls",null]'
+
+const parsed = JSON.parse<unknown[]>(stringified)
+// ["Welcome to dynamic arrays", 3.14, ["Deep"], true, "It also supports nulls", null]
 ```
 
 **Float**
@@ -102,9 +114,24 @@ const parsed = JSON.parse<bool>(stringified)
 **Null**
 
 ```js
-const stringified = JSON.stringify(true)
-// 'true'
+const stringified = JSON.stringify(null)
+// 'null'
 
-const parsed = JSON.parse<boolean>(stringified)
-// true
+const parsed = JSON.parse(stringified)
+// null
 ```
+
+## Accessing unknown types
+**Breaking changes for v2.0.0!**
+**Experimental usage only**
+
+```js
+const parsed = JSON.parse<unknown[]>(["Welcome to dynamic arrays",3.14,["Deep"],true,"It also supports nulls",null])
+console.log(parsed[0].get<string>())
+// "Welcome to dynamic arrays"
+console.log(parsed[1].get<f64>().toString())
+// 3.14
+```
+
+## Benchmarks
+

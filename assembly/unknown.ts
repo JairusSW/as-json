@@ -25,7 +25,7 @@ export class unknown {
         if (data instanceof usize && data === null) {
             this.type = unknownTypes.null
         } else if (isBoolean<T>()) {
-            this.value = data ? 1 : 0
+            this.value = data ? usize(1) : usize(0)
             this.type = unknownTypes.boolean
         } else if (isFloat<T>()) {
             if (data instanceof f32) {
@@ -87,10 +87,10 @@ export class unknown {
         } else if (isFloat<T>()) {
             if (type instanceof f32) {
                 // @ts-ignore
-                return f32(this.f32)
+                return this.f32
             } else {
                 // @ts-ignore
-                return f64(this.f64)
+                return this.f64
             }
         } else if (isInteger<T>()) {
             if (isSigned<T>()) {
