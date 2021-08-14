@@ -1,9 +1,8 @@
 import { StringSink } from 'as-string-sink'
 import { Object } from './Object'
-
 import { unknown, unknownTypes } from './unknown'
-
 export { unknown, unknownTypes } from './unknown'
+export { Object } from './Object'
 
 @global
 export class Nullable { }
@@ -31,7 +30,6 @@ const fwd_slashCode: u16 = 92// "/"
 const t_charCode: u16 = 116// "t"
 const f_charCode: u16 = 116// "t"
 const nCode: u16 = 110// "n"
-
 const unknownId = idof<unknown>()
 const stringId = idof<string>()
 const arrayStringId = idof<string[]>()
@@ -48,40 +46,14 @@ const arrayI64Id = idof<i64[]>()
 const arrayF32Id = idof<f32[]>()
 const arrayF64Id = idof<f64[]>()
 const arrayUnknownId = idof<unknown[]>()
-
-const WS1 = " "
-const WS2 = '\u0020'
-const WS3 = '\u000A'
-const WS4 = '\u000D'
-const WS5 = '\u0009'
-
 const WS1code = " ".charCodeAt(0)
 const WS2code = '\u0020'.charCodeAt(0)
 const WS3code = '\u000A'.charCodeAt(0)
 const WS4code = '\u000D'.charCodeAt(0)
 const WS5code = '\u0009'.charCodeAt(0)
-
 const unknownTrue = unknown.wrap(true)
 const unknownFalse = unknown.wrap(false)
 const unknownNull = unknown.wrap(null)
-
-export function removeJSONWhitespace(data: string): string {
-  let result = ''
-  let instr = false
-  let char: string = ''
-  for (let i = 0; i < data.length; i++) {
-    char = data.charAt(i)
-    if (char === quote && data.charAt(i - 1) === fwd_slash) {
-      instr = !instr
-    }
-    if (instr === true) {
-      result += char
-    } else if (instr === false && char !== WS1 && char !== WS2 && char !== WS3 && char !== WS4 && char !== WS5) {
-      result += char
-    }
-  }
-  return result
-}
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -111,6 +83,8 @@ export namespace JSON {
       return serializeArray<T>(data)
     } else if (data instanceof unknown) {
       return serializeUnknown(data)
+    } else if (data instanceof Object) {
+      return serializeDynamicObject(data)
     }
 
     // @ts-ignore
@@ -145,6 +119,19 @@ export namespace JSON {
     // @ts-ignore
     return parseObject<T>(data)
   }
+}
+
+export function serializeDynamicObject(data: Object): string {
+  const result = new StringSink(lcbracket)
+  const keys = Object.keys(data)
+  const values = Object.values(data)
+  const len: u32 = keys.length - 1
+  if (len === -1) return '{}'
+  for (let i: u32 = 0; i < len; i++) {
+    result.write(`"${unchecked(keys[i])}":${serializeUnknown(unchecked(values[i]))},`)
+  }
+  result.write(`"${unchecked(keys[len])}":${serializeUnknown(unchecked(values[len]))}}`)
+  return result.toString()
 }
 
 export function serializeUnknown(data: unknown): string {
@@ -234,14 +221,88 @@ export function serializeNumber<T>(data: T): string {
 }
 
 export function serializeString(data: string): string {
-  const resultData = new StringSink(quote)
-  resultData.write(data.replaceAll(quote, escapeQuote))
-  resultData.writeCodePoint(quoteCode)
-  return resultData.toString()
+  return quote + data.replaceAll(quote, escapeQuote) + quote
 }
 
 export function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal
+}
+
+export function serializeStringArray(data: string[]): string {
+  const result = new StringSink(lbracket)
+  const len: u32 = data.length - 1
+  for (let i: u32 = 0; i < len; i++) {
+    result.write(serializeString(unchecked(data[i])))
+    result.writeCodePoint(commaCode)
+  }
+  result.write(serializeString(unchecked(data[len])))
+  result.writeCodePoint(rbracketCode)
+  return result.toString()
+}
+
+export function serializeNumberArray<T extends Array<any>>(data: T): string {
+  const result = new StringSink(lbracket)
+  const len: u32 = data.length - 1
+  for (let i: u32 = 0; i < len; i++) {
+    result.write(serializeNumber<valueof<T>>(unchecked(data[i])))
+    result.writeCodePoint(commaCode)
+  }
+  result.write(serializeString(unchecked(data[len])))
+  result.writeCodePoint(rbracketCode)
+  return result.toString()
+}
+
+export function serializeBooleanArray(data: boolean[]): string {
+  const result = new StringSink(lbracket)
+  const len: u32 = data.length - 1
+  for (let i: u32 = 0; i < len; i++) {
+    // @ts-ignore
+    result.write(serializeBoolean(unchecked(data[i])))
+    result.writeCodePoint(commaCode)
+  }
+  // @ts-ignore
+  result.write(serializeBoolean(unchecked(data[len])))
+  result.writeCodePoint(rbracketCode)
+  return result.toString()
+}
+
+export function serializeUnknownArray(data: unknown[]): string {
+  const result = new StringSink(lbracket)
+  const len: u32 = data.length - 1
+  for (let i: u32 = 0; i < len; i++) {
+    result.write(serializeUnknown(unchecked(data[i])))
+    result.writeCodePoint(commaCode)
+  }
+  result.write(serializeUnknown(unchecked(data[len])))
+  result.writeCodePoint(rbracketCode)
+  return result.toString()
+}
+
+export function serializeDeepArray<T extends Array<any>>(data: T): string {
+  const result = new StringSink(lbracket)
+  const len: u32 = data.length - 1
+  for (let i: u32 = 0; i < len; i++) {
+    result.write(serializeArray<valueof<T>>(unchecked(data[i])))
+    result.writeCodePoint(commaCode)
+  }
+  result.write(serializeArray<valueof<T>>(unchecked(data[len])))
+  result.writeCodePoint(rbracketCode)
+  return result.toString()
+}
+
+export function serializeObjectArray<T extends Array<any>>(data: T): string {
+  const result = new StringSink(lbracket)
+  const len: u32 = data.length - 1
+  let obj!: valueof<T>
+  for (let i: u32 = 0; i < len; i++) {
+    obj = unchecked(data[i])
+    if (obj.__encoded.length === 0) obj.__encode()
+    result.write(obj.__encoded)
+    result.writeCodePoint(commaCode)
+  }
+  result.write(serializeString(unchecked(data[len])))
+  result.writeCodePoint(rbracketCode)
+  return result.toString()
 }
 
 export function serializeArray<T extends Array<any>>(data: T): string {
@@ -430,7 +491,7 @@ export function parseNumberArray<T>(data: string): Array<T> {
       lastPos = i
     }
   }
- // console.log('Found number: ' + data.slice(lastPos + 1, i))
+  // console.log('Found number: ' + data.slice(lastPos + 1, i))
   result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
   return result
 }
@@ -472,7 +533,7 @@ export function parseUnknownArray(data: string): Array<unknown> {
       }
     }
   }
- // console.log('Last chunk: ' + data.slice(lastPos + 1, data.length - 1).trim())
+  // console.log('Last chunk: ' + data.slice(lastPos + 1, data.length - 1).trim())
   result.push(parseUnknown(data.slice(lastPos + 1, data.length - 1).trim()))
   return result
 }

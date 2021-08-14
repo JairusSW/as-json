@@ -135,3 +135,19 @@ console.log(parsed[1].get<f64>().toString())
 
 ## Benchmarks
 
+```
+AS-JSON Stringify String: ~1858051.4 ops/s | 53.82ms
+AS-JSON Parse String: ~4321632.43 ops/s | 23.14ms     
+AS-JSON Stringify Integer: ~8529956.89 ops/s | 11.72ms
+AS-JSON Parse Integer: ~27839325.77 ops/s | 3.59ms
+AS-JSON Stringify Float: ~5128590.39 ops/s | 19.5ms    
+AS-JSON Parse Float: ~21467505.24 ops/s | 4.66ms       
+AS-JSON Stringify Boolean: ~361837455.83 ops/s | 0.28ms
+AS-JSON Parse Boolean: ~51522012.58 ops/s | 1.94ms     
+AS-JSON Stringify Array: ~1421792.72 ops/s | 70.33ms
+AS-JSON Parse Array: ~3755593.05 ops/s | 26.63ms
+AS-JSON Stringify Object: ~3309471.1 ops/s | 30.22ms
+AS-JSON Parse Object: ~1054387.45 ops/s | 94.84ms
+AS-JSON Stringify Dynamic Array: ~285433.75 ops/s | 350.34ms
+AS-JSON Parse Dynamic Array: ~661516.87 ops/s | 151.17ms
+```

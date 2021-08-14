@@ -12,8 +12,8 @@ export class Object {
         }
     }
     @operator('[]=')
-    private __setKeyOp(key: usize, value: string): void {
-        this.dataStore.set(changetype<string>(key), unknown.wrap(value))
+    private __setKeyOp(key: usize, value: unknown): void {
+        this.dataStore.set(changetype<string>(key), value)
     }
     static keys(obj: Object): string[] {
         return obj.dataStore.keys()
