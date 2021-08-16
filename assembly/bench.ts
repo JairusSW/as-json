@@ -7,6 +7,7 @@ import { JSON } from './json'
 import * as asJSON from "assemblyscript-json"
 
 import { unknown } from './unknown'
+import { Object } from './Object'
 
 // @ts-ignore
 @json
@@ -191,4 +192,14 @@ bench('Unknown wrap', () => {
 
 bench('Unknown is', () => {
     unk.is<string>()
+})
+
+const o = new Object()
+
+bench('Object set', () => {
+    o['foo'] = unk
+})
+
+bench('Object get', () => {
+    o['foo']
 })

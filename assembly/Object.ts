@@ -21,4 +21,9 @@ export class Object {
     static values(obj: Object): unknown[] {
         return obj.dataStore.values()
     }
+    static fromMap(map: Map<string, unknown>): Object {
+        const o = new Object()
+        o.dataStore = map
+        return o
+    }
 }

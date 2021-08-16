@@ -2,7 +2,7 @@ import { unknown, unknownTypes } from './unknown'
 
 import { console, stringify } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON, parseUnknown, parseUnknownArray } from './json'
+import { JSON, parseDynamicObject, parseUnknown, parseUnknownArray } from './json'
 
 import { Object } from './Object'
 
@@ -186,8 +186,12 @@ check<unknown[]>('Encode/Decode unknown[]', ["Welcome to dynamic arrays", 3.14, 
 
 console.log(JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Very", ["Deep", ["Array"]]], true, "It also supports nulls", null]))
 
-console.log(JSON.stringify(JSON.parse<unknown[]>(JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Very", ["Deep", ["Array"]]], true, "It also supports nulls", null]))))
+console.log(JSON.stringify(JSON.parse<unknown[]>('["Welcome to dynamic arrays",3.14,["Very",["Deep",["Array"]]],true,"It also supports nulls",null]')))
 
 const o = new Object()
-o['foo'] = unknown.wrap("bar") 
+o['foo'] = unknown.wrap("bar")
+o['haha'] = unknown.wrap(3.14)
+o['boo'] = unknown.wrap(["Welcome to dynamic arrays", 3.14, ["Very", ["Deep", ["Array"]]], true, "It also supports nulls", null])
 console.log(JSON.stringify(o))
+
+console.log(JSON.stringify(parseDynamicObject('{"hello":"world"}')))

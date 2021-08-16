@@ -82,3 +82,30 @@ bench('JSON Stringify Dynamic Array', () => {
 bench('JSON Parse Dynamic Array', () => {
     JSON.stringify('["Welcome to dynamic arrays",3.14,["Deep arrays too!"],true]')
 })
+
+let unk = 0
+bench('Unknown set', () => {
+    unk = 'Hello world'
+})
+
+bench('Unknown get', () => {
+    unk
+})
+
+bench('Unknown wrap', () => {
+    let unku = 'Hello world'
+})
+
+bench('Unknown is', () => {
+    typeof unk === 'string'
+})
+
+const o = {}
+
+bench('Object set', () => {
+    o['foo'] = unk
+})
+
+bench('Object get', () => {
+    o['foo']
+})

@@ -16,9 +16,6 @@ const trueVal = "true"
 const falseVal = "false"
 const nullVal = "null"
 const escapeQuote = '\\"'
-const fwd_slash = "\\"
-const empty_string = " "
-
 const quoteCode: u16 = 34// '"'
 const commaCode: u16 = 44// ","
 const rbracketCode: u16 = 93// "]"
@@ -617,4 +614,49 @@ export function parseObject<T>(data: string): T {
   if ((len - lastPos) > 0) result.set(key, data.slice(lastPos + 1, len).trim())
   // @ts-ignore
   return schema.__decode(result)
+}
+
+export function parseDynamicObject(data: string): Object {
+  const len: u32 = data.length - 1
+  const result = new Map<string, unknown>()
+  let lastPos: u32 = 1
+  let key: string = ''
+  let instr: u32 = 0
+  let char: u32 = 0
+  let depth: u32 = 0
+  let fdepth: u32 = 0
+  for (let i: u32 = 1; i < len; i++) {
+    char = data.charCodeAt(i)
+    if (char === quoteCode && data.charCodeAt(i - 1) !== fwd_slashCode) instr = (instr ? 0 : 1)
+    else if (instr === 0) {
+      if (char === lcbracketCode || char === lbracketCode) depth++
+      if (char === rcbracketCode || char === rbracketCode) fdepth++
+    }
+    if (depth !== 0 && depth === fdepth) {
+      console.log(`Deep: ${data.slice(lastPos + 1, i + 1)}`)
+      result.set(key, unknown.wrap(data.slice(lastPos + 1, i + 1).trim()))
+      // Reset the depth
+      depth = 0
+      fdepth = 0
+      // Set new lastPos
+      lastPos = i + 2
+    }
+    if (depth === 0) {
+      if (char === colonCode) {
+        console.log(`Key: ${data.slice(lastPos + 1, i - 1)}`)
+        key = data.slice(lastPos + 1, i - 1).trim()
+        lastPos = i + 1
+      }
+      else if (char === commaCode) {
+        console.log(`Value: ${data.slice(lastPos + 1, i)}`)
+        if ((i - lastPos) > 0) result.set(key, unknown.wrap(data.slice(lastPos + 1, i).trim()))
+        lastPos = i + 1
+      }
+    }
+  }
+  console.log(`Trailing: ${data.slice(lastPos + 1, len - 1)}`)
+
+  if ((len - lastPos) > 0) result.set(key, unknown.wrap(data.slice(lastPos + 1, len - 1).trim()))
+  // @ts-ignore
+  return Object.fromMap(result)
 }
