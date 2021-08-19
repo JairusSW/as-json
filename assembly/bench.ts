@@ -12,12 +12,16 @@ import { Object } from './Object'
 // @ts-ignore
 @json
 class JSONSchema {
-    bool: boolean
+    hello: string
 }
 
 const jsonData: JSONSchema = {
-    bool: true
+    hello: 'world'
 }
+
+const o = new Object()
+
+o['hello'] = unknown.wrap('world')
 
 export function bench(title: string, code: () => void): void {
     let ops: u32 = 100_000
@@ -78,16 +82,33 @@ bench('AS-JSON Stringify Object', () => {
 })
 
 bench('AS-JSON Parse Object', () => {
-    JSON.parse<JSONSchema>('{"bool":true}')
+    JSON.parse<JSONSchema>('{"hello":"world"}')
+})
+
+bench('AS-JSON Stringify Dynamic Object', () => {
+    JSON.stringify<Object>(o)
+})
+
+bench('AS-JSON Parse Object', () => {
+    JSON.parse<Object>('{"hello":"world"}')
 })
 
 bench('AS-JSON Stringify Dynamic Array', () => {
-    JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true])
-})
-bench('AS-JSON Parse Dynamic Array', () => {
-    JSON.stringify('["Welcome to dynamic arrays",3.14,["Deep arrays too!"],true]')
+    JSON.stringify<unknown[]>(["Welcome to dynamic arrays", true])
 })
 
+bench('AS-JSON Parse Dynamic Array', () => {
+    JSON.parse<unknown[]>('["Welcome to dynamic arrays",true]')
+})
+
+bench('AS-JSON Stringify Dynamic Array', () => {
+    JSON.stringify<string[]>(["hello", "world"])
+})
+bench('AS-JSON Parse Dynamic Array', () => {
+    JSON.parse<string[]>('["hello","hello"]')
+})
+
+/*
 bench('AssemblyScript-JSON Stringify String', () => {
     const encoder = new asJSON.JSONEncoder()
     encoder.setString(null, "Hello World")
@@ -175,31 +196,4 @@ bench('AssemblyScript-JSON Parse Object', () => {
     const result = decoder.getBool('bool')
     if (result !== null) result.valueOf()
 })
-
-const unk = new unknown()
-
-bench('Unknown set', () => {
-    unk.set('Hello world')
-})
-
-bench('Unknown get', () => {
-    unk.get<string>()
-})
-
-bench('Unknown wrap', () => {
-    unknown.wrap('Hello world')
-})
-
-bench('Unknown is', () => {
-    unk.is<string>()
-})
-
-const o = new Object()
-
-bench('Object set', () => {
-    o['foo'] = unk
-})
-
-bench('Object get', () => {
-    o['foo']
-})
+*/

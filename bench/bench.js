@@ -11,7 +11,7 @@ wasi.start(wasmModule)
 
 
 function bench(title, code) {
-    let ops= 100_000
+    let ops = 100_000
     const start = Date.now()
     while (ops--) {
         code()
@@ -25,8 +25,10 @@ function bench(title, code) {
 }
 
 const jsonData = {
-    bool: true
+    hello: "world"
 }
+
+Object
 
 bench('JSON Stringify String', () => {
     JSON.stringify('Hello World')
@@ -73,39 +75,28 @@ bench('JSON Stringify Object', () => {
 })
 
 bench('JSON Parse Object', () => {
-    JSON.parse('{"bool":true}')
+    JSON.parse('{"hello":"world"}')
+})
+
+bench('JSON Stringify Dynamic Object', () => {
+    JSON.stringify(jsonData)
+})
+
+bench('JSON Parse Object', () => {
+    JSON.parse('{"hello":"world"}')
 })
 
 bench('JSON Stringify Dynamic Array', () => {
-    JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep arrays too!"], true])
+    JSON.stringify(["Welcome to dynamic arrays", true])
+})
+
+bench('JSON Parse Dynamic Array', () => {
+    JSON.parse('["Welcome to dynamic arrays",true]')
+})
+
+bench('JSON Stringify Dynamic Array', () => {
+    JSON.stringify(["hello", "world"])
 })
 bench('JSON Parse Dynamic Array', () => {
-    JSON.stringify('["Welcome to dynamic arrays",3.14,["Deep arrays too!"],true]')
-})
-
-let unk = 0
-bench('Unknown set', () => {
-    unk = 'Hello world'
-})
-
-bench('Unknown get', () => {
-    unk
-})
-
-bench('Unknown wrap', () => {
-    let unku = 'Hello world'
-})
-
-bench('Unknown is', () => {
-    typeof unk === 'string'
-})
-
-const o = {}
-
-bench('Object set', () => {
-    o['foo'] = unk
-})
-
-bench('Object get', () => {
-    o['foo']
+    JSON.parse('["hello","hello"]')
 })

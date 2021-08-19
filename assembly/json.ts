@@ -29,6 +29,7 @@ const f_charCode: u16 = 116// "t"
 const nCode: u16 = 110// "n"
 const unknownId = idof<unknown>()
 const stringId = idof<string>()
+const objectId = idof<Object>()
 const arrayStringId = idof<string[]>()
 const arrayBooleanId = idof<boolean[]>()
 const arrayBoolId = idof<bool[]>()
@@ -87,7 +88,7 @@ export namespace JSON {
     // @ts-ignore
     if (data.__encoded.length === 0) data.__encode()
     // @ts-ignore
-    return unchecked(lcbracket + data.__encoded + rcbracket)
+    return lcbracket + data.__encoded + rcbracket
   }
   /**
    * Parses valid JSON strings into their original format.
@@ -113,6 +114,8 @@ export namespace JSON {
     else if (isFloat<T>() || isInteger<T>()) return parseNumber<T>(data.trim())
     // @ts-ignore
     else if (type instanceof unknown) return parseUnknown(data)
+    // @ts-ignore
+    else if (type instanceof Object) return parseDynamicObject(data)
     // @ts-ignore
     return parseObject<T>(data)
   }
@@ -147,9 +150,79 @@ export function serializeUnknown(data: unknown): string {
     return serializeString(data.get<string>())
   }
   // @ts-ignore
+  else if (data.type === objectId) {
+    // @ts-ignore
+    return serializeDynamicObject(data.get<Object>())
+  }
+  // @ts-ignore
   else if (data.type === arrayUnknownId) {
     // @ts-ignore
-    return serializeArray<unknown[]>(data.get<unknown[]>())
+    return serializeUnknownArray(data.get<unknown[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayBoolId) {
+    // @ts-ignore
+    return serializeBooleanArray(data.get<bool[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayBooleanId) {
+    // @ts-ignore
+    return serializeBooleanArray(data.get<boolean[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayF32Id) {
+    // @ts-ignore
+    return serializeNumberArray<f32[]>(data.get<f32[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayF64Id) {
+    // @ts-ignore
+    return serializeNumberArray<f64[]>(data.get<f64[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayU8Id) {
+    // @ts-ignore
+    return serializeNumberArray<u8[]>(data.get<u8[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayU16Id) {
+    // @ts-ignore
+    return serializeNumberArray<u16[]>(data.get<u16[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayU32Id) {
+    // @ts-ignore
+    return serializeNumberArray<u32[]>(data.get<u32[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayU64Id) {
+    // @ts-ignore
+    return serializeNumberArray<u64[]>(data.get<u64[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayI8Id) {
+    // @ts-ignore
+    return serializeNumberArray<i8[]>(data.get<i8[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayI16Id) {
+    // @ts-ignore
+    return serializeNumberArray<i16[]>(data.get<i16[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayI32Id) {
+    // @ts-ignore
+    return serializeNumberArray<i32[]>(data.get<i32[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayI64Id) {
+    // @ts-ignore
+    return serializeNumberArray<i64[]>(data.get<i64[]>())
+  }
+  // @ts-ignore
+  else if (data.type === arrayStringId) {
+    // @ts-ignore
+    return serializeStringArray(data.get<string[]>())
   }
   // @ts-ignore
   else if (data.type === unknownTypes.boolean) {
@@ -225,7 +298,7 @@ export function serializeBoolean(data: number): string {
   return data ? trueVal : falseVal
 }
 
-export function serializeStringArray(data: string[]): string {
+function serializeStringArray(data: string[]): string {
   const result = new StringSink(lbracket)
   const len: u32 = data.length - 1
   for (let i: u32 = 0; i < len; i++) {
@@ -237,19 +310,19 @@ export function serializeStringArray(data: string[]): string {
   return result.toString()
 }
 
-export function serializeNumberArray<T extends Array<any>>(data: T): string {
+function serializeNumberArray<T extends Array<any>>(data: T): string {
   const result = new StringSink(lbracket)
   const len: u32 = data.length - 1
   for (let i: u32 = 0; i < len; i++) {
     result.write(serializeNumber<valueof<T>>(unchecked(data[i])))
     result.writeCodePoint(commaCode)
   }
-  result.write(serializeString(unchecked(data[len])))
+  result.write(serializeNumber<valueof<T>>(unchecked(data[len])))
   result.writeCodePoint(rbracketCode)
   return result.toString()
 }
 
-export function serializeBooleanArray(data: boolean[]): string {
+function serializeBooleanArray(data: boolean[]): string {
   const result = new StringSink(lbracket)
   const len: u32 = data.length - 1
   for (let i: u32 = 0; i < len; i++) {
@@ -263,7 +336,7 @@ export function serializeBooleanArray(data: boolean[]): string {
   return result.toString()
 }
 
-export function serializeUnknownArray(data: unknown[]): string {
+function serializeUnknownArray(data: unknown[]): string {
   const result = new StringSink(lbracket)
   const len: u32 = data.length - 1
   for (let i: u32 = 0; i < len; i++) {
@@ -275,7 +348,7 @@ export function serializeUnknownArray(data: unknown[]): string {
   return result.toString()
 }
 
-export function serializeDeepArray<T extends Array<any>>(data: T): string {
+function serializeDeepArray<T extends Array<any>>(data: T): string {
   const result = new StringSink(lbracket)
   const len: u32 = data.length - 1
   for (let i: u32 = 0; i < len; i++) {
@@ -287,7 +360,7 @@ export function serializeDeepArray<T extends Array<any>>(data: T): string {
   return result.toString()
 }
 
-export function serializeObjectArray<T extends Array<any>>(data: T): string {
+function serializeObjectArray<T extends Array<any>>(data: T): string {
   const result = new StringSink(lbracket)
   const len: u32 = data.length - 1
   let obj!: valueof<T>
@@ -297,7 +370,21 @@ export function serializeObjectArray<T extends Array<any>>(data: T): string {
     result.write(obj.__encoded)
     result.writeCodePoint(commaCode)
   }
-  result.write(serializeString(unchecked(data[len])))
+  obj = unchecked(data[len])
+  if (obj.__encoded.length === 0) obj.__encode()
+  result.write(obj.__encoded)
+  result.writeCodePoint(rbracketCode)
+  return result.toString()
+}
+
+function serializeDynamicObjectArray(data: Object[]): string {
+  const result = new StringSink(lbracket)
+  const len: u32 = data.length - 1
+  for (let i: u32 = 0; i < len; i++) {
+    result.write(serializeDynamicObject(unchecked(data[i])))
+    result.writeCodePoint(commaCode)
+  }
+  result.write(serializeDynamicObject(unchecked(data[len])))
   result.writeCodePoint(rbracketCode)
   return result.toString()
 }
@@ -346,6 +433,15 @@ export function serializeArray<T extends Array<any>>(data: T): string {
       result.writeCodePoint(commaCode)
     }
     result.write(serializeArray<valueof<T>>(unchecked(data[len])))
+    result.writeCodePoint(rbracketCode)
+    return result.toString()
+    // @ts-ignore
+  } else if (type instanceof Object) {
+    for (let i = 0; i < len; i++) {
+      result.write(serializeDynamicObject(unchecked(data[i])))
+      result.writeCodePoint(commaCode)
+    }
+    result.write(serializeDynamicObject(unchecked(data[len])))
     result.writeCodePoint(rbracketCode)
     return result.toString()
   } else {
@@ -618,6 +714,7 @@ export function parseObject<T>(data: string): T {
 
 export function parseDynamicObject(data: string): Object {
   const len: u32 = data.length - 1
+  if (len === 1) return new Object()
   const result = new Map<string, unknown>()
   let lastPos: u32 = 1
   let key: string = ''
@@ -633,7 +730,6 @@ export function parseDynamicObject(data: string): Object {
       if (char === rcbracketCode || char === rbracketCode) fdepth++
     }
     if (depth !== 0 && depth === fdepth) {
-      console.log(`Deep: ${data.slice(lastPos + 1, i + 1)}`)
       result.set(key, unknown.wrap(data.slice(lastPos + 1, i + 1).trim()))
       // Reset the depth
       depth = 0
@@ -643,20 +739,19 @@ export function parseDynamicObject(data: string): Object {
     }
     if (depth === 0) {
       if (char === colonCode) {
-        console.log(`Key: ${data.slice(lastPos + 1, i - 1)}`)
         key = data.slice(lastPos + 1, i - 1).trim()
         lastPos = i + 1
       }
       else if (char === commaCode) {
-        console.log(`Value: ${data.slice(lastPos + 1, i)}`)
         if ((i - lastPos) > 0) result.set(key, unknown.wrap(data.slice(lastPos + 1, i).trim()))
         lastPos = i + 1
       }
     }
   }
-  console.log(`Trailing: ${data.slice(lastPos + 1, len - 1)}`)
 
   if ((len - lastPos) > 0) result.set(key, unknown.wrap(data.slice(lastPos + 1, len - 1).trim()))
+  const o = new Object()
   // @ts-ignore
-  return Object.fromMap(result)
+  o.__data = result
+  return o
 }
