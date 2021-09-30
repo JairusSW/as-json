@@ -18,10 +18,8 @@
 - ✅ Null
 - ✅ Dynamic Arrays
 - ✅ Dynamic Types
-- ❌ Dynamic Objects (Soon!)
+- ✅ Dynamic Objects
 - ✅ Whitespace
-
-## WARNING: Possible breaking changes coming for v2.0.0
 
 ## Usage
 
