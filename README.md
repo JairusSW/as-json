@@ -24,7 +24,7 @@
 ## Usage
 
 ```js
-import { JSON, unknown } from 'json-as'
+import { JSON } from 'json-as'
 ```
 
 **Object**
@@ -49,7 +49,7 @@ const parsed = JSON.parse<JSONSchema>(stringified)
 // { firstName: "Jairus", lastName: "Tanaka", age: 14 }
 ```
 
-**Array (Typed)**
+**Array**
 
 ```js
 const stringified = JSON.stringify(['Hello', 'World'])
@@ -57,16 +57,6 @@ const stringified = JSON.stringify(['Hello', 'World'])
 
 const parsed = JSON.parse<JSONSchema>(stringified)
 // ["Hello", "World"]
-```
-
-**Array (Dynamic)**
-
-```js
-const stringified = JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Deep"], true, "It also supports nulls", null])
-// '["Welcome to dynamic arrays",3.14,["Deep"],true,"It also supports nulls",null]'
-
-const parsed = JSON.parse<unknown[]>(stringified)
-// ["Welcome to dynamic arrays", 3.14, ["Deep"], true, "It also supports nulls", null]
 ```
 
 **Float**
@@ -118,34 +108,19 @@ const stringified = JSON.stringify(null)
 const parsed = JSON.parse(stringified)
 // null
 ```
-
-## Accessing unknown types
-**Breaking changes for v2.0.0!**
-**Experimental usage only**
-
-```js
-const parsed = JSON.parse<unknown[]>(["Welcome to dynamic arrays",3.14,["Deep"],true,"It also supports nulls",null])
-console.log(parsed[0].get<string>())
-// "Welcome to dynamic arrays"
-console.log(parsed[1].get<f64>().toString())
-// 3.14
-```
-
 ## Benchmarks
 
 ```
-AS-JSON Stringify String: ~1858051.4 ops/s | 53.82ms
-AS-JSON Parse String: ~4321632.43 ops/s | 23.14ms     
-AS-JSON Stringify Integer: ~8529956.89 ops/s | 11.72ms
-AS-JSON Parse Integer: ~27839325.77 ops/s | 3.59ms
-AS-JSON Stringify Float: ~5128590.39 ops/s | 19.5ms    
-AS-JSON Parse Float: ~21467505.24 ops/s | 4.66ms       
-AS-JSON Stringify Boolean: ~361837455.83 ops/s | 0.28ms
-AS-JSON Parse Boolean: ~51522012.58 ops/s | 1.94ms     
-AS-JSON Stringify Array: ~1421792.72 ops/s | 70.33ms
-AS-JSON Parse Array: ~3755593.05 ops/s | 26.63ms
-AS-JSON Stringify Object: ~3309471.1 ops/s | 30.22ms
-AS-JSON Parse Object: ~1054387.45 ops/s | 94.84ms
-AS-JSON Stringify Dynamic Array: ~285433.75 ops/s | 350.34ms
-AS-JSON Parse Dynamic Array: ~661516.87 ops/s | 151.17ms
+AS-JSON Stringify String: ~4191267.51 ops/s | 23.86ms
+AS-JSON Parse String: ~6218119.99 ops/s | 16.08ms
+AS-JSON Stringify Integer: ~13775012.61 ops/s | 7.26ms
+AS-JSON Parse Integer: ~55061164.13 ops/s | 1.82ms
+AS-JSON Stringify Float: ~7739399.89 ops/s | 12.92ms
+AS-JSON Parse Float: ~37522902.16 ops/s | 2.67ms
+AS-JSON Stringify Boolean: ~615015015.02 ops/s | 0.16ms
+AS-JSON Parse Boolean: ~93901879.87 ops/s | 1.06ms
+AS-JSON Stringify Array: ~2380329.74 ops/s | 42.01ms
+AS-JSON Parse Array: ~6258786.14 ops/s | 15.98ms
+AS-JSON Stringify Object: ~5245632.91 ops/s | 19.06ms
+AS-JSON Parse Object: ~1328576.06 ops/s | 75.27ms
 ```
