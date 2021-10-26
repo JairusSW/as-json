@@ -40,7 +40,9 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
   },
-  "dependencies": {},
+  "dependencies": {
+    "as-string-sink": "^0.4.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aspkg/as-json.git"
