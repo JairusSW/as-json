@@ -2,10 +2,10 @@ import { unknown, unknownTypes } from './unknown'
 
 import { console, stringify } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON, parseDynamicObject, parseUnknown, parseUnknownArray } from './json'
+import { JSON, parseDynamicObject, parseUnknown, parseUnknownArray } from '.'
 
-import { Object } from './Object'
-
+import { DynamicObject } from './DynamicObject'
+/*
 // Not inlining results in an error for some reason
 // @ts-ignore
 @inline
@@ -180,3 +180,13 @@ check<string[][]>('Encode/Decode string[][]', [['Hey'], ['ha'], ['ho']])
 check<JSONSchema>('Encode/Decode object', obj)
 
 check<EmptySchema>('Encode/Decode object', emptyObj)
+*/
+// Unknown
+//check<unknown[]>('Encode/Decode unknown[]', ["Welcome to dynamic arrays", ["Very", ["Deep", ["Array"]]], "It also supports nulls"])
+
+//console.log(JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Very", ["Deep", ["Array"]]], true, "It also supports nulls", null]))
+
+//console.log(JSON.stringify(JSON.parse<unknown[]>('["Welcome to dynamic arrays",3.14,["Very",["Deep",["Array"]]],true,"It also supports nulls",null]')))
+const foo = new Map()
+
+//console.log(JSON.stringify(parseDynamicObject('{"hello":"world"}')))

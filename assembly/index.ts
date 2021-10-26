@@ -1,8 +1,8 @@
 import { StringSink } from 'as-string-sink'
-import { Object } from './Object'
+import { DynamicObject } from './DynamicObject'
 import { unknown, unknownTypes } from './unknown'
 export { unknown, unknownTypes } from './unknown'
-export { Object } from './Object'
+export { DynamicObject as Object } from './DynamicObject'
 
 @global
 export class Nullable { }
@@ -29,7 +29,7 @@ const f_charCode: u16 = 116// "t"
 const nCode: u16 = 110// "n"
 const unknownId = idof<unknown>()
 const stringId = idof<string>()
-const objectId = idof<Object>()
+const objectId = idof<DynamicObject>()
 const arrayStringId = idof<string[]>()
 const arrayBooleanId = idof<boolean[]>()
 const arrayBoolId = idof<bool[]>()
@@ -81,7 +81,7 @@ export namespace JSON {
       return serializeArray<T>(data)
     } else if (data instanceof unknown) {
       return serializeUnknown(data)
-    } else if (data instanceof Object) {
+    } else if (data instanceof DynamicObject) {
       return serializeDynamicObject(data)
     }
 
@@ -115,16 +115,16 @@ export namespace JSON {
     // @ts-ignore
     else if (type instanceof unknown) return parseUnknown(data)
     // @ts-ignore
-    else if (type instanceof Object) return parseDynamicObject(data)
+    else if (type instanceof DynamicObject) return parseDynamicObject(data)
     // @ts-ignore
     return parseObject<T>(data)
   }
 }
 
-export function serializeDynamicObject(data: Object): string {
+export function serializeDynamicObject(data: DynamicObject): string {
   const result = new StringSink(lcbracket)
-  const keys = Object.keys(data)
-  const values = Object.values(data)
+  const keys = DynamicObject.keys(data)
+  const values = DynamicObject.values(data)
   const len: u32 = keys.length - 1
   if (len === -1) return '{}'
   for (let i: u32 = 0; i < len; i++) {
@@ -150,9 +150,64 @@ export function serializeUnknown(data: unknown): string {
     return serializeString(data.get<string>())
   }
   // @ts-ignore
+  else if (data.type === unknownTypes.boolean) {
+    // @ts-ignore
+    return serializeBoolean(data.get<boolean>())
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.i8) {
+    // @ts-ignore
+    return data.get<i8>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.i16) {
+    // @ts-ignore
+    return data.get<i16>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.i32) {
+    // @ts-ignore
+    return data.get<i32>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.i64) {
+    // @ts-ignore
+    return data.get<i64>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.u8) {
+    // @ts-ignore
+    return data.get<u8>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.u16) {
+    // @ts-ignore
+    return data.get<u16>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.u32) {
+    // @ts-ignore
+    return data.get<u32>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.u64) {
+    // @ts-ignore
+    return data.get<u64>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.f32) {
+    // @ts-ignore
+    return data.get<f32>().toString()
+  }
+  // @ts-ignore
+  else if (data.type === unknownTypes.f64) {
+    // @ts-ignore
+    return data.get<f64>().toString()
+  }
+  // @ts-ignore
   else if (data.type === objectId) {
     // @ts-ignore
-    return serializeDynamicObject(data.get<Object>())
+    return serializeDynamicObject(data.get<DynamicObject>())
   }
   // @ts-ignore
   else if (data.type === arrayUnknownId) {
@@ -223,61 +278,6 @@ export function serializeUnknown(data: unknown): string {
   else if (data.type === arrayStringId) {
     // @ts-ignore
     return serializeStringArray(data.get<string[]>())
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.boolean) {
-    // @ts-ignore
-    return serializeBoolean(data.get<boolean>())
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.i8) {
-    // @ts-ignore
-    return data.get<i8>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.i16) {
-    // @ts-ignore
-    return data.get<i16>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.i32) {
-    // @ts-ignore
-    return data.get<i32>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.i64) {
-    // @ts-ignore
-    return data.get<i64>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.u8) {
-    // @ts-ignore
-    return data.get<u8>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.u16) {
-    // @ts-ignore
-    return data.get<u16>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.u32) {
-    // @ts-ignore
-    return data.get<u32>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.u64) {
-    // @ts-ignore
-    return data.get<u64>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.f32) {
-    // @ts-ignore
-    return data.get<f32>().toString()
-  }
-  // @ts-ignore
-  else if (data.type === unknownTypes.f64) {
-    // @ts-ignore
-    return data.get<f64>().toString()
   }
   // @ts-ignore
   else {
@@ -377,7 +377,7 @@ function serializeObjectArray<T extends Array<any>>(data: T): string {
   return result.toString()
 }
 
-function serializeDynamicObjectArray(data: Object[]): string {
+function serializeDynamicObjectArray(data: DynamicObject[]): string {
   const result = new StringSink(lbracket)
   const len: u32 = data.length - 1
   for (let i: u32 = 0; i < len; i++) {
@@ -436,7 +436,7 @@ export function serializeArray<T extends Array<any>>(data: T): string {
     result.writeCodePoint(rbracketCode)
     return result.toString()
     // @ts-ignore
-  } else if (type instanceof Object) {
+  } else if (type instanceof DynamicObject) {
     for (let i = 0; i < len; i++) {
       result.write(serializeDynamicObject(unchecked(data[i])))
       result.writeCodePoint(commaCode)
@@ -712,9 +712,9 @@ export function parseObject<T>(data: string): T {
   return schema.__decode(result)
 }
 
-export function parseDynamicObject(data: string): Object {
+export function parseDynamicObject(data: string): DynamicObject {
   const len: u32 = data.length - 1
-  if (len === 1) return new Object()
+  if (len === 1) return new DynamicObject()
   const result = new Map<string, unknown>()
   let lastPos: u32 = 1
   let key: string = ''
@@ -750,7 +750,7 @@ export function parseDynamicObject(data: string): Object {
   }
 
   if ((len - lastPos) > 0) result.set(key, unknown.wrap(data.slice(lastPos + 1, len - 1).trim()))
-  const o = new Object()
+  const o = new DynamicObject()
   // @ts-ignore
   o.__data = result
   return o

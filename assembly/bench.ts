@@ -2,12 +2,12 @@ import 'wasi'
 
 import { Date } from 'as-wasi'
 
-import { JSON } from './json'
+import { JSON } from '.'
 
 import * as asJSON from "assemblyscript-json"
 
 import { unknown } from './unknown'
-import { Object } from './Object'
+import { DynamicObject } from './DynamicObject'
 
 // @ts-ignore
 @json
@@ -19,7 +19,7 @@ const jsonData: JSONSchema = {
     hello: 'world'
 }
 
-const o = new Object()
+const o = new DynamicObject()
 
 o['hello'] = unknown.wrap('world')
 
@@ -86,11 +86,11 @@ bench('AS-JSON Parse Object', () => {
 })
 
 bench('AS-JSON Stringify Dynamic Object', () => {
-    JSON.stringify<Object>(o)
+    JSON.stringify<DynamicObject>(o)
 })
 
 bench('AS-JSON Parse Object', () => {
-    JSON.parse<Object>('{"hello":"world"}')
+    JSON.parse<DynamicObject>('{"hello":"world"}')
 })
 
 bench('AS-JSON Stringify Dynamic Array', () => {
@@ -116,7 +116,7 @@ bench('AssemblyScript-JSON Stringify String', () => {
     String.UTF8.decode(binary.buffer)
     // Its odd. Not encoded in UTF16 Strings.
     // Since AS-JSON returns a string, so does assemblyscript-json in this bench.
-    // Or else, the bench is biased. 
+    // Or else, the bench is biased.
 })
 
 bench('AssemblyScript-JSON Parse String', () => {

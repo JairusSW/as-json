@@ -3,7 +3,7 @@ const as_1 = require("visitor-as/as");
 const visitor_as_1 = require("visitor-as");
 const utils_1 = require("visitor-as/dist/utils");
 function getTypeName(type) {
-    let _type = utils_1.getName(type);
+    let _type = (0, utils_1.getName)(type);
     const OR_NULL = /\|.*null/;
     if (type.isNullable && !OR_NULL.test(_type)) {
         _type = `${_type} | null`;
@@ -29,9 +29,9 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
     }
     visitElementAccessExpression(node) {
         super.visitElementAccessExpression(node);
-        if (utils_1.toString(node.expression) === 'o') {
+        if ((0, utils_1.toString)(node.expression) === 'o') {
             // Should be like if (node.expression.type.text === "Object") {
-            const replacer = visitor_as_1.SimpleParser.parseExpression(`u32(changetype<usize>(${utils_1.toString(node.elementExpression)}))`);
+            const replacer = visitor_as_1.SimpleParser.parseExpression(`u32(changetype<usize>(${(0, utils_1.toString)(node.elementExpression)}))`);
             node.elementExpression = replacer;
             this.sources.push(replacer.range.source);
         }
@@ -49,7 +49,7 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
                     this.convertToAnyArray(expr.elementExpressions);
                 }
                 // @ts-ignore
-                replacement = visitor_as_1.SimpleParser.parseExpression(`unknown.wrap(${utils_1.toString(expr)})`);
+                replacement = visitor_as_1.SimpleParser.parseExpression(`unknown.wrap(${(0, utils_1.toString)(expr)})`);
                 node.elementExpressions[i] = replacement;
                 this.sources.push(replacement.range.source);
             }
@@ -66,14 +66,14 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
                 this.convertToAnyArray(expr.elementExpressions);
             }
             // @ts-ignore
-            replacement = visitor_as_1.SimpleParser.parseExpression(`unknown.wrap(${utils_1.toString(expr)})`);
+            replacement = visitor_as_1.SimpleParser.parseExpression(`unknown.wrap(${(0, utils_1.toString)(expr)})`);
             exprs[i] = replacement;
             this.sources.push(replacement.range.source);
         }
     }
     visitFieldDeclaration(node) {
         super.visitFieldDeclaration(node);
-        const name = utils_1.toString(node.name);
+        const name = (0, utils_1.toString)(node.name);
         if (!node.type) {
             throw new Error(`Field ${name} is missing a type declaration`);
         }
@@ -96,7 +96,7 @@ class JSONTransformer extends visitor_as_1.BaseVisitor {
             return;
         }
         this.currentClass = node;
-        const name = utils_1.getName(node);
+        const name = (0, utils_1.getName)(node);
         this.encodeStmts.delete(name);
         this.decodeCode.delete(name);
         this.visit(node.members);
@@ -146,10 +146,10 @@ function isanyArray(node) {
     if (node.elementExpressions.length === 0)
         return false;
     const firstKind = node.elementExpressions[0]?.kind;
-    const isBoolean = (utils_1.toString(node.elementExpressions[0]) === 'true' || utils_1.toString(node.elementExpressions[0]) === 'false');
+    const isBoolean = ((0, utils_1.toString)(node.elementExpressions[0]) === 'true' || (0, utils_1.toString)(node.elementExpressions[0]) === 'false');
     for (const chunk of node.elementExpressions) {
         if (isBoolean) {
-            if (utils_1.toString(chunk) !== 'true' || utils_1.toString(chunk) !== 'false')
+            if ((0, utils_1.toString)(chunk) !== 'true' || (0, utils_1.toString)(chunk) !== 'false')
                 true;
         }
         else if (chunk.kind !== firstKind)
