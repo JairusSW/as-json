@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "ascMain": "assembly/index.ts",
@@ -27,7 +27,6 @@
     "as-base64": "^0.2.0",
     "as-bignum": "^0.2.18",
     "as-console": "^6.0.2",
-    "as-string-sink": "^0.4.2",
     "as-variant": "^0.2.1",
     "as-wasi": "^0.4.6",
     "asbuild": "^0.2.0",
