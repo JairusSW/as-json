@@ -1,4 +1,3 @@
-import { console, stringify } from '../node_modules/as-console/assembly/wasi'
 import { StringSink } from 'as-string-sink'
 import { DynamicObject } from './DynamicObject'
 import { unknown, unknownTypes } from './unknown'
@@ -712,8 +711,6 @@ export function parseObject<T>(data: string): T {
   //console.log(`Trailing: ${data.slice(lastPos + 1, len)}\n\t\sValid: ${data.slice(lastPos + 1, len).length > 0}`)
 
   if ((len - lastPos) > 0) result.set(key, data.slice(lastPos + 1, len).trim())
-  console.log(result.keys())
-  console.log(result.values())
   // @ts-ignore
   return schema.__decode(result)
 }
