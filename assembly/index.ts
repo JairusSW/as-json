@@ -1,3 +1,4 @@
+import { console, stringify } from '../node_modules/as-console/assembly/wasi'
 import { StringSink } from 'as-string-sink'
 import { DynamicObject } from './DynamicObject'
 import { unknown, unknownTypes } from './unknown'
@@ -52,6 +53,8 @@ const WS5code = '\u0009'.charCodeAt(0)
 const unknownTrue = unknown.wrap(true)
 const unknownFalse = unknown.wrap(false)
 const unknownNull = unknown.wrap(null)
+const fwd_slash = "\\"
+const empty_stringCode = " ".charCodeAt(0)
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -667,6 +670,7 @@ export function parseArrayArray<T extends Array<unknown>>(data: string): T {
 
 export function parseObject<T>(data: string): T {
   //console.log('Data ' + data)
+  data = removeJSONWhitespace(data)
   const len: u32 = data.length - 1
   let schema: T
   const result = new Map<string, string>()
@@ -684,7 +688,7 @@ export function parseObject<T>(data: string): T {
       if (char === rcbracketCode || char === rbracketCode) fdepth++
     }
     if (depth !== 0 && depth === fdepth) {
-      //console.log(`Deep: ${prependType(data.slice(lastPos + 1, i + 1))}`)
+      //console.log(`Deep: ${data.slice(lastPos + 1, i + 1)}`)
       result.set(key, data.slice(lastPos + 1, i + 1).trim())
       // Reset the depth
       depth = 0
@@ -694,20 +698,22 @@ export function parseObject<T>(data: string): T {
     }
     if (depth === 0) {
       if (char === colonCode) {
-        //console.log(`Key: ${prependType(data.slice(lastPos + 1, i - 1))}`)
+        //console.log(`Key: ${data.slice(lastPos + 1, i - 1)}`)
         key = data.slice(lastPos + 1, i - 1).trim()
         lastPos = i
       }
       else if (char === commaCode) {
-        //console.log(`Value: ${prependType(data.slice(lastPos + 1, i))}`)
+        //console.log(`Value: ${data.slice(lastPos + 1, i)}`)
         if ((i - lastPos) > 0) result.set(key, data.slice(lastPos + 1, i).trim())
         lastPos = i + 1
       }
     }
   }
-  //console.log(`Trailing: ${prependType(data.slice(lastPos + 1, len))}\n\t\sValid: ${data.slice(lastPos + 1, len).length > 0}`)
+  //console.log(`Trailing: ${data.slice(lastPos + 1, len)}\n\t\sValid: ${data.slice(lastPos + 1, len).length > 0}`)
 
   if ((len - lastPos) > 0) result.set(key, data.slice(lastPos + 1, len).trim())
+  console.log(result.keys())
+  console.log(result.values())
   // @ts-ignore
   return schema.__decode(result)
 }
@@ -754,4 +760,22 @@ export function parseDynamicObject(data: string): DynamicObject {
   // @ts-ignore
   o.__data = result
   return o
+}
+
+export function removeJSONWhitespace(data: string): string {
+  let result = new StringSink()
+  let instr = false
+  let char = 0
+  for (let i = 0; i < data.length; i++) {
+    char = data.charCodeAt(i)
+    if (char === quoteCode && data.charCodeAt(i - 1) === fwd_slashCode) {
+      instr = !instr
+    }
+    if (instr === true) {
+      result.writeCodePoint(char)
+    } else if (instr === false && char !== empty_stringCode) {
+      result.writeCodePoint(char)
+    }
+  }
+  return result.toString()
 }

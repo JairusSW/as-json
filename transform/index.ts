@@ -95,6 +95,7 @@ class JSONTransformer extends BaseVisitor {
       const className = this.currentClass!.name.text
       if (!this.encodeStmts.has(className)) this.encodeStmts.set(className, [])
       if (!this.decodeCode.has(className)) this.decodeCode.set(className, [])
+      // TODO: fix later
       // @ts-ignore
       this.encodeStmts.get(className).push(
         `this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`

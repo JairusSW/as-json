@@ -2,7 +2,7 @@ import { unknown, unknownTypes } from './unknown'
 
 import { console, stringify } from "../node_modules/as-console/assembly/wasi"
 
-import { JSON, parseDynamicObject, parseUnknown, parseUnknownArray } from '.'
+import { JSON, parseDynamicObject, parseUnknown, parseUnknownArray, removeJSONWhitespace } from '.'
 
 import { DynamicObject } from './DynamicObject'
 /*
@@ -187,6 +187,21 @@ check<EmptySchema>('Encode/Decode object', emptyObj)
 //console.log(JSON.stringify(["Welcome to dynamic arrays", 3.14, ["Very", ["Deep", ["Array"]]], true, "It also supports nulls", null]))
 
 //console.log(JSON.stringify(JSON.parse<unknown[]>('["Welcome to dynamic arrays",3.14,["Very",["Deep",["Array"]]],true,"It also supports nulls",null]')))
-const foo = new Map()
+//const foo = new Map()
 
 //console.log(JSON.stringify(parseDynamicObject('{"hello":"world"}')))
+// @ts-ignore
+@json
+class Test {
+    stuff: string
+    things: i32
+}
+
+const test: Test = {
+    stuff: "hi",
+    things: 42
+}
+
+console.log(stringify(JSON.stringify(test)))
+console.log(removeJSONWhitespace('{"stuff":"hi", "things":42}'))
+console.log(stringify(JSON.stringify(JSON.parse<Test>('{"stuff":"hi", "things":42}'))))
