@@ -3,14 +3,17 @@
 
 ## Installation
 
+Install the library:
 ```bash
-~ npm install json-as
+npm install json-as
 ```
+
+Add a transform to the `asc` command (e.g. in `package.json`):
 ```bash
 --transform json-as/transform
 ```
 
-## Support 
+## Support
 - ✅ Objects
 - ✅ Arrays
 - ✅ Numbers
