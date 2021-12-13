@@ -8,6 +8,11 @@ Install the library:
 npm install json-as
 ```
 
+Install dependency for a transformer:
+```bash
+npm install --save-dev visitor-as
+```
+
 Add a transform to the `asc` command (e.g. in `package.json`):
 ```bash
 --transform json-as/transform
