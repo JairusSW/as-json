@@ -6,7 +6,7 @@ import { JSON } from '.'
 
 import * as asJSON from "assemblyscript-json"
 
-import { unknown } from './unknown'
+import { Unknown } from './Unknown'
 import { DynamicObject } from './DynamicObject'
 
 // @ts-ignore
@@ -21,7 +21,7 @@ const jsonData: JSONSchema = {
 
 const o = new DynamicObject()
 
-o['hello'] = unknown.wrap('world')
+o['hello'] = Unknown.wrap('world')
 
 export function bench(title: string, code: () => void): void {
     let ops: u32 = 100_000
@@ -94,11 +94,11 @@ bench('AS-JSON Parse Object', () => {
 })
 
 bench('AS-JSON Stringify Dynamic Array', () => {
-    JSON.stringify<unknown[]>(["Welcome to dynamic arrays", true])
+    JSON.stringify<Unknown[]>(["Welcome to dynamic arrays", true])
 })
 
 bench('AS-JSON Parse Dynamic Array', () => {
-    JSON.parse<unknown[]>('["Welcome to dynamic arrays",true]')
+    JSON.parse<Unknown[]>('["Welcome to dynamic arrays",true]')
 })
 
 bench('AS-JSON Stringify Dynamic Array', () => {
