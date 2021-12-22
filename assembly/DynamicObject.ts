@@ -1,4 +1,4 @@
-import { unknown } from "./unknown"
+import { Unknown } from "./Unknown"
 
 /**
  * Provides functionality common to all JavaScript objects.
@@ -6,13 +6,13 @@ import { unknown } from "./unknown"
 export class DynamicObject {
     [key: string]: any
     // Having it marked as 'any' is for intellisense only
-    protected __data: Map<string, unknown> = new Map<string, unknown>()
-    set(path: string, value: unknown): void {
+    protected __data: Map<string, Unknown> = new Map<string, Unknown>()
+    set(path: string, value: Unknown): void {
         this.__data.set(path, value)
     }
-    get<T = unknown>(path: string): T {
+    get<T = Unknown>(path: string): T {
         let type!: T
-        if (type instanceof unknown) {
+        if (type instanceof Unknown) {
             // @ts-ignore
             return this.__data.get(path)
         } else {
@@ -23,7 +23,7 @@ export class DynamicObject {
     static keys(o: DynamicObject): string[] {
         return o.__data.keys()
     }
-    static values(o: DynamicObject): unknown[] {
+    static values(o: DynamicObject): Unknown[] {
         return o.__data.values()
     }
 }

@@ -33,7 +33,7 @@ class JSONTransformer extends BaseVisitor {
     const values = node.values
     const replacer = SimpleParser.parseExpression(`new Object()`)
     for (const key of keys) {
-      
+
     }
   }
 
@@ -59,7 +59,7 @@ class JSONTransformer extends BaseVisitor {
           this.convertToAnyArray(expr.elementExpressions)
         }
         // @ts-ignore
-        replacement = SimpleParser.parseExpression(`unknown.wrap(${toString(expr)})`)
+        replacement = SimpleParser.parseExpression(`Unknown.wrap(${toString(expr)})`)
         node.elementExpressions[i] = replacement
         this.sources.push(replacement.range.source)
 
@@ -77,7 +77,7 @@ class JSONTransformer extends BaseVisitor {
         this.convertToAnyArray(expr.elementExpressions)
       }
       // @ts-ignore
-      replacement = SimpleParser.parseExpression(`unknown.wrap(${toString(expr)})`)
+      replacement = SimpleParser.parseExpression(`Unknown.wrap(${toString(expr)})`)
       exprs[i] = replacement
       this.sources.push(replacement.range.source)
 
