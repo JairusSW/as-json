@@ -35,14 +35,14 @@ export namespace JSON {
     else if (data instanceof Variant) {
       return serializeVariant(<Variant>data)
     }
-    // Arrays
+    // ArrayLike
     else if (isArrayLike(data)) {
       const result = new StringSink("[")
       for (let i = 0; i < data.length - 1; i++) {
-        result.write(stringify(unchecked(data[i])))
+        result.write(JSON.stringify(unchecked(data[i])))
         result.write(",")
       }
-      result.write(stringify(unchecked(data[data.length - 1])))
+      result.write(JSON.stringify(unchecked(data[data.length - 1])))
       result.write("]")
       return result.toString()
     } else {
@@ -74,10 +74,11 @@ export namespace JSON {
       return parseVariant(data)
     } else {
       // @ts-ignore
-      throw new Error("Unrecognized data. Cannot parse.")
+      return null
     }
   }
 }
+
 // @ts-ignore
 @inline
 function serializeString(data: string): string {
