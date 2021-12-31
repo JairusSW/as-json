@@ -1,5 +1,5 @@
 import { Variant } from "as-variant";
-import { JSON } from ".";
+import { JSON, Nullable } from ".";
 
 function check<T>(message: string, data: T): void {
     const serialized = JSON.stringify<T>(data)
@@ -26,3 +26,8 @@ check('Encode/Decode Variant String', Variant.from("Hel`\"lo Wo\"`r\"ld"))
 check('Encode/Decode Variant Boolean', Variant.from(true))
 
 check('Encode/Decode Variant Boolean', Variant.from(false))
+
+check<Nullable | null>('Encode/Decode Null', <Nullable | null>null)
+ 
+console.log(JSON.stringify([1, 2, 3, 4, 5]))
+console.log(JSON.stringify([Variant.from("Hello World"), null]))
