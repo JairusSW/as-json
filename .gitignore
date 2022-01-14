@@ -11,3 +11,4 @@ assembly/tsconfig.json
 .vscode
 transform/UnknownTransform/lib
 transform/schemaTransform/lib
+logs
