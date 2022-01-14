@@ -22,7 +22,8 @@
   },
   "devDependencies": {
     "as-console": "^6.0.2",
-    "assemblyscript": "^0.19.22"
+    "assemblyscript": "^0.19.22",
+    "assemblyscript-json": "^1.1.0"
   },
   "dependencies": {
     "as-string-sink": "^0.5.0",

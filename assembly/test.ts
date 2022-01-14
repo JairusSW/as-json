@@ -31,3 +31,4 @@ check<Nullable | null>('Encode/Decode Null', <Nullable | null>null)
  
 console.log(JSON.stringify([1, 2, 3, 4, 5]))
 console.log(JSON.stringify([Variant.from("Hello World"), null]))
+console.log(JSON.stringify(JSON.parse<Array<string>>("[\"Hello World\"]")))

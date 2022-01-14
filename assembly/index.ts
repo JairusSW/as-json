@@ -72,6 +72,9 @@ export namespace JSON {
     } else if (type instanceof Variant) {
       // @ts-ignore
       return parseVariant(data)
+    } else if (isArrayLike<T>()) {
+      // @ts-ignore
+      return parseArray<T>(data)
     } else {
       // @ts-ignore
       return null
@@ -163,6 +166,79 @@ function parseNumber<T>(data: string): T {
   else if (type instanceof i16) return I16.parseInt(data)
   // @ts-ignore
   return I8.parseInt(data)
+}
+
+// @ts-ignore
+@inline
+export function parseArray<T extends Array<Variant>>(data: string): T {
+  let type!: valueof<T>
+  // @ts-ignore
+  if (isString<valueof<T>>()) return parseStringArray(data)
+  // @ts-ignore
+  else if (isBoolean<valueof<T>>()) return parseBooleanArray(data)
+  // @ts-ignore
+  return parseNumberArray<valueof<T>>(data)
+}
+
+export function parseStringArray(data: string): Array<string> {
+  const result = new Array<string>()
+  if (data.length === 2) return result
+  let lastPos: u32 = 1
+  let char: u32 = 0
+  let instr: boolean = false
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i)
+    // This ignores [ and ] or { and } if they are inside a string.
+    if (char === "\"".charCodeAt(0) && data.charCodeAt(i - 1) !== "/".charCodeAt(0)) instr = instr ? false : true
+    if (instr === false) {
+      // Handles whitespace after a comma
+      if (char === " ".charCodeAt(0)) lastPos++
+      if (char === "\"".charCodeAt(0)) {
+        result.push(parseString(data.slice(lastPos, i + 1)))
+        lastPos = i + 2
+      }
+    }
+  }
+  return result
+}
+
+export function parseBooleanArray(data: string): Array<boolean> {
+  const result = new Array<boolean>()
+  if (data.length === 2) return result
+  let char: u32 = 0
+  let instr: boolean = false
+  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i)
+    if (instr === false) {
+      if (char === "t".charCodeAt(0)) {
+        result.push(true)
+        i += 4
+      } else {
+        result.push(false)
+        i += 5
+      }
+    }
+  }
+  return result
+}
+
+export function parseNumberArray<T>(data: string): Array<T> {
+  const result = new Array<T>()
+  if (data.length === 2) return result
+  let lastPos: u32 = 0
+  let char: u32 = 0
+  let i: u32 = 1
+  for (; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i)
+    if (char === ",".charCodeAt(0)) {
+      //console.log('Found number: ' + data.slice(lastPos + 1, i))
+      result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
+      lastPos = i
+    }
+  }
+  // console.log('Found number: ' + data.slice(lastPos + 1, i))
+  result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
+  return result
 }
 
 // @ts-ignore
