@@ -62,4 +62,10 @@ describe("AS-JSON Test Suite", () => {
     expect(JSON.stringify<Variant>(Variant.from("Hello World\""))).toStrictEqual("\"Hello World\\\"\"")
     expect(JSON.parse<Variant>("\"Hello World\\\"\"").get<string>()).toStrictEqual("Hello World\"")
   })
+  test("Should (de)serialize variant boolean", () => {
+    expect(JSON.stringify<Variant>(Variant.from(true))).toStrictEqual("true")
+    expect(JSON.parse<Variant>("true").get<boolean>()).toStrictEqual(true)
+    expect(JSON.stringify<Variant>(Variant.from(false))).toStrictEqual("false")
+    expect(JSON.parse<Variant>("false").get<boolean>()).toStrictEqual(false)
+  })
 })

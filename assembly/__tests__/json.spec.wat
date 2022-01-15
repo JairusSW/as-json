@@ -155,11 +155,13 @@
  (data (i32.const 8316) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00f\00\00\00\00\00\00\00\00\00\00\00")
  (data (i32.const 8348) "l\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00X\00\00\00U\00n\00k\00n\00o\00w\00n\00 \00i\00d\00e\00n\00t\00i\00f\00y\00i\00n\00g\00 \00t\00o\00k\00e\00n\00 \00a\00t\00 \00v\00a\00r\00i\00a\00n\00t\00 \00p\00a\00r\00s\00i\00n\00g\00\00\00\00\00")
  (data (i32.const 8460) "\1c\00\00\00\00\00\00\00\00\00\00\00\08\00\00\00\08\00\00\00\n\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8492) "\1c\00\00\00\00\00\00\00\00\00\00\00\08\00\00\00\08\00\00\00\0b\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8524) "\1c\00\00\00\00\00\00\00\00\00\00\00\08\00\00\00\08\00\00\00\0c\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8556) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00n\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00l\00o\00g\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8700) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00p\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00c\00a\00l\00l\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8848) "\11\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\01\00\00\00\00\00\00\02\t\00\00\00\00\00\00\10\t\02\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00$\n\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
+ (data (i32.const 8492) "\\\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00H\00\00\00S\00h\00o\00u\00l\00d\00 \00(\00d\00e\00)\00s\00e\00r\00i\00a\00l\00i\00z\00e\00 \00v\00a\00r\00i\00a\00n\00t\00 \00b\00o\00o\00l\00e\00a\00n\00\00\00\00\00")
+ (data (i32.const 8588) "\1c\00\00\00\00\00\00\00\00\00\00\00\08\00\00\00\08\00\00\00\0b\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8620) "\1c\00\00\00\00\00\00\00\00\00\00\00\08\00\00\00\08\00\00\00\0c\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8652) "\1c\00\00\00\00\00\00\00\00\00\00\00\08\00\00\00\08\00\00\00\0d\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8684) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00n\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00l\00o\00g\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8828) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00p\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00c\00a\00l\00l\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8976) "\11\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\01\00\00\00\00\00\00\02\t\00\00\00\00\00\00\10\t\02\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00$\n\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (import "__asCovers" "coverDeclare" (func $~lib/index/__coverDeclare (param i32 i32 i32 i32 i32)))
  (import "__asCovers" "cover" (func $~lib/index/__cover (param i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
@@ -210,15 +212,15 @@
  (global $~lib/util/number/_frc_pow (mut i64) (i64.const 0))
  (global $~lib/util/number/_exp_pow (mut i32) (i32.const 0))
  (global $~lib/util/string/__fixmulShift (mut i64) (i64.const 0))
- (global $node_modules/@as-pect/assembly/assembly/internal/noOp/noOp i32 (i32.const 8544))
+ (global $node_modules/@as-pect/assembly/assembly/internal/noOp/noOp i32 (i32.const 8672))
  (global $node_modules/@as-pect/assembly/assembly/internal/log/ignoreLogs (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 8848))
- (global $~lib/memory/__data_end i32 (i32.const 8988))
- (global $~lib/memory/__stack_pointer (mut i32) (i32.const 25372))
- (global $~lib/memory/__heap_base i32 (i32.const 25372))
+ (global $~lib/rt/__rtti_base i32 (i32.const 8976))
+ (global $~lib/memory/__data_end i32 (i32.const 9116))
+ (global $~lib/memory/__stack_pointer (mut i32) (i32.const 25500))
+ (global $~lib/memory/__heap_base i32 (i32.const 25500))
  (global $~started (mut i32) (i32.const 0))
- (table $0 13 funcref)
- (elem $0 (i32.const 1) $start:assembly/__tests__/json.spec~anonymous|0~anonymous|0 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|1 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|2 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|3 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|4 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|5 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|6 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|7 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|8 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|9 $start:assembly/__tests__/json.spec~anonymous|0 $start:node_modules/@as-pect/assembly/assembly/internal/noOp~anonymous|0)
+ (table $0 14 funcref)
+ (elem $0 (i32.const 1) $start:assembly/__tests__/json.spec~anonymous|0~anonymous|0 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|1 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|2 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|3 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|4 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|5 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|6 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|7 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|8 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|9 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|10 $start:assembly/__tests__/json.spec~anonymous|0 $start:node_modules/@as-pect/assembly/assembly/internal/noOp~anonymous|0)
  (export "__ignoreLogs" (func $node_modules/@as-pect/assembly/assembly/internal/log/__ignoreLogs))
  (export "memory" (memory $0))
  (export "table" (table $0))
@@ -10691,8 +10693,8 @@
   global.get $~lib/memory/__data_end
   i32.lt_s
   if
-   i32.const 25392
-   i32.const 25440
+   i32.const 25520
+   i32.const 25568
    i32.const 1
    i32.const 1
    call $~lib/builtins/abort
@@ -19754,6 +19756,367 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
+ (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|10
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 32
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 8
+  i32.const 0
+  call $~onstore
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 8
+  i32.const 0
+  call $~onstore
+  i64.const 0
+  i64.store offset=8
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 8
+  i32.const 0
+  call $~onstore
+  i64.const 0
+  i64.store offset=16
+  global.get $~lib/memory/__stack_pointer
+  i32.const 24
+  i32.const 8
+  i32.const 0
+  call $~onstore
+  i64.const 0
+  i64.store offset=24
+  i32.const 1269342512
+  call $~lib/index/__cover
+  i32.const -616578992
+  call $~lib/index/__cover
+  i32.const 1
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 20
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  i32.const 16
+  i32.const 3
+  call $~lib/rt/itcms/__new
+  local.tee $1
+  i32.store offset=20
+  local.get $1
+  local.set $3
+  local.get $0
+  local.set $2
+  local.get $3
+  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.3 (result i32)
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 1
+   drop
+   i32.const 0
+   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.3
+  end
+  call $~lib/as-variant/index/Variant#set:discriminator
+  local.get $3
+  i32.const 8
+  i32.const 1
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store8 offset=8
+  local.get $1
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=16
+  local.get $5
+  call $assembly/index/JSON.stringify<~lib/as-variant/index/Variant>
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=12
+  local.get $5
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/string/String>
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store
+  local.get $5
+  i32.const 2592
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  i32.const 848
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
+  global.get $~lib/memory/__stack_pointer
+  i32.const 24
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  i32.const 2592
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $assembly/index/JSON.parse<~lib/as-variant/index/Variant>
+  local.tee $4
+  i32.store offset=24
+  local.get $4
+  local.set $2
+  local.get $2
+  i32.load
+  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.4 (result i32)
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 1
+   drop
+   i32.const 0
+   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.4
+  end
+  i32.eq
+  i32.eqz
+  if
+   i32.const 8176
+   i32.const 8224
+   i32.const 54
+   i32.const 24
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $4
+  i32.load8_u offset=8
+  local.set $2
+  i32.const 0
+  drop
+  local.get $2
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<bool>
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store
+  local.get $5
+  i32.const 1
+  i32.const 848
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool>#toStrictEqual
+  i32.const 0
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  i32.const 28
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  i32.const 16
+  i32.const 3
+  call $~lib/rt/itcms/__new
+  local.tee $2
+  i32.store offset=28
+  local.get $2
+  local.set $1
+  local.get $3
+  local.set $0
+  local.get $1
+  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.5 (result i32)
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 1
+   drop
+   i32.const 0
+   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.5
+  end
+  call $~lib/as-variant/index/Variant#set:discriminator
+  local.get $1
+  i32.const 8
+  i32.const 1
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store8 offset=8
+  local.get $2
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=16
+  local.get $5
+  call $assembly/index/JSON.stringify<~lib/as-variant/index/Variant>
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=12
+  local.get $5
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/string/String>
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store
+  local.get $5
+  i32.const 2624
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  i32.const 848
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
+  global.get $~lib/memory/__stack_pointer
+  i32.const 24
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  i32.const 2624
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $assembly/index/JSON.parse<~lib/as-variant/index/Variant>
+  local.tee $4
+  i32.store offset=24
+  local.get $4
+  local.set $0
+  local.get $0
+  i32.load
+  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.6 (result i32)
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 1
+   drop
+   i32.const 0
+   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.6
+  end
+  i32.eq
+  i32.eqz
+  if
+   i32.const 8176
+   i32.const 8224
+   i32.const 54
+   i32.const 24
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $4
+  i32.load8_u offset=8
+  local.set $0
+  i32.const 0
+  drop
+  local.get $0
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<bool>
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store
+  local.get $5
+  i32.const 0
+  i32.const 848
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool>#toStrictEqual
+  global.get $~lib/memory/__stack_pointer
+  i32.const 32
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
  (func $start:assembly/__tests__/json.spec~anonymous|0
   (local $0 i32)
   global.get $~lib/memory/__stack_pointer
@@ -19972,6 +20335,27 @@
   i32.store
   local.get $0
   i32.const 8480
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store offset=4
+  local.get $0
+  call $node_modules/@as-pect/assembly/assembly/internal/Test/test
+  i32.const 8512
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 8608
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -20326,6 +20710,36 @@
   local.get $0
   i32.store
   local.get $0
+  i32.const -616578992
+  i32.const 65
+  i32.const 54
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 32
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1269342512
+  i32.const 65
+  i32.const 48
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 32
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
   i32.const -167080470
   i32.const 4
   i32.const 32
@@ -20361,7 +20775,7 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 8512
+  i32.const 8640
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -20391,7 +20805,7 @@
   call $~onstore
   i32.const 0
   i32.store
-  i32.const 8576
+  i32.const 8704
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -20406,7 +20820,7 @@
   i32.const 49
   i32.const 1
   call $~lib/index/__coverDeclare
-  i32.const 8576
+  i32.const 8704
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -20421,7 +20835,7 @@
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
-  i32.const 8576
+  i32.const 8704
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -20436,7 +20850,7 @@
   i32.const 40
   i32.const 1
   call $~lib/index/__coverDeclare
-  i32.const 8576
+  i32.const 8704
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -20451,7 +20865,7 @@
   i32.const 19
   i32.const 2
   call $~lib/index/__coverDeclare
-  i32.const 8576
+  i32.const 8704
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -20485,7 +20899,7 @@
   call $~onstore
   i32.const 0
   i32.store
-  i32.const 8720
+  i32.const 8848
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -20500,7 +20914,7 @@
   i32.const 48
   i32.const 1
   call $~lib/index/__coverDeclare
-  i32.const 8720
+  i32.const 8848
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
