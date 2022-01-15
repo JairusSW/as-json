@@ -1,5 +1,0 @@
-[10:24:06] [Render thread/INFO]: Environment: authHost='https://authserver.mojang.com', accountsHost='https://api.mojang.com', sessionHost='https://sessionserver.mojang.com', servicesHost='https://api.minecraftservices.com', name='PROD'
-[10:24:09] [Render thread/INFO]: Setting user: JairusSW
-[10:24:10] [Render thread/INFO]: Backend library: LWJGL version 3.2.2 build 10
-[10:24:18] [Render thread/INFO]: Narrator library for x64 successfully loaded
-[10:24:19] [Render thread/INFO]: Reloading ResourceManager: Default
