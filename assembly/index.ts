@@ -1,5 +1,6 @@
 import { StringSink } from "as-string-sink"
 import { Variant } from "as-variant"
+
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
@@ -60,6 +61,7 @@ export namespace JSON {
  */
   export function parse<T>(data: string): T {
     let type!: T
+    // This treats type as if it were actually an instantiated T
     if (isString<T>()) {
       // @ts-ignore
       return parseString(data)
@@ -140,7 +142,7 @@ function parseString(data: string): string {
 // @ts-ignore
 @inline
 function parseBoolean(data: string): boolean {
-  return data.charCodeAt(0) === 't'.charCodeAt(0)
+  return data.charCodeAt(0) === "t".charCodeAt(0)
 }
 // @ts-ignore
 @inline
@@ -170,7 +172,7 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseArray<T extends Array<Variant>>(data: string): T {
+function parseArray<T extends Array<Variant>>(data: string): T {
   let type!: valueof<T>
   // @ts-ignore
   if (isString<valueof<T>>()) return parseStringArray(data)
@@ -180,7 +182,7 @@ export function parseArray<T extends Array<Variant>>(data: string): T {
   return parseNumberArray<valueof<T>>(data)
 }
 
-export function parseStringArray(data: string): Array<string> {
+function parseStringArray(data: string): Array<string> {
   const result = new Array<string>()
   if (data.length === 2) return result
   let lastPos: u32 = 1
@@ -192,7 +194,8 @@ export function parseStringArray(data: string): Array<string> {
     if (char === "\"".charCodeAt(0) && data.charCodeAt(i - 1) !== "/".charCodeAt(0)) instr = instr ? false : true
     if (instr === false) {
       // Handles whitespace after a comma
-      if (char === " ".charCodeAt(0)) lastPos++
+      if (char === " ".charCodeAt(0) || char === 0x0020 || char === 0x000A || char === 0x000D || char === 0x0009) lastPos++
+      // @gagdiez from serial-as/json notified me that there are other charcodes used for whitespace.
       if (char === "\"".charCodeAt(0)) {
         result.push(parseString(data.slice(lastPos, i + 1)))
         lastPos = i + 2
@@ -202,7 +205,7 @@ export function parseStringArray(data: string): Array<string> {
   return result
 }
 
-export function parseBooleanArray(data: string): Array<boolean> {
+function parseBooleanArray(data: string): Array<boolean> {
   const result = new Array<boolean>()
   if (data.length === 2) return result
   let char: u32 = 0
@@ -213,8 +216,12 @@ export function parseBooleanArray(data: string): Array<boolean> {
       if (char === "t".charCodeAt(0)) {
         result.push(true)
         i += 4
+        // +4 to skip the 'true'
+        // Possible bug when: [true, tada, true]
+        // It will believe it is [true, true, true]
       } else {
         result.push(false)
+        // If it is only booleans, we can safely assume this
         i += 5
       }
     }
@@ -222,7 +229,7 @@ export function parseBooleanArray(data: string): Array<boolean> {
   return result
 }
 
-export function parseNumberArray<T>(data: string): Array<T> {
+function parseNumberArray<T>(data: string): Array<T> {
   const result = new Array<T>()
   if (data.length === 2) return result
   let lastPos: u32 = 0
@@ -231,12 +238,10 @@ export function parseNumberArray<T>(data: string): Array<T> {
   for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
     if (char === ",".charCodeAt(0)) {
-      //console.log('Found number: ' + data.slice(lastPos + 1, i))
       result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
       lastPos = i
     }
   }
-  // console.log('Found number: ' + data.slice(lastPos + 1, i))
   result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
   return result
 }
@@ -244,10 +249,10 @@ export function parseNumberArray<T>(data: string): Array<T> {
 // @ts-ignore
 @inline
 function parseVariant(data: string): Variant {
-  const firstChar = data.charAt(0)
-  if (firstChar == "\"") {
+  const firstChar = data.charCodeAt(0)
+  if (firstChar == "\"".charCodeAt(0)) {
     return Variant.from(parseString(data))
-  } else if (firstChar == "t" || firstChar == "f") {
+  } else if (firstChar == "t".charCodeAt(0) || firstChar == "f".charCodeAt(0)) {
     return Variant.from(parseBoolean(data))
   } else {
     throw new Error('Unknown identifying token at variant parsing')

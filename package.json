@@ -7,28 +7,31 @@
   "author": "JairusSW",
   "license": "MIT",
   "scripts": {
-    "build:transform": "tsc -w -p ./transform",
     "build:test": "asc assembly/test.ts --target test --explicitStart",
-    "test:node": "node --experimental-wasi-unstable-preview1 ./tests/test",
-    "test:wasmtime": "wasmtime ./tests/output/test.wasm",
-    "test:lunatic": "lunatic ./tests/output/test.wasm",
+    "run:node": "node --experimental-wasi-unstable-preview1 ./tests/test",
+    "run:wasmtime": "wasmtime ./tests/output/test.wasm",
+    "run:lunatic": "lunatic ./tests/output/test.wasm",
+    "as-pect:test": "asp --verbose",
+    "as-pect:test:ci": "asp --summary",
     "bench:build": "asc assembly/bench.ts --runtime incremental --target bench --explicitStart",
     "bench:node": "node --experimental-wasi-unstable-preview1 ./bench/bench",
     "bench:wasmtime": "wasmtime ./bench/output/bench.wasm",
-    "bench:lunatic": "lunatic ./bench/output/bench.wasm",
-    "asbuild:untouched": "asc assembly/index.ts --target debug",
-    "asbuild:optimized": "asc assembly/index.ts --target release",
-    "asbuild": "yarn asbuild:untouched && yarn asbuild:optimized"
+    "bench:lunatic": "lunatic ./bench/output/bench.wasm"
   },
   "devDependencies": {
+    "@as-pect/cli": "^6.2.4",
     "as-console": "^6.0.2",
     "assemblyscript": "^0.19.22",
-    "assemblyscript-json": "^1.1.0"
+    "assemblyscript-json": "^1.1.0",
+    "micromatch": "^4.0.4"
   },
   "dependencies": {
+    "@as-covers/core": "^0.2.1",
     "as-string-sink": "^0.5.0",
     "as-variant": "^0.3.0",
-    "visitor-as": "^0.6.0"
+    "chalk": "^5.0.0",
+    "visitor-as": "^0.6.0",
+    "yaml": "^1.10.2"
   },
   "repository": {
     "type": "git",
