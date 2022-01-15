@@ -7,7 +7,6 @@ benches/output
 build
 pnpm-lock.yaml
 package-lock.json
-assembly/tsconfig.json
 .vscode
 transform/UnknownTransform/lib
 transform/schemaTransform/lib
