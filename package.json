@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build:test": "asc assembly/test.ts --target test --explicitStart",
-    "build:transform": "asc assembly/test_transform.ts --target test --explicitStart",
+    "build:transform": "tsc -w -p ./transform",
     "run:node": "node --experimental-wasi-unstable-preview1 ./tests/test",
     "run:wasmtime": "wasmtime ./tests/output/test.wasm",
     "run:lunatic": "lunatic ./tests/output/test.wasm",

@@ -1,34 +1,24 @@
-import { Variant } from "as-variant";
-import { JSON, Nullable } from ".";
-
-function check<T>(message: string, data: T): void {
-    const serialized = JSON.stringify<T>(data)
-    const deserialized = JSON.parse<T>(serialized)
-    console.log(`${message}\nSerialized: ${serialized}\nDeserialized: ${JSON.stringify(deserialized)}`)
+import { JSON } from "./index";
+import "wasi";
+declare let json: (...a: any) => any;
+@json
+export class player {
+    name: string;
+    position: vec;
+    houseCoords: vec;
+    constructor(name: string, position: vec, houseCoords: vec) {
+        this.name = name;
+        this.position = position;
+        this.houseCoords = houseCoords;
+    }
 }
 
-check('Encode/Decode String', "Hello World")
+@json
+export class vec {
+    x: f64;
+    y: f64;
+}
 
-check('Encode/Decode String', "Hell[}:o Wo[rld}{")
+let myPlayer = new player("Bobby", { x: 10, y: 20 }, { x: -10.1, y: 2000.4 });
 
-check('Encode/Decode String', "Hel`\"lo Wo\"`r\"ld")
-
-check('Encode/Decode Boolean', true)
-
-check('Encode/Decode Boolean', false)
-
-check('Encode/Decode Variant String', Variant.from("Hello World"))
-
-check('Encode/Decode Variant String', Variant.from("Hell[}:o Wo[rld}{"))
-
-check('Encode/Decode Variant String', Variant.from("Hel`\"lo Wo\"`r\"ld"))
-
-check('Encode/Decode Variant Boolean', Variant.from(true))
-
-check('Encode/Decode Variant Boolean', Variant.from(false))
-
-check<Nullable | null>('Encode/Decode Null', <Nullable | null>null)
- 
-console.log(JSON.stringify([1, 2, 3, 4, 5]))
-console.log(JSON.stringify([Variant.from("Hello World"), null]))
-console.log(JSON.stringify(JSON.parse<Array<string>>("[\"Hello World\"]")))
+console.log(JSON.stringify(myPlayer));
