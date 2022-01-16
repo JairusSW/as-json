@@ -31,6 +31,12 @@ export namespace JSON {
       // @ts-ignore
       return data.toString()
     }
+    // Class-Based serialization
+    // @ts-ignore
+    else if(isDefined(data.__JSON_Serialize)){
+      //@ts-ignore
+      return data.__JSON_Serialize()
+    }
     // Variants
     // @ts-ignore
     else if (data instanceof Variant) {
@@ -128,7 +134,7 @@ function serializeVariant(data: Variant): string {
   else if (data.is<i32>()) {
     return data.get<i32>().toString()
   }
-  // @ts-ignore
+  //@ts-ignore
   else {
     return "idk"
   }

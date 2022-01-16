@@ -11,3 +11,4 @@ package-lock.json
 transform/UnknownTransform/lib
 transform/schemaTransform/lib
 logs
+transform/lib

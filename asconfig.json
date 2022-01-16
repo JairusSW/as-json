@@ -52,5 +52,7 @@
       "noAssert": false
     }
   },
-  "options": {}
+  "options": {
+    "transform": "./transform"
+  }
 }
