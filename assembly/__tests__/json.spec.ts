@@ -65,6 +65,5 @@ describe("AS-JSON Test Suite", () => {
 
   test("Should (de)serialize array", () => {
     expect(JSON.stringify<i32[]>([1, 2, 3, 4, 5])).toStrictEqual("[1,2,3,4,5]")
-    expect
   })
 })
