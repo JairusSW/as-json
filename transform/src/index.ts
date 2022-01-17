@@ -123,6 +123,7 @@ class MyTransform extends Transform {
             }
             return outChars;
           };
+
           for (const field of c.instanceMembers!.values()) {
             if (field instanceof FieldPrototype) {
               fnBody.statements.push(
