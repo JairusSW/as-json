@@ -1,6 +1,4 @@
 {
   "main": "./lib/index.js",
-  "devDependencies": {
-    "typescript": "^4.5.4"
-  }
+  "devDependencies": {}
 }

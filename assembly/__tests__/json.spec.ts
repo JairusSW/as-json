@@ -1,6 +1,16 @@
 import { JSON, Nullable } from ".."
 import { Variant } from "as-variant"
 
+@json
+class JSONSchema {
+  foo: string
+  bar: i32
+}
+
+const obj: JSONSchema = {
+  foo: "moo",
+  bar: 12345
+}
 describe("AS-JSON Test Suite", () => {
   test("Should (de)serialize strings", () => {
     expect(JSON.stringify<string>("Hello World\"")).toStrictEqual("\"Hello World\\\"\"");
@@ -65,5 +75,10 @@ describe("AS-JSON Test Suite", () => {
 
   test("Should (de)serialize array", () => {
     expect(JSON.stringify<i32[]>([1, 2, 3, 4, 5])).toStrictEqual("[1,2,3,4,5]")
+    expect(JSON.parse<i32[]>("[1,2,3,4,5]")).toStrictEqual(<i32[]>[1,2,3,4,5])
+  })
+
+  test("Should (de)serialize Objects", () => {
+    expect(JSON.stringify(obj)).toStrictEqual("{\"foo\":\"moo\",\"bar\":12345}")
   })
 })
