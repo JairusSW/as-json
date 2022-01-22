@@ -1,5 +1,8 @@
 # AS-JSON
 
+# Total time
+37 hours
+
 **JSON encoder/decoder for AssemblyScript**
 
 ## Installation
