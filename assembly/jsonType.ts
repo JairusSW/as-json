@@ -15,16 +15,24 @@ export class JSONValue {
     else if (t instanceof JSONobject) return this.kind == 2;
     //@ts-ignore
     else if (t instanceof JSONArray) return this.kind == 3;
+    //@ts-ignore
+    else if (t instanceof JSONNull) return this.kind == 4;
     else ERROR("TYPE <T> PASSED TO JSONValue.is is NOT one of the three ");
   }
   @inline as<T>(): T {
+    let t = changetype<T>(null)!;
+    //@ts-ignore
+    if (isNullable<T>())
+      return this.is<NonNullable<T>>() ? this.asUnchecked<T>() : null;
     if (this.is<T>()) return this.asUnchecked<T>();
     else throw new Error(`JSON type mismatch.`);
   }
+
   @inline expect<T>(message: string): T {
     if (this.is<T>()) return this.asUnchecked<T>();
     else throw new Error(message);
   }
+
   @inline
   asUnchecked<T>(): T {
     let t: T;
@@ -62,7 +70,12 @@ export class JSONValue {
   @unsafe private __visit(cookie: u32): void {
     if (this.kind != 1) __visit(this.value as usize, cookie);
   }
+  @inline public static null(): JSONNull {
+    return Null;
+  }
 }
 
 export class JSONArray extends Array<JSONValue> {}
 export class JSONobject extends Map<string, JSONValue> {}
+export class JSONNull {}
+const Null = new JSONNull();

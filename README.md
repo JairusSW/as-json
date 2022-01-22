@@ -1,4 +1,5 @@
 # AS-JSON
+
 **JSON encoder/decoder for AssemblyScript**
 
 ## Installation
@@ -6,11 +7,13 @@
 ```bash
 ~ npm install json-as
 ```
+
 ```bash
 --transform json-as/transform
 ```
 
-## Support 
+## Support
+
 - ✅ Objects
 - ✅ Arrays
 - ✅ Numbers
@@ -24,10 +27,11 @@
 ## Usage
 
 ```js
-import { JSON } from 'json-as'
+import { JSON } from "json-as";
 ```
 
 **Object**
+
 ```js
 @json
 class JSONSchema {
@@ -52,62 +56,63 @@ const parsed = JSON.parse<JSONSchema>(stringified)
 **Array**
 
 ```js
-const stringified = JSON.stringify(['Hello', 'World'])
+const stringified = JSON.stringify(["Hello", "World"]);
 // '["Hello","World"]'
 
-const parsed = JSON.parse<JSONSchema>(stringified)
+const parsed = JSON.parse < JSONSchema > stringified;
 // ["Hello", "World"]
 ```
 
 **Float**
 
 ```js
-const stringified = JSON.stringify(3.14)
+const stringified = JSON.stringify(3.14);
 // '3.14'
 
-const parsed = JSON.parse<f64>(stringified)
+const parsed = JSON.parse < f64 > stringified;
 // 3.14
 ```
 
 **Integer**
 
 ```js
-const stringified = JSON.stringify(14)
+const stringified = JSON.stringify(14);
 // '14'
 
-const parsed = JSON.parse<i32>(stringified)
+const parsed = JSON.parse < i32 > stringified;
 // 14
 ```
 
 **Boolean**
 
 ```js
-const stringified = JSON.stringify(true)
+const stringified = JSON.stringify(true);
 // 'true'
 
-const parsed = JSON.parse<boolean>(stringified)
+const parsed = JSON.parse < boolean > stringified;
 // true
 ```
 
 **Bool**
 
 ```js
-const stringified = JSON.stringify(true)
+const stringified = JSON.stringify(true);
 // 'true'
 
-const parsed = JSON.parse<bool>(stringified)
+const parsed = JSON.parse < bool > stringified;
 // true
 ```
 
 **Null**
 
 ```js
-const stringified = JSON.stringify(null)
+const stringified = JSON.stringify(null);
 // 'null'
 
-const parsed = JSON.parse(stringified)
+const parsed = JSON.parse(stringified);
 // null
 ```
+
 ## Benchmarks
 
 ```

@@ -1,6 +1,6 @@
 import { StringSink } from "as-string-sink"
 import { Variant } from "as-variant"
-
+import { JSONValue, JSONobject } from "./jsonType"
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
@@ -33,7 +33,7 @@ export namespace JSON {
     }
     // Class-Based serialization
     // @ts-ignore
-    else if(isDefined(data.__JSON_Serialize)){
+    else if (isDefined(data.__JSON_Serialize)) {
       //@ts-ignore
       return data.__JSON_Serialize()
     }
@@ -178,8 +178,7 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-function parseArray<T extends Array<Variant>>(data: string): T {
-  let type!: valueof<T>
+function parseArray<T>(data: string): T {
   // @ts-ignore
   if (isString<valueof<T>>()) return parseStringArray(data)
   // @ts-ignore
@@ -263,6 +262,102 @@ function parseVariant(data: string): Variant {
   } else {
     throw new Error('Unknown identifying token at variant parsing')
   }
+}
+
+function parseDynamicObject(data: string): void {
+
+}
+function parseDynamicArray(data: string): void {
+// need deep array
+  
+}
+class boxed { value: i32 }
+function parseOnStr(data: string, i1: boxed): JSONValue {
+  let index = i1.value;
+  while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
+  // TODO: add other whitespace codes later
+
+  switch (data.charCodeAt(index)) {
+
+    case "{".charCodeAt(0):
+      index++;
+      while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
+      let obj = new JSONobject();
+      while (true) {
+        let nchar = data.charCodeAt(index);
+
+        if (nchar == '"'.charCodeAt(0)) {
+          index++;
+          let keyChars = ''
+          while (true) {
+
+            nchar = data.charCodeAt(index);
+            if (nchar == "\\".charCodeAt(0)) {
+              index++;
+              if (data.charCodeAt(index) == "") { }
+
+            }
+            else {
+              if(nchar=='"'.charCodeAt(0)) break;
+              else {
+                keyChars+=data.charAt(index);
+              }
+            }
+
+          }
+        }
+        else if (nchar == '}'.charCodeAt(0)) break;
+        else throw new Error("Parsing object: unexepcted character")
+      }
+      return JSONValue.from(obj);
+    case "\"".charCodeAt(0):
+
+      return JSONValue.from(parseString(data.slice(index)));
+    case "[".charCodeAt(0):
+      throw new Error("dyn array not implemented");
+      parseDynamicArray(data.slice(index))
+      break;
+    default:
+      if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(data.charAt(index))) {
+
+        return JSONValue.from(parseNumber<f64>(data.slice(index)))
+      }
+      else throw new Error("PANIC: NOT JSON");
+
+  }
+
+}
+
+export function parseDynamic(data: string): JSONValue {
+  let index = 0;
+
+  while (true) {
+
+    switch (data.charCodeAt(index)) {
+      case " ".charCodeAt(0):
+        index++;
+        continue;
+      case "{".charCodeAt(0):
+        throw new Error("dyn object not implemented")
+        parseDynamicObject(data.slice(index))
+      case "\"".charCodeAt(0):
+
+        return JSONValue.from(parseString(data.slice(index)));
+      case "[".charCodeAt(0):
+        throw new Error("dyn array not implemented");
+        parseDynamicArray(data.slice(index))
+        break;
+      default:
+        if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(data.charAt(index))) {
+
+          return JSONValue.from(parseNumber<f64>(data.slice(index)))
+        }
+        else throw new Error("PANIC: NOT JSON")
+
+    }
+  }
+  // oh, yuk. just default parsenumber.
+
 }
 
 export class Nullable { }
