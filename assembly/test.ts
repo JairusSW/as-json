@@ -1,7 +1,7 @@
-import { JSON, parseDynamic } from "./index";
+import { JSON, parseDynamic, parseOnStr } from "./index";
 import "wasi";
 import { JSONobject, JSONValue, JSONNull } from "./jsonType";
-
+/*
 declare let json: (...a: any) => any;
 
 @json
@@ -28,3 +28,9 @@ let my2ndVal = JSONValue.null;
 console.log(myval.is<JSONNull>().toString());
 let myDynamic = parseDynamic('"hello world"');
 console.log(myDynamic.expect<string>("string"));
+*/
+let myString = parseOnStr('"Hello world"', { value: 0 });
+console.log(myString.expect<string>("should be string") + " << string")
+let myObject = parseOnStr('{"hello":"world","this":{"is":"cool"}}', { value: 0 });
+
+console.log(myObject.toString());

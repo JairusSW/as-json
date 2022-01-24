@@ -267,12 +267,13 @@ function parseVariant(data: string): Variant {
 function parseDynamicObject(data: string): void {
 
 }
+
 function parseDynamicArray(data: string): void {
-// need deep array
-  
+  // need deep array
+
 }
-class boxed { value: i32 }
-function parseOnStr(data: string, i1: boxed): JSONValue {
+export class boxed { value: i32 }
+export function parseOnStr(data: string, i1: boxed): JSONValue {
   let index = i1.value;
   while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
   // TODO: add other whitespace codes later
@@ -283,36 +284,105 @@ function parseOnStr(data: string, i1: boxed): JSONValue {
       index++;
       while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
       let obj = new JSONobject();
-      while (true) {
-        let nchar = data.charCodeAt(index);
 
+      while (true) {
+
+        let nchar = data.charCodeAt(index);
         if (nchar == '"'.charCodeAt(0)) {
           index++;
           let keyChars = ''
+          /** warning: code is duplicated to str parsing later in fn*/
           while (true) {
-
             nchar = data.charCodeAt(index);
             if (nchar == "\\".charCodeAt(0)) {
               index++;
-              if (data.charCodeAt(index) == "") { }
+              keyChars += data.charAt(index);
+              index++;
 
             }
             else {
-              if(nchar=='"'.charCodeAt(0)) break;
+              if (nchar == '"'.charCodeAt(0)) break;
               else {
-                keyChars+=data.charAt(index);
+                keyChars += data.charAt(index);
+                index++;
               }
             }
 
           }
+          index++;
+          while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
+          if (data.charCodeAt(index) == ":".charCodeAt(0)) {
+            index++;
+            while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
+            let newBoxed: boxed = { value: index };
+            /** parse field */
+            let value = parseOnStr(data, newBoxed);
+            index = newBoxed.value;
+            obj.set(keyChars, value);
+            while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
+            nchar = data.charCodeAt(index);
+            /** more fields */
+            if (nchar == ",".charCodeAt(0)) continue;
+            /** early exit */
+            else if (nchar == "}".charCodeAt(0)) {
+              /** return new index. */
+              i1.value = index;
+              /** break out of key/value setting and exit fn. */
+              return JSONValue.from(obj);
+            };
+          }
+          else {
+            throw new Error("Parsing object field: Unexpected `" + data.charAt(index) + "` -- Expected `:`");
+          }
         }
+        else if (nchar = " ".charCodeAt(0))
+          index++;
+        /** object ends */
         else if (nchar == '}'.charCodeAt(0)) break;
         else throw new Error("Parsing object: unexepcted character")
       }
       return JSONValue.from(obj);
     case "\"".charCodeAt(0):
+      index++;
+      let keyChars = ''
+      /** warning: code is duplicated to str parsing later in fn*/
+      let nchar: number;
+      while (true) {
+        nchar = data.charCodeAt(index);
+        if (nchar == "\\".charCodeAt(0)) {
+          index++;
+          keyChars += data.charAt(index);
+          index++;
 
-      return JSONValue.from(parseString(data.slice(index)));
+        }
+        else {
+          if (nchar == '"'.charCodeAt(0)) {
+            index++;
+            i1.value=index;
+            return JSONValue.from(keyChars)
+          }
+          else {
+            keyChars += data.charAt(index);
+            index++;
+          }
+        }
+
+      }
+break;
+case "t".charCodeAt(0):
+  if(data.slice(index+1,index+3)=="rue"){
+    i1.value=index+4;
+    return JSONValue.from<bool>(true)
+  }
+  else
+    throw new Error("Unexpected character after 't'");
+  
+  case "f".charCodeAt(0):
+    if(data.slice(index+1,index+4)=="alse"){
+      i1.value=index+4;
+      return JSONValue.from<bool>(false);
+    }
+  break;
     case "[".charCodeAt(0):
       throw new Error("dyn array not implemented");
       parseDynamicArray(data.slice(index))
