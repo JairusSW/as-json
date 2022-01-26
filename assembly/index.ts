@@ -1,6 +1,7 @@
 import { StringSink } from "as-string-sink"
 import { Variant } from "as-variant"
 import { JSONValue, JSONobject } from "./jsonType"
+import "assemblyscript/std/util/string"
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
@@ -272,7 +273,36 @@ function parseDynamicArray(data: string): void {
   // need deep array
 
 }
+
+//@ts-ignore
+@inline
+function parseNum(e: number): f64 {
+  switch (e) {
+    case "0".charCodeAt(0):
+      return 0;
+    case "1".charCodeAt(0):
+      return 1;
+    case "2".charCodeAt(0):
+      return 2;
+    case "3".charCodeAt(0):
+      return 3;
+    case "4".charCodeAt(0):
+      return 4;
+    case "5".charCodeAt(0):
+      return 5;
+    case "6".charCodeAt(0):
+      return 6;
+    case "7".charCodeAt(0):
+      return 7;
+    case "8".charCodeAt(0):
+      return 8;
+    case "9".charCodeAt(0):
+      return 9;
+    default: return -1;
+  }
+}
 export class boxed { value: i32 }
+
 export function parseOnStr(data: string, i1: boxed): JSONValue {
   let index = i1.value;
   while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
@@ -298,9 +328,7 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
               index++;
               keyChars += data.charAt(index);
               index++;
-
-            }
-            else {
+            } else {
               if (nchar == '"'.charCodeAt(0)) break;
               else {
                 keyChars += data.charAt(index);
@@ -358,7 +386,7 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
         else {
           if (nchar == '"'.charCodeAt(0)) {
             index++;
-            i1.value=index;
+            i1.value = index;
             return JSONValue.from(keyChars)
           }
           else {
@@ -368,21 +396,21 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
         }
 
       }
-break;
-case "t".charCodeAt(0):
-  if(data.slice(index+1,index+3)=="rue"){
-    i1.value=index+4;
-    return JSONValue.from<bool>(true)
-  }
-  else
-    throw new Error("Unexpected character after 't'");
-  
-  case "f".charCodeAt(0):
-    if(data.slice(index+1,index+4)=="alse"){
-      i1.value=index+4;
-      return JSONValue.from<bool>(false);
-    }
-  break;
+      break;
+    case "t".charCodeAt(0):
+      if (data.slice(index + 1, index + 3) == "rue") {
+        i1.value = index + 4;
+        return JSONValue.from<bool>(true)
+      }
+      else
+        throw new Error("Unexpected character after 't'");
+
+    case "f".charCodeAt(0):
+      if (data.slice(index + 1, index + 4) == "alse") {
+        i1.value = index + 4;
+        return JSONValue.from<bool>(false);
+      }
+      break;
     case "[".charCodeAt(0):
       throw new Error("dyn array not implemented");
       parseDynamicArray(data.slice(index))
@@ -390,6 +418,21 @@ case "t".charCodeAt(0):
     default:
       if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(data.charAt(index))) {
 
+        let num: f64 = parseNum(data.charCodeAt(index));
+        index++;
+        let _num;
+        let periodFound=false;
+        while (true) {
+          _num = parseNum(data.charCodeAt(index));
+          if (_num != -1) {
+            num **= 10;
+            num += _num;
+          } else if(data.charCodeAt(index)==".".charCodeAt(0)) {
+
+
+          }
+          index++;
+        }
         return JSONValue.from(parseNumber<f64>(data.slice(index)))
       }
       else throw new Error("PANIC: NOT JSON");

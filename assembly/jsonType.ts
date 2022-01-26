@@ -1,3 +1,4 @@
+import { StringSink } from "as-string-sink"
 export class Option<T> {
   exists: boolean;
 }
@@ -20,6 +21,7 @@ export class JSONValue {
     else if (isBoolean<T>()) return this.kind == 5;
     else ERROR("TYPE <T> PASSED TO JSONValue.is is NOT one of the three ");
   }
+
   @inline as<T>(): T {
     let t = changetype<T>(null)!;
     //@ts-ignore
@@ -94,14 +96,15 @@ export class JSONValue {
 
 export class JSONArray extends Array<JSONValue> {
   toString(): string {
-    let outString = "[";
+    const result = new StringSink("[");
     let len = this.length - 1;
-    for (let i = 0; i < this.length; i++) {
-      outString += this[i].toString()
-      if (i < len) { outString += "," }
+    for (let i = 0; i < this.length-1; i++) {
+      result.write(this[i].toString())
+      result.write(",")
     }
-    outString += "]"
-    return outString;
+    result.write(this[len].toString())
+    result.write("]")
+    return result.toString();
   }
 }
 export class JSONobject extends Map<string, JSONValue> {
@@ -109,11 +112,10 @@ export class JSONobject extends Map<string, JSONValue> {
     let outString = "{"
     let keys = this.keys();
     let len = keys.length - 1;
-    for (let i = 0; i < keys.length; i++) {
-      outString += '"' + keys[i].toString() + '":' + unchecked(this.get(keys[i])).toString();
-      if (i < len) outString += ","
+    for (let i = 0; i < keys.length-1; i++) {
+      outString += '"' + keys[i].toString() + '":' + unchecked(this.get(keys[i])).toString() + ",";
     }
-
+    outString += '"' + keys[len].toString() + '":' + unchecked(this.get(keys[len])).toString();
     return outString + "}"
 
   }
