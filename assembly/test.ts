@@ -1,6 +1,7 @@
 import { JSON, parseDynamic, parseOnStr } from "./index";
 import "wasi";
 import { JSONobject, JSONValue, JSONNull } from "./jsonType";
+import { console } from "as-console"
 /*
 declare let json: (...a: any) => any;
 
@@ -30,7 +31,11 @@ let myDynamic = parseDynamic('"hello world"');
 console.log(myDynamic.expect<string>("string"));
 */
 let myString = parseOnStr('"Hello world"', { value: 0 });
+let myNum = parseOnStr('2.34', { value: 0 });
+console.log("num: " + myNum.toString());
 console.log(myString.expect<string>("should be string") + " << string")
-let myObject = parseOnStr('{"hello":"world","this":{"is":"cool"}}', { value: 0 });
-
-console.log(myObject.toString());
+//let myObject = parseOnStr('{"hello":"world","this":{"is":"cool"}}', { value: 0 });
+let myArray = parseOnStr('["hi",2.34,{},{"h 🧘🏻‍♂️, 🌍, 🌦️,ello":"world","this":{"is":"VERY cool","😐":"cuz"}}]', { value: 0 });
+// console.log(myObject.toString());
+console.log("stringifying array: ")
+console.log(myArray.toString());

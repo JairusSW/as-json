@@ -7,15 +7,16 @@
  (type $i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
- (type $i64_i32_=>_i32 (func (param i64 i32) (result i32)))
- (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_=>_f64 (func (param i32) (result f64)))
+ (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
+ (type $i64_i32_=>_i32 (func (param i64 i32) (result i32)))
+ (type $i32_f64_=>_none (func (param i32 f64)))
+ (type $i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32) (result i32)))
  (type $i32_i64_i32_=>_none (func (param i32 i64 i32)))
  (type $i64_=>_i32 (func (param i64) (result i32)))
  (type $f32_i32_=>_i32 (func (param f32 i32) (result i32)))
  (type $f64_i32_=>_i32 (func (param f64 i32) (result i32)))
  (type $f64_=>_i32 (func (param f64) (result i32)))
- (type $i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32) (result i32)))
  (type $i32_i32_=>_i64 (func (param i32 i32) (result i64)))
  (type $i64_i64_i32_i32_=>_i32 (func (param i64 i64 i32 i32) (result i32)))
  (type $i32_f64_=>_i32 (func (param i32 f64) (result i32)))
@@ -23,6 +24,7 @@
  (type $i32_=>_f32 (func (param i32) (result f32)))
  (type $f32_f32_i32_i32_=>_i32 (func (param f32 f32 i32 i32) (result i32)))
  (type $f64_f64_i32_i32_=>_i32 (func (param f64 f64 i32 i32) (result i32)))
+ (type $i32_i64_i32_=>_i32 (func (param i32 i64 i32) (result i32)))
  (type $i32_i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_i32_i32_i32_i32_i32_i32_i32_i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
@@ -39,7 +41,6 @@
  (type $f32_=>_none (func (param f32)))
  (type $f32_i32_=>_none (func (param f32 i32)))
  (type $i32_f32_i32_=>_none (func (param i32 f32 i32)))
- (type $i32_f64_=>_none (func (param i32 f64)))
  (type $f64_=>_none (func (param f64)))
  (type $f64_i32_=>_none (func (param f64 i32)))
  (type $i32_f64_i32_=>_none (func (param i32 f64 i32)))
@@ -140,47 +141,36 @@
  (data (i32.const 7356) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\14\00\00\001\00.\002\003\004\005\006\00e\00+\005\00\00\00\00\00\00\00\00\00")
  (data (i32.const 7404) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\12\00\00\001\002\003\004\005\006\00E\00-\005\00\00\00\00\00\00\00\00\00\00\00")
  (data (i32.const 7452) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\04\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 7484) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00:\00\00\00S\00h\00o\00u\00l\00d\00 \00(\00d\00e\00)\00s\00e\00r\00i\00a\00l\00i\00z\00e\00 \00v\00a\00r\00i\00a\00n\00t\00s\00\00\00")
- (data (i32.const 7564) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\1a\00\00\00t\00y\00p\00e\00 \00m\00i\00s\00m\00a\00t\00c\00h\00\00\00")
- (data (i32.const 7612) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\000\00\00\00~\00l\00i\00b\00/\00a\00s\00-\00v\00a\00r\00i\00a\00n\00t\00/\00i\00n\00d\00e\00x\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 7692) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\06\00\00\00i\00d\00k\00\00\00\00\00\00\00")
- (data (i32.const 7724) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00f\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 7756) "l\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00X\00\00\00U\00n\00k\00n\00o\00w\00n\00 \00i\00d\00e\00n\00t\00i\00f\00y\00i\00n\00g\00 \00t\00o\00k\00e\00n\00 \00a\00t\00 \00v\00a\00r\00i\00a\00n\00t\00 \00p\00a\00r\00s\00i\00n\00g\00\00\00\00\00")
- (data (i32.const 7868) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 7900) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\004\00\00\00S\00h\00o\00u\00l\00d\00 \00(\00d\00e\00)\00s\00e\00r\00i\00a\00l\00i\00z\00e\00 \00a\00r\00r\00a\00y\00\00\00\00\00\00\00\00\00")
- (data (i32.const 7980) ",\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\14\00\00\00\01\00\00\00\02\00\00\00\03\00\00\00\04\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8028) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00[\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8060) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00,\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8092) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00]\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8124) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\16\00\00\00[\001\00,\002\00,\003\00,\004\00,\005\00]\00\00\00\00\00\00\00")
- (data (i32.const 8172) ",\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\14\00\00\00\01\00\00\00\02\00\00\00\03\00\00\00\04\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8220) "\1c\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8252) "\1c\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8284) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\14\00\00\00A\00r\00r\00a\00y\00<\00i\003\002\00>\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8332) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8364) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\008\00\00\00S\00h\00o\00u\00l\00d\00 \00(\00d\00e\00)\00s\00e\00r\00i\00a\00l\00i\00z\00e\00 \00O\00b\00j\00e\00c\00t\00s\00\00\00\00\00")
- (data (i32.const 8444) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00{\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8476) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\0c\00\00\00\"\00f\00o\00o\00\"\00:\00")
- (data (i32.const 8508) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\0c\00\00\00\"\00b\00a\00r\00\"\00:\00")
- (data (i32.const 8540) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00}\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8572) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\002\00\00\00{\00\"\00f\00o\00o\00\"\00:\00\"\00m\00o\00o\00\"\00,\00\"\00b\00a\00r\00\"\00:\001\002\003\004\005\00}\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8652) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8684) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00<\00\00\00S\00h\00o\00u\00l\00d\00 \00h\00a\00n\00d\00l\00e\00 \00a\00r\00r\00a\00y\00 \00w\00h\00i\00t\00e\00s\00p\00a\00c\00e\00")
- (data (i32.const 8764) "\\\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00J\00\00\00 \00 \00 \00 \00 \00[\00 \00 \00\"\00a\00y\00o\00o\00\"\00 \00 \00 \00,\00 \00 \00 \00 \00\"\00u\00h\00.\00.\00.\00\"\00 \00 \00 \00 \00]\00 \00 \00 \00\00\00")
- (data (i32.const 8860) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00/\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8892) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00 \00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 8924) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\08\00\00\00a\00y\00o\00o\00\00\00\00\00")
- (data (i32.const 8956) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\n\00\00\00u\00h\00.\00.\00.\00\00\00")
- (data (i32.const 8988) "\1c\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\08\00\00\00\f0\"\00\00\10#\00\00\00\00\00\00")
- (data (i32.const 9020) "\1c\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9052) "\1c\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9084) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\002\00\00\00A\00r\00r\00a\00y\00<\00~\00l\00i\00b\00/\00s\00t\00r\00i\00n\00g\00/\00S\00t\00r\00i\00n\00g\00>\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9164) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\08\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9196) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\t\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9228) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\n\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9260) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00n\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00l\00o\00g\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9404) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00p\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00c\00a\00l\00l\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data (i32.const 9552) "\17\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\01\00\00\00\00\00\00\02\t\00\00\00\00\00\00\10\t\02\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00$\n\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7484) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\004\00\00\00S\00h\00o\00u\00l\00d\00 \00(\00d\00e\00)\00s\00e\00r\00i\00a\00l\00i\00z\00e\00 \00a\00r\00r\00a\00y\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7564) ",\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\14\00\00\00\01\00\00\00\02\00\00\00\03\00\00\00\04\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7612) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00[\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7644) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00,\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7676) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00]\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7708) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\16\00\00\00[\001\00,\002\00,\003\00,\004\00,\005\00]\00\00\00\00\00\00\00")
+ (data (i32.const 7756) ",\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\14\00\00\00\01\00\00\00\02\00\00\00\03\00\00\00\04\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7804) "\1c\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7836) "\1c\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7868) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\14\00\00\00A\00r\00r\00a\00y\00<\00i\003\002\00>\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7916) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\05\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 7948) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\008\00\00\00S\00h\00o\00u\00l\00d\00 \00(\00d\00e\00)\00s\00e\00r\00i\00a\00l\00i\00z\00e\00 \00O\00b\00j\00e\00c\00t\00s\00\00\00\00\00")
+ (data (i32.const 8028) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00{\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8060) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\0c\00\00\00\"\00f\00o\00o\00\"\00:\00")
+ (data (i32.const 8092) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\0c\00\00\00\"\00b\00a\00r\00\"\00:\00")
+ (data (i32.const 8124) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00}\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8156) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\002\00\00\00{\00\"\00f\00o\00o\00\"\00:\00\"\00m\00o\00o\00\"\00,\00\"\00b\00a\00r\00\"\00:\001\002\003\004\005\00}\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8236) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8268) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00.\00\00\00S\00h\00o\00u\00l\00d\00 \00s\00e\00r\00i\00a\00l\00i\00z\00e\00 \00a\00r\00r\00a\00y\00s\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8348) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\08\00\00\00\"\00x\00\"\00:\00\00\00\00\00")
+ (data (i32.const 8380) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\08\00\00\00\"\00y\00\"\00:\00\00\00\00\00")
+ (data (i32.const 8412) "L\00\00\00\00\00\00\00\00\00\00\00\01\00\00\000\00\00\00{\00\"\00x\00\"\00:\001\002\00.\003\004\00,\00\"\00y\00\"\00:\001\002\003\004\005\006\00.\000\00}\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8492) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8524) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\08\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8556) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00x\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8588) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00y\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8620) "\1c\00\00\00\00\00\00\00\00\00\00\00\n\00\00\00\08\00\00\00\t\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8652) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00n\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00l\00o\00g\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8796) "\8c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00p\00\00\00n\00o\00d\00e\00_\00m\00o\00d\00u\00l\00e\00s\00/\00@\00a\00s\00-\00p\00e\00c\00t\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00i\00n\00t\00e\00r\00n\00a\00l\00/\00c\00a\00l\00l\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 8944) "\16\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\01\00\00\00\00\00\00\02\t\00\00\00\00\00\00\10\t\02\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00$\n\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (import "__asCovers" "coverDeclare" (func $~lib/index/__coverDeclare (param i32 i32 i32 i32 i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (import "rtrace" "onvisit" (func $~lib/rt/rtrace/onvisit (param i32) (result i32)))
@@ -199,6 +189,7 @@
  (import "__aspect" "createReflectedLong" (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/createReflectedLong (param i32 i32 i32 i32 i32 i32) (result i32)))
  (import "__aspect" "pushReflectedObjectValue" (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/__aspectPushReflectedObjectValue (param i32 i32)))
  (import "__aspect" "reportGroupTypeNode" (func $node_modules/@as-pect/assembly/assembly/internal/Test/describe (param i32 i32)))
+ (import "__aspect" "pushReflectedObjectKey" (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/__aspectPushReflectedObjectKey (param i32 i32)))
  (import "rtrace" "onstore" (func $~onstore (param i32 i32 i32 i32) (result i32)))
  (global $~lib/as-string-sink/index/MIN_BUFFER_LEN i32 (i32.const 32))
  (global $~lib/as-string-sink/index/MIN_BUFFER_SIZE i32 (i32.const 64))
@@ -234,19 +225,30 @@
  (global $~lib/util/number/_exp_pow (mut i32) (i32.const 0))
  (global $~lib/util/string/__fixmulShift (mut i64) (i64.const 0))
  (global $~lib/builtins/i32.MAX_VALUE i32 (i32.const 2147483647))
- (global $node_modules/@as-pect/assembly/assembly/internal/noOp/noOp i32 (i32.const 9248))
+ (global $assembly/__tests__/json.spec/foo (mut i32) (i32.const 0))
+ (global $node_modules/@as-pect/assembly/assembly/internal/noOp/noOp i32 (i32.const 8640))
  (global $node_modules/@as-pect/assembly/assembly/internal/log/ignoreLogs (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 9552))
- (global $~lib/memory/__data_end i32 (i32.const 9740))
- (global $~lib/memory/__stack_pointer (mut i32) (i32.const 26124))
- (global $~lib/memory/__heap_base i32 (i32.const 26124))
+ (global $assembly/__tests__/json.spec/vec i32 (i32.const 21))
+ (global $~lib/rt/__rtti_base i32 (i32.const 8944))
+ (global $~lib/memory/__data_end i32 (i32.const 9124))
+ (global $~lib/memory/__stack_pointer (mut i32) (i32.const 25508))
+ (global $~lib/memory/__heap_base i32 (i32.const 25508))
  (global $~started (mut i32) (i32.const 0))
- (table $0 11 funcref)
- (elem $0 (i32.const 1) $start:assembly/__tests__/json.spec~anonymous|0~anonymous|0 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|1 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|2 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|3 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|4 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|5 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|6 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|7 $start:assembly/__tests__/json.spec~anonymous|0 $start:node_modules/@as-pect/assembly/assembly/internal/noOp~anonymous|0)
+ (table $0 10 funcref)
+ (elem $0 (i32.const 1) $start:assembly/__tests__/json.spec~anonymous|0~anonymous|0 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|1 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|2 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|3 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|4 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|5 $start:assembly/__tests__/json.spec~anonymous|0~anonymous|6 $start:assembly/__tests__/json.spec~anonymous|0 $start:node_modules/@as-pect/assembly/assembly/internal/noOp~anonymous|0)
+ (export "vec" (global $assembly/__tests__/json.spec/vec))
  (export "__ignoreLogs" (func $node_modules/@as-pect/assembly/assembly/internal/log/__ignoreLogs))
  (export "memory" (memory $0))
  (export "table" (table $0))
  (export "_start" (func $~start))
+ (export "vec#get:x" (func $export:assembly/__tests__/json.spec/vec#get:x))
+ (export "vec#set:x" (func $export:assembly/__tests__/json.spec/vec#set:x))
+ (export "vec#get:y" (func $export:assembly/__tests__/json.spec/vec#get:y))
+ (export "vec#set:y" (func $export:assembly/__tests__/json.spec/vec#set:y))
+ (export "vec#__aspectStrictEquals" (func $export:assembly/__tests__/json.spec/vec#__aspectStrictEquals))
+ (export "vec#__aspectAddReflectedValueKeyValuePairs" (func $export:assembly/__tests__/json.spec/vec#__aspectAddReflectedValueKeyValuePairs))
+ (export "vec#__JSON_Serialize" (func $export:assembly/__tests__/json.spec/vec#__JSON_Serialize))
+ (export "vec#constructor" (func $export:assembly/__tests__/json.spec/vec#constructor))
  (export "__call" (func $export:node_modules/@as-pect/assembly/assembly/internal/call/__call))
  (func $~lib/rt/itcms/Object#set:nextWithColor (param $0 i32) (param $1 i32)
   local.get $0
@@ -5191,25 +5193,25 @@
   call $node_modules/@as-pect/assembly/assembly/internal/Expected/clearExpected
  )
  (func $assembly/index/JSON.stringify<bool> (param $0 i32) (result i32)
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -457931531
+  i32.const 1900375032
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 1863036495
+  i32.const 636563820
   call $~lib/index/__cover
   local.get $0
   if (result i32)
-   i32.const 966534614
+   i32.const -970126119
    call $~lib/index/__cover
    i32.const 2688
   else
-   i32.const -45611912
+   i32.const -1982272645
    call $~lib/index/__cover
    i32.const 2720
   end
@@ -5355,44 +5357,40 @@
   call $node_modules/@as-pect/assembly/assembly/internal/Expected/Expected.clear
  )
  (func $assembly/index/JSON.stringify<assembly/index/Nullable|null> (param $0 i32) (result i32)
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -176834311
+  i32.const 1900375032
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2113495044
   call $~lib/index/__cover
   local.get $0
   i32.const 0
   i32.eq
   if
-   i32.const -1239409168
+   i32.const 1829085453
    call $~lib/index/__cover
    i32.const 2992
    return
   else
-   i32.const -567460334
+   i32.const 1790846229
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -145814504
+   i32.const -2082475237
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -395891917
+   i32.const -255343307
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -114794697
-   call $~lib/index/__cover
-   i32.const 0
-   drop
-   i32.const 323103666
+   i32.const 1140752116
    call $~lib/index/__cover
    i32.const 2992
    return
@@ -5401,29 +5399,25 @@
  )
  (func $assembly/index/JSON.parse<assembly/index/Nullable|null> (param $0 i32) (result i32)
   (local $1 i32)
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -1880089901
+  i32.const -83977778
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -193506581
+  i32.const -2020638511
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -2130167314
+  i32.const 337668052
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const 548332180
+  i32.const -1702513991
   call $~lib/index/__cover
   i32.const 0
   return
@@ -6162,25 +6156,25 @@
   call $~lib/util/number/itoa32
  )
  (func $assembly/index/JSON.stringify<i32> (param $0 i32) (result i32)
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -176834311
+  i32.const 1900375032
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -567460334
+  i32.const -2113495044
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const 1790846229
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 71577398
+  i32.const -1154895277
   call $~lib/index/__cover
   local.get $0
   i32.const 10
@@ -6585,40 +6579,40 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -1880089901
+  i32.const -83977778
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2020638511
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 761830869
+  i32.const 1579479319
   call $~lib/index/__cover
   block $assembly/index/parseNumber<i32>|inlined.0 (result i32)
    local.get $0
    local.set $2
-   i32.const -1426435441
+   i32.const -1098379543
    call $~lib/index/__cover
-   i32.const 2072647452
-   call $~lib/index/__cover
-   i32.const 0
-   drop
-   i32.const -1338258579
+   i32.const 607068662
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -1472272085
+   i32.const 390846791
+   call $~lib/index/__cover
+   i32.const 0
+   drop
+   i32.const 256833285
    call $~lib/index/__cover
    i32.const 1
    drop
-   i32.const -1722937629
+   i32.const 339721289
    call $~lib/index/__cover
    local.get $2
    i32.const 0
@@ -6942,25 +6936,25 @@
   call $~lib/util/number/itoa64
  )
  (func $assembly/index/JSON.stringify<i64> (param $0 i64) (result i32)
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -176834311
+  i32.const 1900375032
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -567460334
+  i32.const -2113495044
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const 1790846229
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 71577398
+  i32.const -1154895277
   call $~lib/index/__cover
   local.get $0
   i32.const 10
@@ -7283,52 +7277,52 @@
   (local $1 i64)
   (local $2 i32)
   (local $3 i64)
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -1880089901
+  i32.const -83977778
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2020638511
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 761830869
+  i32.const 1579479319
   call $~lib/index/__cover
   block $assembly/index/parseNumber<i64>|inlined.0 (result i64)
    local.get $0
    local.set $2
-   i32.const -1426435441
+   i32.const -1098379543
    call $~lib/index/__cover
-   i32.const 2072647452
-   call $~lib/index/__cover
-   i32.const 0
-   drop
-   i32.const -1338258579
+   i32.const 607068662
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -1472272085
+   i32.const 390846791
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -1606285591
+   i32.const 256833285
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -1740299097
+   i32.const 122819779
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -1874312603
+   i32.const -11193727
+   call $~lib/index/__cover
+   i32.const 0
+   drop
+   i32.const -145207233
    call $~lib/index/__cover
    i32.const 1
    drop
-   i32.const -1301291799
+   i32.const 761367119
    call $~lib/index/__cover
    local.get $2
    i32.const 0
@@ -8777,25 +8771,25 @@
   call $~lib/util/number/dtoa
  )
  (func $assembly/index/JSON.stringify<f32> (param $0 f32) (result i32)
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -176834311
+  i32.const 1900375032
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -567460334
+  i32.const -2113495044
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const 1790846229
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 71577398
+  i32.const -1154895277
   call $~lib/index/__cover
   local.get $0
   i32.const 0
@@ -10050,36 +10044,36 @@
   (local $1 f32)
   (local $2 i32)
   (local $3 f32)
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -1880089901
+  i32.const -83977778
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2020638511
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 761830869
+  i32.const 1579479319
   call $~lib/index/__cover
   block $assembly/index/parseNumber<f32>|inlined.0 (result f32)
    local.get $0
    local.set $2
-   i32.const -1426435441
+   i32.const -1098379543
    call $~lib/index/__cover
-   i32.const 2072647452
+   i32.const 607068662
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -1338258579
+   i32.const 390846791
    call $~lib/index/__cover
    i32.const 1
    drop
-   i32.const -1863486239
+   i32.const 199172679
    call $~lib/index/__cover
    local.get $2
    call $~lib/number/F32.parseFloat
@@ -10226,25 +10220,25 @@
   call $~lib/util/number/dtoa
  )
  (func $assembly/index/JSON.stringify<f64> (param $0 f64) (result i32)
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -176834311
+  i32.const 1900375032
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -567460334
+  i32.const -2113495044
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const 1790846229
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 71577398
+  i32.const -1154895277
   call $~lib/index/__cover
   local.get $0
   i32.const 0
@@ -10259,32 +10253,32 @@
   (local $1 f64)
   (local $2 i32)
   (local $3 f64)
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -1880089901
+  i32.const -83977778
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2020638511
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 761830869
+  i32.const 1579479319
   call $~lib/index/__cover
   block $assembly/index/parseNumber<f64>|inlined.0 (result f64)
    local.get $0
    local.set $2
-   i32.const -1426435441
+   i32.const -1098379543
    call $~lib/index/__cover
-   i32.const 2072647452
+   i32.const 607068662
    call $~lib/index/__cover
    i32.const 1
    drop
-   i32.const 117544356
+   i32.const -2114764022
    call $~lib/index/__cover
    local.get $2
    call $~lib/number/F64.parseFloat
@@ -10425,60 +10419,6 @@
   call $node_modules/@as-pect/assembly/assembly/internal/assert/assert
   call $node_modules/@as-pect/assembly/assembly/internal/Actual/Actual.clear
   call $node_modules/@as-pect/assembly/assembly/internal/Expected/Expected.clear
- )
- (func $~lib/as-variant/index/Variant#set:discriminator (param $0 i32) (param $1 i32)
-  local.get $0
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store
- )
- (func $~lib/number/I8#toString (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  i32.extend8_s
-  local.get $1
-  call $~lib/util/number/itoa32
- )
- (func $~lib/number/I16#toString (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  i32.extend16_s
-  local.get $1
-  call $~lib/util/number/itoa32
- )
- (func $assembly/index/JSON.stringify<~lib/as-variant/index/Variant> (param $0 i32) (result i32)
-  i32.const -1620190790
-  call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -176834311
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -567460334
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -145814504
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -395891917
-  call $~lib/index/__cover
-  i32.const 1
-  drop
-  i32.const 227314009
-  call $~lib/index/__cover
-  local.get $0
-  call $assembly/index/serializeVariant
-  return
  )
  (func $~lib/as-string-sink/index/StringSink#set:buffer (param $0 i32) (param $1 i32)
   local.get $0
@@ -10762,39 +10702,35 @@
  (func $assembly/index/JSON.parse<~lib/array/Array<i32>> (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -1880089901
+  i32.const -83977778
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -193506581
+  i32.const -2020638511
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -2130167314
+  i32.const 337668052
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const -1807687753
+  i32.const 231807505
   call $~lib/index/__cover
   local.get $0
   local.set $2
-  i32.const 1870148566
+  i32.const -2096762832
   call $~lib/index/__cover
-  i32.const -1306279902
+  i32.const 1523108604
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -1532743734
+  i32.const 196361636
   call $~lib/index/__cover
   i32.const 0
   drop
@@ -10920,285 +10856,221 @@
   call $node_modules/@as-pect/assembly/assembly/internal/Expected/reportExpectedReflectedValue
  )
  (func $assembly/index/JSON.stringify<assembly/__tests__/json.spec/JSONSchema> (param $0 i32) (result i32)
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -176834311
+  i32.const 1900375032
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -567460334
+  i32.const -2113495044
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -145814504
+  i32.const 1790846229
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2082475237
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 325251442
+  i32.const -901221233
   call $~lib/index/__cover
   local.get $0
   call $assembly/__tests__/json.spec/JSONSchema#__JSON_Serialize
   return
  )
- (func $~lib/array/Array<~lib/string/String>#set:buffer (param $0 i32) (param $1 i32)
+ (func $assembly/__tests__/json.spec/vec#set:x (param $0 i32) (param $1 f64)
   local.get $0
   i32.const 0
-  i32.const 4
+  i32.const 8
   i32.const 0
   call $~onstore
   local.get $1
-  i32.store
-  local.get $0
-  local.get $1
-  i32.const 0
-  call $~lib/rt/itcms/__link
+  f64.store
  )
- (func $~lib/array/Array<~lib/string/String>#set:dataStart (param $0 i32) (param $1 i32)
-  local.get $0
-  i32.const 4
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store offset=4
- )
- (func $~lib/array/Array<~lib/string/String>#set:byteLength (param $0 i32) (param $1 i32)
+ (func $assembly/__tests__/json.spec/vec#set:y (param $0 i32) (param $1 f64)
   local.get $0
   i32.const 8
-  i32.const 4
+  i32.const 8
   i32.const 0
   call $~onstore
   local.get $1
-  i32.store offset=8
+  f64.store offset=8
  )
- (func $~lib/array/Array<~lib/string/String>#set:length_ (param $0 i32) (param $1 i32)
+ (func $assembly/index/JSON.stringify<assembly/__tests__/json.spec/vec> (param $0 i32) (result i32)
+  i32.const 855574935
+  call $~lib/index/__cover
+  i32.const -376410166
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const 1900375032
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2113495044
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const 1790846229
+  call $~lib/index/__cover
+  i32.const 0
+  drop
+  i32.const -2082475237
+  call $~lib/index/__cover
+  i32.const 1
+  drop
+  i32.const -901221233
+  call $~lib/index/__cover
   local.get $0
-  i32.const 12
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store offset=12
+  call $assembly/__tests__/json.spec/vec#__JSON_Serialize
+  return
  )
- (func $~lib/array/Array<~lib/string/String>#push (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
+ (func $assembly/__tests__/json.spec/vec#get:x (param $0 i32) (result f64)
+  local.get $0
+  f64.load
+ )
+ (func $assembly/__tests__/json.spec/vec#get:y (param $0 i32) (result f64)
+  local.get $0
+  f64.load offset=8
+ )
+ (func $~lib/staticarray/StaticArray<i64>#get:length (param $0 i32) (result i32)
+  local.get $0
+  i32.const 20
+  i32.sub
+  i32.load offset=16
+  i32.const 3
+  i32.shr_u
+ )
+ (func $~lib/staticarray/StaticArray<i64>#indexOf (param $0 i32) (param $1 i64) (param $2 i32) (result i32)
   (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
   local.get $0
-  i32.load offset=12
-  local.set $2
-  local.get $2
-  i32.const 1
-  i32.add
+  call $~lib/staticarray/StaticArray<i64>#get:length
   local.set $3
-  local.get $0
   local.get $3
-  i32.const 2
-  i32.const 1
-  call $~lib/array/ensureCapacity
-  i32.const 1
-  drop
-  local.get $0
-  i32.load offset=4
-  local.get $2
-  i32.const 2
-  i32.shl
-  i32.add
   i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store
-  local.get $0
-  local.get $1
-  i32.const 1
-  call $~lib/rt/itcms/__link
-  local.get $0
-  local.get $3
-  call $~lib/array/Array<~lib/string/String>#set:length_
-  local.get $3
- )
- (func $assembly/index/JSON.parse<~lib/array/Array<~lib/string/String>> (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  i32.const 527519037
-  call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -1880089901
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -193506581
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -2130167314
-  call $~lib/index/__cover
-  i32.const 1
-  drop
-  i32.const -1807687753
-  call $~lib/index/__cover
-  block $assembly/index/parseArray<~lib/array/Array<~lib/string/String>>|inlined.0 (result i32)
-   local.get $0
-   local.set $2
-   i32.const 1870148566
-   call $~lib/index/__cover
-   i32.const -1306279902
-   call $~lib/index/__cover
+  i32.eq
+  if (result i32)
    i32.const 1
-   drop
-   i32.const 338005220
-   call $~lib/index/__cover
+  else
    local.get $2
-   call $assembly/index/parseStringArray
-   br $assembly/index/parseArray<~lib/array/Array<~lib/string/String>>|inlined.0
+   local.get $3
+   i32.ge_s
   end
+  if
+   i32.const -1
+   return
+  end
+  local.get $2
+  i32.const 0
+  i32.lt_s
+  if
+   local.get $3
+   local.get $2
+   i32.add
+   local.tee $4
+   i32.const 0
+   local.tee $5
+   local.get $4
+   local.get $5
+   i32.gt_s
+   select
+   local.set $2
+  end
+  loop $while-continue|0
+   local.get $2
+   local.get $3
+   i32.lt_s
+   local.set $4
+   local.get $4
+   if
+    local.get $0
+    local.get $2
+    i32.const 3
+    i32.shl
+    i32.add
+    i64.load
+    local.get $1
+    i64.eq
+    if
+     local.get $2
+     return
+    end
+    local.get $2
+    i32.const 1
+    i32.add
+    local.set $2
+    br $while-continue|0
+   end
+  end
+  i32.const -1
+ )
+ (func $~lib/staticarray/StaticArray<i64>#includes (param $0 i32) (param $1 i64) (param $2 i32) (result i32)
+  i32.const 0
+  drop
+  local.get $0
+  local.get $1
+  local.get $2
+  call $~lib/staticarray/StaticArray<i64>#indexOf
+  i32.const 0
+  i32.ge_s
   return
  )
- (func $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#set:actual (param $0 i32) (param $1 i32)
-  local.get $0
-  i32.const 4
-  i32.const 4
+ (func $assembly/__tests__/json.spec/vec#__aspectStrictEquals (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
+  local.get $4
+  i64.const 4685345497827770368
   i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store offset=4
-  local.get $0
-  local.get $1
-  i32.const 0
-  call $~lib/rt/itcms/__link
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#set:_not (param $0 i32) (param $1 i32)
-  local.get $0
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/array/Array<~lib/string/String>> (param $0 i32) (result i32)
-  i32.const -1106692936
-  call $~lib/index/__cover
-  i32.const -2014114394
-  call $~lib/index/__cover
-  i32.const 0
-  local.get $0
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#constructor
- )
- (func $~lib/array/Array<~lib/string/String>#get:length (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=12
- )
- (func $~lib/array/Array<~lib/string/String>#__uget (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  i32.load offset=4
-  local.get $1
-  i32.const 2
-  i32.shl
-  i32.add
-  i32.load
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.equals<~lib/array/Array<~lib/string/String>> (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
-  i32.const -652178477
-  call $~lib/index/__cover
-  i32.const -1408236481
-  call $~lib/index/__cover
-  local.get $0
-  local.get $1
-  i32.eq
-  if
-   global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.SUCCESSFUL_MATCH
-   return
-  end
-  i32.const 0
-  drop
-  i32.const 1
-  drop
-  i32.const -901900409
-  call $~lib/index/__cover
-  local.get $0
-  i32.const 0
-  i32.eq
-  local.get $1
-  i32.const 0
-  i32.eq
-  i32.xor
-  if
-   i32.const 1288782772
-   call $~lib/index/__cover
-   global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.FAILED_MATCH
-   return
-  end
-  i32.const 1
-  drop
-  i32.const -690549496
-  call $~lib/index/__cover
-  i32.const 0
+  call $~lib/staticarray/StaticArray<i64>#includes
   i32.eqz
-  drop
-  i32.const 1607245673
-  call $~lib/index/__cover
+  if (result i32)
+   local.get $0
+   f64.load
+   local.get $1
+   f64.load
+   local.get $2
+   local.get $3
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.equals<f64>
+   global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.FAILED_MATCH
+   i32.eq
+  else
+   i32.const 0
+  end
+  if
+   i32.const 0
+   return
+  end
+  local.get $4
+  i64.const 4685345532187508736
+  i32.const 0
+  call $~lib/staticarray/StaticArray<i64>#includes
+  i32.eqz
+  if (result i32)
+   local.get $0
+   f64.load offset=8
+   local.get $1
+   f64.load offset=8
+   local.get $2
+   local.get $3
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.equals<f64>
+   global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.FAILED_MATCH
+   i32.eq
+  else
+   i32.const 0
+  end
+  if
+   i32.const 0
+   return
+  end
   i32.const 0
   drop
-  i32.const 1617509423
-  call $~lib/index/__cover
-  local.get $0
-  local.get $1
-  local.get $2
-  local.get $3
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/referencesEqual<~lib/array/Array<~lib/string/String>>
-  return
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Actual/Actual.report<~lib/array/Array<~lib/string/String>> (param $0 i32)
-  (local $1 i32)
-  i32.const 463713627
-  call $~lib/index/__cover
-  i32.const -1702914511
-  call $~lib/index/__cover
-  local.get $0
   i32.const 1
-  global.set $~argumentsLength
-  i32.const 0
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/array/Array<~lib/string/String>>@varargs
-  local.set $1
-  local.get $1
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.attachStackTrace
-  local.get $1
-  call $node_modules/@as-pect/assembly/assembly/internal/Actual/reportActualReflectedValue
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Expected/Expected.report<~lib/array/Array<~lib/string/String>> (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  i32.const 125956076
-  call $~lib/index/__cover
-  i32.const -1069480640
-  call $~lib/index/__cover
-  local.get $0
-  i32.const 1
-  global.set $~argumentsLength
-  i32.const 0
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/array/Array<~lib/string/String>>@varargs
-  local.set $2
-  local.get $2
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.attachStackTrace
-  local.get $2
-  local.get $1
-  call $node_modules/@as-pect/assembly/assembly/internal/Expected/reportExpectedReflectedValue
  )
  (func $start:node_modules/@as-pect/assembly/assembly/internal/noOp~anonymous|0
   nop
@@ -11231,6 +11103,13 @@
  (func $~lib/rt/__visit_globals (param $0 i32)
   (local $1 i32)
   global.get $assembly/__tests__/json.spec/obj
+  local.tee $1
+  if
+   local.get $1
+   local.get $0
+   call $~lib/rt/itcms/__visit
+  end
+  global.get $assembly/__tests__/json.spec/foo
   local.tee $1
   if
    local.get $1
@@ -11412,153 +11291,89 @@
    call $~lib/rt/itcms/__visit
   end
  )
- (func $~lib/array/Array<~lib/string/String>#__visit (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  i32.const 1
-  drop
-  local.get $0
-  i32.load offset=4
-  local.set $2
-  local.get $2
-  local.get $0
-  i32.load offset=12
-  i32.const 2
-  i32.shl
-  i32.add
-  local.set $3
-  loop $while-continue|0
-   local.get $2
-   local.get $3
-   i32.lt_u
-   local.set $4
-   local.get $4
-   if
-    local.get $2
-    i32.load
-    local.set $5
-    local.get $5
-    if
-     local.get $5
-     local.get $1
-     call $~lib/rt/itcms/__visit
-    end
-    local.get $2
-    i32.const 4
-    i32.add
-    local.set $2
-    br $while-continue|0
-   end
-  end
-  local.get $0
-  i32.load
-  local.get $1
-  call $~lib/rt/itcms/__visit
- )
- (func $~lib/array/Array<~lib/string/String>~visit (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  call $~lib/array/Array<~lib/string/String>#__visit
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>~visit (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  local.get $0
-  i32.load offset=4
-  local.tee $2
-  if
-   local.get $2
-   local.get $1
-   call $~lib/rt/itcms/__visit
-  end
- )
  (func $~lib/rt/__visit_members (param $0 i32) (param $1 i32)
   block $invalid
-   block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>
-    block $~lib/array/Array<~lib/string/String>
-     block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<i32>>
-      block $~lib/as-string-sink/index/StringSink
-       block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f64>
-        block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f32>
-         block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i64>
-          block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i32>
-           block $~lib/staticarray/StaticArray<i64>
-            block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<assembly/index/Nullable|null>
-             block $assembly/index/Nullable
-              block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool>
-               block $~lib/function/Function<%28%29=>void>
-                block $~lib/map/Map<usize,i32>
-                 block $~lib/array/Array<i32>
-                  block $~lib/array/Array<usize>
-                   block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>
-                    block $assembly/__tests__/json.spec/JSONSchema
-                     block $assembly/jsonType/JSONNull
-                      block $~lib/as-variant/index/Variant
-                       block $~lib/arraybuffer/ArrayBufferView
-                        block $~lib/string/String
-                         block $~lib/arraybuffer/ArrayBuffer
-                          local.get $0
-                          i32.const 8
-                          i32.sub
-                          i32.load
-                          br_table $~lib/arraybuffer/ArrayBuffer $~lib/string/String $~lib/arraybuffer/ArrayBufferView $~lib/as-variant/index/Variant $assembly/jsonType/JSONNull $assembly/__tests__/json.spec/JSONSchema $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String> $~lib/array/Array<usize> $~lib/array/Array<i32> $~lib/map/Map<usize,i32> $~lib/function/Function<%28%29=>void> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool> $assembly/index/Nullable $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<assembly/index/Nullable|null> $~lib/staticarray/StaticArray<i64> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i32> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i64> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f32> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f64> $~lib/as-string-sink/index/StringSink $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<i32>> $~lib/array/Array<~lib/string/String> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>> $invalid
-                         end
-                         return
+   block $assembly/__tests__/json.spec/vec
+    block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<i32>>
+     block $~lib/as-string-sink/index/StringSink
+      block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f64>
+       block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f32>
+        block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i64>
+         block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i32>
+          block $~lib/staticarray/StaticArray<i64>
+           block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<assembly/index/Nullable|null>
+            block $assembly/index/Nullable
+             block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool>
+              block $~lib/function/Function<%28%29=>void>
+               block $~lib/map/Map<usize,i32>
+                block $~lib/array/Array<i32>
+                 block $~lib/array/Array<usize>
+                  block $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>
+                   block $assembly/__tests__/json.spec/JSONSchema
+                    block $assembly/jsonType/JSONNull
+                     block $~lib/as-variant/index/Variant
+                      block $~lib/arraybuffer/ArrayBufferView
+                       block $~lib/string/String
+                        block $~lib/arraybuffer/ArrayBuffer
+                         local.get $0
+                         i32.const 8
+                         i32.sub
+                         i32.load
+                         br_table $~lib/arraybuffer/ArrayBuffer $~lib/string/String $~lib/arraybuffer/ArrayBufferView $~lib/as-variant/index/Variant $assembly/jsonType/JSONNull $assembly/__tests__/json.spec/JSONSchema $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String> $~lib/array/Array<usize> $~lib/array/Array<i32> $~lib/map/Map<usize,i32> $~lib/function/Function<%28%29=>void> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool> $assembly/index/Nullable $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<assembly/index/Nullable|null> $~lib/staticarray/StaticArray<i64> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i32> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<i64> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f32> $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<f64> $~lib/as-string-sink/index/StringSink $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<i32>> $assembly/__tests__/json.spec/vec $invalid
                         end
                         return
                        end
-                       local.get $0
-                       local.get $1
-                       call $~lib/arraybuffer/ArrayBufferView~visit
                        return
                       end
                       local.get $0
                       local.get $1
-                      call $~lib/as-variant/index/Variant~visit
+                      call $~lib/arraybuffer/ArrayBufferView~visit
                       return
                      end
+                     local.get $0
+                     local.get $1
+                     call $~lib/as-variant/index/Variant~visit
                      return
                     end
-                    local.get $0
-                    local.get $1
-                    call $assembly/__tests__/json.spec/JSONSchema~visit
                     return
                    end
                    local.get $0
                    local.get $1
-                   call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>~visit
+                   call $assembly/__tests__/json.spec/JSONSchema~visit
                    return
                   end
                   local.get $0
                   local.get $1
-                  call $~lib/array/Array<usize>~visit
+                  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>~visit
                   return
                  end
                  local.get $0
                  local.get $1
-                 call $~lib/array/Array<i32>~visit
+                 call $~lib/array/Array<usize>~visit
                  return
                 end
                 local.get $0
                 local.get $1
-                call $~lib/map/Map<usize,i32>~visit
+                call $~lib/array/Array<i32>~visit
                 return
                end
                local.get $0
                local.get $1
-               call $~lib/function/Function<%28%29=>void>~visit
+               call $~lib/map/Map<usize,i32>~visit
                return
               end
+              local.get $0
+              local.get $1
+              call $~lib/function/Function<%28%29=>void>~visit
               return
              end
              return
             end
-            local.get $0
-            local.get $1
-            call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<assembly/index/Nullable|null>~visit
             return
            end
+           local.get $0
+           local.get $1
+           call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<assembly/index/Nullable|null>~visit
            return
           end
           return
@@ -11569,24 +11384,18 @@
        end
        return
       end
-      local.get $0
-      local.get $1
-      call $~lib/as-string-sink/index/StringSink~visit
       return
      end
      local.get $0
      local.get $1
-     call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<i32>>~visit
+     call $~lib/as-string-sink/index/StringSink~visit
      return
     end
     local.get $0
     local.get $1
-    call $~lib/array/Array<~lib/string/String>~visit
+    call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<i32>>~visit
     return
    end
-   local.get $0
-   local.get $1
-   call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>~visit
    return
   end
   unreachable
@@ -11606,8 +11415,8 @@
   global.get $~lib/memory/__data_end
   i32.lt_s
   if
-   i32.const 26144
-   i32.const 26192
+   i32.const 25536
+   i32.const 25584
    i32.const 1
    i32.const 1
    call $~lib/builtins/abort
@@ -11638,8 +11447,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1200421325
-  i32.const 8
+  i32.const 791597100
+  i32.const 9
   i32.const 20
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -11653,8 +11462,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 489188751
-  i32.const 11
+  i32.const -1588020592
+  i32.const 12
   i32.const 30
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -11668,8 +11477,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1859791601
-  i32.const 13
+  i32.const 357966352
+  i32.const 14
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -11683,8 +11492,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 260391752
-  i32.const 13
+  i32.const -1816817591
+  i32.const 14
   i32.const 28
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -11698,8 +11507,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1719242991
-  i32.const 15
+  i32.const 498514962
+  i32.const 16
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -11713,8 +11522,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -392351446
-  i32.const 15
+  i32.const 1825406507
+  i32.const 16
   i32.const 39
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -11728,8 +11537,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1578694381
-  i32.const 17
+  i32.const 639063572
+  i32.const 18
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -11743,39 +11552,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1786253453
-  i32.const 17
+  i32.const -290955890
+  i32.const 18
   i32.const 38
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1438145771
-  i32.const 19
-  i32.const 10
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -330108944
-  i32.const 19
-  i32.const 37
   i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 192
@@ -11803,190 +11582,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1146394114
-  i32.const 7
-  i32.const 3
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 445272313
-  i32.const 22
-  i32.const 22
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -586857921
-  i32.const 26
-  i32.const 7
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 187715634
-  i32.const 26
-  i32.const 42
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1180013264
-  i32.const 26
-  i32.const 66
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -2122111664
-  i32.const 27
-  i32.const 23
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 670083379
-  i32.const 28
-  i32.const 10
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1344234169
-  i32.const 22
-  i32.const 3
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 2012960344
-  i32.const 31
-  i32.const 41
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -294979734
-  i32.const 32
-  i32.const 23
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1797751987
-  i32.const 33
-  i32.const 10
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 1938586601
-  i32.const 31
-  i32.const 3
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -34188202
+  i32.const 1215925766
+  i32.const 20
   i32.const 37
-  i32.const 23
-  i32.const 1
+  i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 192
   local.set $0
@@ -11998,8 +11597,23 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1635509781
-  i32.const 40
+  i32.const -1969320404
+  i32.const 21
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 520208558
+  i32.const 21
   i32.const 30
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12013,8 +11627,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 310477163
-  i32.const 42
+  i32.const 248437549
+  i32.const 22
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12028,10 +11642,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1864306780
-  i32.const 42
-  i32.const 28
-  i32.const 2
+  i32.const 1110516893
+  i32.const 8
+  i32.const 3
+  i32.const 0
   call $~lib/index/__coverDeclare
   i32.const 192
   local.set $0
@@ -12043,10 +11657,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 451025773
-  i32.const 44
-  i32.const 10
-  i32.const 2
+  i32.const -781200362
+  i32.const 25
+  i32.const 22
+  i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 192
   local.set $0
@@ -12058,8 +11672,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -446309311
-  i32.const 46
+  i32.const -787878180
+  i32.const 29
   i32.const 7
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12073,8 +11687,53 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 732122993
-  i32.const 48
+  i32.const -1748945099
+  i32.const 29
+  i32.const 42
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1178293299
+  i32.const 29
+  i32.const 66
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -435528344
+  i32.const 30
+  i32.const 23
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1938300597
+  i32.const 31
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12088,8 +11747,158 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -2121478136
-  i32.const 50
+  i32.const 1131531556
+  i32.const 25
+  i32.const 3
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 786487669
+  i32.const 34
+  i32.const 41
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 2063326829
+  i32.const 35
+  i32.const 23
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 560554576
+  i32.const 36
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 119385030
+  i32.const 34
+  i32.const 3
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1256035010
+  i32.const 40
+  i32.const 23
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 722796782
+  i32.const 43
+  i32.const 30
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1626183570
+  i32.const 45
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 493999783
+  i32.const 45
+  i32.const 28
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1485634960
+  i32.const 47
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -647329570
+  i32.const 49
   i32.const 7
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12118,10 +11927,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 338239748
-  i32.const 36
-  i32.const 3
-  i32.const 0
+  i32.const 1972468901
+  i32.const 53
+  i32.const 7
+  i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 192
   local.set $0
@@ -12133,10 +11942,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1967506309
-  i32.const 54
-  i32.const 45
-  i32.const 1
+  i32.const -1595163763
+  i32.const 55
+  i32.const 10
+  i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 192
   local.set $0
@@ -12148,38 +11957,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1686053304
-  i32.const 54
-  i32.const 3
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 1280412215
-  i32.const 59
-  i32.const 35
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 644287786
-  i32.const 61
+  i32.const 894365199
+  i32.const 55
   i32.const 30
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12193,8 +11972,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1704692566
-  i32.const 63
+  i32.const 622594190
+  i32.const 56
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12208,10 +11987,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 415490787
-  i32.const 63
-  i32.const 28
-  i32.const 2
+  i32.const -1480961823
+  i32.const 39
+  i32.const 3
+  i32.const 0
   call $~lib/index/__coverDeclare
   i32.const 192
   local.set $0
@@ -12223,10 +12002,40 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 513065387
+  i32.const 283339862
+  i32.const 59
+  i32.const 45
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1008567139
+  i32.const 59
+  i32.const 3
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -759083043
   i32.const 64
-  i32.const 10
-  i32.const 2
+  i32.const 35
+  i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 192
   local.set $0
@@ -12238,39 +12047,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -238753948
-  i32.const 65
-  i32.const 7
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 653613997
+  i32.const -1151824337
   i32.const 66
-  i32.const 10
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 192
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -372767454
-  i32.const 67
-  i32.const 7
+  i32.const 30
   i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 192
@@ -12298,8 +12077,113 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1248343868
-  i32.const 58
+  i32.const -1380621336
+  i32.const 68
+  i32.const 28
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1283046736
+  i32.const 69
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1980929526
+  i32.const 70
+  i32.const 7
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1814221369
+  i32.const 71
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -2114943032
+  i32.const 72
+  i32.const 7
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1673672759
+  i32.const 73
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1533124149
+  i32.const 75
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1596767466
+  i32.const 63
   i32.const 3
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -12313,8 +12197,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1443802114
-  i32.const 70
+  i32.const -1417967461
+  i32.const 77
   i32.const 46
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12328,8 +12212,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 2125163555
-  i32.const 71
+  i32.const 469600042
+  i32.const 78
   i32.const 25
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12343,8 +12227,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 365766222
-  i32.const 70
+  i32.const -1015725913
+  i32.const 77
   i32.const 3
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -12358,8 +12242,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -900942053
-  i32.const 73
+  i32.const 536881535
+  i32.const 80
   i32.const 42
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12373,8 +12257,398 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1453435349
-  i32.const 73
+  i32.const 1610530703
+  i32.const 80
+  i32.const 3
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 895729341
+  i32.const 84
+  i32.const 22
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 856202221
+  i32.const 88
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 251866911
+  i32.const 85
+  i32.const 25
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -949236113
+  i32.const 88
+  i32.const 30
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1221007122
+  i32.const 89
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1268521840
+  i32.const 89
+  i32.const 30
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 325027588
+  i32.const 90
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1480410746
+  i32.const 90
+  i32.const 30
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1752181755
+  i32.const 91
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 737347207
+  i32.const 91
+  i32.const 30
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 465576198
+  i32.const 92
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1339862136
+  i32.const 92
+  i32.const 30
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1611633145
+  i32.const 93
+  i32.const 10
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1806230980
+  i32.const 92
+  i32.const 56
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 794084454
+  i32.const 92
+  i32.const 65
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 2048240139
+  i32.const 84
+  i32.const 3
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -528216646
+  i32.const 98
+  i32.const 22
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1165194962
+  i32.const 101
+  i32.const 20
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -429436745
+  i32.const 102
+  i32.const 47
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -564253240
+  i32.const 98
+  i32.const 3
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -695522315
+  i32.const 112
+  i32.const 22
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -599897354
+  i32.const 116
+  i32.const 20
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 2032760339
+  i32.const 117
+  i32.const 47
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1863756099
+  i32.const 112
+  i32.const 3
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -2119468302
+  i32.const 126
+  i32.const 22
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 192
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -748737280
+  i32.const 126
   i32.const 3
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -12427,8 +12701,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 850062509
-  i32.const 16
+  i32.const -376410166
+  i32.const 19
   i32.const 67
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12442,8 +12716,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -457931531
-  i32.const 22
+  i32.const 1900375032
+  i32.const 25
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12457,8 +12731,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1314084077
-  i32.const 18
+  i32.const 92237269
+  i32.const 21
   i32.const 25
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12472,8 +12746,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -176834311
-  i32.const 26
+  i32.const -2113495044
+  i32.const 29
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12487,8 +12761,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1863036495
-  i32.const 22
+  i32.const 636563820
+  i32.const 25
   i32.const 31
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12502,8 +12776,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 966534614
-  i32.const 23
+  i32.const -970126119
+  i32.const 26
   i32.const 21
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12517,8 +12791,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -45611912
-  i32.const 23
+  i32.const -1982272645
+  i32.const 26
   i32.const 30
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12532,8 +12806,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -567460334
-  i32.const 30
+  i32.const 1790846229
+  i32.const 33
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12547,8 +12821,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1239409168
-  i32.const 26
+  i32.const 1829085453
+  i32.const 29
   i32.const 47
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12562,8 +12836,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -145814504
-  i32.const 36
+  i32.const -2082475237
+  i32.const 39
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12577,8 +12851,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 71577398
-  i32.const 30
+  i32.const -1154895277
+  i32.const 33
   i32.const 46
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12592,8 +12866,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -395891917
-  i32.const 42
+  i32.const -255343307
+  i32.const 44
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12607,8 +12881,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 325251442
-  i32.const 36
+  i32.const -901221233
+  i32.const 39
   i32.const 48
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12622,38 +12896,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -114794697
-  i32.const 46
-  i32.const 10
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 227314009
-  i32.const 42
-  i32.const 39
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -937906481
-  i32.const 46
+  i32.const -120258031
+  i32.const 44
   i32.const 33
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12667,8 +12911,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1072263602
-  i32.const 48
+  i32.const 1889912052
+  i32.const 46
   i32.const 49
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12682,8 +12926,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 323103666
-  i32.const 55
+  i32.const 1140752116
+  i32.const 53
   i32.const 12
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12697,8 +12941,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1620190790
-  i32.const 16
+  i32.const 855574935
+  i32.const 19
   i32.const 3
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -12712,8 +12956,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 376693936
-  i32.const 68
+  i32.const 1194342386
+  i32.const 66
   i32.const 45
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12727,8 +12971,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 56570832
-  i32.const 74
+  i32.const -83977778
+  i32.const 72
   i32.const 12
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12742,8 +12986,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -204317863
-  i32.const 71
+  i32.const 608704720
+  i32.const 69
   i32.const 24
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12757,8 +13001,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1880089901
-  i32.const 77
+  i32.const -2020638511
+  i32.const 75
   i32.const 12
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12772,8 +13016,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -839514989
-  i32.const 74
+  i32.const -21866539
+  i32.const 72
   i32.const 32
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12787,8 +13031,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -193506581
-  i32.const 80
+  i32.const 337668052
+  i32.const 78
   i32.const 12
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12802,8 +13046,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 761830869
-  i32.const 77
+  i32.const 1579479319
+  i32.const 75
   i32.const 48
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12817,38 +13061,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -2130167314
-  i32.const 83
-  i32.const 12
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1343249226
-  i32.const 80
-  i32.const 41
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1807687753
-  i32.const 83
+  i32.const 231807505
+  i32.const 78
   i32.const 34
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12862,8 +13076,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 548332180
-  i32.const 86
+  i32.const -1702513991
+  i32.const 81
   i32.const 12
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -12877,8 +13091,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 527519037
-  i32.const 68
+  i32.const 308664319
+  i32.const 66
   i32.const 3
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -12892,9 +13106,39 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 2002181145
-  i32.const 95
+  i32.const -248665026
+  i32.const 90
   i32.const 48
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1796640160
+  i32.const 89
+  i32.const 1
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 883909653
+  i32.const 95
+  i32.const 44
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -12922,9 +13166,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1428236204
-  i32.const 99
-  i32.const 50
+  i32.const -525506017
+  i32.const 101
+  i32.const 46
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -12937,8 +13181,53 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 2066015616
-  i32.const 107
+  i32.const 501967310
+  i32.const 100
+  i32.const 1
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 607068662
+  i32.const 106
+  i32.const 42
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -2114764022
+  i32.const 109
+  i32.const 28
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 390846791
+  i32.const 111
   i32.const 8
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -12952,10 +13241,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1468638689
-  i32.const 101
-  i32.const 26
-  i32.const 1
+  i32.const 199172679
+  i32.const 111
+  i32.const 33
+  i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
   local.set $0
@@ -12982,24 +13271,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1195316790
-  i32.const 107
-  i32.const 32
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1307708977
-  i32.const 109
-  i32.const 34
+  i32.const 339721289
+  i32.const 113
+  i32.const 33
   i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -13012,9 +13286,54 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1975111793
-  i32.const 109
-  i32.const 43
+  i32.const 122819779
+  i32.const 115
+  i32.const 8
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 480269899
+  i32.const 115
+  i32.const 33
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -11193727
+  i32.const 117
+  i32.const 8
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 620818509
+  i32.const 117
+  i32.const 33
   i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -13042,263 +13361,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1253002693
-  i32.const 113
-  i32.const 32
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1887382811
-  i32.const 124
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -643091305
+  i32.const 761367119
   i32.const 119
-  i32.const 45
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 2072550720
-  i32.const 129
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 2018177537
-  i32.const 124
-  i32.const 27
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 330375142
-  i32.const 134
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 1327366109
-  i32.const 129
-  i32.const 28
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -712129149
-  i32.const 134
-  i32.const 28
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -656398973
-  i32.const 138
-  i32.const 8
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1253562655
-  i32.const 99
-  i32.const 1
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 681772862
-  i32.const 144
-  i32.const 44
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -633143633
-  i32.const 143
-  i32.const 1
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 940072773
-  i32.const 150
-  i32.const 46
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 23420521
-  i32.const 149
-  i32.const 1
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 2072647452
-  i32.const 155
-  i32.const 42
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 117544356
-  i32.const 158
-  i32.const 28
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1338258579
-  i32.const 160
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1863486239
-  i32.const 160
   i32.const 33
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13312,8 +13376,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1472272085
-  i32.const 162
+  i32.const -1686362552
+  i32.const 121
   i32.const 8
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13327,128 +13391,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1722937629
-  i32.const 162
-  i32.const 33
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1606285591
-  i32.const 164
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1582389019
-  i32.const 164
-  i32.const 33
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1740299097
-  i32.const 166
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1441840409
-  i32.const 166
-  i32.const 33
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1874312603
-  i32.const 168
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1301291799
-  i32.const 168
-  i32.const 33
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 879499374
-  i32.const 170
-  i32.const 8
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 205589857
-  i32.const 170
+  i32.const -2026718521
+  i32.const 121
   i32.const 32
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13462,8 +13406,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 745485868
-  i32.const 172
+  i32.const -1820376058
+  i32.const 123
   i32.const 8
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13477,8 +13421,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1691917822
-  i32.const 172
+  i32.const 370741096
+  i32.const 123
   i32.const 33
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13492,8 +13436,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 611472362
-  i32.const 174
+  i32.const -1954389564
+  i32.const 125
   i32.const 8
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13507,8 +13451,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1551369212
-  i32.const 174
+  i32.const 511289706
+  i32.const 125
   i32.const 33
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13522,8 +13466,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1426435441
-  i32.const 154
+  i32.const -1098379543
+  i32.const 105
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -13537,8 +13481,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1306279902
-  i32.const 181
+  i32.const 1523108604
+  i32.const 132
   i32.const 41
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13552,8 +13496,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 338005220
-  i32.const 183
+  i32.const -1894303158
+  i32.const 134
   i32.const 31
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13567,8 +13511,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1532743734
-  i32.const 185
+  i32.const 196361636
+  i32.const 136
   i32.const 8
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13582,8 +13526,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1135117984
-  i32.const 185
+  i32.const -1097190394
+  i32.const 136
   i32.const 37
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13597,8 +13541,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1870148566
-  i32.const 180
+  i32.const -2096762832
+  i32.const 131
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -13612,8 +13556,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 788404072
-  i32.const 190
+  i32.const -677174718
+  i32.const 141
   i32.const 56
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13627,8 +13571,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -398876964
-  i32.const 192
+  i32.const 1663781954
+  i32.const 143
   i32.const 26
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13642,8 +13586,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1277116321
-  i32.const 196
+  i32.const -188462469
+  i32.const 147
   i32.const 55
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13657,8 +13601,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1119179113
-  i32.const 199
+  i32.const -1784852508
+  i32.const 150
   i32.const 86
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13672,8 +13616,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1729990036
-  i32.const 199
+  i32.const -1560657071
+  i32.const 150
   i32.const 102
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13687,8 +13631,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -704080273
-  i32.const 199
+  i32.const -534747308
+  i32.const 150
   i32.const 110
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13702,8 +13646,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -160593375
-  i32.const 200
+  i32.const -1769574042
+  i32.const 151
   i32.const 26
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13717,8 +13661,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1454073415
-  i32.const 202
+  i32.const -2042034740
+  i32.const 153
   i32.const 115
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13732,8 +13676,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 975008725
-  i32.const 204
+  i32.const -633971942
+  i32.const 155
   i32.const 40
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13747,8 +13691,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1180054249
-  i32.const 190
+  i32.const -851998351
+  i32.const 141
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -13762,8 +13706,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1460312802
-  i32.const 213
+  i32.const 1225673827
+  i32.const 164
   i32.const 58
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13777,8 +13721,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1622082136
-  i32.const 215
+  i32.const -210839165
+  i32.const 166
   i32.const 26
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13792,8 +13736,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1025571574
-  i32.const 218
+  i32.const -583409093
+  i32.const 169
   i32.const 55
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13807,8 +13751,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 262108451
-  i32.const 220
+  i32.const -1346872216
+  i32.const 171
   i32.const 26
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13822,8 +13766,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1378826332
-  i32.const 221
+  i32.const 1307160297
+  i32.const 172
   i32.const 39
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13837,8 +13781,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -14240869
-  i32.const 227
+  i32.const -1623221536
+  i32.const 178
   i32.const 14
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13852,8 +13796,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -139476533
-  i32.const 213
+  i32.const -181670960
+  i32.const 164
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -13867,8 +13811,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 503787928
-  i32.const 237
+  i32.const -1105192739
+  i32.const 188
   i32.const 54
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13882,8 +13826,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1278945302
-  i32.const 239
+  i32.const -539425574
+  i32.const 190
   i32.const 26
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13897,8 +13841,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -712420997
-  i32.const 243
+  i32.const 1973565632
+  i32.const 194
   i32.const 41
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13912,8 +13856,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1003073504
-  i32.const 245
+  i32.const 1682913125
+  i32.const 196
   i32.const 37
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13927,8 +13871,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1507205431
-  i32.const 237
+  i32.const -1549399858
+  i32.const 188
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -13942,8 +13886,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 744038430
-  i32.const 256
+  i32.const -721540360
+  i32.const 207
   i32.const 46
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13957,8 +13901,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1572199613
-  i32.const 260
+  i32.const 490459305
+  i32.const 211
   i32.const 10
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -13972,8 +13916,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 396466390
-  i32.const 258
+  i32.const -1069112400
+  i32.const 209
   i32.const 40
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -13987,8 +13931,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1257454594
-  i32.const 260
+  i32.const 805204324
+  i32.const 211
   i32.const 48
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -14002,8 +13946,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -109878309
-  i32.const 260
+  i32.const -1575457099
+  i32.const 211
   i32.const 80
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14017,8 +13961,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1757012416
-  i32.const 262
+  i32.const 291433626
+  i32.const 213
   i32.const 10
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14032,8 +13976,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 763468813
-  i32.const 255
+  i32.const 1091524711
+  i32.const 206
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -14047,8 +13991,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 311526913
-  i32.const 267
+  i32.const -1154051877
+  i32.const 218
   i32.const 49
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14062,8 +14006,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -2067879284
-  i32.const 267
+  i32.const -1739823386
+  i32.const 218
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -14077,8 +14021,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1622513479
-  i32.const 271
+  i32.const 156934689
+  i32.const 222
   i32.const 48
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14092,8 +14036,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1479678957
-  i32.const 271
+  i32.const -1151623059
+  i32.const 222
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -14107,9 +14051,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1522977600
-  i32.const 276
-  i32.const 57
+  i32.const 200137465
+  i32.const 236
+  i32.const 32
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14122,8 +14066,203 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -954658431
-  i32.const 278
+  i32.const 197110044
+  i32.const 237
+  i32.const 14
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 732771291
+  i32.const 239
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -80251292
+  i32.const 241
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -897899742
+  i32.const 243
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1715548192
+  i32.const 245
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1761770654
+  i32.const 247
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 944122204
+  i32.const 249
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 131099621
+  i32.const 251
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -686548829
+  i32.const 253
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1504197279
+  i32.const 255
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1973121567
+  i32.const 257
+  i32.const 15
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1726060149
+  i32.const 235
+  i32.const 1
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1776065214
+  i32.const 263
+  i32.const 64
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 60463331
+  i32.const 265
   i32.const 16
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14137,8 +14276,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -431622392
-  i32.const 278
+  i32.const 1474018534
+  i32.const 265
   i32.const 67
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -14152,8 +14291,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1401342416
-  i32.const 278
+  i32.const -987983954
+  i32.const 265
   i32.const 81
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -14167,8 +14306,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1228992346
-  i32.const 281
+  i32.const -218496451
+  i32.const 268
   i32.const 35
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14182,8 +14321,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -43830786
-  i32.const 285
+  i32.const 562466751
+  i32.const 273
   i32.const 20
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14197,8 +14336,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 2124258475
-  i32.const 285
+  i32.const 1952690058
+  i32.const 273
   i32.const 71
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -14212,8 +14351,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -488234904
-  i32.const 285
+  i32.const -659803321
+  i32.const 273
   i32.const 85
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -14227,8 +14366,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -861479236
-  i32.const 287
+  i32.const -255181699
+  i32.const 275
   i32.const 20
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14242,8 +14381,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -327975195
-  i32.const 310
+  i32.const 265239052
+  i32.const 328
   i32.const 14
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -14257,8 +14396,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1570806243
-  i32.const 290
+  i32.const 1763653688
+  i32.const 279
   i32.const 41
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14272,8 +14411,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 2103440069
-  i32.const 293
+  i32.const 1483264931
+  i32.const 284
   i32.const 24
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14287,8 +14426,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1589442082
-  i32.const 296
+  i32.const 969266944
+  i32.const 287
   i32.const 46
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14302,38 +14441,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1096217858
-  i32.const 301
-  i32.const 18
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -779120245
-  i32.const 302
-  i32.const 44
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 1339921367
-  i32.const 303
+  i32.const 1802817027
+  i32.const 291
   i32.const 20
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14347,9 +14456,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -669794330
-  i32.const 310
-  i32.const 46
+  i32.const 1014209726
+  i32.const 292
+  i32.const 47
   i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14362,24 +14471,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1889782758
-  i32.const 311
-  i32.const 14
-  i32.const 2
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 319161722
-  i32.const 313
-  i32.const 33
+  i32.const 985168577
+  i32.const 293
+  i32.const 20
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14392,8 +14486,53 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 631477489
-  i32.const 316
+  i32.const -610301762
+  i32.const 300
+  i32.const 24
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 776568299
+  i32.const 300
+  i32.const 75
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1835925080
+  i32.const 300
+  i32.const 89
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1830719595
+  i32.const 301
   i32.const 60
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14407,9 +14546,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -1897146977
-  i32.const 320
-  i32.const 12
+  i32.const 869844957
+  i32.const 303
+  i32.const 26
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14422,9 +14561,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -94164276
-  i32.const 326
-  i32.const 12
+  i32.const -941237716
+  i32.const 303
+  i32.const 77
   i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14437,9 +14576,24 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -2101439659
-  i32.const 322
-  i32.const 92
+  i32.const 891727092
+  i32.const 303
+  i32.const 91
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1583100393
+  i32.const 309
+  i32.const 26
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14452,10 +14606,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1214941486
-  i32.const 276
-  i32.const 1
-  i32.const 0
+  i32.const -519591886
+  i32.const 309
+  i32.const 77
+  i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
   local.set $0
@@ -14467,10 +14621,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1863162461
-  i32.const 332
-  i32.const 55
-  i32.const 1
+  i32.const 1313372922
+  i32.const 309
+  i32.const 91
+  i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
   local.set $0
@@ -14482,10 +14636,10 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1683321599
-  i32.const 335
-  i32.const 16
-  i32.const 1
+  i32.const 531380071
+  i32.const 316
+  i32.const 18
+  i32.const 2
   call $~lib/index/__coverDeclare
   i32.const 128
   local.set $0
@@ -14497,38 +14651,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 224838140
-  i32.const 337
-  i32.const 37
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 997136038
-  i32.const 340
-  i32.const 17
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 128
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const -1632205794
-  i32.const 343
+  i32.const -1857434308
+  i32.const 312
   i32.const 45
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14542,9 +14666,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const -322817674
-  i32.const 346
-  i32.const 62
+  i32.const 1628549842
+  i32.const 316
+  i32.const 50
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14557,9 +14681,9 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1443525156
-  i32.const 350
-  i32.const 14
+  i32.const 1880794911
+  i32.const 324
+  i32.const 16
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 128
@@ -14572,8 +14696,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 217749863
-  i32.const 356
+  i32.const -125386971
+  i32.const 332
   i32.const 14
   i32.const 2
   call $~lib/index/__coverDeclare
@@ -14587,8 +14711,698 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 1239232474
-  i32.const 352
+  i32.const 1549248248
+  i32.const 328
+  i32.const 46
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 155710249
+  i32.const 336
+  i32.const 14
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -81422785
+  i32.const 332
+  i32.const 46
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -2115280160
+  i32.const 340
+  i32.const 33
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 958852344
+  i32.const 346
+  i32.const 20
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 853678582
+  i32.const 348
+  i32.const 42
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -191771744
+  i32.const 354
+  i32.const 14
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -650155429
+  i32.const 355
+  i32.const 43
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 66528167
+  i32.const 360
+  i32.const 16
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 381454396
+  i32.const 367
+  i32.const 12
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1364544313
+  i32.const 374
+  i32.const 9
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1717864072
+  i32.const 369
+  i32.const 54
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1655879458
+  i32.const 374
+  i32.const 58
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 664444988
+  i32.const 377
+  i32.const 55
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1037865724
+  i32.const 381
+  i32.const 12
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -2081887075
+  i32.const 385
+  i32.const 20
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1209094804
+  i32.const 385
+  i32.const 71
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 473379113
+  i32.const 385
+  i32.const 85
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1657037473
+  i32.const 386
+  i32.const 56
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -235239262
+  i32.const 391
+  i32.const 20
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -799213668
+  i32.const 399
+  i32.const 22
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -678123059
+  i32.const 399
+  i32.const 73
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1004350858
+  i32.const 399
+  i32.const 87
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1024264845
+  i32.const 406
+  i32.const 14
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 2011511893
+  i32.const 402
+  i32.const 40
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1303021911
+  i32.const 413
+  i32.const 14
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1447171114
+  i32.const 406
+  i32.const 45
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1172786613
+  i32.const 418
+  i32.const 12
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1397797401
+  i32.const 453
+  i32.const 12
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 973119798
+  i32.const 420
+  i32.const 92
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 387065173
+  i32.const 428
+  i32.const 22
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1414485092
+  i32.const 434
+  i32.const 18
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1636799554
+  i32.const 431
+  i32.const 27
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 717004763
+  i32.const 434
+  i32.const 67
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1760631268
+  i32.const 436
+  i32.const 26
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 2134177107
+  i32.const 439
+  i32.const 31
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1032254947
+  i32.const 442
+  i32.const 22
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1789378576
+  i32.const 263
+  i32.const 1
+  i32.const 0
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1681005719
+  i32.const 459
+  i32.const 55
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1505790724
+  i32.const 462
+  i32.const 16
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 47307265
+  i32.const 464
+  i32.const 37
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 814979296
+  i32.const 467
+  i32.const 17
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1809736669
+  i32.const 470
+  i32.const 45
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -500348549
+  i32.const 473
+  i32.const 62
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1261368414
+  i32.const 477
+  i32.const 14
+  i32.const 1
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const -1085883262
+  i32.const 483
+  i32.const 14
+  i32.const 2
+  call $~lib/index/__coverDeclare
+  i32.const 128
+  local.set $0
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  i32.const 1057075732
+  i32.const 479
   i32.const 94
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -14602,8 +15416,8 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 26134669
-  i32.const 332
+  i32.const 1067164743
+  i32.const 459
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -14642,19 +15456,19 @@
   call $~onstore
   i64.const 0
   i64.store offset=16
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const 1314084077
+  i32.const 92237269
   call $~lib/index/__cover
   local.get $0
   local.set $1
-  i32.const 346784198
+  i32.const 1796640160
   call $~lib/index/__cover
-  i32.const 2002181145
+  i32.const -248665026
   call $~lib/index/__cover
   i32.const 880
   local.set $2
@@ -18544,19 +19358,19 @@
   call $~onstore
   i32.const 0
   i32.store offset=8
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const -204317863
+  i32.const 608704720
   call $~lib/index/__cover
   local.get $0
   local.set $2
-  i32.const -633143633
+  i32.const 346784198
   call $~lib/index/__cover
-  i32.const 681772862
+  i32.const 883909653
   call $~lib/index/__cover
   local.get $2
   i32.const 1
@@ -18758,23 +19572,23 @@
   call $~onstore
   i32.const 0
   i32.store
-  i32.const 527519037
+  i32.const 308664319
   call $~lib/index/__cover
-  i32.const 376693936
+  i32.const 1194342386
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const 56570832
+  i32.const -83977778
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const -839514989
+  i32.const -21866539
   call $~lib/index/__cover
   local.get $0
   local.set $2
-  i32.const 23420521
+  i32.const 501967310
   call $~lib/index/__cover
-  i32.const 940072773
+  i32.const -525506017
   call $~lib/index/__cover
   local.get $2
   i32.const 0
@@ -20795,1447 +21609,6 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $assembly/index/serializeVariant (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 32
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=16
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=24
-  i32.const -1253562655
-  call $~lib/index/__cover
-  i32.const 1428236204
-  call $~lib/index/__cover
-  local.get $0
-  local.set $1
-  local.get $1
-  i32.load
-  block $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.1 (result i32)
-   i32.const 1
-   drop
-   i32.const 12
-   i32.const 1
-   i32.add
-   br $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.1
-  end
-  i32.eq
-  if
-   i32.const 1468638689
-   call $~lib/index/__cover
-   global.get $~lib/memory/__stack_pointer
-   i32.const 4
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $0
-   local.set $1
-   local.get $1
-   local.set $2
-   local.get $2
-   i32.load
-   block $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.2 (result i32)
-    i32.const 1
-    drop
-    i32.const 12
-    i32.const 1
-    i32.add
-    br $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.2
-   end
-   i32.eq
-   i32.eqz
-   if
-    i32.const 7584
-    i32.const 7632
-    i32.const 54
-    i32.const 24
-    call $~lib/builtins/abort
-    unreachable
-   end
-   global.get $~lib/memory/__stack_pointer
-   i32.const 0
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $1
-   i32.load offset=8
-   local.tee $2
-   i32.store
-   i32.const 0
-   i32.eqz
-   drop
-   local.get $2
-   call $~lib/string/String.__not
-   if
-    i32.const 3024
-    i32.const 7632
-    i32.const 57
-    i32.const 19
-    call $~lib/builtins/abort
-    unreachable
-   end
-   local.get $2
-   local.tee $1
-   i32.store offset=4
-   i32.const 346784198
-   call $~lib/index/__cover
-   i32.const 2002181145
-   call $~lib/index/__cover
-   i32.const 880
-   local.set $4
-   global.get $~lib/memory/__stack_pointer
-   i32.const 16
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $4
-   i32.store offset=16
-   local.get $4
-   local.get $1
-   i32.const 880
-   local.set $4
-   global.get $~lib/memory/__stack_pointer
-   i32.const 24
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $4
-   i32.store offset=24
-   local.get $4
-   i32.const 912
-   local.set $4
-   global.get $~lib/memory/__stack_pointer
-   i32.const 28
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $4
-   i32.store offset=28
-   local.get $4
-   call $~lib/string/String#replaceAll
-   local.set $4
-   global.get $~lib/memory/__stack_pointer
-   i32.const 20
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $4
-   i32.store offset=20
-   local.get $4
-   call $~lib/string/String.__concat
-   local.set $4
-   global.get $~lib/memory/__stack_pointer
-   i32.const 8
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $4
-   i32.store offset=8
-   local.get $4
-   i32.const 880
-   local.set $4
-   global.get $~lib/memory/__stack_pointer
-   i32.const 12
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $4
-   i32.store offset=12
-   local.get $4
-   call $~lib/string/String.__concat
-   local.set $4
-   global.get $~lib/memory/__stack_pointer
-   i32.const 32
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $4
-   return
-  else
-   i32.const 2066015616
-   call $~lib/index/__cover
-   local.get $0
-   local.set $2
-   local.get $2
-   i32.load
-   block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.0 (result i32)
-    i32.const 0
-    drop
-    i32.const 0
-    drop
-    i32.const 1
-    drop
-    i32.const 0
-    br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.0
-   end
-   i32.eq
-   if
-    i32.const 1195316790
-    call $~lib/index/__cover
-    local.get $0
-    local.set $1
-    local.get $1
-    local.set $2
-    local.get $2
-    i32.load
-    block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.1 (result i32)
-     i32.const 0
-     drop
-     i32.const 0
-     drop
-     i32.const 1
-     drop
-     i32.const 0
-     br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.1
-    end
-    i32.eq
-    i32.eqz
-    if
-     i32.const 7584
-     i32.const 7632
-     i32.const 54
-     i32.const 24
-     call $~lib/builtins/abort
-     unreachable
-    end
-    local.get $1
-    i32.load8_u offset=8
-    local.set $2
-    i32.const 0
-    drop
-    local.get $2
-    if (result i32)
-     i32.const -1307708977
-     call $~lib/index/__cover
-     i32.const 2688
-    else
-     i32.const 1975111793
-     call $~lib/index/__cover
-     i32.const 2720
-    end
-    local.set $4
-    global.get $~lib/memory/__stack_pointer
-    i32.const 32
-    i32.add
-    global.set $~lib/memory/__stack_pointer
-    local.get $4
-    return
-   else
-    i32.const 256833285
-    call $~lib/index/__cover
-    local.get $0
-    local.set $3
-    local.get $3
-    i32.load
-    block $~lib/as-variant/index/DISCRIMINATOR<~lib/as-variant/index/Variant>|inlined.0 (result i32)
-     i32.const 1
-     drop
-     i32.const 12
-     i32.const 3
-     i32.add
-     br $~lib/as-variant/index/DISCRIMINATOR<~lib/as-variant/index/Variant>|inlined.0
-    end
-    i32.eq
-    if
-     i32.const -1253002693
-     call $~lib/index/__cover
-     local.get $0
-     local.set $1
-     local.get $1
-     local.set $2
-     local.get $2
-     i32.load
-     block $~lib/as-variant/index/DISCRIMINATOR<~lib/as-variant/index/Variant>|inlined.1 (result i32)
-      i32.const 1
-      drop
-      i32.const 12
-      i32.const 3
-      i32.add
-      br $~lib/as-variant/index/DISCRIMINATOR<~lib/as-variant/index/Variant>|inlined.1
-     end
-     i32.eq
-     i32.eqz
-     if
-      i32.const 7584
-      i32.const 7632
-      i32.const 54
-      i32.const 24
-      call $~lib/builtins/abort
-      unreachable
-     end
-     global.get $~lib/memory/__stack_pointer
-     i32.const 0
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     local.get $1
-     i32.load offset=8
-     local.tee $2
-     i32.store
-     i32.const 0
-     i32.eqz
-     drop
-     local.get $2
-     i32.eqz
-     if
-      i32.const 3024
-      i32.const 7632
-      i32.const 57
-      i32.const 19
-      call $~lib/builtins/abort
-      unreachable
-     end
-     local.get $2
-     local.set $4
-     global.get $~lib/memory/__stack_pointer
-     i32.const 8
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     local.get $4
-     i32.store offset=8
-     local.get $4
-     call $assembly/index/serializeVariant
-     local.set $4
-     global.get $~lib/memory/__stack_pointer
-     i32.const 32
-     i32.add
-     global.set $~lib/memory/__stack_pointer
-     local.get $4
-     return
-    else
-     i32.const -145207233
-     call $~lib/index/__cover
-     local.get $0
-     local.set $3
-     local.get $3
-     i32.load offset=8
-     i32.const 0
-     i32.eq
-     if
-      i32.const -643091305
-      call $~lib/index/__cover
-      i32.const 2992
-      local.set $4
-      global.get $~lib/memory/__stack_pointer
-      i32.const 32
-      i32.add
-      global.set $~lib/memory/__stack_pointer
-      local.get $4
-      return
-     else
-      i32.const -1887382811
-      call $~lib/index/__cover
-      local.get $0
-      local.set $1
-      local.get $1
-      i32.load
-      block $~lib/as-variant/index/DISCRIMINATOR<i8>|inlined.0 (result i32)
-       i32.const 0
-       drop
-       i32.const 0
-       drop
-       i32.const 0
-       drop
-       i32.const 1
-       drop
-       i32.const 1
-       br $~lib/as-variant/index/DISCRIMINATOR<i8>|inlined.0
-      end
-      i32.eq
-      if
-       i32.const 2018177537
-       call $~lib/index/__cover
-       local.get $0
-       local.set $2
-       local.get $2
-       local.set $3
-       local.get $3
-       i32.load
-       block $~lib/as-variant/index/DISCRIMINATOR<i8>|inlined.1 (result i32)
-        i32.const 0
-        drop
-        i32.const 0
-        drop
-        i32.const 0
-        drop
-        i32.const 1
-        drop
-        i32.const 1
-        br $~lib/as-variant/index/DISCRIMINATOR<i8>|inlined.1
-       end
-       i32.eq
-       i32.eqz
-       if
-        i32.const 7584
-        i32.const 7632
-        i32.const 54
-        i32.const 24
-        call $~lib/builtins/abort
-        unreachable
-       end
-       local.get $2
-       i32.load8_s offset=8
-       local.set $3
-       i32.const 0
-       drop
-       local.get $3
-       i32.const 10
-       call $~lib/number/I8#toString
-       local.set $4
-       global.get $~lib/memory/__stack_pointer
-       i32.const 32
-       i32.add
-       global.set $~lib/memory/__stack_pointer
-       local.get $4
-       return
-      else
-       i32.const 2072550720
-       call $~lib/index/__cover
-       local.get $0
-       local.set $1
-       local.get $1
-       i32.load
-       block $~lib/as-variant/index/DISCRIMINATOR<i16>|inlined.0 (result i32)
-        i32.const 0
-        drop
-        i32.const 0
-        drop
-        i32.const 0
-        drop
-        i32.const 0
-        drop
-        i32.const 1
-        drop
-        i32.const 2
-        br $~lib/as-variant/index/DISCRIMINATOR<i16>|inlined.0
-       end
-       i32.eq
-       if
-        i32.const 1327366109
-        call $~lib/index/__cover
-        local.get $0
-        local.set $2
-        local.get $2
-        local.set $3
-        local.get $3
-        i32.load
-        block $~lib/as-variant/index/DISCRIMINATOR<i16>|inlined.1 (result i32)
-         i32.const 0
-         drop
-         i32.const 0
-         drop
-         i32.const 0
-         drop
-         i32.const 0
-         drop
-         i32.const 1
-         drop
-         i32.const 2
-         br $~lib/as-variant/index/DISCRIMINATOR<i16>|inlined.1
-        end
-        i32.eq
-        i32.eqz
-        if
-         i32.const 7584
-         i32.const 7632
-         i32.const 54
-         i32.const 24
-         call $~lib/builtins/abort
-         unreachable
-        end
-        local.get $2
-        i32.load16_s offset=8
-        local.set $3
-        i32.const 0
-        drop
-        local.get $3
-        i32.const 10
-        call $~lib/number/I16#toString
-        local.set $4
-        global.get $~lib/memory/__stack_pointer
-        i32.const 32
-        i32.add
-        global.set $~lib/memory/__stack_pointer
-        local.get $4
-        return
-       else
-        i32.const 330375142
-        call $~lib/index/__cover
-        local.get $0
-        local.set $1
-        local.get $1
-        i32.load
-        block $~lib/as-variant/index/DISCRIMINATOR<i32>|inlined.0 (result i32)
-         i32.const 0
-         drop
-         i32.const 0
-         drop
-         i32.const 0
-         drop
-         i32.const 0
-         drop
-         i32.const 0
-         drop
-         i32.const 1
-         drop
-         i32.const 3
-         br $~lib/as-variant/index/DISCRIMINATOR<i32>|inlined.0
-        end
-        i32.eq
-        if
-         i32.const -712129149
-         call $~lib/index/__cover
-         local.get $0
-         local.set $2
-         local.get $2
-         local.set $3
-         local.get $3
-         i32.load
-         block $~lib/as-variant/index/DISCRIMINATOR<i32>|inlined.1 (result i32)
-          i32.const 0
-          drop
-          i32.const 0
-          drop
-          i32.const 0
-          drop
-          i32.const 0
-          drop
-          i32.const 0
-          drop
-          i32.const 1
-          drop
-          i32.const 3
-          br $~lib/as-variant/index/DISCRIMINATOR<i32>|inlined.1
-         end
-         i32.eq
-         i32.eqz
-         if
-          i32.const 7584
-          i32.const 7632
-          i32.const 54
-          i32.const 24
-          call $~lib/builtins/abort
-          unreachable
-         end
-         local.get $2
-         i32.load offset=8
-         local.set $3
-         i32.const 0
-         drop
-         local.get $3
-         i32.const 10
-         call $~lib/number/I32#toString
-         local.set $4
-         global.get $~lib/memory/__stack_pointer
-         i32.const 32
-         i32.add
-         global.set $~lib/memory/__stack_pointer
-         local.get $4
-         return
-        else
-         i32.const -656398973
-         call $~lib/index/__cover
-         i32.const 7712
-         local.set $4
-         global.get $~lib/memory/__stack_pointer
-         i32.const 32
-         i32.add
-         global.set $~lib/memory/__stack_pointer
-         local.get $4
-         return
-        end
-        unreachable
-       end
-       unreachable
-      end
-      unreachable
-     end
-     unreachable
-    end
-    unreachable
-   end
-   unreachable
-  end
-  unreachable
- )
- (func $assembly/index/JSON.parse<~lib/as-variant/index/Variant> (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $7 i32)
-  (local $8 i32)
-  (local $9 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=16
-  i32.const 527519037
-  call $~lib/index/__cover
-  i32.const 376693936
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 56570832
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -1880089901
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -193506581
-  call $~lib/index/__cover
-  i32.const 1
-  drop
-  i32.const -1343249226
-  call $~lib/index/__cover
-  block $assembly/index/parseVariant|inlined.0 (result i32)
-   local.get $0
-   local.set $2
-   i32.const 763468813
-   call $~lib/index/__cover
-   i32.const 744038430
-   call $~lib/index/__cover
-   local.get $2
-   i32.const 0
-   call $~lib/string/String#charCodeAt
-   local.set $3
-   local.get $3
-   i32.const 880
-   local.set $9
-   global.get $~lib/memory/__stack_pointer
-   i32.const 0
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $9
-   i32.store
-   local.get $9
-   i32.const 0
-   call $~lib/string/String#charCodeAt
-   i32.eq
-   if
-    i32.const 396466390
-    call $~lib/index/__cover
-    global.get $~lib/memory/__stack_pointer
-    i32.const 12
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $2
-    local.set $4
-    i32.const -633143633
-    call $~lib/index/__cover
-    i32.const 681772862
-    call $~lib/index/__cover
-    local.get $4
-    i32.const 1
-    local.get $4
-    call $~lib/string/String#get:length
-    i32.const 1
-    i32.sub
-    call $~lib/string/String#slice
-    local.set $9
-    global.get $~lib/memory/__stack_pointer
-    i32.const 0
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $9
-    i32.store
-    local.get $9
-    i32.const 912
-    local.set $9
-    global.get $~lib/memory/__stack_pointer
-    i32.const 4
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $9
-    i32.store offset=4
-    local.get $9
-    i32.const 880
-    local.set $9
-    global.get $~lib/memory/__stack_pointer
-    i32.const 8
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $9
-    i32.store offset=8
-    local.get $9
-    call $~lib/string/String#replaceAll
-    local.tee $4
-    i32.store offset=12
-    global.get $~lib/memory/__stack_pointer
-    i32.const 16
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    i32.const 16
-    i32.const 3
-    call $~lib/rt/itcms/__new
-    local.tee $5
-    i32.store offset=16
-    local.get $5
-    local.set $7
-    local.get $4
-    local.set $6
-    local.get $7
-    block $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.3 (result i32)
-     i32.const 1
-     drop
-     i32.const 12
-     i32.const 1
-     i32.add
-     br $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.3
-    end
-    call $~lib/as-variant/index/Variant#set:discriminator
-    local.get $7
-    i32.const 8
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $6
-    i32.store offset=8
-    local.get $5
-    br $assembly/index/parseVariant|inlined.0
-   else
-    i32.const -1572199613
-    call $~lib/index/__cover
-    local.get $3
-    i32.const 2752
-    local.set $9
-    global.get $~lib/memory/__stack_pointer
-    i32.const 0
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $9
-    i32.store
-    local.get $9
-    i32.const 0
-    call $~lib/string/String#charCodeAt
-    i32.eq
-    if (result i32)
-     i32.const 1
-    else
-     i32.const -1257454594
-     call $~lib/index/__cover
-     local.get $3
-     i32.const 7744
-     local.set $9
-     global.get $~lib/memory/__stack_pointer
-     i32.const 0
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     local.get $9
-     i32.store
-     local.get $9
-     i32.const 0
-     call $~lib/string/String#charCodeAt
-     i32.eq
-    end
-    if
-     i32.const -109878309
-     call $~lib/index/__cover
-     local.get $2
-     local.set $6
-     i32.const 23420521
-     call $~lib/index/__cover
-     i32.const 940072773
-     call $~lib/index/__cover
-     local.get $6
-     i32.const 0
-     call $~lib/string/String#charCodeAt
-     i32.const 2752
-     local.set $9
-     global.get $~lib/memory/__stack_pointer
-     i32.const 0
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     local.get $9
-     i32.store
-     local.get $9
-     i32.const 0
-     call $~lib/string/String#charCodeAt
-     i32.eq
-     local.set $7
-     global.get $~lib/memory/__stack_pointer
-     i32.const 20
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     i32.const 16
-     i32.const 3
-     call $~lib/rt/itcms/__new
-     local.tee $6
-     i32.store offset=20
-     local.get $6
-     local.set $5
-     local.get $7
-     local.set $4
-     local.get $5
-     block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.2 (result i32)
-      i32.const 0
-      drop
-      i32.const 0
-      drop
-      i32.const 1
-      drop
-      i32.const 0
-      br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.2
-     end
-     call $~lib/as-variant/index/Variant#set:discriminator
-     local.get $5
-     i32.const 8
-     i32.const 1
-     i32.const 0
-     call $~onstore
-     local.get $4
-     i32.store8 offset=8
-     local.get $6
-     br $assembly/index/parseVariant|inlined.0
-    else
-     i32.const 1757012416
-     call $~lib/index/__cover
-     i32.const 7776
-     i32.const 128
-     i32.const 263
-     i32.const 5
-     call $~lib/builtins/abort
-     unreachable
-    end
-    unreachable
-   end
-   unreachable
-  end
-  local.set $9
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $9
-  return
- )
- (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|4
-  (local $0 i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 40
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=16
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=24
-  global.get $~lib/memory/__stack_pointer
-  i32.const 32
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=32
-  i32.const -914952590
-  call $~lib/index/__cover
-  i32.const 1992102969
-  call $~lib/index/__cover
-  global.get $~lib/memory/__stack_pointer
-  i32.const 20
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 832
-  local.tee $0
-  i32.store offset=20
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 16
-  i32.const 3
-  call $~lib/rt/itcms/__new
-  local.tee $1
-  i32.store offset=24
-  local.get $1
-  local.set $3
-  local.get $0
-  local.set $2
-  local.get $3
-  block $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.0 (result i32)
-   i32.const 1
-   drop
-   i32.const 12
-   i32.const 1
-   i32.add
-   br $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.0
-  end
-  call $~lib/as-variant/index/Variant#set:discriminator
-  local.get $3
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $2
-  i32.store offset=8
-  local.get $1
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=16
-  local.get $5
-  call $assembly/index/JSON.stringify<~lib/as-variant/index/Variant>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=12
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/string/String>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  i32.const 1968
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 4
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  i32.const 944
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
-  global.get $~lib/memory/__stack_pointer
-  i32.const 28
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 1968
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=16
-  local.get $5
-  call $assembly/index/JSON.parse<~lib/as-variant/index/Variant>
-  local.tee $2
-  i32.store offset=28
-  local.get $2
-  local.set $3
-  local.get $3
-  i32.load
-  block $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.4 (result i32)
-   i32.const 1
-   drop
-   i32.const 12
-   i32.const 1
-   i32.add
-   br $~lib/as-variant/index/DISCRIMINATOR<~lib/string/String>|inlined.4
-  end
-  i32.eq
-  i32.eqz
-  if
-   i32.const 7584
-   i32.const 7632
-   i32.const 54
-   i32.const 24
-   call $~lib/builtins/abort
-   unreachable
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 32
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $2
-  i32.load offset=8
-  local.tee $3
-  i32.store offset=32
-  i32.const 0
-  i32.eqz
-  drop
-  local.get $3
-  call $~lib/string/String.__not
-  if
-   i32.const 3024
-   i32.const 7632
-   i32.const 57
-   i32.const 19
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $3
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=12
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/string/String>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  i32.const 832
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 4
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  i32.const 944
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
-  i32.const 1
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 32
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 16
-  i32.const 3
-  call $~lib/rt/itcms/__new
-  local.tee $3
-  i32.store offset=32
-  local.get $3
-  local.set $2
-  local.get $0
-  local.set $1
-  local.get $2
-  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.3 (result i32)
-   i32.const 0
-   drop
-   i32.const 0
-   drop
-   i32.const 1
-   drop
-   i32.const 0
-   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.3
-  end
-  call $~lib/as-variant/index/Variant#set:discriminator
-  local.get $2
-  i32.const 8
-  i32.const 1
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store8 offset=8
-  local.get $3
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=16
-  local.get $5
-  call $assembly/index/JSON.stringify<~lib/as-variant/index/Variant>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=12
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/string/String>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  i32.const 2688
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 4
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  i32.const 944
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
-  global.get $~lib/memory/__stack_pointer
-  i32.const 36
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 2688
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $assembly/index/JSON.parse<~lib/as-variant/index/Variant>
-  local.tee $4
-  i32.store offset=36
-  local.get $4
-  local.set $1
-  local.get $1
-  i32.load
-  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.4 (result i32)
-   i32.const 0
-   drop
-   i32.const 0
-   drop
-   i32.const 1
-   drop
-   i32.const 0
-   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.4
-  end
-  i32.eq
-  i32.eqz
-  if
-   i32.const 7584
-   i32.const 7632
-   i32.const 54
-   i32.const 24
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $4
-  i32.load8_u offset=8
-  local.set $1
-  i32.const 0
-  drop
-  local.get $1
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<bool>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  i32.const 1
-  i32.const 944
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool>#toStrictEqual
-  i32.const 0
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 16
-  i32.const 3
-  call $~lib/rt/itcms/__new
-  local.tee $1
-  i32.store offset=24
-  local.get $1
-  local.set $3
-  local.get $2
-  local.set $0
-  local.get $3
-  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.5 (result i32)
-   i32.const 0
-   drop
-   i32.const 0
-   drop
-   i32.const 1
-   drop
-   i32.const 0
-   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.5
-  end
-  call $~lib/as-variant/index/Variant#set:discriminator
-  local.get $3
-  i32.const 8
-  i32.const 1
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store8 offset=8
-  local.get $1
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=16
-  local.get $5
-  call $assembly/index/JSON.stringify<~lib/as-variant/index/Variant>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=12
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/string/String>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  i32.const 2720
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 4
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  i32.const 944
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
-  global.get $~lib/memory/__stack_pointer
-  i32.const 36
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 2720
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $assembly/index/JSON.parse<~lib/as-variant/index/Variant>
-  local.tee $4
-  i32.store offset=36
-  local.get $4
-  local.set $0
-  local.get $0
-  i32.load
-  block $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.6 (result i32)
-   i32.const 0
-   drop
-   i32.const 0
-   drop
-   i32.const 1
-   drop
-   i32.const 0
-   br $~lib/as-variant/index/DISCRIMINATOR<bool>|inlined.6
-  end
-  i32.eq
-  i32.eqz
-  if
-   i32.const 7584
-   i32.const 7632
-   i32.const 54
-   i32.const 24
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $4
-  i32.load8_u offset=8
-  local.set $0
-  i32.const 0
-  drop
-  local.get $0
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<bool>
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  i32.const 0
-  i32.const 944
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<bool>#toStrictEqual
-  global.get $~lib/memory/__stack_pointer
-  i32.const 40
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
  (func $assembly/index/JSON.stringify<~lib/array/Array<i32>> (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
@@ -22253,37 +21626,33 @@
   call $~onstore
   i64.const 0
   i64.store
-  i32.const -1620190790
+  i32.const 855574935
   call $~lib/index/__cover
-  i32.const 850062509
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -457931531
+  i32.const -376410166
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -176834311
+  i32.const 1900375032
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -567460334
+  i32.const -2113495044
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -145814504
+  i32.const 1790846229
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -395891917
+  i32.const -2082475237
   call $~lib/index/__cover
   i32.const 0
   drop
-  i32.const -114794697
+  i32.const -255343307
   call $~lib/index/__cover
   i32.const 1
   drop
-  i32.const -937906481
+  i32.const -120258031
   call $~lib/index/__cover
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -22291,7 +21660,7 @@
   i32.const 0
   call $~onstore
   i32.const 0
-  i32.const 8048
+  i32.const 7632
   local.set $4
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -22317,7 +21686,7 @@
    local.set $3
    local.get $3
    if
-    i32.const 1072263602
+    i32.const 1889912052
     call $~lib/index/__cover
     local.get $1
     local.get $0
@@ -22337,7 +21706,7 @@
     global.get $~lib/builtins/i32.MAX_VALUE
     call $~lib/as-string-sink/index/StringSink#write
     local.get $1
-    i32.const 8080
+    i32.const 7664
     local.set $4
     global.get $~lib/memory/__stack_pointer
     i32.const 0
@@ -22378,7 +21747,7 @@
   global.get $~lib/builtins/i32.MAX_VALUE
   call $~lib/as-string-sink/index/StringSink#write
   local.get $1
-  i32.const 8112
+  i32.const 7696
   local.set $4
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -22429,9 +21798,9 @@
   call $~onstore
   i32.const 0
   i32.store offset=8
-  i32.const -1507205431
+  i32.const -1549399858
   call $~lib/index/__cover
-  i32.const 503787928
+  i32.const -1105192739
   call $~lib/index/__cover
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -22448,7 +21817,7 @@
   i32.const 2
   i32.eq
   if
-   i32.const -1278945302
+   i32.const -539425574
    call $~lib/index/__cover
    local.get $1
    local.set $8
@@ -22475,14 +21844,14 @@
    local.set $5
    local.get $5
    if
-    i32.const -712420997
+    i32.const 1973565632
     call $~lib/index/__cover
     local.get $0
     local.get $4
     call $~lib/string/String#charCodeAt
     local.set $3
     local.get $3
-    i32.const 8080
+    i32.const 7664
     local.set $8
     global.get $~lib/memory/__stack_pointer
     i32.const 4
@@ -22496,7 +21865,7 @@
     call $~lib/string/String#charCodeAt
     i32.eq
     if
-     i32.const -1003073504
+     i32.const 1682913125
      call $~lib/index/__cover
      local.get $1
      block $assembly/index/parseNumber<i32>|inlined.1 (result i32)
@@ -22513,21 +21882,21 @@
       call $~lib/string/String#slice
       local.tee $6
       i32.store offset=8
-      i32.const -1426435441
+      i32.const -1098379543
       call $~lib/index/__cover
-      i32.const 2072647452
-      call $~lib/index/__cover
-      i32.const 0
-      drop
-      i32.const -1338258579
+      i32.const 607068662
       call $~lib/index/__cover
       i32.const 0
       drop
-      i32.const -1472272085
+      i32.const 390846791
+      call $~lib/index/__cover
+      i32.const 0
+      drop
+      i32.const 256833285
       call $~lib/index/__cover
       i32.const 1
       drop
-      i32.const -1722937629
+      i32.const 339721289
       call $~lib/index/__cover
       local.get $6
       i32.const 0
@@ -22561,21 +21930,21 @@
    call $~lib/string/String#slice
    local.tee $6
    i32.store offset=8
-   i32.const -1426435441
+   i32.const -1098379543
    call $~lib/index/__cover
-   i32.const 2072647452
-   call $~lib/index/__cover
-   i32.const 0
-   drop
-   i32.const -1338258579
+   i32.const 607068662
    call $~lib/index/__cover
    i32.const 0
    drop
-   i32.const -1472272085
+   i32.const 390846791
+   call $~lib/index/__cover
+   i32.const 0
+   drop
+   i32.const 256833285
    call $~lib/index/__cover
    i32.const 1
    drop
-   i32.const -1722937629
+   i32.const 339721289
    call $~lib/index/__cover
    local.get $6
    i32.const 0
@@ -22873,7 +22242,7 @@
    i32.const 8
    i32.const -1371405759
    call $~lib/index/__cover
-   i32.const 8304
+   i32.const 7888
    local.set $8
    global.get $~lib/memory/__stack_pointer
    i32.const 0
@@ -22961,7 +22330,7 @@
   i32.const 517897114
   call $~lib/index/__cover
   i32.const 8
-  i32.const 8304
+  i32.const 7888
   local.set $8
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -23091,7 +22460,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|5
+ (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|4
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -23121,14 +22490,14 @@
   call $~onstore
   i32.const 0
   i32.store offset=16
-  i32.const -881460241
+  i32.const 306894218
   call $~lib/index/__cover
-  i32.const -14453263
+  i32.const -2067826122
   call $~lib/index/__cover
   i32.const 5
   i32.const 2
   i32.const 8
-  i32.const 8000
+  i32.const 7584
   call $~lib/rt/__newArray
   local.set $2
   global.get $~lib/memory/__stack_pointer
@@ -23159,7 +22528,7 @@
   local.get $2
   i32.store
   local.get $2
-  i32.const 8144
+  i32.const 7728
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -23180,7 +22549,7 @@
   i32.store offset=8
   local.get $2
   call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
-  i32.const 8144
+  i32.const 7728
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 16
@@ -23213,7 +22582,7 @@
   i32.const 5
   i32.const 2
   i32.const 8
-  i32.const 8192
+  i32.const 7776
   call $~lib/rt/__newArray
   local.set $2
   global.get $~lib/memory/__stack_pointer
@@ -23274,7 +22643,7 @@
   i32.const 4
   i32.const 0
   call $~onstore
-  i32.const 8464
+  i32.const 8048
   local.tee $1
   i32.store
   global.get $~lib/memory/__stack_pointer
@@ -23283,7 +22652,7 @@
   i32.const 0
   call $~onstore
   local.get $1
-  i32.const 8496
+  i32.const 8080
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -23314,7 +22683,7 @@
   local.get $2
   i32.store offset=12
   local.get $2
-  i32.const 8080
+  i32.const 7664
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 16
@@ -23353,7 +22722,7 @@
   i32.const 0
   call $~onstore
   local.get $1
-  i32.const 8528
+  i32.const 8112
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -23409,7 +22778,7 @@
   local.tee $1
   i32.store
   local.get $1
-  i32.const 8560
+  i32.const 8144
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -23427,7 +22796,7 @@
   global.set $~lib/memory/__stack_pointer
   local.get $2
  )
- (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|6
+ (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|5
   (local $0 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 20
@@ -23455,9 +22824,9 @@
   call $~onstore
   i32.const 0
   i32.store offset=16
-  i32.const -1200815724
+  i32.const -1627476071
   call $~lib/index/__cover
-  i32.const -164977577
+  i32.const -1814152078
   call $~lib/index/__cover
   global.get $assembly/__tests__/json.spec/obj
   local.set $0
@@ -23489,7 +22858,7 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 8592
+  i32.const 8176
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -23515,831 +22884,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $assembly/index/parseStringArray (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $7 i32)
-  (local $8 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store offset=16
-  i32.const -1180054249
-  call $~lib/index/__cover
-  i32.const 788404072
-  call $~lib/index/__cover
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 0
-  i32.const 0
-  call $~lib/array/Array<~lib/string/String>#constructor
-  local.tee $1
-  i32.store
-  local.get $0
-  call $~lib/string/String#get:length
-  i32.const 2
-  i32.eq
-  if
-   i32.const -398876964
-   call $~lib/index/__cover
-   local.get $1
-   local.set $8
-   global.get $~lib/memory/__stack_pointer
-   i32.const 24
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $8
-   return
-  end
-  i32.const 1
-  local.set $2
-  i32.const 0
-  local.set $3
-  i32.const 0
-  local.set $4
-  i32.const 1
-  local.set $5
-  loop $for-loop|0
-   local.get $5
-   local.get $0
-   call $~lib/string/String#get:length
-   i32.const 1
-   i32.sub
-   i32.lt_u
-   local.set $6
-   local.get $6
-   if
-    i32.const 1277116321
-    call $~lib/index/__cover
-    local.get $0
-    local.get $5
-    call $~lib/string/String#charCodeAt
-    local.set $3
-    local.get $3
-    i32.const 880
-    local.set $8
-    global.get $~lib/memory/__stack_pointer
-    i32.const 4
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $8
-    i32.store offset=4
-    local.get $8
-    i32.const 0
-    call $~lib/string/String#charCodeAt
-    i32.eq
-    if (result i32)
-     local.get $0
-     local.get $5
-     i32.const 1
-     i32.sub
-     call $~lib/string/String#charCodeAt
-     i32.const 8880
-     local.set $8
-     global.get $~lib/memory/__stack_pointer
-     i32.const 4
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     local.get $8
-     i32.store offset=4
-     local.get $8
-     i32.const 0
-     call $~lib/string/String#charCodeAt
-     i32.ne
-    else
-     i32.const 0
-    end
-    if
-     i32.const 1119179113
-     call $~lib/index/__cover
-     local.get $4
-     if (result i32)
-      i32.const -1729990036
-      call $~lib/index/__cover
-      i32.const 0
-     else
-      i32.const -704080273
-      call $~lib/index/__cover
-      i32.const 1
-     end
-     local.set $4
-    end
-    local.get $4
-    i32.const 0
-    i32.eq
-    if
-     i32.const -160593375
-     call $~lib/index/__cover
-     local.get $3
-     i32.const 8912
-     local.set $8
-     global.get $~lib/memory/__stack_pointer
-     i32.const 4
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     local.get $8
-     i32.store offset=4
-     local.get $8
-     i32.const 0
-     call $~lib/string/String#charCodeAt
-     i32.eq
-     if (result i32)
-      i32.const 1
-     else
-      local.get $3
-      i32.const 32
-      i32.eq
-     end
-     if (result i32)
-      i32.const 1
-     else
-      local.get $3
-      i32.const 10
-      i32.eq
-     end
-     if (result i32)
-      i32.const 1
-     else
-      local.get $3
-      i32.const 13
-      i32.eq
-     end
-     if (result i32)
-      i32.const 1
-     else
-      local.get $3
-      i32.const 9
-      i32.eq
-     end
-     if
-      i32.const 1454073415
-      call $~lib/index/__cover
-      local.get $2
-      i32.const 1
-      i32.add
-      local.set $2
-     end
-     local.get $3
-     i32.const 880
-     local.set $8
-     global.get $~lib/memory/__stack_pointer
-     i32.const 4
-     i32.const 4
-     i32.const 0
-     call $~onstore
-     local.get $8
-     i32.store offset=4
-     local.get $8
-     i32.const 0
-     call $~lib/string/String#charCodeAt
-     i32.eq
-     if
-      i32.const 975008725
-      call $~lib/index/__cover
-      local.get $1
-      global.get $~lib/memory/__stack_pointer
-      i32.const 12
-      i32.const 4
-      i32.const 0
-      call $~onstore
-      local.get $0
-      local.get $2
-      local.get $5
-      i32.const 1
-      i32.add
-      call $~lib/string/String#slice
-      local.tee $7
-      i32.store offset=12
-      i32.const -633143633
-      call $~lib/index/__cover
-      i32.const 681772862
-      call $~lib/index/__cover
-      local.get $7
-      i32.const 1
-      local.get $7
-      call $~lib/string/String#get:length
-      i32.const 1
-      i32.sub
-      call $~lib/string/String#slice
-      local.set $8
-      global.get $~lib/memory/__stack_pointer
-      i32.const 8
-      i32.const 4
-      i32.const 0
-      call $~onstore
-      local.get $8
-      i32.store offset=8
-      local.get $8
-      i32.const 912
-      local.set $8
-      global.get $~lib/memory/__stack_pointer
-      i32.const 16
-      i32.const 4
-      i32.const 0
-      call $~onstore
-      local.get $8
-      i32.store offset=16
-      local.get $8
-      i32.const 880
-      local.set $8
-      global.get $~lib/memory/__stack_pointer
-      i32.const 20
-      i32.const 4
-      i32.const 0
-      call $~onstore
-      local.get $8
-      i32.store offset=20
-      local.get $8
-      call $~lib/string/String#replaceAll
-      local.set $8
-      global.get $~lib/memory/__stack_pointer
-      i32.const 8
-      i32.const 4
-      i32.const 0
-      call $~onstore
-      local.get $8
-      i32.store offset=8
-      local.get $8
-      call $~lib/array/Array<~lib/string/String>#push
-      drop
-      local.get $5
-      i32.const 2
-      i32.add
-      local.set $2
-     end
-    end
-    local.get $5
-    i32.const 1
-    i32.add
-    local.set $5
-    br $for-loop|0
-   end
-  end
-  local.get $1
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 24
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $8
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/referencesEqual<~lib/array/Array<~lib/string/String>> (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $7 i32)
-  (local $8 i32)
-  (local $9 i32)
-  (local $10 i32)
-  (local $11 i32)
-  (local $12 i32)
-  (local $13 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store
-  i32.const 1068415319
-  call $~lib/index/__cover
-  i32.const 107512378
-  call $~lib/index/__cover
-  local.get $0
-  local.set $4
-  local.get $1
-  local.set $5
-  local.get $3
-  call $~lib/array/Array<usize>#get:length
-  local.set $6
-  local.get $6
-  i32.const 1
-  i32.and
-  i32.const 0
-  i32.eq
-  i32.const 2176
-  local.set $13
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $13
-  i32.store
-  local.get $13
-  call $node_modules/@as-pect/assembly/assembly/internal/assert/assert
-  i32.const 0
-  drop
-  i32.const 0
-  local.set $7
-  loop $for-loop|0
-   local.get $7
-   local.get $6
-   i32.lt_s
-   local.set $8
-   local.get $8
-   if
-    i32.const -377779670
-    call $~lib/index/__cover
-    local.get $4
-    local.get $5
-    local.get $3
-    local.get $7
-    call $~lib/array/Array<usize>#__uget
-    local.get $3
-    local.get $7
-    i32.const 1
-    i32.add
-    call $~lib/array/Array<usize>#__uget
-    call $node_modules/@as-pect/assembly/assembly/internal/Reflect/pairSeen
-    if
-     i32.const -752616206
-     call $~lib/index/__cover
-     global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.SUCCESSFUL_MATCH
-     local.set $13
-     global.get $~lib/memory/__stack_pointer
-     i32.const 8
-     i32.add
-     global.set $~lib/memory/__stack_pointer
-     local.get $13
-     return
-    end
-    local.get $7
-    i32.const 2
-    i32.add
-    local.set $7
-    br $for-loop|0
-   end
-  end
-  local.get $2
-  call $~lib/array/Array<usize>#get:length
-  local.set $7
-  i32.const 0
-  local.set $8
-  loop $for-loop|1
-   local.get $8
-   local.get $7
-   i32.lt_s
-   local.set $9
-   local.get $9
-   if
-    i32.const 233730164
-    call $~lib/index/__cover
-    local.get $4
-    local.get $5
-    local.get $2
-    local.get $8
-    call $~lib/array/Array<usize>#__uget
-    local.get $2
-    local.get $8
-    i32.const 1
-    i32.add
-    call $~lib/array/Array<usize>#__uget
-    call $node_modules/@as-pect/assembly/assembly/internal/Reflect/pairSeen
-    if
-     i32.const 1666162006
-     call $~lib/index/__cover
-     global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.DEFER_MATCH
-     local.set $13
-     global.get $~lib/memory/__stack_pointer
-     i32.const 8
-     i32.add
-     global.set $~lib/memory/__stack_pointer
-     local.get $13
-     return
-    end
-    local.get $8
-    i32.const 2
-    i32.add
-    local.set $8
-    br $for-loop|1
-   end
-  end
-  i32.const 0
-  drop
-  i32.const 1
-  drop
-  i32.const -648916693
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 0
-  drop
-  i32.const 1
-  drop
-  i32.const 2102875297
-  call $~lib/index/__cover
-  local.get $0
-  call $~lib/array/Array<~lib/string/String>#get:length
-  local.set $8
-  local.get $1
-  call $~lib/array/Array<~lib/string/String>#get:length
-  local.set $9
-  local.get $8
-  local.get $9
-  i32.ne
-  if
-   i32.const 1624499682
-   call $~lib/index/__cover
-   global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.FAILED_MATCH
-   local.set $13
-   global.get $~lib/memory/__stack_pointer
-   i32.const 8
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $13
-   return
-  end
-  i32.const 0
-  local.set $10
-  loop $for-loop|2
-   local.get $10
-   local.get $8
-   i32.lt_s
-   local.set $11
-   local.get $11
-   if
-    i32.const -1389465537
-    call $~lib/index/__cover
-    local.get $0
-    local.get $10
-    call $~lib/array/Array<~lib/string/String>#__uget
-    local.set $13
-    global.get $~lib/memory/__stack_pointer
-    i32.const 4
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $13
-    i32.store offset=4
-    local.get $13
-    local.get $1
-    local.get $10
-    call $~lib/array/Array<~lib/string/String>#__uget
-    local.set $13
-    global.get $~lib/memory/__stack_pointer
-    i32.const 0
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $13
-    i32.store
-    local.get $13
-    local.get $2
-    local.get $3
-    call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.equals<~lib/string/String>
-    local.set $12
-    local.get $12
-    global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.FAILED_MATCH
-    i32.eq
-    if
-     i32.const -816425280
-     call $~lib/index/__cover
-     global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.FAILED_MATCH
-     local.set $13
-     global.get $~lib/memory/__stack_pointer
-     i32.const 8
-     i32.add
-     global.set $~lib/memory/__stack_pointer
-     local.get $13
-     return
-    end
-    local.get $10
-    i32.const 1
-    i32.add
-    local.set $10
-    br $for-loop|2
-   end
-  end
-  local.get $3
-  local.get $4
-  call $~lib/array/Array<usize>#push
-  drop
-  local.get $3
-  local.get $5
-  call $~lib/array/Array<usize>#push
-  drop
-  global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.SUCCESSFUL_MATCH
-  local.set $13
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $13
-  return
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/array/Array<~lib/string/String>> (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $7 i32)
-  (local $8 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 8
-  i32.const 0
-  call $~onstore
-  i64.const 0
-  i64.store
-  i32.const -455903854
-  call $~lib/index/__cover
-  i32.const 1268988619
-  call $~lib/index/__cover
-  i32.const 1
-  drop
-  i32.const 337501103
-  call $~lib/index/__cover
-  local.get $0
-  i32.const 0
-  i32.eq
-  if
-   i32.const -650905946
-   call $~lib/index/__cover
-   i32.const 1
-   i32.const 0
-   i32.const 0
-   i32.const 0
-   i32.const 0
-   i32.const 0
-   i32.const 4
-   i32.const 1524485209
-   call $~lib/index/__cover
-   i32.const 1
-   i32.const -1127161224
-   call $~lib/index/__cover
-   i32.const 21
-   i32.const -1371405759
-   call $~lib/index/__cover
-   i32.const 9104
-   local.set $8
-   global.get $~lib/memory/__stack_pointer
-   i32.const 0
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   local.get $8
-   i32.store
-   local.get $8
-   i32.const 0
-   i32.const 0
-   i32.const 1
-   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/createReflectedValue
-   local.set $8
-   global.get $~lib/memory/__stack_pointer
-   i32.const 8
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $8
-   return
-  end
-  i32.const 0
-  i32.eqz
-  drop
-  i32.const -1502572791
-  call $~lib/index/__cover
-  local.get $1
-  local.get $0
-  call $~lib/map/Map<usize,i32>#has
-  if
-   i32.const 389425574
-   call $~lib/index/__cover
-   local.get $1
-   local.get $0
-   call $~lib/map/Map<usize,i32>#get
-   local.set $8
-   global.get $~lib/memory/__stack_pointer
-   i32.const 8
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $8
-   return
-  end
-  i32.const 0
-  drop
-  i32.const 0
-  drop
-  i32.const -464870436
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -402830822
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -1876113407
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const 44077944
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -2049600781
-  call $~lib/index/__cover
-  i32.const 0
-  drop
-  i32.const -1456386534
-  call $~lib/index/__cover
-  i32.const 1
-  drop
-  i32.const 1076813835
-  call $~lib/index/__cover
-  local.get $0
-  call $~lib/array/Array<~lib/string/String>#get:length
-  local.set $2
-  i32.const 0
-  i32.const 0
-  i32.const 0
-  i32.const 0
-  local.get $0
-  i32.const 0
-  local.get $2
-  i32.const 10
-  i32.const 517897114
-  call $~lib/index/__cover
-  i32.const 21
-  i32.const 9104
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $8
-  i32.store
-  local.get $8
-  i32.const 0
-  i32.const 1
-  i32.const 1
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/createReflectedValue
-  local.set $3
-  local.get $1
-  local.get $0
-  local.get $3
-  call $~lib/map/Map<usize,i32>#set
-  drop
-  i32.const 0
-  local.set $4
-  loop $for-loop|0
-   local.get $4
-   local.get $2
-   i32.lt_s
-   local.set $5
-   local.get $5
-   if
-    i32.const 1783045731
-    call $~lib/index/__cover
-    global.get $~lib/memory/__stack_pointer
-    i32.const 4
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    local.get $0
-    local.get $4
-    call $~lib/array/Array<~lib/string/String>#__uget
-    local.tee $6
-    i32.store offset=4
-    local.get $6
-    local.get $1
-    call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/string/String>
-    local.set $7
-    local.get $3
-    local.get $7
-    call $node_modules/@as-pect/assembly/assembly/internal/Reflect/__aspectPushReflectedObjectValue
-    local.get $4
-    i32.const 1
-    i32.add
-    local.set $4
-    br $for-loop|0
-   end
-  end
-  local.get $3
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $8
-  return
- )
- (func $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#toStrictEqual (param $0 i32) (param $1 i32) (param $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 4
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  i32.const 0
-  i32.store
-  i32.const 116273713
-  call $~lib/index/__cover
-  i32.const 120666850
-  call $~lib/index/__cover
-  global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.FAILED_MATCH
-  local.set $3
-  local.get $0
-  i32.load offset=4
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $1
-  i32.const 0
-  i32.const 2
-  global.set $~argumentsLength
-  i32.const 0
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.equals<~lib/array/Array<~lib/string/String>>@varargs
-  local.set $3
-  local.get $3
-  global.get $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.SUCCESSFUL_MATCH
-  i32.eq
-  local.set $4
-  local.get $0
-  i32.load offset=4
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $5
-  i32.store
-  local.get $5
-  call $node_modules/@as-pect/assembly/assembly/internal/Actual/Actual.report<~lib/array/Array<~lib/string/String>>
-  local.get $1
-  i32.const 0
-  call $node_modules/@as-pect/assembly/assembly/internal/Expected/Expected.report<~lib/array/Array<~lib/string/String>>
-  local.get $4
-  local.get $0
-  i32.load
-  i32.xor
-  local.get $2
-  call $node_modules/@as-pect/assembly/assembly/internal/assert/assert
-  call $node_modules/@as-pect/assembly/assembly/internal/Actual/Actual.clear
-  call $node_modules/@as-pect/assembly/assembly/internal/Expected/Expected.clear
-  global.get $~lib/memory/__stack_pointer
-  i32.const 4
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|7
-  (local $0 i32)
+ (func $assembly/__tests__/json.spec/vec#__JSON_Serialize (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   global.get $~lib/memory/__stack_pointer
@@ -24368,45 +22913,21 @@
   call $~onstore
   i32.const 0
   i32.store offset=16
-  i32.const -1334373546
-  call $~lib/index/__cover
-  i32.const 906344917
-  call $~lib/index/__cover
-  i32.const 8784
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $2
-  i32.store offset=16
-  local.get $2
-  call $assembly/index/JSON.parse<~lib/array/Array<~lib/string/String>>
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $2
-  i32.store offset=12
-  local.get $2
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/array/Array<~lib/string/String>>
-  local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 0
   i32.const 4
   i32.const 0
   call $~onstore
-  local.get $2
+  i32.const 8048
+  local.tee $1
   i32.store
-  local.get $2
-  i32.const 2
-  i32.const 2
-  i32.const 21
-  i32.const 9008
-  call $~lib/rt/__newArray
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.const 8368
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -24416,7 +22937,29 @@
   local.get $2
   i32.store offset=4
   local.get $2
-  i32.const 944
+  local.get $0
+  f64.load
+  call $assembly/index/JSON.stringify<f64>
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=12
+  local.get $2
+  i32.const 7664
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=16
+  local.get $2
+  call $~lib/string/String.__concat
   local.set $2
   global.get $~lib/memory/__stack_pointer
   i32.const 8
@@ -24426,7 +22969,183 @@
   local.get $2
   i32.store offset=8
   local.get $2
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#toStrictEqual
+  call $~lib/string/String.__concat
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  call $~lib/string/String.__concat
+  local.tee $1
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.const 8400
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  local.get $0
+  f64.load offset=8
+  call $assembly/index/JSON.stringify<f64>
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=12
+  local.get $2
+  i32.const 944
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=16
+  local.get $2
+  call $~lib/string/String.__concat
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=8
+  local.get $2
+  call $~lib/string/String.__concat
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  call $~lib/string/String.__concat
+  local.tee $1
+  i32.store
+  local.get $1
+  i32.const 8144
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  call $~lib/string/String.__concat
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 20
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $2
+ )
+ (func $start:assembly/__tests__/json.spec~anonymous|0~anonymous|6
+  (local $0 i32)
+  (local $1 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 20
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 8
+  i32.const 0
+  call $~onstore
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 8
+  i32.const 0
+  call $~onstore
+  i64.const 0
+  i64.store offset=8
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  i32.const 0
+  i32.store offset=16
+  i32.const 221595659
+  call $~lib/index/__cover
+  i32.const -1212612779
+  call $~lib/index/__cover
+  global.get $assembly/__tests__/json.spec/foo
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.store offset=16
+  local.get $1
+  call $assembly/index/JSON.stringify<assembly/__tests__/json.spec/vec>
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.store offset=12
+  local.get $1
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/expect<~lib/string/String>
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 8432
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  i32.const 944
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/string/String>#toStrictEqual
   global.get $~lib/memory/__stack_pointer
   i32.const 20
   i32.add
@@ -24544,7 +23263,7 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 7888
+  i32.const 7936
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -24555,7 +23274,7 @@
   i32.store offset=4
   local.get $0
   call $node_modules/@as-pect/assembly/assembly/internal/Test/test
-  i32.const 7920
+  i32.const 7968
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -24565,7 +23284,7 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 8352
+  i32.const 8256
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -24576,7 +23295,7 @@
   i32.store offset=4
   local.get $0
   call $node_modules/@as-pect/assembly/assembly/internal/Test/test
-  i32.const 8384
+  i32.const 8288
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -24586,28 +23305,7 @@
   local.get $0
   i32.store
   local.get $0
-  i32.const 8672
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 4
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store offset=4
-  local.get $0
-  call $node_modules/@as-pect/assembly/assembly/internal/Test/test
-  i32.const 8704
-  local.set $0
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $0
-  i32.store
-  local.get $0
-  i32.const 9184
+  i32.const 8512
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -24790,38 +23488,8 @@
   local.get $1
   i32.store
   local.get $1
-  i32.const 1992102969
+  i32.const -2067826122
   i32.const 71
-  i32.const 47
-  i32.const 1
-  call $~lib/index/__coverDeclare
-  i32.const 32
-  local.set $1
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store
-  local.get $1
-  i32.const -914952590
-  i32.const 71
-  i32.const 41
-  i32.const 0
-  call $~lib/index/__coverDeclare
-  i32.const 32
-  local.set $1
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $1
-  i32.store
-  local.get $1
-  i32.const -14453263
-  i32.const 87
   i32.const 44
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -24835,8 +23503,8 @@
   local.get $1
   i32.store
   local.get $1
-  i32.const -881460241
-  i32.const 87
+  i32.const 306894218
+  i32.const 71
   i32.const 38
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -24850,8 +23518,8 @@
   local.get $1
   i32.store
   local.get $1
-  i32.const -164977577
-  i32.const 94
+  i32.const -1814152078
+  i32.const 77
   i32.const 46
   i32.const 1
   call $~lib/index/__coverDeclare
@@ -24865,8 +23533,8 @@
   local.get $1
   i32.store
   local.get $1
-  i32.const -1200815724
-  i32.const 94
+  i32.const -1627476071
+  i32.const 77
   i32.const 40
   i32.const 0
   call $~lib/index/__coverDeclare
@@ -24880,9 +23548,9 @@
   local.get $1
   i32.store
   local.get $1
-  i32.const 906344917
-  i32.const 98
-  i32.const 48
+  i32.const -1212612779
+  i32.const 80
+  i32.const 41
   i32.const 1
   call $~lib/index/__coverDeclare
   i32.const 32
@@ -24895,9 +23563,9 @@
   local.get $1
   i32.store
   local.get $1
-  i32.const -1334373546
-  i32.const 98
-  i32.const 42
+  i32.const 221595659
+  i32.const 80
+  i32.const 35
   i32.const 0
   call $~lib/index/__coverDeclare
   i32.const 32
@@ -24935,6 +23603,23 @@
   global.set $assembly/__tests__/json.spec/obj
   call $start:node_modules/@as-pect/assembly/assembly/internal/Expectation
   call $start:node_modules/@as-pect/assembly/assembly/internal/Reflect
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  i32.const 0
+  call $assembly/__tests__/json.spec/vec#constructor
+  local.tee $0
+  i32.store offset=4
+  local.get $0
+  f64.const 12.34
+  call $assembly/__tests__/json.spec/vec#set:x
+  local.get $0
+  f64.const 123456
+  call $assembly/__tests__/json.spec/vec#set:y
+  local.get $0
+  global.set $assembly/__tests__/json.spec/foo
   i32.const 688
   local.set $1
   global.get $~lib/memory/__stack_pointer
@@ -24945,7 +23630,7 @@
   local.get $1
   i32.store
   local.get $1
-  i32.const 9216
+  i32.const 8544
   local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 8
@@ -24958,6 +23643,81 @@
   call $node_modules/@as-pect/assembly/assembly/internal/Test/describe
   global.get $~lib/memory/__stack_pointer
   i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $assembly/__tests__/json.spec/vec#__aspectAddReflectedValueKeyValuePairs (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32)
+  (local $4 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  i32.const 0
+  i32.store
+  i32.const 0
+  drop
+  local.get $3
+  i64.const 4685345497827770368
+  i32.const 0
+  call $~lib/staticarray/StaticArray<i64>#includes
+  i32.eqz
+  if
+   local.get $1
+   i32.const 8576
+   local.set $4
+   global.get $~lib/memory/__stack_pointer
+   i32.const 0
+   i32.const 4
+   i32.const 0
+   call $~onstore
+   local.get $4
+   i32.store
+   local.get $4
+   local.get $2
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/string/String>
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/__aspectPushReflectedObjectKey
+   local.get $1
+   local.get $0
+   f64.load
+   local.get $2
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<f64>
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/__aspectPushReflectedObjectValue
+  end
+  local.get $3
+  i64.const 4685345532187508736
+  i32.const 0
+  call $~lib/staticarray/StaticArray<i64>#includes
+  i32.eqz
+  if
+   local.get $1
+   i32.const 8608
+   local.set $4
+   global.get $~lib/memory/__stack_pointer
+   i32.const 0
+   i32.const 4
+   i32.const 0
+   call $~onstore
+   local.get $4
+   i32.store
+   local.get $4
+   local.get $2
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/string/String>
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/__aspectPushReflectedObjectKey
+   local.get $1
+   local.get $0
+   f64.load offset=8
+   local.get $2
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<f64>
+   call $node_modules/@as-pect/assembly/assembly/internal/Reflect/__aspectPushReflectedObjectValue
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
@@ -24975,7 +23735,7 @@
   call $~onstore
   i32.const 0
   i32.store
-  i32.const 9280
+  i32.const 8672
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -24990,7 +23750,7 @@
   i32.const 49
   i32.const 1
   call $~lib/index/__coverDeclare
-  i32.const 9280
+  i32.const 8672
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -25005,7 +23765,7 @@
   i32.const 1
   i32.const 0
   call $~lib/index/__coverDeclare
-  i32.const 9280
+  i32.const 8672
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -25020,7 +23780,7 @@
   i32.const 40
   i32.const 1
   call $~lib/index/__coverDeclare
-  i32.const 9280
+  i32.const 8672
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -25035,7 +23795,7 @@
   i32.const 19
   i32.const 2
   call $~lib/index/__coverDeclare
-  i32.const 9280
+  i32.const 8672
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -25069,7 +23829,7 @@
   call $~onstore
   i32.const 0
   i32.store
-  i32.const 9424
+  i32.const 8816
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -25084,7 +23844,7 @@
   i32.const 48
   i32.const 1
   call $~lib/index/__coverDeclare
-  i32.const 9424
+  i32.const 8816
   local.set $0
   global.get $~lib/memory/__stack_pointer
   i32.const 0
@@ -28041,7 +26801,7 @@
     i32.const 0
     i32.const 2
     i32.const 7
-    i32.const 8240
+    i32.const 7824
     call $~lib/rt/__newArray
     local.tee $2
     i32.store
@@ -28054,7 +26814,7 @@
    i32.const 0
    i32.const 2
    i32.const 7
-   i32.const 8272
+   i32.const 7856
    call $~lib/rt/__newArray
    local.tee $3
    i32.store offset=4
@@ -28115,24 +26875,20 @@
   global.set $~lib/memory/__stack_pointer
   local.get $2
  )
- (func $~lib/array/Array<~lib/string/String>#constructor (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
+ (func $assembly/__tests__/json.spec/vec#constructor (param $0 i32) (result i32)
+  (local $1 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 8
+  i32.const 4
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
   global.get $~lib/memory/__stack_pointer
   i32.const 0
-  i32.const 8
+  i32.const 4
   i32.const 0
   call $~onstore
-  i64.const 0
-  i64.store
+  i32.const 0
+  i32.store
   local.get $0
   i32.eqz
   if
@@ -28148,77 +26904,21 @@
    i32.store
   end
   local.get $0
-  i32.const 0
-  call $~lib/array/Array<~lib/string/String>#set:buffer
+  f64.const 0
+  call $assembly/__tests__/json.spec/vec#set:x
   local.get $0
-  i32.const 0
-  call $~lib/array/Array<~lib/string/String>#set:dataStart
+  f64.const 0
+  call $assembly/__tests__/json.spec/vec#set:y
   local.get $0
-  i32.const 0
-  call $~lib/array/Array<~lib/string/String>#set:byteLength
-  local.get $0
-  i32.const 0
-  call $~lib/array/Array<~lib/string/String>#set:length_
-  local.get $1
-  i32.const 1073741820
-  i32.const 2
-  i32.shr_u
-  i32.gt_u
-  if
-   i32.const 2464
-   i32.const 3088
-   i32.const 70
-   i32.const 60
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $1
-  local.tee $2
-  i32.const 8
-  local.tee $3
-  local.get $2
-  local.get $3
-  i32.gt_u
-  select
-  i32.const 2
-  i32.shl
-  local.set $4
+  local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
-  i32.const 4
-  i32.const 0
-  call $~onstore
-  local.get $4
-  i32.const 0
-  call $~lib/rt/itcms/__new
-  local.tee $5
-  i32.store offset=4
-  i32.const 2
-  global.get $~lib/shared/runtime/Runtime.Incremental
-  i32.ne
-  drop
-  local.get $0
-  local.get $5
-  call $~lib/array/Array<~lib/string/String>#set:buffer
-  local.get $0
-  local.get $5
-  call $~lib/array/Array<~lib/string/String>#set:dataStart
-  local.get $0
-  local.get $4
-  call $~lib/array/Array<~lib/string/String>#set:byteLength
-  local.get $0
-  local.get $1
-  call $~lib/array/Array<~lib/string/String>#set:length_
-  local.get $0
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $6
+  local.get $1
  )
- (func $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#constructor (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
+ (func $export:assembly/__tests__/json.spec/vec#get:x (param $0 i32) (result f64)
+  (local $1 f64)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.sub
@@ -28229,110 +26929,176 @@
   i32.const 4
   i32.const 0
   call $~onstore
-  i32.const 0
+  local.get $0
   i32.store
   local.get $0
-  i32.eqz
-  if
-   global.get $~lib/memory/__stack_pointer
-   i32.const 0
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   i32.const 8
-   i32.const 22
-   call $~lib/rt/itcms/__new
-   local.tee $0
-   i32.store
-  end
-  local.get $0
-  i32.const 0
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#set:_not
-  local.get $0
-  i32.const 0
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#set:actual
-  i32.const 2058439701
-  call $~lib/index/__cover
-  i32.const -899951797
-  call $~lib/index/__cover
-  local.get $0
-  local.get $1
-  call $node_modules/@as-pect/assembly/assembly/internal/Expectation/Expectation<~lib/array/Array<~lib/string/String>>#set:actual
-  local.get $0
-  local.set $2
+  call $assembly/__tests__/json.spec/vec#get:x
+  local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $2
+  local.get $1
  )
- (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.equals<~lib/array/Array<~lib/string/String>>@varargs (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
-  (local $4 i32)
+ (func $export:assembly/__tests__/json.spec/vec#set:x (param $0 i32) (param $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  local.get $1
+  call $assembly/__tests__/json.spec/vec#set:x
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/__tests__/json.spec/vec#get:y (param $0 i32) (result f64)
+  (local $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/__tests__/json.spec/vec#get:y
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
+ )
+ (func $export:assembly/__tests__/json.spec/vec#set:y (param $0 i32) (param $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  local.get $1
+  call $assembly/__tests__/json.spec/vec#set:y
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/__tests__/json.spec/vec#__aspectStrictEquals (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
   (local $5 i32)
-  (local $6 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 8
+  i32.const 20
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
   global.get $~lib/memory/__stack_pointer
   i32.const 0
-  i32.const 8
+  i32.const 4
   i32.const 0
   call $~onstore
-  i64.const 0
-  i64.store
-  block $2of2
-   block $1of2
-    block $0of2
-     block $outOfRange
-      global.get $~argumentsLength
-      i32.const 2
-      i32.sub
-      br_table $0of2 $1of2 $2of2 $outOfRange
-     end
-     unreachable
-    end
-    global.get $~lib/memory/__stack_pointer
-    i32.const 0
-    i32.const 4
-    i32.const 0
-    call $~onstore
-    i32.const 0
-    i32.const 2
-    i32.const 7
-    i32.const 9040
-    call $~lib/rt/__newArray
-    local.tee $2
-    i32.store
-   end
-   global.get $~lib/memory/__stack_pointer
-   i32.const 4
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   i32.const 0
-   i32.const 2
-   i32.const 7
-   i32.const 9072
-   call $~lib/rt/__newArray
-   local.tee $3
-   i32.store offset=4
-  end
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $1
+  i32.store offset=4
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=8
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $3
+  i32.store offset=12
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $4
+  i32.store offset=16
   local.get $0
   local.get $1
   local.get $2
   local.get $3
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.equals<~lib/array/Array<~lib/string/String>>
-  local.set $6
+  local.get $4
+  call $assembly/__tests__/json.spec/vec#__aspectStrictEquals
+  local.set $5
   global.get $~lib/memory/__stack_pointer
-  i32.const 8
+  i32.const 20
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $6
+  local.get $5
  )
- (func $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/array/Array<~lib/string/String>>@varargs (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
+ (func $export:assembly/__tests__/json.spec/vec#__aspectAddReflectedValueKeyValuePairs (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $2
+  i32.store offset=4
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $3
+  i32.store offset=8
+  local.get $0
+  local.get $1
+  local.get $2
+  local.get $3
+  call $assembly/__tests__/json.spec/vec#__aspectAddReflectedValueKeyValuePairs
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/__tests__/json.spec/vec#__JSON_Serialize (param $0 i32) (result i32)
+  (local $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.sub
@@ -28343,37 +27109,39 @@
   i32.const 4
   i32.const 0
   call $~onstore
-  i32.const 0
-  i32.store
-  block $1of1
-   block $0of1
-    block $outOfRange
-     global.get $~argumentsLength
-     i32.const 1
-     i32.sub
-     br_table $0of1 $1of1 $outOfRange
-    end
-    unreachable
-   end
-   global.get $~lib/memory/__stack_pointer
-   i32.const 0
-   i32.const 4
-   i32.const 0
-   call $~onstore
-   i32.const 0
-   call $~lib/map/Map<usize,i32>#constructor
-   local.tee $1
-   i32.store
-  end
   local.get $0
-  local.get $1
-  call $node_modules/@as-pect/assembly/assembly/internal/Reflect/Reflect.toReflectedValue<~lib/array/Array<~lib/string/String>>
-  local.set $2
+  i32.store
+  local.get $0
+  call $assembly/__tests__/json.spec/vec#__JSON_Serialize
+  local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $2
+  local.get $1
+ )
+ (func $export:assembly/__tests__/json.spec/vec#constructor (param $0 i32) (result i32)
+  (local $1 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  i32.const 0
+  call $~onstore
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/__tests__/json.spec/vec#constructor
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
  )
  (func $export:node_modules/@as-pect/assembly/assembly/internal/call/__call (param $0 i32)
   global.get $~lib/memory/__stack_pointer

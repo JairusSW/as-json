@@ -68,36 +68,29 @@ describe("AS-JSON Test Suite", () => {
     expect(JSON.parse<f64>("1.23456e+5")).toStrictEqual(123456.0);
     expect(JSON.parse<f64>("123456E-5")).toStrictEqual(1.23456);
   });
-  test("Should (de)serialize variants", () => {
-    // Variant<string>
-    expect(JSON.stringify<Variant>(Variant.from('Hello World"'))).toStrictEqual(
-      '"Hello World\\""'
-    );
-    expect(JSON.parse<Variant>('"Hello World\\""').get<string>()).toStrictEqual(
-      'Hello World"'
-    );
-
-    // Variant<boolean>
-    expect(JSON.stringify<Variant>(Variant.from(true))).toStrictEqual("true");
-    expect(JSON.parse<Variant>("true").get<boolean>()).toStrictEqual(true);
-    expect(JSON.stringify<Variant>(Variant.from(false))).toStrictEqual("false");
-    expect(JSON.parse<Variant>("false").get<boolean>()).toStrictEqual(false);
-  });
-
   test("Should (de)serialize array", () => {
     expect(JSON.stringify<i32[]>([1, 2, 3, 4, 5])).toStrictEqual("[1,2,3,4,5]");
     expect(JSON.parse<i32[]>("[1,2,3,4,5]")).toStrictEqual(<i32[]>[
       1, 2, 3, 4, 5,
     ]);
   });
-
   test("Should (de)serialize Objects", () => {
     expect(JSON.stringify(obj)).toStrictEqual('{"foo":"moo","bar":12345}');
   });
-  // ayo!
-  test("Should handle array whitespace", () => {
-    expect(
-      JSON.parse<string[]>('     [  "ayoo"   ,    "uh..."    ]   ')
-    ).toStrictEqual(["ayoo", "uh..."]);
-  });
+  test("Should serialize arrays", () => {
+    expect(JSON.stringify(foo)).toStrictEqual('{"x":12.34,"y":123456.0}')
+  })
+  test("Should parse arrays", () => {
+    expect(JSON.parse('{"x":12.34,"y":123456.0}'))
+  })
 });
+// @ts-ignore
+@json
+export class vec {
+  x: f64; 
+  y: f64;
+}
+const foo: vec = {
+  x: 12.34,
+  y:123456.0
+}

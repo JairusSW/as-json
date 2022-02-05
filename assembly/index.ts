@@ -1,7 +1,9 @@
 import { StringSink } from "as-string-sink"
 import { Variant } from "as-variant"
-import { JSONValue, JSONobject } from "./jsonType"
-import "assemblyscript/std/util/string"
+import {
+  JSONValue, JSONobject, JSONArray
+} from "./jsonType"
+// import "assemblyscript/std/util/string"
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
@@ -38,11 +40,6 @@ export namespace JSON {
       //@ts-ignore
       return data.__JSON_Serialize()
     }
-    // Variants
-    // @ts-ignore
-    else if (data instanceof Variant) {
-      return serializeVariant(<Variant>data)
-    }
     // ArrayLike
     else if (isArrayLike(data)) {
       const result = new StringSink("[")
@@ -78,9 +75,6 @@ export namespace JSON {
     } else if (isFloat<T>() || isInteger<T>()) {
       // @ts-ignore
       return parseNumber<T>(data)
-    } else if (type instanceof Variant) {
-      // @ts-ignore
-      return parseVariant(data)
     } else if (isArrayLike<T>()) {
       // @ts-ignore
       return parseArray<T>(data)
@@ -95,50 +89,6 @@ export namespace JSON {
 @inline
 function serializeString(data: string): string {
   return "\"" + data.replaceAll("\"", "\\\"") + "\""
-}
-
-function serializeVariant(data: Variant): string {
-  // String
-  if (data.is<string>()) {
-    // @ts-ignore
-    return serializeString(data.get<string>())
-  }
-  // @ts-ignore
-  // Boolean
-  else if (data.is<boolean>()) {
-    // @ts-ignore
-    return data.get<boolean>() ? "true" : "false"
-  }
-  // @ts-ignore
-  // Unknown
-  else if (data.is<Variant>()) {
-    // @ts-ignore
-    return serializeVariant(data.get<Variant>())
-  }
-  // @ts-ignore
-  // Null
-  else if (data.getUnchecked<usize>() == 0) {
-    return "null"
-  }
-  // @ts-ignore
-  // i8
-  else if (data.is<i8>()) {
-    return data.get<i8>().toString()
-  }
-  // @ts-ignore
-  // i16
-  else if (data.is<i16>()) {
-    return data.get<i16>().toString()
-  }
-  // @ts-ignore
-  // i32
-  else if (data.is<i32>()) {
-    return data.get<i32>().toString()
-  }
-  //@ts-ignore
-  else {
-    return "idk"
-  }
 }
 // @ts-ignore
 @inline
@@ -270,13 +220,20 @@ function parseDynamicObject(data: string): void {
 }
 
 function parseDynamicArray(data: string): void {
-  // need deep array
-
+  /*const result: JSONValue[] = []
+  let inStr: boolean = false
+  let pos: u32 = 1
+  for (let i: u32 = 1; i < data.length - 1; i++) {
+    if (data.codePointAt(i) == ",".codePointAt(0)) {
+      result.push(JSON.parse(data.slice(pos, i)))
+      pos = i
+    }
+  }*/
 }
 
 //@ts-ignore
 @inline
-function parseNum(e: number): f64 {
+function parseNum(e: u32): f64 {
   switch (e) {
     case "0".charCodeAt(0):
       return 0;
@@ -311,18 +268,21 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
   switch (data.charCodeAt(index)) {
 
     case "{".charCodeAt(0):
+
       index++;
       while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
       let obj = new JSONobject();
-
       while (true) {
 
         let nchar = data.charCodeAt(index);
+
         if (nchar == '"'.charCodeAt(0)) {
+
           index++;
           let keyChars = ''
           /** warning: code is duplicated to str parsing later in fn*/
           while (true) {
+
             nchar = data.charCodeAt(index);
             if (nchar == "\\".charCodeAt(0)) {
               index++;
@@ -335,7 +295,6 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
                 index++;
               }
             }
-
           }
           index++;
           while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
@@ -350,9 +309,12 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
             while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
             nchar = data.charCodeAt(index);
             /** more fields */
-            if (nchar == ",".charCodeAt(0)) continue;
+            if (nchar == ",".charCodeAt(0)) {
+              index++; continue;
+            }
             /** early exit */
             else if (nchar == "}".charCodeAt(0)) {
+              index++;
               /** return new index. */
               i1.value = index;
               /** break out of key/value setting and exit fn. */
@@ -363,12 +325,18 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
             throw new Error("Parsing object field: Unexpected `" + data.charAt(index) + "` -- Expected `:`");
           }
         }
-        else if (nchar = " ".charCodeAt(0))
+        else if (nchar == " ".charCodeAt(0)) {
           index++;
+        }
         /** object ends */
-        else if (nchar == '}'.charCodeAt(0)) break;
+        else if (nchar == '}'.charCodeAt(0)) {
+          index++;
+          break;
+        }
         else throw new Error("Parsing object: unexepcted character")
       }
+      i1.value = index;
+
       return JSONValue.from(obj);
     case "\"".charCodeAt(0):
       index++;
@@ -412,23 +380,70 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
       }
       break;
     case "[".charCodeAt(0):
-      throw new Error("dyn array not implemented");
-      parseDynamicArray(data.slice(index))
+      index++;
+      let arr = (new JSONArray());
+      while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
+      if (data.charCodeAt(index) == "]".charCodeAt(0)) {
+        index++;
+        i1.value = index;
+        return JSONValue.from(arr);
+      }
+      while (true) {
+        i1.value = index;
+
+        let value = parseOnStr(data, i1);
+
+        arr.push(value);
+        index = i1.value;
+
+        while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
+        let char = data.charCodeAt(index);
+
+        if (char == ",".charCodeAt(0)) {
+          index++;
+          continue;
+        }
+        else if (char == "]".charCodeAt(0)) {
+
+          index++;
+          i1.value = index;
+          return JSONValue.from(arr);
+        }
+
+        else throw new Error("Unexpected character when parsing array.")
+
+
+
+      }
       break;
-    default:
+    default:// lol. idk
       if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(data.charAt(index))) {
 
         let num: f64 = parseNum(data.charCodeAt(index));
+
+
         index++;
-        let _num;
-        let periodFound=false;
+        let _num: number;
+        let periodFound = false;
         while (true) {
           _num = parseNum(data.charCodeAt(index));
-          if (_num != -1) {
-            num **= 10;
-            num += _num;
-          } else if(data.charCodeAt(index)==".".charCodeAt(0)) {
 
+          if (_num != -1) {
+            num *= 10;
+            num += _num;
+          } else if (data.charCodeAt(index) == ".".charCodeAt(0)) {
+            let ival = 1;
+            while (true) {
+              index++;
+              _num = parseNum(data.charCodeAt(index));
+              if (_num != -1) {
+                num += (_num / 10 ** ival);
+                ival++;
+              } else {
+                i1.value = index;
+                return JSONValue.from(num);
+              }
+            }
 
           }
           index++;
@@ -438,7 +453,7 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
       else throw new Error("PANIC: NOT JSON");
 
   }
-
+  throw new Error("Unreachable")
 }
 
 export function parseDynamic(data: string): JSONValue {

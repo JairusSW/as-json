@@ -7,7 +7,7 @@
   "author": "JairusSW",
   "license": "MIT",
   "scripts": {
-    "build:test": "asc assembly/test.ts --target test --explicitStart",
+    "build:test": "asc assembly/test.ts --target test --explicitStart --sourceMap --exportRuntime",
     "build:transform": "tsc -w -p ./transform",
     "run:node": "node --experimental-wasi-unstable-preview1 ./tests/test",
     "run:wasmtime": "wasmtime ./tests/output/test.wasm",

@@ -98,7 +98,8 @@ export class JSONArray extends Array<JSONValue> {
   toString(): string {
     const result = new StringSink("[");
     let len = this.length - 1;
-    for (let i = 0; i < this.length-1; i++) {
+    if (len == -1) return "[]";
+    for (let i = 0; i < this.length - 1; i++) {
       result.write(this[i].toString())
       result.write(",")
     }
@@ -112,7 +113,8 @@ export class JSONobject extends Map<string, JSONValue> {
     let outString = "{"
     let keys = this.keys();
     let len = keys.length - 1;
-    for (let i = 0; i < keys.length-1; i++) {
+    if (len == -1) return "{}"
+    for (let i = 0; i < keys.length - 1; i++) {
       outString += '"' + keys[i].toString() + '":' + unchecked(this.get(keys[i])).toString() + ",";
     }
     outString += '"' + keys[len].toString() + '":' + unchecked(this.get(keys[len])).toString();
