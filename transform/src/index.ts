@@ -1,25 +1,14 @@
 import {
-  Class,
   ClassPrototype,
   IdentifierExpression,
   ImportStatement,
-  NodeKind,
   Parser,
   Program,
-  Compiler,
-  PropertyPrototype,
-  ElementKind,
   FieldPrototype,
-  FieldDeclaration,
-  Tokenizer,
-  Source,
-  SourceKind,
   ClassDeclaration,
   MethodDeclaration,
-  ExportMember,
   CommonFlags,
   FunctionTypeNode,
-  TypeNode,
   TypeName,
   BlockStatement,
   FunctionPrototype,
@@ -28,21 +17,16 @@ import {
   StringLiteralExpression,
   VariableDeclaration,
   VariableStatement,
-  Statement,
   BinaryExpression,
   ExpressionStatement,
   Token,
   PropertyAccessExpression,
   CallExpression,
   ThisExpression,
-  Expression,
 } from "assemblyscript";
-import { Transform } from "assemblyscript/cli/transform";
+import { Transform } from "assemblyscript/transform";
 
-// @ts-ignore CommonJS export is needed for AS transforms (we should add support for ESM upstream)
-
-export = //
-class MyTransform extends Transform {
+export default class MyTransform extends Transform {
   readFile(filename: string, baseDir: string) {
     return null;
   }
@@ -64,11 +48,11 @@ class MyTransform extends Transform {
   afterInitialize(program: Program): void {
     // initializer(program);
     // console.log(program.managedClasses);
-    program.filesByName.forEach((e) => {
+    //program.filesByName.forEach((e) => {
       //   console.log(e.name);
-    });
+    //});
     program.elementsByName.forEach((c) => {
-      program.elementsByName.forEach((e) => {});
+      //program.elementsByName.forEach((e) => {});
       if (c instanceof ClassPrototype) {
         if (
           !!c.decoratorNodes?.find((e) => {
@@ -192,7 +176,7 @@ class MyTransform extends Transform {
               new BinaryExpression(
                 Token.PLUS,
                 new IdentifierExpression("_str", false, c.declaration.range),
-                new StringLiteralExpression("}", c.declaration.range),
+                new StringLiteralExpression("},", c.declaration.range),
                 c.declaration.range
               ),
               c.declaration.range

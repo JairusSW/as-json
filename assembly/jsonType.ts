@@ -119,7 +119,6 @@ export class JSONobject extends Map<string, JSONValue> {
     }
     outString += '"' + keys[len].toString() + '":' + unchecked(this.get(keys[len])).toString();
     return outString + "}"
-
   }
 }
 export class JSONNull {

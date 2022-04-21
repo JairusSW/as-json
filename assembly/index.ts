@@ -1,9 +1,3 @@
-import { StringSink } from "as-string-sink"
-import { Variant } from "as-variant"
-import {
-  JSONValue, JSONobject, JSONArray
-} from "./jsonType"
-// import "assemblyscript/std/util/string"
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
@@ -42,14 +36,14 @@ export namespace JSON {
     }
     // ArrayLike
     else if (isArrayLike(data)) {
-      const result = new StringSink("[")
+      let result = "["
       for (let i = 0; i < data.length - 1; i++) {
-        result.write(JSON.stringify(unchecked(data[i])))
-        result.write(",")
+        result += JSON.stringify(unchecked(data[i]))
+        result += ","
       }
-      result.write(JSON.stringify(unchecked(data[data.length - 1])))
-      result.write("]")
-      return result.toString()
+      result += JSON.stringify(unchecked(data[data.length - 1]))
+      result += "]"
+      return result
     } else {
       return "null"
     }
@@ -201,36 +195,7 @@ function parseNumberArray<T>(data: string): Array<T> {
   result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
   return result
 }
-
-// @ts-ignore
-@inline
-function parseVariant(data: string): Variant {
-  const firstChar = data.charCodeAt(0)
-  if (firstChar == "\"".charCodeAt(0)) {
-    return Variant.from(parseString(data))
-  } else if (firstChar == "t".charCodeAt(0) || firstChar == "f".charCodeAt(0)) {
-    return Variant.from(parseBoolean(data))
-  } else {
-    throw new Error('Unknown identifying token at variant parsing')
-  }
-}
-
-function parseDynamicObject(data: string): void {
-
-}
-
-function parseDynamicArray(data: string): void {
-  /*const result: JSONValue[] = []
-  let inStr: boolean = false
-  let pos: u32 = 1
-  for (let i: u32 = 1; i < data.length - 1; i++) {
-    if (data.codePointAt(i) == ",".codePointAt(0)) {
-      result.push(JSON.parse(data.slice(pos, i)))
-      pos = i
-    }
-  }*/
-}
-
+/*
 //@ts-ignore
 @inline
 function parseNum(e: u32): f64 {
@@ -280,7 +245,6 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
 
           index++;
           let keyChars = ''
-          /** warning: code is duplicated to str parsing later in fn*/
           while (true) {
 
             nchar = data.charCodeAt(index);
@@ -302,22 +266,17 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
             index++;
             while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
             let newBoxed: boxed = { value: index };
-            /** parse field */
             let value = parseOnStr(data, newBoxed);
             index = newBoxed.value;
             obj.set(keyChars, value);
             while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
             nchar = data.charCodeAt(index);
-            /** more fields */
             if (nchar == ",".charCodeAt(0)) {
               index++; continue;
             }
-            /** early exit */
             else if (nchar == "}".charCodeAt(0)) {
               index++;
-              /** return new index. */
               i1.value = index;
-              /** break out of key/value setting and exit fn. */
               return JSONValue.from(obj);
             };
           }
@@ -328,7 +287,6 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
         else if (nchar == " ".charCodeAt(0)) {
           index++;
         }
-        /** object ends */
         else if (nchar == '}'.charCodeAt(0)) {
           index++;
           break;
@@ -341,7 +299,6 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
     case "\"".charCodeAt(0):
       index++;
       let keyChars = ''
-      /** warning: code is duplicated to str parsing later in fn*/
       let nchar: number;
       while (true) {
         nchar = data.charCodeAt(index);
@@ -487,5 +444,5 @@ export function parseDynamic(data: string): JSONValue {
   // oh, yuk. just default parsenumber.
 
 }
-
+*/
 export class Nullable { }

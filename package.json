@@ -1,42 +1,28 @@
 {
   "name": "json-as",
-  "version": "0.2.6 ",
+  "version": "0.3.0",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
-  "ascMain": "assembly/index.ts",
-  "author": "JairusSW",
+  "author": "Jairus Tanaka",
+  "contributors": [
+    "DogWhich"
+  ],
   "license": "MIT",
   "scripts": {
-    "build:test": "asc assembly/test.ts --target test --explicitStart --sourceMap --exportRuntime",
+    "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -w -p ./transform",
-    "run:node": "node --experimental-wasi-unstable-preview1 ./tests/test",
-    "run:wasmtime": "wasmtime ./tests/output/test.wasm",
-    "run:lunatic": "lunatic ./tests/output/test.wasm",
-    "as-pect:test": "asp --verbose",
-    "as-pect:test:ci": "asp --summary",
-    "bench:build": "asc assembly/bench.ts --runtime incremental --target bench --explicitStart",
-    "bench:node": "node --experimental-wasi-unstable-preview1 ./bench/bench",
-    "bench:wasmtime": "wasmtime ./bench/output/bench.wasm",
-    "bench:lunatic": "lunatic ./bench/output/bench.wasm"
+    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:release": "asc assembly/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "test": "node tests",
+    "start": "npx serve ."
   },
   "devDependencies": {
-    "@as-pect/cli": "^6.2.4",
     "as-console": "^6.0.2",
-    "as-wasi": "^0.4.6",
-    "assemblyscript": "^0.19.22",
-    "assemblyscript-json": "^1.1.0",
-    "micromatch": "^4.0.4",
-    "typescript": "^4.5.4"
+    "assemblyscript": "^0.20.4",
+    "typescript": "^4.6.3"
   },
-  "dependencies": {
-    "@as-covers/core": "^0.2.1",
-    "as-string-sink": "^0.5.0",
-    "as-variant": "^0.3.0",
-    "chalk": "^5.0.0",
-    "source-map-support": "^0.5.21",
-    "visitor-as": "^0.6.0",
-    "yaml": "^1.10.2"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aspkg/as-json.git"
@@ -51,5 +37,12 @@
   "bugs": {
     "url": "https://github.com/aspkg/as-json/issues"
   },
-  "homepage": "https://github.com/aspkg/as-json#readme"
+  "homepage": "https://github.com/aspkg/as-json#readme",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./assembly/index.ts",
+      "types": "./assembly/index.ts"
+    }
+  }
 }
