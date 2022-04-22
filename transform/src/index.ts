@@ -108,11 +108,15 @@ export default class MyTransform extends Transform {
             return outChars;
           };
           let i = 0;
+          const size = c.instanceMembers!.size;
           let d;
           for (const field of c.instanceMembers!.values()) {
-            if (i < c.instanceMembers!.size / 2 - 1)
+            // Leave out trailing commas
+            if (i < size - 1) {
               d = new StringLiteralExpression(",", c.declaration.range);
-            else d = new StringLiteralExpression("", c.declaration.range);
+            } else {
+              d = new StringLiteralExpression("", c.declaration.range);
+            }
             if (field instanceof FieldPrototype) {
               fnBody.statements.push(
                 new ExpressionStatement(
@@ -176,13 +180,13 @@ export default class MyTransform extends Transform {
               new BinaryExpression(
                 Token.PLUS,
                 new IdentifierExpression("_str", false, c.declaration.range),
-                new StringLiteralExpression("},", c.declaration.range),
+                new StringLiteralExpression("}", c.declaration.range),
                 c.declaration.range
               ),
               c.declaration.range
             )
           );
-          let mem = new FunctionPrototype(
+          let __JSON_Serialize = new FunctionPrototype(
             "__JSON_Serialize",
             c,
             new MethodDeclaration(
@@ -218,8 +222,8 @@ export default class MyTransform extends Transform {
               c.declaration.range
             )
           );
-          c.instanceMembers?.set("__JSON_Serialize", mem);
-          (c.declaration as ClassDeclaration).members.push(mem.declaration);
+          c.instanceMembers?.set("__JSON_Serialize", __JSON_Serialize);
+          (c.declaration as ClassDeclaration).members.push(__JSON_Serialize.declaration);
           //c.instanceMembers?.forEach((m) => {
           //console.log(ElementKind[m.kind]);
           //if (m instanceof FieldPrototype) {
