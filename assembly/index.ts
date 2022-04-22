@@ -1,5 +1,4 @@
 export declare let json: (...a: any) => any;
-import { stringify } from "as-console/assembly/wasi"
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -260,7 +259,7 @@ export function parseObject(data: string): void {
     }
   }
   result.push(data.slice(lastPos, data.length - 1))
-  console.log(stringify(result))
+  //console.log(stringify(result))
   //return obj
 }
 
