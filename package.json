@@ -40,6 +40,6 @@
   "type": "module",
   "exports": {
     ".": "./assembly/index.ts",
-    "./transform": "./transform/lib/index.js"
+    "./*": "./*"
   }
 }

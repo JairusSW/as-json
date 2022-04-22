@@ -286,10 +286,12 @@ export function parseMap<T>(data: string): T {
         lastPos = i
         isKey = false
         //console.log(`Found Val: ${val}`)
+        // @ts-ignore
         result.set(key, parseString(val))
       }
     }
   }
+  // @ts-ignore
   result.set(key, parseString(data.slice(lastPos, data.length - 1)))
   return result
 }
