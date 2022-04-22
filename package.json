@@ -3,7 +3,6 @@
   "version": "0.3.0",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
-  "main": "./transform/lib/index.js",
   "author": "Jairus Tanaka",
   "contributors": [
     "DogWhich"
