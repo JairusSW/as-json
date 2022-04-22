@@ -23,7 +23,7 @@
     }
   },
   "options": {
-    "transform": "./transform",
+    "transform": ".",
     "bindings": "none"
   }
 }

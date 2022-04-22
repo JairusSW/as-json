@@ -3,6 +3,7 @@
   "version": "0.3.0",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
+  "main": "./transform/lib/index.js",
   "author": "Jairus Tanaka",
   "contributors": [
     "DogWhich"
@@ -11,18 +12,19 @@
   "scripts": {
     "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -w -p ./transform",
-    "asbuild:debug": "asc assembly/index.ts --target debug",
-    "asbuild:release": "asc assembly/index.ts --target release",
-    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
-    "test": "node tests",
-    "start": "npx serve ."
+    "test:wasmtime": "wasmtime ./build/test.wasm",
+    "test:lunatic": "lunatic ./build/test.wasm"
   },
   "devDependencies": {
     "as-console": "^6.0.2",
     "assemblyscript": "^0.20.4",
     "typescript": "^4.6.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@envy-as/cli": "https://github.com/jtenner/envy",
+    "as-tral": "https://github.com/romdotdog/as-tral",
+    "visitor-as": "^0.8.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aspkg/as-json.git"
