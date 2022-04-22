@@ -17,13 +17,14 @@
     },
     "test": {
       "outFile": "build/test.wasm",
-      "textFile": "build/test.wat",
       "sourceMap": true,
-      "debug": true
+      "optimizeLevel": 0,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
     }
   },
   "options": {
-    "transform": ".",
-    "bindings": "none"
+    "transform": "."
   }
 }

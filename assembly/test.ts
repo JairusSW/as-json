@@ -2,7 +2,7 @@ import { stringify } from "as-console/assembly/wasi";
 import "wasi"
 import { JSON, json, parseObject } from "./index";
 
-@json 
+@json
 class vec {
   x: f64;
   y: f64;
@@ -36,20 +36,20 @@ class JSONSchema {
 
 const data: JSONSchema = {
   firstName: 'Emmet',
-  lastName: 'Hutchison',
+  lastName: 'Smith',
   age: 23
 }
 
-parseObject('{"firstName":"Emmet","lastName":"Hutchison","age":23}')
+parseObject('{"firstName":"Emmet","lastName":"Smith","age":23}')
 
 console.log(JSON.stringify(myPlayer))
 
-const map = new Map<string, string>() 
+const map = new Map<string, string>()
 
 map.set("firstName", "Emmet")
-map.set("lastName", "Hutchison")
+map.set("lastName", "Smith")
 map.set("age", "23")
 
 console.log(JSON.stringify(map))
 
-console.log(JSON.stringify(JSON.parse<Map<string, string>>('{"firstName":"Emmet","lastName":"Hutchison","age":"23"}')))
+console.log(JSON.stringify(JSON.parse<Map<string, string>>('{"firstName":"Emmet","lastName":"Smith","age":"23"}')))
