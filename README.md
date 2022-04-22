@@ -1,7 +1,8 @@
 # AS-JSON
 
 # Total time
-30 hours 20m
+
+35 hours 44m
 
 **JSON encoder/decoder for AssemblyScript**
 
@@ -13,10 +14,13 @@
 ```
 
 Add the transform to your `asc` command
+
 ```bash
 --transform json-as
 ```
+
 Or, add it to `asconfig.json`
+
 ```
 {
   "targets": {
@@ -42,29 +46,32 @@ Or, add it to `asconfig.json`
 ## Usage
 
 ```js
-import { JSON } from "json-as";
+import { JSON } from 'json-as'
 
 @json
 class JSONSchema {
-    firstName: string
-    lastName: string
-    age: i32
+  firstName: string
+  lastName: string
+  age: i32
 }
 
 const data: JSONSchema = {
-    firstName: 'Emmet',
-    lastName: 'Hutchison',
-    age: 23
+  firstName: 'Emmet',
+  lastName: 'Smith',
+  age: 23,
 }
 
 const stringified = JSON.stringify(data)
-// '{"firstName":"Emmet","lastName":"Hutchison","age":23}'
+// '{"firstName":"Emmet","lastName":"Smith","age":23}'
+console.log(`Stringified: ${stringified}`)
 
 const parsed = JSON.parse<JSONSchema>(stringified)
-// { firstName: "Emmet", lastName: "Hutchison", age: 23 }
+// { firstName: "Emmet", lastName: "Smith", age: 23 }
+console.log(`Parsed: ${JSON.stringify(parsed)}`)
 ```
 
 ## Todo
+
 Add [Envy](https://github.com/jtenner/envy) as the testing framework. Remove as-pect
 
 Finish parsing objects into classes
