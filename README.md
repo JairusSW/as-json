@@ -16,17 +16,15 @@
 Add the transform to your `asc` command
 
 ```bash
---transform json-as
+--transform json-as/transform
 ```
 
 Or, add it to `asconfig.json`
 
 ```
 {
-  "targets": {
-  },
   "options": {
-    "transform": "json-as"
+    "transform": "json-as/transform"
   }
 }
 ```

@@ -1,6 +1,6 @@
 import { stringify } from "as-console/assembly/wasi";
 import "wasi"
-import { JSON, json, parseObject } from "./index";
+import { JSON, json, parseObject } from "../";
 
 @json
 class vec {
