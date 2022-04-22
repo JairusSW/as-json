@@ -39,5 +39,8 @@
   },
   "homepage": "https://github.com/aspkg/as-json#readme",
   "type": "module",
-  "exports": "./assembly/index.ts"
+  "exports": {
+    ".": "./assembly/index.ts",
+    "./transform": "./transform/lib/index.js"
+  }
 }
