@@ -1,13 +1,38 @@
+export declare let json: (...a: any) => any;
+import { stringify } from "as-console/assembly/wasi"
+
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
 export namespace JSON {
   /**
+   * Validates JSON data
+   * ```js
+   * JSON.verify<T>("{word:"Hi!"}")
+   * // Valid
+   * JSON.verify<T>("{er@#]23d}")
+   * // Invalid
+   */
+  export function verify(data: string): boolean {
+    let i = 0
+    // Remove preceeding whitespace
+    data = data.trim()
+    let char: u32 = data.charCodeAt(i)
+    if (char == "\"".charCodeAt(0) && data.charCodeAt(data.length - 1) == "\"".charCodeAt(0)) {
+      return true
+    } else if (char == "t".charCodeAt(0) && data.charCodeAt(i + 1) == "r".charCodeAt(0) && data.charCodeAt(i + 2) == "u".charCodeAt(0) && data.charCodeAt(i + 3) == "e".charCodeAt(0)) {
+      return true
+    } else if (char == "f".charCodeAt(0) && data.charCodeAt(i + 1) == "a".charCodeAt(0) && data.charCodeAt(i + 2) == "l".charCodeAt(0) && data.charCodeAt(i + 3) == "s".charCodeAt(0) && data.charCodeAt(i + 4) == "e".charCodeAt(0)) {
+      return true
+    }
+    return false
+  }
+  /**
    * Stringifies valid JSON data.
    * ```js
    * JSON.stringify<T>(data)
    * ```
-   * @param data Unknown
+   * @param data T
    * @returns string
   */
   export function stringify<T = Nullable | null>(data: T): string {
@@ -34,6 +59,18 @@ export namespace JSON {
       //@ts-ignore
       return data.__JSON_Serialize()
     }
+    // Map
+    else if (data instanceof Map) {
+      let result = "{"
+      let i = 0;
+      const keys = data.keys()
+      const values = data.values()
+      for (; i < keys.length - 1; i++) {
+        result += `"${unchecked(keys[i])}":${JSON.stringify(unchecked(values[i]))},`
+      }
+      result += `"${unchecked(keys[keys.length - 1])}":${JSON.stringify(unchecked(values[keys.length - 1]))}}`
+      return result
+    }
     // ArrayLike
     else if (isArrayLike(data)) {
       let result = "["
@@ -49,17 +86,15 @@ export namespace JSON {
     }
   }
   /**
- * Parses valid JSON strings into their original format.
- * Useful for exchanging data and cloning.
- * ```js
- * JSON.parse<T>(data)
- * ```
- * @param data string
- * @returns T
- */
+   * Parses valid JSON strings into their original format.
+   * ```js
+   * JSON.parse<T>(data)
+   * ```
+   * @param data string
+   * @returns T
+   */
   export function parse<T>(data: string): T {
     let type!: T
-    // This treats type as if it were actually an instantiated T
     if (isString<T>()) {
       // @ts-ignore
       return parseString(data)
@@ -67,11 +102,11 @@ export namespace JSON {
       // @ts-ignore
       return parseBoolean(data)
     } else if (isFloat<T>() || isInteger<T>()) {
-      // @ts-ignore
       return parseNumber<T>(data)
     } else if (isArrayLike<T>()) {
-      // @ts-ignore
       return parseArray<T>(data)
+    } else if (type instanceof Map) {
+      return parseMap<T>(data)
     } else {
       // @ts-ignore
       return null
@@ -193,6 +228,70 @@ function parseNumberArray<T>(data: string): Array<T> {
     }
   }
   result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
+  return result
+}
+
+export function parseObject(data: string): void {
+  //const obj = instantiate<T>()
+  const result = new Array<string>()
+  let lastPos: u32 = 0
+  let char: u32 = 0
+  let i: u32 = 1
+  let key: string = ""
+  let isKey: boolean = false
+  for (; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i)
+    if (isKey == false) {
+      if (char == ":".charCodeAt(0)) {
+        key = data.slice(lastPos + 2, i - 1)
+        console.log(`Found Key: ${key}`)
+        result.push(key)
+        lastPos = ++i
+        isKey = true
+      }
+    } else {
+      if (char == ",".charCodeAt(0)) {
+        const val = data.slice(lastPos, i)
+        lastPos = i
+        isKey = false
+        console.log(`Found Val: ${val}`)
+        result.push(val)
+      }
+    }
+  }
+  result.push(data.slice(lastPos, data.length - 1))
+  console.log(stringify(result))
+  //return obj
+}
+
+export function parseMap<T>(data: string): T {
+  //const obj = instantiate<T>()
+  const result = instantiate<T>()
+  let lastPos: u32 = 0
+  let char: u32 = 0
+  let i: u32 = 1
+  let key: string = ""
+  let isKey: boolean = false
+  for (; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i)
+    if (isKey == false) {
+      if (char == ":".charCodeAt(0)) {
+        key = data.slice(lastPos + 2, i - 1)
+        //console.log(`Found Key: ${key}`)
+        lastPos = ++i
+        isKey = true
+      }
+    } else {
+      if (char == ",".charCodeAt(0)) {
+        const val = data.slice(lastPos, i)
+        lastPos = i
+        isKey = false
+        //console.log(`Found Val: ${val}`)
+        result.set(key, parseString(val))
+      }
+    }
+  }
+  result.set(key, parseString(data.slice(lastPos, data.length - 1)))
   return result
 }
 /*
@@ -445,4 +544,4 @@ export function parseDynamic(data: string): JSONValue {
 
 }
 */
-export class Nullable { }
+class Nullable { }

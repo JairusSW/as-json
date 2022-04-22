@@ -1,4 +1,3 @@
-import { StringSink } from "as-string-sink"
 export class Option<T> {
   exists: boolean;
 }
@@ -85,6 +84,7 @@ export class JSONValue {
     if (this.kind == 0) {
       return '"' + changetype<string>(usize(this.value)) + '"';
     }
+    // @ts-ignore
     else if (this.kind == 1) return reinterpret<f64>(this.value).toString();
     else if (this.kind == 2) return changetype<JSONobject>(usize(this.value)).toString();
     else if (this.kind == 3) return changetype<JSONArray>(usize(this.value)).toString();
@@ -96,16 +96,14 @@ export class JSONValue {
 
 export class JSONArray extends Array<JSONValue> {
   toString(): string {
-    const result = new StringSink("[");
+    let result = "[";
     let len = this.length - 1;
     if (len == -1) return "[]";
     for (let i = 0; i < this.length - 1; i++) {
-      result.write(this[i].toString())
-      result.write(",")
+      result += this[i].toString() + ","
     }
-    result.write(this[len].toString())
-    result.write("]")
-    return result.toString();
+    result += this[len].toString() + "]"
+    return result
   }
 }
 export class JSONobject extends Map<string, JSONValue> {
