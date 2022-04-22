@@ -52,4 +52,7 @@ map.set("age", "23")
 
 console.log(JSON.stringify(map))
 
-console.log(JSON.stringify(JSON.parse<Map<string, string>>('{"firstName":"Emmet","lastName":"Smith","age":"23"}')))
+const parseMap = JSON.parse<Map<string, string>>('{"firstName":"Emmet","lastName":"Smith","age":"23"}')
+
+console.log(parseMap.get("lastName"))
+console.log(JSON.stringify(parseMap))
