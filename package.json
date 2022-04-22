@@ -1,34 +1,28 @@
 {
   "name": "json-as",
-  "version": "0.2.6 ",
+  "version": "0.3.0",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
-  "ascMain": "assembly/index.ts",
-  "author": "JairusSW",
+  "main": "./transform/lib/index.js",
+  "author": "Jairus Tanaka",
+  "contributors": [
+    "DogWhich"
+  ],
   "license": "MIT",
   "scripts": {
+    "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -w -p ./transform",
-    "build:test": "asc assembly/test.ts --target test --explicitStart",
-    "test:node": "node --experimental-wasi-unstable-preview1 ./tests/test",
-    "test:wasmtime": "wasmtime ./tests/output/test.wasm",
-    "test:lunatic": "lunatic ./tests/output/test.wasm",
-    "bench:build": "asc assembly/bench.ts --runtime incremental --target bench --explicitStart",
-    "bench:node": "node --experimental-wasi-unstable-preview1 ./bench/bench",
-    "bench:wasmtime": "wasmtime ./bench/output/bench.wasm",
-    "bench:lunatic": "lunatic ./bench/output/bench.wasm",
-    "asbuild:untouched": "asc assembly/index.ts --target debug",
-    "asbuild:optimized": "asc assembly/index.ts --target release",
-    "asbuild": "yarn asbuild:untouched && yarn asbuild:optimized"
+    "test:wasmtime": "wasmtime ./build/test.wasm",
+    "test:lunatic": "lunatic ./build/test.wasm"
   },
   "devDependencies": {
     "as-console": "^6.0.2",
-    "assemblyscript": "^0.19.22"
+    "assemblyscript": "^0.20.4",
+    "typescript": "^4.6.3",
+    "@envy-as/cli": "https://github.com/jtenner/envy",
+    "as-tral": "https://github.com/romdotdog/as-tral"
   },
-  "dependencies": {
-    "as-string-sink": "^0.5.0",
-    "as-variant": "^0.3.0",
-    "visitor-as": "^0.6.0"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aspkg/as-json.git"
@@ -43,5 +37,12 @@
   "bugs": {
     "url": "https://github.com/aspkg/as-json/issues"
   },
-  "homepage": "https://github.com/aspkg/as-json#readme"
+  "homepage": "https://github.com/aspkg/as-json#readme",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./assembly/index.ts",
+      "types": "./assembly/index.ts"
+    }
+  }
 }

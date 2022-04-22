@@ -1,50 +1,22 @@
 {
   "targets": {
     "debug": {
-      "binaryFile": "build/untouched.wasm",
-      "textFile": "build/untouched.wat",
+      "outFile": "build/debug.wasm",
+      "textFile": "build/debug.wat",
       "sourceMap": true,
       "debug": true
     },
     "release": {
-      "binaryFile": "build/optimized.wasm",
-      "textFile": "build/optimized.wat",
+      "outFile": "build/release.wasm",
+      "textFile": "build/release.wat",
       "sourceMap": true,
-      "optimizeLevel": 0,
+      "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": false,
       "noAssert": false
     },
     "test": {
-      "binaryFile": "tests/output/test.wasm",
-      "textFile": "tests/output/test.wat",
-      "sourceMap": true,
-      "optimizeLevel": 0,
-      "shrinkLevel": 0,
-      "converge": false,
-      "noAssert": false
-    },
-    "bench": {
-      "binaryFile": "./bench.wasm",
-      "textFile": "./bench.wat",
-      "sourceMap": true,
-      "optimizeLevel": 3,
-      "shrinkLevel": 0,
-      "converge": false,
-      "noAssert": false
-    },
-    "dynamic:bench": {
-      "binaryFile": "dynamic/bench/output/bench.wasm",
-      "textFile": "dynamic/bench/output/bench.wat",
-      "sourceMap": true,
-      "optimizeLevel": 3,
-      "shrinkLevel": 0,
-      "converge": false,
-      "noAssert": false
-    },
-    "dynamic:test": {
-      "binaryFile": "dynamic/test/output/test.wasm",
-      "textFile": "dynamic/test/output/test.wat",
+      "outFile": "build/test.wasm",
       "sourceMap": true,
       "optimizeLevel": 0,
       "shrinkLevel": 0,
@@ -52,5 +24,7 @@
       "noAssert": false
     }
   },
-  "options": {}
+  "options": {
+    "transform": "."
+  }
 }

@@ -1,209 +1,96 @@
-"use strict";
-const as_1 = require("visitor-as/as");
-const visitor_as_1 = require("visitor-as");
-const utils_1 = require("visitor-as/dist/utils");
-function getTypeName(type) {
-  let _type = (0, utils_1.getName)(type);
-  const OR_NULL = /\|.*null/;
-  if (type.isNullable && !OR_NULL.test(_type)) {
-    _type = `${_type} | null`;
-  }
-  return _type;
+import { ClassPrototype, IdentifierExpression, ImportStatement, FieldPrototype, MethodDeclaration, CommonFlags, FunctionTypeNode, TypeName, BlockStatement, FunctionPrototype, NamedTypeNode, ReturnStatement, StringLiteralExpression, VariableDeclaration, VariableStatement, BinaryExpression, ExpressionStatement, Token, PropertyAccessExpression, CallExpression, ThisExpression, } from "assemblyscript";
+import { Transform } from "assemblyscript/transform";
+export default class MyTransform extends Transform {
+    readFile(filename, baseDir) {
+        return null;
+    }
+    afterParse(p) {
+        p.sources.forEach((s) => {
+            if (s.isLibrary)
+                return;
+            s.statements.forEach((s) => {
+                if (s instanceof ImportStatement) {
+                    //   console.log(s.internalPath);
+                    // console.log(s.path.value.charAt(s.path.value.length - 1));
+                    if (s.path.value.charAt(s.path.value.length - 1) == "~") {
+                        s.path.value = s.path.value.slice(0, s.path.value.length - 1);
+                        s.internalPath = s.internalPath.slice(0, s.internalPath.length - 1);
+                    }
+                }
+            });
+        });
+    }
+    afterInitialize(program) {
+        // initializer(program);
+        // console.log(program.managedClasses);
+        //program.filesByName.forEach((e) => {
+        //   console.log(e.name);
+        //});
+        program.elementsByName.forEach((c) => {
+            var _a, _b, _c;
+            //program.elementsByName.forEach((e) => {});
+            if (c instanceof ClassPrototype) {
+                if (!!((_a = c.decoratorNodes) === null || _a === void 0 ? void 0 : _a.find((e) => {
+                    /** detect decorator */
+                    return (e.name instanceof IdentifierExpression && e.name.text == "json");
+                }))) {
+                    //   console.log({ ...c, program: {}, parent: {} });
+                    (_b = c.members) === null || _b === void 0 ? void 0 : _b.forEach((m) => {
+                        //console.log(ElementKind[m.kind]);
+                        if (m instanceof FieldPrototype) {
+                            console.log(m.name);
+                        }
+                    });
+                    let fnBody = new BlockStatement([
+                        new VariableStatement(null, [
+                            new VariableDeclaration(new IdentifierExpression("_str", false, c.declaration.range), null, CommonFlags.LET, null, new StringLiteralExpression("{", c.declaration.range), c.declaration.range),
+                        ], c.declaration.range),
+                    ], c.declaration.range);
+                    const escapeChars = (e) => {
+                        let outChars = "";
+                        let cchhar = "";
+                        for (let i = 0; i < e.length; i++) {
+                            cchhar = e.charAt(i);
+                            if (cchhar == '"') {
+                                outChars += `\\"` + cchhar;
+                            }
+                            else {
+                                outChars += cchhar;
+                            }
+                        }
+                        return outChars;
+                    };
+                    let i = 0;
+                    const size = c.instanceMembers.size;
+                    let d;
+                    for (const field of c.instanceMembers.values()) {
+                        // Leave out trailing commas
+                        if (i < size - 1) {
+                            d = new StringLiteralExpression(",", c.declaration.range);
+                        }
+                        else {
+                            d = new StringLiteralExpression("", c.declaration.range);
+                        }
+                        if (field instanceof FieldPrototype) {
+                            fnBody.statements.push(new ExpressionStatement(new BinaryExpression(Token.PLUS_EQUALS, new IdentifierExpression("_str", false, c.declaration.range), new BinaryExpression(Token.PLUS, new StringLiteralExpression('"' + escapeChars(field.name) + '":', c.declaration.range), new BinaryExpression(Token.PLUS, new CallExpression(new PropertyAccessExpression(new IdentifierExpression("JSON", false, c.declaration.range), new IdentifierExpression("stringify", false, c.declaration.range), c.declaration.range), null, [
+                                new PropertyAccessExpression(new ThisExpression(c.declaration.range), new IdentifierExpression(field.name, false, c.declaration.range), c.declaration.range),
+                            ], c.declaration.range), d, c.declaration.range), c.declaration.range), c.declaration.range)));
+                        }
+                        i++;
+                    }
+                    fnBody.statements.push(new ReturnStatement(new BinaryExpression(Token.PLUS, new IdentifierExpression("_str", false, c.declaration.range), new StringLiteralExpression("}", c.declaration.range), c.declaration.range), c.declaration.range));
+                    let __JSON_Serialize = new FunctionPrototype("__JSON_Serialize", c, new MethodDeclaration(new IdentifierExpression("__JSON_Serialize", false, c.declaration.range), null, CommonFlags.INSTANCE, null, new FunctionTypeNode([], new NamedTypeNode(new TypeName(new IdentifierExpression("string", false, c.declaration.range), null, c.declaration.range), null, false, c.declaration.range), null, false, c.declaration.range), fnBody, c.declaration.range));
+                    (_c = c.instanceMembers) === null || _c === void 0 ? void 0 : _c.set("__JSON_Serialize", __JSON_Serialize);
+                    c.declaration.members.push(__JSON_Serialize.declaration);
+                    //c.instanceMembers?.forEach((m) => {
+                    //console.log(ElementKind[m.kind]);
+                    //if (m instanceof FieldPrototype) {
+                    // console.log(m.name);
+                    //}
+                    //});
+                }
+            }
+        });
+    }
 }
-// Replace Next Line
-const replaceNextLineRegex = /^\W*\/\/ <replace next line>.*$/gm;
-class JSONTransformer extends visitor_as_1.BaseVisitor {
-  currentClass;
-  encodeStmts = new Map();
-  decodeCode = new Map();
-  lastType = "";
-  sources = [];
-  globalStatements = [];
-  replaceNextLines = new Set();
-  visitObjectLiteralExpression(node) {
-    const keys = node.names;
-    const values = node.values;
-    const replacer = visitor_as_1.SimpleParser.parseExpression(`new Object()`);
-    for (const key of keys) {
-    }
-  }
-  visitElementAccessExpression(node) {
-    super.visitElementAccessExpression(node);
-    if ((0, utils_1.toString)(node.expression) === "o") {
-      // Should be like if (node.expression.type.text === "Object") {
-      const replacer = visitor_as_1.SimpleParser.parseExpression(
-        `u32(changetype<usize>(${(0, utils_1.toString)(
-          node.elementExpression
-        )}))`
-      );
-      node.elementExpression = replacer;
-      this.sources.push(replacer.range.source);
-    }
-  }
-  visitArrayLiteralExpression(node) {
-    super.visitArrayLiteralExpression(node);
-    if (isanyArray(node)) {
-      for (let i = 0; i < node.elementExpressions.length; i++) {
-        const expr = node.elementExpressions[i];
-        // @ts-ignore
-        let replacement;
-        // @ts-ignore
-        if (expr.elementExpressions) {
-          // @ts-ignore
-          this.convertToAnyArray(expr.elementExpressions);
-        }
-        // @ts-ignore
-        replacement = visitor_as_1.SimpleParser.parseExpression(
-          `Unknown.wrap(${(0, utils_1.toString)(expr)})`
-        );
-        node.elementExpressions[i] = replacement;
-        this.sources.push(replacement.range.source);
-      }
-    }
-  }
-  convertToAnyArray(exprs) {
-    for (let i = 0; i < exprs.length; i++) {
-      const expr = exprs[i];
-      // @ts-ignore
-      let replacement;
-      // @ts-ignore
-      if (expr.elementExpressions) {
-        // @ts-ignore
-        this.convertToAnyArray(expr.elementExpressions);
-      }
-      // @ts-ignore
-      replacement = visitor_as_1.SimpleParser.parseExpression(
-        `Unknown.wrap(${(0, utils_1.toString)(expr)})`
-      );
-      exprs[i] = replacement;
-      this.sources.push(replacement.range.source);
-    }
-  }
-  visitFieldDeclaration(node) {
-    super.visitFieldDeclaration(node);
-    const name = (0, utils_1.toString)(node.name);
-    if (!node.type) {
-      throw new Error(`Field ${name} is missing a type declaration`);
-    }
-    const type = getTypeName(node.type);
-    if (this.currentClass) {
-      const className = this.currentClass.name.text;
-      if (!this.encodeStmts.has(className)) this.encodeStmts.set(className, []);
-      if (!this.decodeCode.has(className)) this.decodeCode.set(className, []);
-      // @ts-ignore
-      this.encodeStmts
-        .get(className)
-        .push(
-          `this.__encoded += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
-        );
-      // @ts-ignore
-      this.decodeCode
-        .get(className)
-        .push(
-          `${name}: JSON.parse<${type}>(unchecked(values.get('${name}'))),\n`
-        );
-    }
-  }
-  visitClassDeclaration(node) {
-    super.visitClassDeclaration(node);
-    if (!node.members) {
-      return;
-    }
-    this.currentClass = node;
-    const name = (0, utils_1.getName)(node);
-    this.encodeStmts.delete(name);
-    this.decodeCode.delete(name);
-    this.visit(node.members);
-    const encodedProp = `__encoded: string = ''`;
-    let encodeMethod = ``;
-    if (this.encodeStmts.has(name) && this.encodeStmts.get(name)) {
-      encodeMethod = `
-      __encode(): void {
-        if (!this.__encoded) {
-          ${
-            // @ts-ignore
-            this.encodeStmts.get(name).join("\n")
-          };
-          this.__encoded = this.__encoded.slice(0, this.__encoded.length - 1)
-        }
-      }
-      `;
-    } else {
-      encodeMethod = `
-      __encode(): void {}
-      `;
-    }
-    const decodeMethod = `
-    __decode(values: Map<string, string>): ${name} {
-        const decoded: ${name} = {
-          ${
-            // @ts-ignore
-            this.decodeCode.get(name) ? this.decodeCode.get(name).join("") : ""
-          }
-        }
-      return decoded
-    }
-    `;
-    const encodedPropMember = visitor_as_1.SimpleParser.parseClassMember(
-      encodedProp,
-      node
-    );
-    node.members.push(encodedPropMember);
-    const encodeMember = visitor_as_1.SimpleParser.parseClassMember(
-      encodeMethod,
-      node
-    );
-    node.members.push(encodeMember);
-    const decodeMember = visitor_as_1.SimpleParser.parseClassMember(
-      decodeMethod,
-      node
-    );
-    node.members.push(decodeMember);
-  }
-  static visit(node) {
-    new JSONTransformer().visit(node);
-  }
-  visitSource(source) {
-    this.globalStatements = [];
-    super.visitSource(source);
-  }
-}
-function isanyArray(node) {
-  if (node.elementExpressions.length === 0) return false;
-  const firstKind = node.elementExpressions[0]?.kind;
-  const isBoolean =
-    (0, utils_1.toString)(node.elementExpressions[0]) === "true" ||
-    (0, utils_1.toString)(node.elementExpressions[0]) === "false";
-  for (const chunk of node.elementExpressions) {
-    if (isBoolean) {
-      if (
-        (0, utils_1.toString)(chunk) !== "true" ||
-        (0, utils_1.toString)(chunk) !== "false"
-      )
-        true;
-    } else if (chunk.kind !== firstKind) return true;
-  }
-  return false;
-}
-module.exports = class MyTransform extends as_1.Transform {
-  // Trigger the transform after parse.
-  afterParse(parser) {
-    // Create new transform
-    const transformer = new JSONTransformer();
-    // Loop over every source
-    for (const source of parser.sources) {
-      // Ignore all lib (std lib). Visit everything else.
-      if (!source.isLibrary && !source.internalPath.startsWith(`~lib/`)) {
-        transformer.visit(source);
-      }
-    }
-    let i = 0;
-    for (const source of transformer.sources) {
-      //source.internalPath += `${i++}.ts`
-      if (i === 0) {
-        parser.sources.push(source);
-        i++;
-      }
-    }
-  }
-};
+;

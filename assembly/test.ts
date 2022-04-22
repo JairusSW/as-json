@@ -1,33 +1,58 @@
-import { Variant } from "as-variant";
-import { JSON, Nullable } from ".";
+import { stringify } from "as-console/assembly/wasi";
+import "wasi"
+import { JSON, json, parseObject } from "./index";
 
-function check<T>(message: string, data: T): void {
-    const serialized = JSON.stringify<T>(data)
-    const deserialized = JSON.parse<T>(serialized)
-    console.log(`${message}\nSerialized: ${serialized}\nDeserialized: ${JSON.stringify(deserialized)}`)
+@json
+class vec {
+  x: f64;
+  y: f64;
 }
 
-check('Encode/Decode String', "Hello World")
+@json
+class player {
+  name: string;
+  position: vec;
+  houseCoords: vec;
+}
 
-check('Encode/Decode String', "Hell[}:o Wo[rld}{")
+let myPlayer: player = {
+  name: "Bobby",
+  position: {
+    x: 10,
+    y: 20
+  },
+  houseCoords: {
+    x: -10.1,
+    y: 2000.4
+  }
+}
 
-check('Encode/Decode String', "Hel`\"lo Wo\"`r\"ld")
+@json
+class JSONSchema {
+  firstName: string
+  lastName: string
+  age: i32
+}
 
-check('Encode/Decode Boolean', true)
+const data: JSONSchema = {
+  firstName: 'Emmet',
+  lastName: 'Smith',
+  age: 23
+}
 
-check('Encode/Decode Boolean', false)
+parseObject('{"firstName":"Emmet","lastName":"Smith","age":23}')
 
-check('Encode/Decode Variant String', Variant.from("Hello World"))
+console.log(JSON.stringify(myPlayer))
 
-check('Encode/Decode Variant String', Variant.from("Hell[}:o Wo[rld}{"))
+const map = new Map<string, string>()
 
-check('Encode/Decode Variant String', Variant.from("Hel`\"lo Wo\"`r\"ld"))
+map.set("firstName", "Emmet")
+map.set("lastName", "Smith")
+map.set("age", "23")
 
-check('Encode/Decode Variant Boolean', Variant.from(true))
+console.log(JSON.stringify(map))
 
-check('Encode/Decode Variant Boolean', Variant.from(false))
+const parseMap = JSON.parse<Map<string, string>>('{"firstName":"Emmet","lastName":"Smith","age":"23"}')
 
-check<Nullable | null>('Encode/Decode Null', <Nullable | null>null)
- 
-console.log(JSON.stringify([1, 2, 3, 4, 5]))
-console.log(JSON.stringify([Variant.from("Hello World"), null]))
+console.log(parseMap.get("lastName"))
+console.log(JSON.stringify(parseMap))
