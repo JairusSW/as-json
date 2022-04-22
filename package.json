@@ -3,7 +3,6 @@
   "version": "0.3.0",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
-  "ascMain": "assembly/index.ts",
   "author": "Jairus Tanaka",
   "contributors": [
     "DogWhich"
@@ -38,8 +37,5 @@
     "url": "https://github.com/aspkg/as-json/issues"
   },
   "homepage": "https://github.com/aspkg/as-json#readme",
-  "type": "module",
-  "exports": {
-    ".": "./assembly/index.ts"
-  }
+  "type": "module"
 }
