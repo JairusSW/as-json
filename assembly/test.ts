@@ -1,6 +1,6 @@
-import { stringify } from "as-console/assembly/wasi";
 import "wasi"
-import { JSON, json, parseObject } from "./index";
+import { json, JSON } from "./index";
+import { JSONArray, JSONValue } from "./jsonType";
 
 @json
 class vec {
@@ -40,19 +40,16 @@ const data: JSONSchema = {
   age: 23
 }
 
-parseObject('{"firstName":"Emmet","lastName":"Smith","age":23}')
-
 console.log(JSON.stringify(myPlayer))
 
-const map = new Map<string, string>()
-
-map.set("firstName", "Emmet")
-map.set("lastName", "Smith")
-map.set("age", "23")
-
-console.log(JSON.stringify(map))
-
-const parseMap = JSON.parse<Map<string, string>>('{"firstName":"Emmet","lastName":"Smith","age":"23"}')
-
-console.log(parseMap.get("lastName"))
-console.log(JSON.stringify(parseMap))
+let foo = JSONValue.from("hello, json types!")
+console.log(JSON.stringify(foo))
+const arr = new JSONArray()
+arr.push(JSONValue.from("string!"))
+arr.push(JSONValue.from(314))
+arr.push(JSONValue.from(3.14))
+arr.push(JSONValue.from(-314))
+arr.push(JSONValue.from<boolean>(true))
+arr.push(JSONValue.from<boolean>(false))
+foo = JSONValue.from(arr)
+console.log(JSON.stringify(foo))

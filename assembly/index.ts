@@ -1,3 +1,7 @@
+import { StringSink } from "as-string-sink/assembly";
+import { JSONArray, JSONObject, JSONValue } from "./jsonType";
+
+
 export declare let json: (...a: any) => any;
 
 /**
@@ -48,7 +52,8 @@ export namespace JSON {
       return "null"
     }
     // Integers/Floats
-    else if (isInteger<T>() || isFloat<T>()) {
+    // @ts-ignore
+    else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
       // @ts-ignore
       return data.toString()
     }
@@ -60,25 +65,45 @@ export namespace JSON {
     }
     // Map
     else if (data instanceof Map) {
-      let result = "{"
+      let result = new StringSink("{")
       let i = 0;
       const keys = data.keys()
       const values = data.values()
       for (; i < keys.length - 1; i++) {
-        result += `"${unchecked(keys[i])}":${JSON.stringify(unchecked(values[i]))},`
+        result.write(`"${unchecked(keys[i])}":${stringify(unchecked(values[i]))},`)
       }
-      result += `"${unchecked(keys[keys.length - 1])}":${JSON.stringify(unchecked(values[keys.length - 1]))}}`
-      return result
+      result.write(`"${unchecked(keys[keys.length - 1])}":${stringify(unchecked(values[keys.length - 1]))}}`)
+      return result.toString()
     }
     // ArrayLike
     else if (isArrayLike(data)) {
       let result = "["
-      for (let i = 0; i < data.length - 1; i++) {
-        result += JSON.stringify(unchecked(data[i]))
-        result += ","
+      const len = data.length - 1;
+      if (len == -1) return "[]";
+      for (let i = 0; i < len; i++) {
+        result += stringify(unchecked(data[i])) + ","
       }
-      result += JSON.stringify(unchecked(data[data.length - 1]))
-      result += "]"
+      result += stringify(unchecked(data[data.length - 1])) + "]"
+      return result
+    } else if (data instanceof JSONValue) {
+      if (data.kind == 0) {
+        return '"' + changetype<string>(usize(data.value)) + '"';
+      }
+      // @ts-ignore
+      else if (data.kind == 1) return reinterpret<f64>(data.value).toString();
+      else if (data.kind == 2) return stringify(changetype<JSONObject>(usize(data.value)))
+      else if (data.kind == 3) return stringify(changetype<JSONArray>(usize(data.value)))
+      else if (data.kind == 4) return "null";
+      else if (data.kind == 5) return bool(data.value) ? "true" : "false"
+      else throw new Error("Unreachable: Jsontype is not of correct kind.")
+    } else if (data instanceof JSONArray) {
+      let result = "[";
+      const len = data.length - 1;
+      if (len == -1) return "[]";
+      for (let i = 0; i < len; i++) {
+        result += stringify(unchecked(data[i])) + ","
+      }
+      result += stringify(unchecked(data[len])) + "]"
       return result
     } else {
       return "null"
@@ -546,3 +571,10 @@ export function parseDynamic(data: string): JSONValue {
 }
 */
 class Nullable { }
+
+function intToString(num: number): string {
+  const result = new StringSink()
+  while (num > 0) {
+    
+  }
+}

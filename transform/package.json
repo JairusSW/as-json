@@ -8,17 +8,12 @@
         "DogWhich"
     ],
     "license": "MIT",
-    "scripts": {
-        "build:test": "asc assembly/test.ts --target test",
-        "build:transform": "tsc -w -p ./transform",
-        "test:wasmtime": "wasmtime ./build/test.wasm",
-        "test:lunatic": "lunatic ./build/test.wasm"
-    },
+    "scripts": {},
     "devDependencies": {},
     "dependencies": {},
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/aspkg/as-json.git"
+        "url": "git+https://github.com/JairusSW/as-json.git"
     },
     "keywords": [
         "assemblyscript",
@@ -28,9 +23,9 @@
         "dynamic"
     ],
     "bugs": {
-        "url": "https://github.com/aspkg/as-json/issues"
+        "url": "https://github.com/JairusSW/as-json/issues"
     },
-    "homepage": "https://github.com/aspkg/as-json#readme",
+    "homepage": "https://github.com/JairusSW/as-json#readme",
     "type": "module",
     "exports": "./lib/index.js"
 }

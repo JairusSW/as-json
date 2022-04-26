@@ -25,6 +25,7 @@
     }
   },
   "options": {
-    "transform": "./transform"
+    "transform": "./transform",
+    "bindings": "esm"
   }
 }

@@ -12,19 +12,23 @@
     "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -w -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
-    "test:lunatic": "lunatic ./build/test.wasm"
+    "test:lunatic": "lunatic ./build/test.wasm",
+    "test:node": "",
+    "test:browser": "serve ."
   },
   "devDependencies": {
-    "as-console": "^6.0.2",
-    "assemblyscript": "^0.20.4",
-    "typescript": "^4.6.3",
     "@envy-as/cli": "https://github.com/jtenner/envy",
-    "as-tral": "https://github.com/romdotdog/as-tral"
+    "as-console": "^6.0.2",
+    "as-tral": "https://github.com/romdotdog/as-tral",
+    "assemblyscript": "^0.20.4",
+    "typescript": "^4.6.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "as-string-sink": "^0.5.0"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aspkg/as-json.git"
+    "url": "git+https://github.com/JairusSW/as-json.git"
   },
   "keywords": [
     "assemblyscript",
@@ -34,8 +38,8 @@
     "dynamic"
   ],
   "bugs": {
-    "url": "https://github.com/aspkg/as-json/issues"
+    "url": "https://github.com/JairusSW/as-json/issues"
   },
-  "homepage": "https://github.com/aspkg/as-json#readme",
+  "homepage": "https://github.com/JairusSW/as-json#readme",
   "type": "module"
 }
