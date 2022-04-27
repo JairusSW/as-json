@@ -11,9 +11,9 @@ export class JSONValue {
       return this.kind == 0;
     } else if (isFloat<T>()) {
       return this.kind == 1;
-    } else if (type instanceof JSONObject) {
+    } else if (idof<T>() == idof<JSONObject>()) {
       return this.kind == 2;
-    } else if (type instanceof JSONArray) {
+    } else if (idof<T>() == idof<JSONArray>()) {
       return this.kind == 3;
     } else if (type instanceof JSONNull) {
       return this.kind == 4;
@@ -56,10 +56,10 @@ export class JSONValue {
     else if (isFloat<T>()) {
       // @ts-ignore
       return reinterpret<f64>(this.value);
-    } else if (type instanceof JSONObject) {
+    } else if (idof<T>() == idof<JSONObject>()) {
       // @ts-ignore
       return changetype<JSONObject>(usize(this.value));
-    } else if (type instanceof JSONArray) {
+    } else if (idof<T>() == idof<JSONArray>()) {
       // @ts-ignore
       return changetype<JSONArray>(usize(this.value));
     } else if (isBoolean<T>()) {
@@ -79,17 +79,17 @@ export class JSONValue {
     //@ts-ignore
     if (data instanceof string) {
       return new JSONValue(0, u64(changetype<usize>(data)));
-    } else if ((isFloat<T>() || isInteger<T>())) {
-      // @ts-ignore
-      return new JSONValue(1, reinterpret<u64>(data));
-    } else if (data instanceof JSONObject) {
+    } else if (idof<T>() == idof<JSONObject>()) {
       return new JSONValue(2, u64(changetype<usize>(data)));
-    } else if (data instanceof JSONArray) {
+    } else if (idof<T>() == idof<JSONArray>()) {
       return new JSONValue(3, u64(changetype<usize>(data)));
     } else if (isNullable(data) && data == null) {
       return new JSONValue(4, u64(changetype<usize>(data)));
     } else if (isBoolean<T>()) {
       return new JSONValue(5, u64(data));
+    } else if ((isFloat<T>() || isInteger<T>())) {
+      // @ts-ignore
+      return new JSONValue(1, reinterpret<u64>(data));
     } else {
       ERROR("Type T is not a member of the four possible json types.");
     }
@@ -102,8 +102,8 @@ export class JSONValue {
   }
 }
 
-export class JSONArray extends Array<JSONValue> {}
-export class JSONObject extends Map<string, JSONValue> {}
-export class JSONNull { }
+export type JSONArray = Array<JSONValue>
+export type JSONObject = Map<string, JSONValue>
+export class JSONNull {}
 
 const Null = new JSONNull();

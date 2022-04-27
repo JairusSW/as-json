@@ -97,13 +97,16 @@ export namespace JSON {
       else if (data.kind == 4) return "null";
       else if (data.kind == 5) return bool(data.value) ? "true" : "false"
       else throw new Error("Unreachable: Jsontype is not of correct kind.")
-    } else if (data instanceof JSONArray) {
+    } else if (idof<T>() == idof<JSONArray>()) {
       let result = "[";
+      // @ts-ignore
       const len = data.length - 1;
       if (len == -1) return "[]";
       for (let i = 0; i < len; i++) {
+        // @ts-ignore
         result += stringify(unchecked(data[i])) + ","
       }
+      // @ts-ignore
       result += stringify(unchecked(data[len])) + "]"
       return result
     } else {
@@ -122,23 +125,33 @@ export namespace JSON {
     let type!: T
     if (isString<T>()) {
       // @ts-ignore
-      return parseString(data)
+      return parseString(data);
     } else if (isBoolean<T>()) {
       // @ts-ignore
-      return parseBoolean(data)
+      return parseBoolean(data);
     } else if (isFloat<T>() || isInteger<T>()) {
-      return parseNumber<T>(data)
-    } else if (isArrayLike<T>()) {
+      return parseNumber<T>(data);
+    } /*else if (isArrayLike<T>()) {
       return parseArray<T>(data)
-    } else if (type instanceof Map) {
-      return parseMap<T>(data)
+    }*/ else if (type instanceof Map) {
+      return parseMap<T>(data);
     } else if (type instanceof JSONValue) {
-      // @ts-ignore
-      return JSONValue.from<string>(parseString(data))
-
+      data = data.trimStart();
+      let char = data.charCodeAt(0);
+      if (char == "\"".charCodeAt(0)) {
+        // @ts-ignore
+        return JSONValue.from<string>(parseString(data))
+      } else if (char == "t".charCodeAt(0) && data.startsWith("true")) {
+        // @ts-ignore
+        return JSONValue.from<boolean>(true);
+      } else if (char == "f".charCodeAt(0) && data.startsWith("false")) {
+        // @ts-ignore
+        return JSONValue.from<boolean>(false);
+      }
+      throw new Error("wrong type detected!")
     } else {
       // @ts-ignore
-      return null
+      return null;
     }
   }
 }
@@ -187,8 +200,8 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseArray<T>(data: string): T {
-  const result: T = instantiate<T>()
+export function parseArray(data: string): void {
+  //const result: T = instantiate<T>()
   data = data.trim();
   let len: u32 = data.length - 1;
   let lastPos: u32 = 1;
@@ -203,24 +216,35 @@ export function parseArray<T>(data: string): T {
   let outDepth: u32 = 0;
   for (; i < len; i++) {
     char = data.charCodeAt(i);
-    if (char == "\"".charCodeAt(0) && data.charCodeAt(i-1) != "\\".charCodeAt(0)) isStr = !isStr
-    // This removes whitespace before and after an element
+    if (char == "\"".charCodeAt(0) && data.charCodeAt(i - 1) != "\\".charCodeAt(0)) isStr = !isStr
     if (!isStr) {
-      if (offset != 0 && isSpace(char)) {
+      // This removes whitespace before and after an element
+      /*if (offset != 0 && isSpace(char)) {
         lastPos++;
       } else {
         if (isSpace(char)) offset++;
-      }
-      if (char == ",".charCodeAt(0)) {
-        //console.log(`-${data.slice(lastPos, i - offset)}-`)
-        // @ts-ignore
-        result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset)))
-        offset = 0;
-        lastPos = ++i;
+      }*/
+      // This checks to see if we are dealing with structures such as Objects and Arrays
+      if (isStruct == true) {
+        if (char == "{".charCodeAt(0) || char == "[".charCodeAt(0)) inDepth++;
+        else if (char == "}".charCodeAt(0) || char == "]".charCodeAt(0)) outDepth++;
+      } else {
+        if (char == "{".charCodeAt(0) || char == "[".charCodeAt(0)) {
+          lastPos = i;
+          isStruct = true;
+          inDepth++;
+        } else if (char == ",".charCodeAt(0)) {
+          //console.log(`-${data.slice(lastPos, i - offset)}-`)
+          // @ts-ignore
+          //result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset)))
+          console.log(`Value-${data.slice(lastPos, i - offset).trim()}-`)
+          offset = 0;
+          lastPos = ++i;
+        }
       }
     }
   }
-  char = data.charCodeAt(lastPos)
+  /*char = data.charCodeAt(lastPos)
   // Remove preceeding whitespace
   while (isSpace(char)) {
     lastPos++;
@@ -230,12 +254,13 @@ export function parseArray<T>(data: string): T {
   while (isSpace(char)) {
     len--;
     char = data.charCodeAt(len);
-  }
+  }*/
 
   // @ts-ignore
   // Handle empty arrays
   if (len != 0) result.push(JSON.parse<valueof<T>>(data.slice(lastPos, len + 1)))
-  return result;
+  console.log(`Trailing-${data.slice(lastPos, len).trim()}-`)
+  //return result;
 }
 
 export function parseObject(data: string): void {
