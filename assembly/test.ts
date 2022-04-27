@@ -1,7 +1,7 @@
 import "wasi"
-import { json, JSON } from "./index";
+import { json, JSON, parseArray } from "./index";
 import { JSONArray, JSONValue } from "./jsonType";
-
+/*
 @json
 class vec {
   x: f64;
@@ -53,3 +53,7 @@ arr.push(JSONValue.from<boolean>(true))
 arr.push(JSONValue.from<boolean>(false))
 foo = JSONValue.from(arr)
 console.log(JSON.stringify(foo))
+
+console.log(JSON.stringify(JSON.parse<JSONValue>("\"hello\"")))
+*/
+console.log(JSON.stringify(parseArray<string[]>('[ "hello" , "pillow" ]')))

@@ -102,8 +102,8 @@ export class JSONValue {
   }
 }
 
-export class JSONArray extends Array<JSONValue> { }
-export class JSONObject extends Map<string, JSONValue> { }
+export class JSONArray extends Array<JSONValue> {}
+export class JSONObject extends Map<string, JSONValue> {}
 export class JSONNull { }
 
 const Null = new JSONNull();

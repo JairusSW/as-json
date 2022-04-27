@@ -1,5 +1,6 @@
 import { StringSink } from "as-string-sink/assembly";
 import { JSONArray, JSONObject, JSONValue } from "./jsonType";
+import { isSpace } from "util/string"
 
 
 export declare let json: (...a: any) => any;
@@ -131,6 +132,10 @@ export namespace JSON {
       return parseArray<T>(data)
     } else if (type instanceof Map) {
       return parseMap<T>(data)
+    } else if (type instanceof JSONValue) {
+      // @ts-ignore
+      return JSONValue.from<string>(parseString(data))
+
     } else {
       // @ts-ignore
       return null
@@ -152,7 +157,7 @@ function parseString(data: string): string {
 // @ts-ignore
 @inline
 function parseBoolean(data: string): boolean {
-  return data.charCodeAt(0) === "t".charCodeAt(0)
+  return data.trim() == "true"
 }
 // @ts-ignore
 @inline
@@ -182,77 +187,49 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-function parseArray<T>(data: string): T {
-  // @ts-ignore
-  if (isString<valueof<T>>()) return parseStringArray(data)
-  // @ts-ignore
-  else if (isBoolean<valueof<T>>()) return parseBooleanArray(data)
-  // @ts-ignore
-  return parseNumberArray<valueof<T>>(data)
-}
-
-function parseStringArray(data: string): Array<string> {
-  const result = new Array<string>()
-  if (data.length === 2) return result
-  let lastPos: u32 = 1
-  let char: u32 = 0
-  let instr: boolean = false
-  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
-    char = data.charCodeAt(i)
-    // This ignores [ and ] or { and } if they are inside a string.
-    if (char === "\"".charCodeAt(0) && data.charCodeAt(i - 1) !== "/".charCodeAt(0)) instr = instr ? false : true
-    if (instr === false) {
-      // Handles whitespace after a comma
-      if (char === " ".charCodeAt(0) || char === 0x0020 || char === 0x000A || char === 0x000D || char === 0x0009) lastPos++
-      // @gagdiez from serial-as/json notified me that there are other charcodes used for whitespace.
-      if (char === "\"".charCodeAt(0)) {
-        result.push(parseString(data.slice(lastPos, i + 1)))
-        lastPos = i + 2
-      }
+export function parseArray<T>(data: string): string[] {
+  const result: string[] = []
+  data = data.trim();
+  let len: u32 = data.length - 1;
+  let lastPos: u32 = 1;
+  let i: u32 = 1;
+  let char: u32 = 0;
+  // Is struct such as String, Object, or Array
+  let isStruct: boolean = false;
+  let offset: u32 = 0;
+  for (; i < len; i++) {
+    char = data.charCodeAt(i);
+    if (!isStruct && isSpace(char)) {
+      lastPos++;
+    } else {
+      if (isSpace(char)) offset++;
+      isStruct = true
+    }
+    if (char == ",".charCodeAt(0)) {
+      console.log(`-${data.slice(lastPos, i - offset)}-`)
+      // @ts-ignore
+      result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset)))
+      offset = 0;
+      lastPos = ++i;
     }
   }
-  return result
-}
-
-function parseBooleanArray(data: string): Array<boolean> {
-  const result = new Array<boolean>()
-  if (data.length === 2) return result
-  let char: u32 = 0
-  let instr: boolean = false
-  for (let i: u32 = 1; i < u32(data.length - 1); i++) {
-    char = data.charCodeAt(i)
-    if (instr === false) {
-      if (char === "t".charCodeAt(0)) {
-        result.push(true)
-        i += 4
-        // +4 to skip the 'true'
-        // Possible bug when: [true, tada, true]
-        // It will believe it is [true, true, true]
-      } else {
-        result.push(false)
-        // If it is only booleans, we can safely assume this
-        i += 5
-      }
-    }
+  char = data.charCodeAt(lastPos)
+  // Remove preceeding whitespace
+  while (isSpace(char)) {
+    lastPos++;
+    char = data.charCodeAt(lastPos);
   }
-  return result
-}
-
-function parseNumberArray<T>(data: string): Array<T> {
-  const result = new Array<T>()
-  if (data.length === 2) return result
-  let lastPos: u32 = 0
-  let char: u32 = 0
-  let i: u32 = 1
-  for (; i < u32(data.length - 1); i++) {
-    char = data.charCodeAt(i)
-    if (char === ",".charCodeAt(0)) {
-      result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
-      lastPos = i
-    }
+  char = data.charCodeAt(len);
+  while (isSpace(char)) {
+    len--;
+    char = data.charCodeAt(len);
   }
-  result.push(parseNumber<T>(data.slice(lastPos + 1, i)))
-  return result
+
+  // @ts-ignore
+  // TODO: Make sure to handle empty arrays with and without whitespace between both brackets
+  console.log(`-${data.slice(lastPos, len)}-`)
+  result.push(JSON.parse<valueof<T>>(data.slice(lastPos, len)))
+  return result;
 }
 
 export function parseObject(data: string): void {
@@ -575,6 +552,6 @@ class Nullable { }
 function intToString(num: number): string {
   const result = new StringSink()
   while (num > 0) {
-    
+
   }
 }
