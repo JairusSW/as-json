@@ -31,15 +31,15 @@ Or, add it to `asconfig.json`
 
 ## Support
 
-- ✅ Objects
-- ✅ Arrays
+- ✅ Objects (Serializing only)
+- ✅ Arrays (Basic parsing. Serializing good)
 - ✅ Numbers
 - ✅ Integers
-- ✅ Null
-- ✅ Dynamic Arrays
-- ✅ Dynamic Types
-- ✅ Dynamic Objects
-- ✅ Whitespace
+- ✅ Null (Not tested yet, but should work)
+- ❌ Dynamic Arrays (Not yet)
+- ❌ Dynamic Types (Not yet)
+- ❌ Dynamic Objects (Not yet)
+- ✅ Whitespace (Yes, somewhat working for array parsing.)
 
 ## Usage
 
@@ -63,6 +63,7 @@ const stringified = JSON.stringify(data)
 // '{"firstName":"Emmet","lastName":"Smith","age":23}'
 console.log(`Stringified: ${stringified}`)
 
+// PARSING DOES NOT WORK QUITE YET!
 const parsed = JSON.parse<JSONSchema>(stringified)
 // { firstName: "Emmet", lastName: "Smith", age: 23 }
 console.log(`Parsed: ${JSON.stringify(parsed)}`)

@@ -187,8 +187,8 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseArray<T>(data: string): string[] {
-  const result: string[] = []
+export function parseArray<T>(data: string): T {
+  const result: T = instantiate<T>()
   data = data.trim();
   let len: u32 = data.length - 1;
   let lastPos: u32 = 1;
@@ -199,14 +199,16 @@ export function parseArray<T>(data: string): string[] {
   let offset: u32 = 0;
   for (; i < len; i++) {
     char = data.charCodeAt(i);
-    if (!isStruct && isSpace(char)) {
+    if (char == "\"".charCodeAt(0))
+    // This removes whitespace before and after an element
+    if (offset != 0 && isSpace(char)) {
       lastPos++;
     } else {
       if (isSpace(char)) offset++;
       isStruct = true
     }
     if (char == ",".charCodeAt(0)) {
-      console.log(`-${data.slice(lastPos, i - offset)}-`)
+      //console.log(`-${data.slice(lastPos, i - offset)}-`)
       // @ts-ignore
       result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset)))
       offset = 0;
@@ -226,10 +228,7 @@ export function parseArray<T>(data: string): string[] {
   }
 
   // @ts-ignore
-  // TODO: Make sure to handle empty arrays with and without whitespace between both brackets
-  console.log(`-${data.slice(lastPos, len + 1)}-`)
-  console.log(`len: ${len}`)
-  console.log(`lastPos: ${lastPos}`)
+  // Handle empty arrays
   if (len != 0) result.push(JSON.parse<valueof<T>>(data.slice(lastPos, len + 1)))
   return result;
 }
