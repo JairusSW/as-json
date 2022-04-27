@@ -219,7 +219,7 @@ export function parseArray<T>(data: string): string[] {
     lastPos++;
     char = data.charCodeAt(lastPos);
   }
-  char = data.charCodeAt(len);
+  char = data.charCodeAt(--len);
   while (isSpace(char)) {
     len--;
     char = data.charCodeAt(len);
@@ -227,8 +227,10 @@ export function parseArray<T>(data: string): string[] {
 
   // @ts-ignore
   // TODO: Make sure to handle empty arrays with and without whitespace between both brackets
-  console.log(`-${data.slice(lastPos, len)}-`)
-  result.push(JSON.parse<valueof<T>>(data.slice(lastPos, len)))
+  console.log(`-${data.slice(lastPos, len + 1)}-`)
+  console.log(`len: ${len}`)
+  console.log(`lastPos: ${lastPos}`)
+  if (len != 0) result.push(JSON.parse<valueof<T>>(data.slice(lastPos, len + 1)))
   return result;
 }
 
