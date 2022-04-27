@@ -56,7 +56,7 @@ console.log(JSON.stringify(foo))
 
 console.log(JSON.stringify(JSON.parse<JSONValue>("\"hello\"")))
 */
-console.log(JSON.stringify(parseArray<string[]>('[ "hello" , "pillow" ]')))
+console.log(JSON.stringify(parseArray<string[]>('[ "he llo" , "pil low" ]')))
 console.log(JSON.stringify(parseArray<string[]>('["hello","pillow"]')))
 
 console.log(JSON.stringify(parseArray<i32[]>('[ 1 , 2,3, 4 ]')))

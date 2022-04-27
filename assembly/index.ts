@@ -194,25 +194,30 @@ export function parseArray<T>(data: string): T {
   let lastPos: u32 = 1;
   let i: u32 = 1;
   let char: u32 = 0;
-  // Is struct such as String, Object, or Array
+  // Is struct such as Object, or Array
   let isStruct: boolean = false;
+  let isStr: boolean = false;
   let offset: u32 = 0;
+  // Depth for finding matching brackets
+  let inDepth: u32 = 0;
+  let outDepth: u32 = 0;
   for (; i < len; i++) {
     char = data.charCodeAt(i);
-    if (char == "\"".charCodeAt(0))
+    if (char == "\"".charCodeAt(0) && data.charCodeAt(i-1) != "\\".charCodeAt(0)) isStr = !isStr
     // This removes whitespace before and after an element
-    if (offset != 0 && isSpace(char)) {
-      lastPos++;
-    } else {
-      if (isSpace(char)) offset++;
-      isStruct = true
-    }
-    if (char == ",".charCodeAt(0)) {
-      //console.log(`-${data.slice(lastPos, i - offset)}-`)
-      // @ts-ignore
-      result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset)))
-      offset = 0;
-      lastPos = ++i;
+    if (!isStr) {
+      if (offset != 0 && isSpace(char)) {
+        lastPos++;
+      } else {
+        if (isSpace(char)) offset++;
+      }
+      if (char == ",".charCodeAt(0)) {
+        //console.log(`-${data.slice(lastPos, i - offset)}-`)
+        // @ts-ignore
+        result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset)))
+        offset = 0;
+        lastPos = ++i;
+      }
     }
   }
   char = data.charCodeAt(lastPos)
