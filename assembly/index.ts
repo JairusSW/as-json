@@ -1,7 +1,16 @@
 import { StringSink } from "as-string-sink/assembly";
-import { JSONArray, JSONObject, JSONValue } from "./jsonType";
+import { Variant } from "as-variant/assembly";
 import { isSpace } from "util/string"
 
+// Discriminator from as-variant
+const enum Discriminator {
+  Bool,
+  I8, I16, I32, I64,
+  U8, U16, U32, U64,
+  F32, F64,
+  UnmanagedRef,
+  ManagedRef
+}
 
 export declare let json: (...a: any) => any;
 
@@ -9,28 +18,6 @@ export declare let json: (...a: any) => any;
  * JSON Encoder/Decoder for AssemblyScript
  */
 export namespace JSON {
-  /**
-   * Validates JSON data
-   * ```js
-   * JSON.verify<T>("{word:"Hi!"}")
-   * // Valid
-   * JSON.verify<T>("{er@#]23d}")
-   * // Invalid
-   */
-  export function verify(data: string): boolean {
-    let i = 0
-    // Remove preceeding whitespace
-    data = data.trim()
-    let char: u32 = data.charCodeAt(i)
-    if (char == "\"".charCodeAt(0) && data.charCodeAt(data.length - 1) == "\"".charCodeAt(0)) {
-      return true
-    } else if (char == "t".charCodeAt(0) && data.charCodeAt(i + 1) == "r".charCodeAt(0) && data.charCodeAt(i + 2) == "u".charCodeAt(0) && data.charCodeAt(i + 3) == "e".charCodeAt(0)) {
-      return true
-    } else if (char == "f".charCodeAt(0) && data.charCodeAt(i + 1) == "a".charCodeAt(0) && data.charCodeAt(i + 2) == "l".charCodeAt(0) && data.charCodeAt(i + 3) == "s".charCodeAt(0) && data.charCodeAt(i + 4) == "e".charCodeAt(0)) {
-      return true
-    }
-    return false
-  }
   /**
    * Stringifies valid JSON data.
    * ```js
@@ -86,29 +73,64 @@ export namespace JSON {
       }
       result += stringify(unchecked(data[data.length - 1])) + "]"
       return result
-    } else if (data instanceof JSONValue) {
-      if (data.kind == 0) {
-        return '"' + changetype<string>(usize(data.value)) + '"';
+    } else if (data instanceof Variant) {
+      if (data.is<string>()) {
+        return JSON.stringify<string>(data.getUnchecked<string>())
+      } else if (data.is<boolean>()) {
+        return JSON.stringify<boolean>(data.getUnchecked<boolean>())
+      } else if (data.is<bool>()) {
+        return JSON.stringify<bool>(data.getUnchecked<bool>())
+      } else if (data.is<i8>()) {
+        return JSON.stringify<i8>(data.getUnchecked<i8>())
+      } else if (data.is<i16>()) {
+        return JSON.stringify<i16>(data.getUnchecked<i16>())
+      } else if (data.is<i32>()) {
+        return JSON.stringify<i32>(data.getUnchecked<i32>())
+      } else if (data.is<u8>()) {
+        return JSON.stringify<u8>(data.getUnchecked<u8>())
+      } else if (data.is<u16>()) {
+        return JSON.stringify<u16>(data.getUnchecked<u16>())
+      } else if (data.is<u32>()) {
+        return JSON.stringify<u32>(data.getUnchecked<u32>())
+      } else if (data.is<f32>()) {
+        return JSON.stringify<f32>(data.getUnchecked<f32>())
+      } else if (data.is<f64>()) {
+        return JSON.stringify<f64>(data.getUnchecked<f64>())
+      } else if (data.discriminator >= Discriminator.ManagedRef) {
+        let value = load<Obj>(changetype<usize>(data), offsetof<Variant>("storage"));
+        if (isReference<T>() && !isNullable<T>()) {
+          if (!value) throw new Error("unexpected null");
+        }
+        if (isDefined(data.__JSON_Stringify)) {
+          return data.__JSON_Stringify()
+        } else {
+          return "null"
+        }
+      } else if (data.is<string[]>()) {
+        return JSON.stringify<string[]>(data.getUnchecked<string[]>())
+      } else if (data.is<boolean[]>()) {
+        return JSON.stringify<boolean[]>(data.getUnchecked<boolean[]>())
+      } else if (data.is<bool[]>()) {
+        return JSON.stringify<bool[]>(data.getUnchecked<bool[]>())
+      } else if (data.is<i8[]>()) {
+        return JSON.stringify<i8[]>(data.getUnchecked<i8[]>())
+      } else if (data.is<i16[]>()) {
+        return JSON.stringify<i16[]>(data.getUnchecked<i16[]>())
+      } else if (data.is<i32[]>()) {
+        return JSON.stringify<i32[]>(data.getUnchecked<i32[]>())
+      } else if (data.is<u8[]>()) {
+        return JSON.stringify<u8[]>(data.getUnchecked<u8[]>())
+      } else if (data.is<u16[]>()) {
+        return JSON.stringify<u16[]>(data.getUnchecked<u16[]>())
+      } else if (data.is<u32[]>()) {
+        return JSON.stringify<u32[]>(data.getUnchecked<u32[]>())
+      } else if (data.is<f32[]>()) {
+        return JSON.stringify<f32[]>(data.getUnchecked<f32[]>())
+      } else if (data.is<f64[]>()) {
+        return JSON.stringify<f64[]>(data.getUnchecked<f64[]>())
+      } else {
+        return "null"
       }
-      // @ts-ignore
-      else if (data.kind == 1) return reinterpret<f64>(data.value).toString();
-      else if (data.kind == 2) return stringify(changetype<JSONObject>(usize(data.value)))
-      else if (data.kind == 3) return stringify(changetype<JSONArray>(usize(data.value)))
-      else if (data.kind == 4) return "null";
-      else if (data.kind == 5) return bool(data.value) ? "true" : "false"
-      else throw new Error("Unreachable: Jsontype is not of correct kind.")
-    } else if (idof<T>() == idof<JSONArray>()) {
-      let result = "[";
-      // @ts-ignore
-      const len = data.length - 1;
-      if (len == -1) return "[]";
-      for (let i = 0; i < len; i++) {
-        // @ts-ignore
-        result += stringify(unchecked(data[i])) + ","
-      }
-      // @ts-ignore
-      result += stringify(unchecked(data[len])) + "]"
-      return result
     } else {
       return "null"
     }
@@ -121,7 +143,7 @@ export namespace JSON {
    * @param data string
    * @returns T
    */
-  export function parse<T>(data: string): T {
+  export function parse<T = Variant>(data: string): T {
     let type!: T
     if (isString<T>()) {
       // @ts-ignore
@@ -131,24 +153,42 @@ export namespace JSON {
       return parseBoolean(data);
     } else if (isFloat<T>() || isInteger<T>()) {
       return parseNumber<T>(data);
-    } /*else if (isArrayLike<T>()) {
+    } else if (isArrayLike<T>()) {
       return parseArray<T>(data)
-    }*/ else if (type instanceof Map) {
+    } else if (type instanceof Map) {
       return parseMap<T>(data);
-    } else if (type instanceof JSONValue) {
-      data = data.trimStart();
-      let char = data.charCodeAt(0);
-      if (char == "\"".charCodeAt(0)) {
-        // @ts-ignore
-        return JSONValue.from<string>(parseString(data))
-      } else if (char == "t".charCodeAt(0) && data.startsWith("true")) {
-        // @ts-ignore
-        return JSONValue.from<boolean>(true);
-      } else if (char == "f".charCodeAt(0) && data.startsWith("false")) {
-        // @ts-ignore
-        return JSONValue.from<boolean>(false);
+      // @ts-ignore
+    } else if (isDefined(type.__JSON_Parse)) {
+      const result = new Map<string, Variant>()
+      let lastPos: u32 = 0
+      let char: u32 = 0
+      let i: u32 = 1
+      let key: string = ""
+      let isKey: boolean = false
+      for (; i < u32(data.length - 1); i++) {
+        char = data.charCodeAt(i)
+        if (isKey == false) {
+          if (char == ":".charCodeAt(0)) {
+            key = data.slice(lastPos + 2, i - 1)
+            //console.log(`Found Key: ${key}`)
+            lastPos = ++i
+            isKey = true
+          }
+        } else {
+          if (char == ",".charCodeAt(0)) {
+            const val = data.slice(lastPos, i)
+            lastPos = i
+            isKey = false
+            //console.log(`Found Val: ${val}`)
+            // @ts-ignore
+            result.set(key, JSON.parse<JSONValue>(val))
+          }
+        }
       }
-      throw new Error("wrong type detected!")
+      // @ts-ignore
+      result.set(key, JSON.parse<JSONValue>(data.slice(lastPos, data.length - 1)))
+      // @ts-ignore
+      return type.__JSON_Parse(result)
     } else {
       // @ts-ignore
       return null;
@@ -185,10 +225,6 @@ function parseNumber<T>(data: string): T {
   // @ts-ignore
   else if (type instanceof u32) return U32.parseInt(data)
   // @ts-ignore
-  else if (type instanceof u64) return U64.parseInt(data)
-  // @ts-ignore
-  else if (type instanceof i64) return I64.parseInt(data)
-  // @ts-ignore
   else if (type instanceof u8) return U8.parseInt(data)
   // @ts-ignore
   else if (type instanceof u16) return U16.parseInt(data)
@@ -200,8 +236,8 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseArray(data: string): void {
-  //const result: T = instantiate<T>()
+export function parseArray<T>(data: string): T {
+  const result = instantiate<T>()
   data = data.trim();
   let len: u32 = data.length - 1;
   let lastPos: u32 = 1;
@@ -217,29 +253,37 @@ export function parseArray(data: string): void {
   for (; i < len; i++) {
     char = data.charCodeAt(i);
     if (char == "\"".charCodeAt(0) && data.charCodeAt(i - 1) != "\\".charCodeAt(0)) isStr = !isStr
+    if (char == "{".charCodeAt(0) || char == "[".charCodeAt(0)) {
+      inDepth++;
+      isStruct = true;
+    } else if (char == "}".charCodeAt(0) || char == "]".charCodeAt(0)) {
+      outDepth++;
+      isStruct = true;
+    }
     if (!isStr) {
-      // This removes whitespace before and after an element
-      /*if (offset != 0 && isSpace(char)) {
-        lastPos++;
-      } else {
-        if (isSpace(char)) offset++;
-      }*/
-      // This checks to see if we are dealing with structures such as Objects and Arrays
-      if (isStruct == true) {
-        if (char == "{".charCodeAt(0) || char == "[".charCodeAt(0)) inDepth++;
-        else if (char == "}".charCodeAt(0) || char == "]".charCodeAt(0)) outDepth++;
-      } else {
-        if (char == "{".charCodeAt(0) || char == "[".charCodeAt(0)) {
-          lastPos = i;
-          isStruct = true;
-          inDepth++;
-        } else if (char == ",".charCodeAt(0)) {
-          //console.log(`-${data.slice(lastPos, i - offset)}-`)
+      if (!isStruct) {
+        // This removes whitespace before and after an element
+        /*if (offset != 0 && isSpace(char)) {
+          lastPos++;
+        } else {
+          if (isSpace(char)) offset++;
+        }*/
+        // This checks to see if we are dealing with structures such as Objects and Arrays
+        if (char == ",".charCodeAt(0)) {
           // @ts-ignore
-          //result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset)))
+          result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset).trim()))
           console.log(`Value-${data.slice(lastPos, i - offset).trim()}-`)
           offset = 0;
-          lastPos = ++i;
+          lastPos = i + 1;
+        }
+      } else {
+        if (inDepth == outDepth) {
+          i++;
+          console.log(`Struct-${data.slice(lastPos, i).trim()}-`)
+          lastPos = i + 1;
+          inDepth = 0;
+          outDepth = 0;
+          isStruct = false;
         }
       }
     }
@@ -258,9 +302,10 @@ export function parseArray(data: string): void {
 
   // @ts-ignore
   // Handle empty arrays
-  if (len != 0) result.push(JSON.parse<valueof<T>>(data.slice(lastPos, len + 1)))
-  console.log(`Trailing-${data.slice(lastPos, len).trim()}-`)
-  //return result;
+  data = data.slice(lastPos, len).trim()
+  if (data.length != 0) result.push(JSON.parse<valueof<T>>(data))
+  //if (data.length != 0) console.log(`Trailing-${data.slice(lastPos, len).trim()}-`)
+  return result;
 }
 
 export function parseObject(data: string): void {
@@ -506,7 +551,7 @@ export function parseOnStr(data: string, i1: boxed): JSONValue {
 
       }
       break;
-    default:// lol. idk
+    default:
       if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(data.charAt(index))) {
 
         let num: f64 = parseNum(data.charCodeAt(index));
@@ -574,15 +619,7 @@ export function parseDynamic(data: string): JSONValue {
 
     }
   }
-  // oh, yuk. just default parsenumber.
 
 }
 */
 class Nullable { }
-
-function intToString(num: number): string {
-  const result = new StringSink()
-  while (num > 0) {
-
-  }
-}
