@@ -5,6 +5,7 @@ export default class MyTransform extends Transform {
         return null;
     }
     afterParse(p) {
+        console.log("Using as-json transform");
         p.sources.forEach((s) => {
             if (s.isLibrary)
                 return;

@@ -9,6 +9,7 @@
   ],
   "license": "MIT",
   "scripts": {
+    "bench:astral": "astral",
     "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -w -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",

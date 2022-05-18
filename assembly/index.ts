@@ -12,7 +12,7 @@ const enum Discriminator {
   ManagedRef
 }
 
-export declare let json: (...a: any) => any;
+//export declare let json: (...a: any) => any;
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -65,14 +65,15 @@ export namespace JSON {
     }
     // ArrayLike
     else if (isArrayLike(data)) {
-      let result = "["
-      const len = data.length - 1;
-      if (len == -1) return "[]";
-      for (let i = 0; i < len; i++) {
-        result += stringify(unchecked(data[i])) + ","
+      let result = new StringSink("[")
+      if (data.length == 0) return "[]";
+      for (let i = 0; i < data.length - 1; i++) {
+        result.write(stringify(unchecked(data[i])))
+        result.write(",")
       }
-      result += stringify(unchecked(data[data.length - 1])) + "]"
-      return result
+      result.write(stringify(unchecked(data[data.length - 1])))
+      result.write("]")
+      return result.toString()
     } else if (data instanceof Variant) {
       if (data.is<string>()) {
         return JSON.stringify<string>(data.getUnchecked<string>())
@@ -97,15 +98,9 @@ export namespace JSON {
       } else if (data.is<f64>()) {
         return JSON.stringify<f64>(data.getUnchecked<f64>())
       } else if (data.discriminator >= Discriminator.ManagedRef) {
-        let value = load<Obj>(changetype<usize>(data), offsetof<Variant>("storage"));
-        if (isReference<T>() && !isNullable<T>()) {
-          if (!value) throw new Error("unexpected null");
-        }
-        if (isDefined(data.__JSON_Stringify)) {
-          return data.__JSON_Stringify()
-        } else {
-          return "null"
-        }
+        // TODO: We know it is a Object, but how to call __JSON_Stringify()?
+        // I'm 100% stumped.
+        // Transform?
       } else if (data.is<string[]>()) {
         return JSON.stringify<string[]>(data.getUnchecked<string[]>())
       } else if (data.is<boolean[]>()) {
@@ -158,6 +153,9 @@ export namespace JSON {
     } else if (type instanceof Map) {
       return parseMap<T>(data);
       // @ts-ignore
+    } else if (type instanceof Variant) {
+      // @ts-ignore
+      return Variant.from(JSON.parse<T>(data))
     } else if (isDefined(type.__JSON_Parse)) {
       const result = new Map<string, Variant>()
       let lastPos: u32 = 0
@@ -181,12 +179,12 @@ export namespace JSON {
             isKey = false
             //console.log(`Found Val: ${val}`)
             // @ts-ignore
-            result.set(key, JSON.parse<JSONValue>(val))
+            result.set(key, JSON.parse<Variant>(val))
           }
         }
       }
       // @ts-ignore
-      result.set(key, JSON.parse<JSONValue>(data.slice(lastPos, data.length - 1)))
+      result.set(key, JSON.parse<Variant>(data.slice(lastPos, data.length - 1)))
       // @ts-ignore
       return type.__JSON_Parse(result)
     } else {
@@ -365,12 +363,12 @@ export function parseMap<T>(data: string): T {
         isKey = false
         //console.log(`Found Val: ${val}`)
         // @ts-ignore
-        result.set(key, parseString(val))
+        result.set(key, JSON.parse<f32>(val))
       }
     }
   }
   // @ts-ignore
-  result.set(key, parseString(data.slice(lastPos, data.length - 1)))
+  result.set(key, JSON.parse<f32>(data.slice(lastPos, data.length - 1)))
   return result
 }
 /*
