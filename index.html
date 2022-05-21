@@ -1,10 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<script type="module">
-import { test } from "./build/test.js";
-test();
-</script>
-</head>
-<body></body>
+  <head>
+    <script type="module" async="true">
+      import { init, WASI } from "../node_modules/@wasmer/wasi/dist/Library.esm.js";
+      await init();
+      const wasi = new WASI({
+        env: {},
+        args: [],
+      });
+
+      const moduleBytes = fetch("./build/test.wasm");
+      const module = await WebAssembly.compileStreaming(moduleBytes);
+      // Instantiate the WASI module
+      await wasi.instantiate(module, {});
+
+      // Run the start function
+      let exitCode = wasi.start();
+      let stdout = wasi.getStdoutString();
+
+      // This should print "hello world (exit code: 0)"
+      console.log(`${stdout}(exit code: ${exitCode})`);
+    </script>
+  </head>
+  <body></body>
 </html>

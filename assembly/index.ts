@@ -156,6 +156,7 @@ export namespace JSON {
     } else if (type instanceof Variant) {
       // @ts-ignore
       return Variant.from(JSON.parse<T>(data))
+      // @ts-ignore
     } else if (isDefined(type.__JSON_Parse)) {
       const result = new Map<string, Variant>()
       let lastPos: u32 = 0
@@ -233,6 +234,29 @@ function parseNumber<T>(data: string): T {
 }
 
 // @ts-ignore
+//@inline
+export function parseNumberArray<T>(data: string): T {
+  const result = instantiate<T>();
+  if (data.length == 0) return result;
+  let lastPos: u32 = 1;
+  let i: u32 = 1;
+  let char: u32 = 0;
+  for (; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i);
+    if (char == ",".charCodeAt(0)) {
+     // console.log(data.slice(lastPos, i))
+      // @ts-ignore
+      result.push(parseNumber<valueof<T>>(data.slice(lastPos, i).trim()));
+      lastPos = ++i;
+    }
+  }
+  //console.log(data.slice(lastPos, data.length - 1))
+  // @ts-ignore
+  result.push(parseNumber<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart()));
+  return result;
+}
+
+// @ts-ignore
 @inline
 export function parseArray<T>(data: string): T {
   const result = instantiate<T>()
@@ -270,14 +294,14 @@ export function parseArray<T>(data: string): T {
         if (char == ",".charCodeAt(0)) {
           // @ts-ignore
           result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset).trim()))
-          console.log(`Value-${data.slice(lastPos, i - offset).trim()}-`)
+          //console.log(`Value-${data.slice(lastPos, i - offset).trim()}-`)
           offset = 0;
           lastPos = i + 1;
         }
       } else {
         if (inDepth == outDepth) {
           i++;
-          console.log(`Struct-${data.slice(lastPos, i).trim()}-`)
+          //console.log(`Struct-${data.slice(lastPos, i).trim()}-`)
           lastPos = i + 1;
           inDepth = 0;
           outDepth = 0;
@@ -301,6 +325,7 @@ export function parseArray<T>(data: string): T {
   // @ts-ignore
   // Handle empty arrays
   data = data.slice(lastPos, len).trim()
+  // @ts-ignore
   if (data.length != 0) result.push(JSON.parse<valueof<T>>(data))
   //if (data.length != 0) console.log(`Trailing-${data.slice(lastPos, len).trim()}-`)
   return result;

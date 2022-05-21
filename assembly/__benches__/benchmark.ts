@@ -1,4 +1,4 @@
-import { JSON, parseMap } from "..";
+import { JSON, parseMap, parseNumberArray } from "..";
 import { StringSink } from "as-string-sink/assembly";
 @json
 class Vector {
@@ -10,7 +10,7 @@ const vec: Vector = {
     x: 0.0,
     y: 0.0
 }
-
+/*
 bench("JSON Stringify String", () => {
     blackbox(JSON.stringify("Hello"))
 })
@@ -54,7 +54,7 @@ bench("JSON Parse Float", () => {
 bench("JSON Parse Vector", () => {
     blackbox(parseMap<Map<string, f32>>(("{\"x\":0.0,\"y\":0.0}")))
 })
-/*
-bench("JSON Parse Array", () => {
-    blackbox(JSON.parse<i32[]>("[1,2,3,4,5]"))
-})*/
+*/
+bench("JSON Parse i32 Array", () => {
+    blackbox(parseNumberArray<u32[]>("[1,2,3,4,5]"))
+})
