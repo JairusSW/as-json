@@ -97,10 +97,9 @@ export namespace JSON {
         return JSON.stringify<f32>(data.getUnchecked<f32>())
       } else if (data.is<f64>()) {
         return JSON.stringify<f64>(data.getUnchecked<f64>())
+        // @ts-ignore
       } else if (data.discriminator >= Discriminator.ManagedRef) {
         // TODO: We know it is a Object, but how to call __JSON_Stringify()?
-        // I'm 100% stumped.
-        // Transform?
       } else if (data.is<string[]>()) {
         return JSON.stringify<string[]>(data.getUnchecked<string[]>())
       } else if (data.is<boolean[]>()) {
@@ -145,7 +144,7 @@ export namespace JSON {
       return parseString(data);
     } else if (isBoolean<T>()) {
       // @ts-ignore
-      return parseBoolean(data);
+      return parseBoolean<T>(data);
     } else if (isFloat<T>() || isInteger<T>()) {
       return parseNumber<T>(data);
     } else if (isArrayLike<T>()) {
@@ -196,23 +195,24 @@ export namespace JSON {
 }
 
 // @ts-ignore
-@inline
+//@inline
 function serializeString(data: string): string {
   return "\"" + data.replaceAll("\"", "\\\"") + "\""
 }
 // @ts-ignore
-@inline
+//@inline
 function parseString(data: string): string {
   return data.slice(1, data.length - 1).replaceAll("\\\"", "\"")
 }
 
 // @ts-ignore
-@inline
-function parseBoolean(data: string): boolean {
-  return data.trim() == "true"
+//@inline
+function parseBoolean<T extends boolean>(data: string): T {
+  if (data.charCodeAt(0) == "t".charCodeAt(0)) return <T>true
+  else return <T>false
 }
 // @ts-ignore
-@inline
+//@inline
 function parseNumber<T>(data: string): T {
   let type: T
   // @ts-ignore
@@ -244,7 +244,7 @@ export function parseNumberArray<T>(data: string): T {
   for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i);
     if (char == ",".charCodeAt(0)) {
-     // console.log(data.slice(lastPos, i))
+      // console.log(data.slice(lastPos, i))
       // @ts-ignore
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i).trim()));
       lastPos = ++i;
@@ -257,7 +257,30 @@ export function parseNumberArray<T>(data: string): T {
 }
 
 // @ts-ignore
-@inline
+//@inline
+export function parseBooleanArray<T>(data: string): T {
+  const result = instantiate<T>();
+  if (data.length == 0) return result;
+  let lastPos: u32 = 1;
+  let i: u32 = 1;
+  let char: u32 = 0;
+  for (; i < u32(data.length - 1); i++) {
+    char = data.charCodeAt(i);
+    if (char == ",".charCodeAt(0)) {
+      // console.log(data.slice(lastPos, i))
+      // @ts-ignore
+      result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i).trimStart()));
+      lastPos = ++i;
+    }
+  }
+  //console.log(data.slice(lastPos, data.length - 1))
+  // @ts-ignore
+  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart()));
+  return result;
+}
+
+// @ts-ignore
+//@inline
 export function parseArray<T>(data: string): T {
   const result = instantiate<T>()
   data = data.trim();
@@ -292,7 +315,7 @@ export function parseArray<T>(data: string): T {
         }*/
         // This checks to see if we are dealing with structures such as Objects and Arrays
         if (char == ",".charCodeAt(0)) {
-          // @ts-ignore
+          // @ts-ignore 
           result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset).trim()))
           //console.log(`Value-${data.slice(lastPos, i - offset).trim()}-`)
           offset = 0;
