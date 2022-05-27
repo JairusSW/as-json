@@ -2,7 +2,7 @@
 
 # Total time
 
-52 hours 9m
+71 hours
 
 **JSON encoder/decoder for AssemblyScript**
 
@@ -36,10 +36,10 @@ Or, add it to `asconfig.json`
 - ✅ Numbers
 - ✅ Integers
 - ✅ Null (Not tested yet, but should work)
-- ❌ Dynamic Arrays (Not yet)
-- ❌ Dynamic Types (Not yet)
-- ❌ Dynamic Objects (Not yet)
-- ✅ Whitespace (Yes, somewhat working for array parsing.)
+- ✅ Dynamic Arrays (Objects not supported)
+- ✅ Dynamic Types (Objects not supported)
+- ✅ Dynamic Objects (Stringify only. Objects not supported as values)
+- ✅ Whitespace
 
 ## Usage
 
