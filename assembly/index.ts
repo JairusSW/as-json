@@ -1,6 +1,7 @@
 import { StringSink } from "as-string-sink/assembly";
 import { Variant } from "as-variant/assembly";
 import { isSpace } from "util/string"
+import { aCode, backSlashCode, colonCode, commaCode, eCode, fCode, lCode, leftBraceCode, leftBracketCode, quoteCode, rCode, rightBraceCode, rightBracketCode, sCode, tCode, uCode } from "./chars";
 
 // Discriminator from as-variant
 const enum Discriminator {
@@ -166,14 +167,14 @@ export namespace JSON {
       for (; i < u32(data.length - 1); i++) {
         char = data.charCodeAt(i)
         if (isKey == false) {
-          if (char == ":".charCodeAt(0)) {
+          if (char == colonCode) {
             key = data.slice(lastPos + 2, i - 1)
             //console.log(`Found Key: ${key}`)
             lastPos = ++i
             isKey = true
           }
         } else {
-          if (char == ",".charCodeAt(0)) {
+          if (char == commaCode) {
             const val = data.slice(lastPos, i)
             lastPos = i
             isKey = false
@@ -208,8 +209,9 @@ function parseString(data: string): string {
 // @ts-ignore
 //@inline
 function parseBoolean<T extends boolean>(data: string): T {
-  if (data.charCodeAt(0) == "t".charCodeAt(0)) return <T>true
-  else return <T>false
+  if (data.length > 3 && data.charCodeAt(0) == tCode && data.charCodeAt(1) == rCode && data.charCodeAt(2) == uCode && data.charCodeAt(3) == eCode) return <T>true;
+  else if (data.length > 4 && data.charCodeAt(0) == fCode && data.charCodeAt(1) == aCode && data.charCodeAt(2) == lCode && data.charCodeAt(3) == sCode && data.charCodeAt(4) == eCode) return <T>false;
+  else throw new Error(`JSON: Cannot parse "${data}" as boolean`)
 }
 // @ts-ignore
 //@inline
@@ -230,7 +232,8 @@ function parseNumber<T>(data: string): T {
   // @ts-ignore
   else if (type instanceof i16) return I16.parseInt(data)
   // @ts-ignore
-  return I8.parseInt(data)
+  else if (type instanceof i8) return I8.parseInt(data)
+  else throw new Error(`JSON: Cannot parse invalid data into a number. Either "${data}" is not a valid number, or <${nameof<T>()}> is an invald number type.`)
 }
 
 // @ts-ignore
@@ -243,7 +246,7 @@ export function parseNumberArray<T>(data: string): T {
   let char: u32 = 0;
   for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i);
-    if (char == ",".charCodeAt(0)) {
+    if (char == commaCode) {
       // console.log(data.slice(lastPos, i))
       // @ts-ignore
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i).trim()));
@@ -266,14 +269,12 @@ export function parseBooleanArray<T>(data: string): T {
   let char: u32 = 0;
   for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i);
-    if (char == ",".charCodeAt(0)) {
-      // console.log(data.slice(lastPos, i))
+    if (char == commaCode) {
       // @ts-ignore
       result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i).trimStart()));
       lastPos = ++i;
     }
   }
-  //console.log(data.slice(lastPos, data.length - 1))
   // @ts-ignore
   result.push(parseBoolean<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart()));
   return result;
@@ -291,17 +292,17 @@ export function parseArray<T>(data: string): T {
   // Is struct such as Object, or Array
   let isStruct: boolean = false;
   let isStr: boolean = false;
-  let offset: u32 = 0;
+  //let offset: u32 = 0;
   // Depth for finding matching brackets
   let inDepth: u32 = 0;
   let outDepth: u32 = 0;
   for (; i < len; i++) {
     char = data.charCodeAt(i);
-    if (char == "\"".charCodeAt(0) && data.charCodeAt(i - 1) != "\\".charCodeAt(0)) isStr = !isStr
-    if (char == "{".charCodeAt(0) || char == "[".charCodeAt(0)) {
+    if (char == quoteCode && data.charCodeAt(i - 1) != backSlashCode) isStr = !isStr
+    if (char == leftBraceCode || char == leftBracketCode) {
       inDepth++;
       isStruct = true;
-    } else if (char == "}".charCodeAt(0) || char == "]".charCodeAt(0)) {
+    } else if (char == rightBraceCode || char == rightBracketCode) {
       outDepth++;
       isStruct = true;
     }
@@ -314,11 +315,10 @@ export function parseArray<T>(data: string): T {
           if (isSpace(char)) offset++;
         }*/
         // This checks to see if we are dealing with structures such as Objects and Arrays
-        if (char == ",".charCodeAt(0)) {
+        if (char == commaCode) {
           // @ts-ignore 
-          result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i - offset).trim()))
-          //console.log(`Value-${data.slice(lastPos, i - offset).trim()}-`)
-          offset = 0;
+          result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i).trim()))
+          //offset = 0;
           lastPos = i + 1;
         }
       } else {
@@ -365,7 +365,7 @@ export function parseObject(data: string): void {
   for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
     if (isKey == false) {
-      if (char == ":".charCodeAt(0)) {
+      if (char == colonCode) {
         key = data.slice(lastPos + 2, i - 1)
         console.log(`Found Key: ${key}`)
         result.push(key)
@@ -373,7 +373,7 @@ export function parseObject(data: string): void {
         isKey = true
       }
     } else {
-      if (char == ",".charCodeAt(0)) {
+      if (char == commaCode) {
         const val = data.slice(lastPos, i)
         lastPos = i
         isKey = false
@@ -398,14 +398,14 @@ export function parseMap<T>(data: string): T {
   for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i)
     if (isKey == false) {
-      if (char == ":".charCodeAt(0)) {
+      if (char == colonCode) {
         key = data.slice(lastPos + 2, i - 1)
         //console.log(`Found Key: ${key}`)
         lastPos = ++i
         isKey = true
       }
     } else {
-      if (char == ",".charCodeAt(0)) {
+      if (char == commaCode) {
         const val = data.slice(lastPos, i)
         lastPos = i
         isKey = false
@@ -419,253 +419,5 @@ export function parseMap<T>(data: string): T {
   result.set(key, JSON.parse<f32>(data.slice(lastPos, data.length - 1)))
   return result
 }
-/*
-//@ts-ignore
-@inline
-function parseNum(e: u32): f64 {
-  switch (e) {
-    case "0".charCodeAt(0):
-      return 0;
-    case "1".charCodeAt(0):
-      return 1;
-    case "2".charCodeAt(0):
-      return 2;
-    case "3".charCodeAt(0):
-      return 3;
-    case "4".charCodeAt(0):
-      return 4;
-    case "5".charCodeAt(0):
-      return 5;
-    case "6".charCodeAt(0):
-      return 6;
-    case "7".charCodeAt(0):
-      return 7;
-    case "8".charCodeAt(0):
-      return 8;
-    case "9".charCodeAt(0):
-      return 9;
-    default: return -1;
-  }
-}
-export class boxed { value: i32 }
 
-export function parseOnStr(data: string, i1: boxed): JSONValue {
-  let index = i1.value;
-  while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
-  // TODO: add other whitespace codes later
-
-  switch (data.charCodeAt(index)) {
-
-    case "{".charCodeAt(0):
-
-      index++;
-      while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
-      let obj = new JSONobject();
-      while (true) {
-
-        let nchar = data.charCodeAt(index);
-
-        if (nchar == '"'.charCodeAt(0)) {
-
-          index++;
-          let keyChars = ''
-          while (true) {
-
-            nchar = data.charCodeAt(index);
-            if (nchar == "\\".charCodeAt(0)) {
-              index++;
-              keyChars += data.charAt(index);
-              index++;
-            } else {
-              if (nchar == '"'.charCodeAt(0)) break;
-              else {
-                keyChars += data.charAt(index);
-                index++;
-              }
-            }
-          }
-          index++;
-          while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
-          if (data.charCodeAt(index) == ":".charCodeAt(0)) {
-            index++;
-            while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
-            let newBoxed: boxed = { value: index };
-            let value = parseOnStr(data, newBoxed);
-            index = newBoxed.value;
-            obj.set(keyChars, value);
-            while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
-            nchar = data.charCodeAt(index);
-            if (nchar == ",".charCodeAt(0)) {
-              index++; continue;
-            }
-            else if (nchar == "}".charCodeAt(0)) {
-              index++;
-              i1.value = index;
-              return JSONValue.from(obj);
-            };
-          }
-          else {
-            throw new Error("Parsing object field: Unexpected `" + data.charAt(index) + "` -- Expected `:`");
-          }
-        }
-        else if (nchar == " ".charCodeAt(0)) {
-          index++;
-        }
-        else if (nchar == '}'.charCodeAt(0)) {
-          index++;
-          break;
-        }
-        else throw new Error("Parsing object: unexepcted character")
-      }
-      i1.value = index;
-
-      return JSONValue.from(obj);
-    case "\"".charCodeAt(0):
-      index++;
-      let keyChars = ''
-      let nchar: number;
-      while (true) {
-        nchar = data.charCodeAt(index);
-        if (nchar == "\\".charCodeAt(0)) {
-          index++;
-          keyChars += data.charAt(index);
-          index++;
-
-        }
-        else {
-          if (nchar == '"'.charCodeAt(0)) {
-            index++;
-            i1.value = index;
-            return JSONValue.from(keyChars)
-          }
-          else {
-            keyChars += data.charAt(index);
-            index++;
-          }
-        }
-
-      }
-      break;
-    case "t".charCodeAt(0):
-      if (data.slice(index + 1, index + 3) == "rue") {
-        i1.value = index + 4;
-        return JSONValue.from<bool>(true)
-      }
-      else
-        throw new Error("Unexpected character after 't'");
-
-    case "f".charCodeAt(0):
-      if (data.slice(index + 1, index + 4) == "alse") {
-        i1.value = index + 4;
-        return JSONValue.from<bool>(false);
-      }
-      break;
-    case "[".charCodeAt(0):
-      index++;
-      let arr = (new JSONArray());
-      while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
-      if (data.charCodeAt(index) == "]".charCodeAt(0)) {
-        index++;
-        i1.value = index;
-        return JSONValue.from(arr);
-      }
-      while (true) {
-        i1.value = index;
-
-        let value = parseOnStr(data, i1);
-
-        arr.push(value);
-        index = i1.value;
-
-        while (true) { if (data.charCodeAt(index) == " ".charCodeAt(0)) index++; else break; }
-        let char = data.charCodeAt(index);
-
-        if (char == ",".charCodeAt(0)) {
-          index++;
-          continue;
-        }
-        else if (char == "]".charCodeAt(0)) {
-
-          index++;
-          i1.value = index;
-          return JSONValue.from(arr);
-        }
-
-        else throw new Error("Unexpected character when parsing array.")
-
-
-
-      }
-      break;
-    default:
-      if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(data.charAt(index))) {
-
-        let num: f64 = parseNum(data.charCodeAt(index));
-
-
-        index++;
-        let _num: number;
-        let periodFound = false;
-        while (true) {
-          _num = parseNum(data.charCodeAt(index));
-
-          if (_num != -1) {
-            num *= 10;
-            num += _num;
-          } else if (data.charCodeAt(index) == ".".charCodeAt(0)) {
-            let ival = 1;
-            while (true) {
-              index++;
-              _num = parseNum(data.charCodeAt(index));
-              if (_num != -1) {
-                num += (_num / 10 ** ival);
-                ival++;
-              } else {
-                i1.value = index;
-                return JSONValue.from(num);
-              }
-            }
-
-          }
-          index++;
-        }
-        return JSONValue.from(parseNumber<f64>(data.slice(index)))
-      }
-      else throw new Error("PANIC: NOT JSON");
-
-  }
-  throw new Error("Unreachable")
-}
-
-export function parseDynamic(data: string): JSONValue {
-  let index = 0;
-
-  while (true) {
-
-    switch (data.charCodeAt(index)) {
-      case " ".charCodeAt(0):
-        index++;
-        continue;
-      case "{".charCodeAt(0):
-        throw new Error("dyn object not implemented")
-        parseDynamicObject(data.slice(index))
-      case "\"".charCodeAt(0):
-
-        return JSONValue.from(parseString(data.slice(index)));
-      case "[".charCodeAt(0):
-        throw new Error("dyn array not implemented");
-        parseDynamicArray(data.slice(index))
-        break;
-      default:
-        if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(data.charAt(index))) {
-
-          return JSONValue.from(parseNumber<f64>(data.slice(index)))
-        }
-        else throw new Error("PANIC: NOT JSON")
-
-    }
-  }
-
-}
-*/
 class Nullable { }

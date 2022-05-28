@@ -23,15 +23,15 @@ import {
   PropertyAccessExpression,
   CallExpression,
   ThisExpression,
-} from "assemblyscript";
-import { Transform } from "assemblyscript/transform";
+} from "assemblyscript/dist/assemblyscript";
+import { Transform } from "assemblyscript/dist/transform";
+import { NodeKind, TypeNode, TypeParameterNode } from "types:assemblyscript/src/ast";
 
 export default class MyTransform extends Transform {
   readFile(filename: string, baseDir: string) {
     return null;
   }
   afterParse(p: Parser) {
-    console.log("Using as-json transform")
     p.sources.forEach((s) => {
       if (s.isLibrary) return;
       s.statements.forEach((s) => {
@@ -187,6 +187,57 @@ export default class MyTransform extends Transform {
               c.declaration.range
             )
           );
+          let __JSON_Parse = new FunctionPrototype(
+            "__JSON_Parse",
+            c,
+            new MethodDeclaration(
+              new IdentifierExpression(
+                "__JSON_Parse",
+                false,
+                c.declaration.range
+              ),
+              null,
+              CommonFlags.INSTANCE,
+              new TypeParameterNode(
+                new IdentifierExpression("data", false, c.declaration.range),
+                null,
+                new NamedTypeNode(
+                  "Map",
+                  new TypeNode(NodeKind.NAMEDTYPE))
+              ),
+              new FunctionTypeNode(
+                [],
+                new NamedTypeNode(
+                  new TypeName(
+                    new IdentifierExpression(
+                      "string",
+                      false,
+                      c.declaration.range
+                    ),
+                    null,
+                    c.declaration.range
+                  ),
+                  null,
+                  false,
+                  c.declaration.range
+                ),
+                null,
+                false,
+                c.declaration.range
+              ),
+              fnBody,
+              c.declaration.range
+            )
+          );
+          c.instanceMembers?.set("__JSON_Parse", __JSON_Parse);
+          (c.declaration as ClassDeclaration).members.push(__JSON_Parse.declaration);
+          //c.instanceMembers?.forEach((m) => {
+          //console.log(ElementKind[m.kind]);
+          //if (m instanceof FieldPrototype) {
+          // console.log(m.name);
+          //}
+          //});
+        }
           let __JSON_Serialize = new FunctionPrototype(
             "__JSON_Serialize",
             c,

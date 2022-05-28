@@ -1,5 +1,4 @@
 import { JSON, parseBooleanArray, parseMap, parseNumberArray } from "..";
-import { StringSink } from "as-string-sink/assembly";
 @json
 class Vector {
     x: f32
