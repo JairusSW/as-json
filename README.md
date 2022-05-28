@@ -32,6 +32,7 @@ Or, add it to `asconfig.json`
 ## Support
 
 - ✅ Objects (Serializing only)
+- ✅ Map (Partial Parsing, Serializing good)
 - ✅ Arrays (Basic parsing. Serializing good)
 - ✅ Numbers
 - ✅ Integers
