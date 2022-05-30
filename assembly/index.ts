@@ -19,7 +19,7 @@ const enum Discriminator {
  * JSON Encoder/Decoder for AssemblyScript
  */
 export namespace JSON {
-  //export type _Variant = Variant;
+  export type _Variant = Variant;
   /**
    * Stringifies valid JSON data.
    * ```js

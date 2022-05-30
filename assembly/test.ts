@@ -2,19 +2,18 @@ import { Variant } from "as-variant/assembly";
 import "wasi";
 import { JSON } from ".";
 
-@json
+// @json
 class Obj {
-    hello: "world";
+    hello: string;
+    static __Json__Deserialize(param: Map<string,JSON._Variant> ): Obj {
+        return {
+            hello: param.get("hello").get<string>()
+        }
+    }
 }
 
 const obj: Obj = {
     hello: "world"
 }
 
-console.log(JSON.stringify(obj));
-console.log(JSON.stringify("Hello World"));
-console.log(JSON.stringify(314));
-console.log(JSON.stringify(3.14));
-console.log(JSON.stringify(true));
-console.log(JSON.stringify(false));
-console.log(JSON.stringify(["a", "b", "c"]));
+console.log(Obj.__Json__Deserialize(new Map<string, Variant>().set("hello", Variant.from("world"))).hello)
