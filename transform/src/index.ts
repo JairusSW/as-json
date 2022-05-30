@@ -24,7 +24,9 @@ import {
   CallExpression,
   ThisExpression,
 } from "assemblyscript/dist/assemblyscript";
+//from "assemblyscript";
 import { Transform } from "assemblyscript/dist/transform";
+//import { Transform } from "assemblyscript/transform";
 import { NodeKind, TypeNode, TypeParameterNode } from "types:assemblyscript/src/ast";
 
 export default class MyTransform extends Transform {
@@ -32,16 +34,12 @@ export default class MyTransform extends Transform {
     return null;
   }
   afterParse(p: Parser) {
+
     p.sources.forEach((s) => {
       if (s.isLibrary) return;
       s.statements.forEach((s) => {
-        if (s instanceof ImportStatement) {
-          //   console.log(s.internalPath);
-          // console.log(s.path.value.charAt(s.path.value.length - 1));
-          if (s.path.value.charAt(s.path.value.length - 1) == "~") {
-            s.path.value = s.path.value.slice(0, s.path.value.length - 1);
-            s.internalPath = s.internalPath.slice(0, s.internalPath.length - 1);
-          }
+        if (s.kind == NodeKind.CLASSDECLARATION) {
+          if (s.decorators.includes("")) {}
         }
       });
     });
@@ -50,7 +48,7 @@ export default class MyTransform extends Transform {
     // initializer(program);
     // console.log(program.managedClasses);
     //program.filesByName.forEach((e) => {
-      //   console.log(e.name);
+    //   console.log(e.name);
     //});
     program.elementsByName.forEach((c) => {
       //program.elementsByName.forEach((e) => {});
