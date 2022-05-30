@@ -1,57 +1,65 @@
 import Benchmark from "benchmark"
-const suite = new Benchmark.Suite("JSON Benchmark")
+const suite = new Benchmark.Suite("Benchmark")
 
 const vec = {
     x: 0.0,
     y: 0.0
 }
-/*
-suite.add("JSON Stringify String", () => {
+
+suite.add("Stringify String", () => {
     JSON.stringify("Hello")
 })
 
-suite.add("JSON Stringify Boolean", () => {
+suite.add("Stringify Boolean", () => {
     JSON.stringify(true)
 })
 
-suite.add("JSON Stringify Integer", () => {
+suite.add("Stringify Integer", () => {
     JSON.stringify(314)
 })
 
-suite.add("JSON Stringify Float", () => {
+suite.add("Stringify Float", () => {
     JSON.stringify(3.14)
 })
 
-suite.add("JSON Stringify Vector", () => {
+suite.add("Stringify Vector", () => {
     JSON.stringify(vec)
 });
 
-suite.add("JSON Stringify Array", () => {
+suite.add("Stringify Array", () => {
     JSON.stringify([1,2,3,4,5])
 })
 
-suite.add("JSON Parse String", () => {
+suite.add("Parse String", () => {
     JSON.parse("\"Hello\"")
 })
 
-suite.add("JSON Parse Boolean", () => {
+suite.add("Parse Boolean", () => {
     JSON.parse("true")
 })
 
-suite.add("JSON Parse Integer", () => {
+suite.add("Parse Integer", () => {
     JSON.parse("314")
 })
 
-suite.add("JSON Parse Float", () => {
+suite.add("Parse Float", () => {
     JSON.parse("3.14")
 })
 
-suite.add("JSON Parse Vector", () => {
+suite.add("Parse Vector", () => {
     JSON.parse("{\"x\":0.0,\"y\":0.0}")
 })
-*/
-suite.add("JSON Parse Array", () => {
+
+suite.add("Parse Boolean Array", () => {
+  JSON.parse("[true,false,true,false,true]");
+})
+
+suite.add("Parse IntegerArray", () => {
     JSON.parse("[1,2,3,4,5]")
+})
+    
+suite.add("Parse FloatArray", () => {
+    JSON.parse("[1.0,2.0,3.0,4.0,5.0]")
 })
 
 .on('cycle', function(event) {
