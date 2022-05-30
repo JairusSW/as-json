@@ -1,8 +1,8 @@
 import { StringSink } from "as-string-sink/assembly";
 import { Variant } from "as-variant/assembly";
+
 import { isSpace } from "util/string";
 import { aCode, backSlashCode, colonCode, commaCode, eCode, fCode, lCode, leftBraceCode, leftBracketCode, quoteCode, rCode, rightBraceCode, rightBracketCode, sCode, tCode, uCode } from "./chars";
-
 // Discriminator from as-variant
 const enum Discriminator {
   Bool,
@@ -19,6 +19,7 @@ const enum Discriminator {
  * JSON Encoder/Decoder for AssemblyScript
  */
 export namespace JSON {
+  //export type _Variant = Variant;
   /**
    * Stringifies valid JSON data.
    * ```js
