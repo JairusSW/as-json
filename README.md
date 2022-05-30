@@ -2,7 +2,7 @@
 
 # Total time
 
-71 hours 56 minutes
+77 hours 16 minutes
 
 **JSON encoder/decoder for AssemblyScript**
 
