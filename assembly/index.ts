@@ -1,6 +1,6 @@
 import { StringSink } from "as-string-sink/assembly";
 import { Variant } from "as-variant/assembly";
-import { isSpace } from "util/string"
+import { isSpace } from "util/string";
 import { aCode, backSlashCode, colonCode, commaCode, eCode, fCode, lCode, leftBraceCode, leftBracketCode, quoteCode, rCode, rightBraceCode, rightBracketCode, sCode, tCode, uCode } from "./chars";
 
 // Discriminator from as-variant
@@ -30,104 +30,104 @@ export namespace JSON {
   export function stringify<T = Nullable | null>(data: T): string {
     // String
     if (isString(data)) {
-      return serializeString(<string>data)
+      return serializeString(<string>data);
     }
     // Boolean
     else if (isBoolean(data)) {
-      return data ? "true" : "false"
+      return data ? "true" : "false";
     }
     // Null
     else if (isNullable<T>() && data == null) {
-      return "null"
+      return "null";
     }
     // Integers/Floats
     // @ts-ignore
     else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
       // @ts-ignore
-      return data.toString()
+      return data.toString();
     }
     // Class-Based serialization
     // @ts-ignore
     else if (isDefined(data.__JSON_Serialize)) {
       //@ts-ignore
-      return data.__JSON_Serialize()
+      return data.__JSON_Serialize();
     }
     // Map
     else if (data instanceof Map) {
-      let result = new StringSink("{")
+      let result = new StringSink("{");
       let i = 0;
-      const keys = data.keys()
-      const values = data.values()
+      const keys = data.keys();
+      const values = data.values();
       for (; i < keys.length - 1; i++) {
-        result.write(`"${unchecked(keys[i])}":${stringify(unchecked(values[i]))},`)
+        result.write(`"${unchecked(keys[i])}":${stringify(unchecked(values[i]))},`);
       }
-      result.write(`"${unchecked(keys[keys.length - 1])}":${stringify(unchecked(values[keys.length - 1]))}}`)
-      return result.toString()
+      result.write(`"${unchecked(keys[keys.length - 1])}":${stringify(unchecked(values[keys.length - 1]))}}`);
+      return result.toString();
     }
     // ArrayLike
     else if (isArrayLike(data)) {
-      let result = new StringSink("[")
+      let result = new StringSink("[");
       if (data.length == 0) return "[]";
       for (let i = 0; i < data.length - 1; i++) {
-        result.write(stringify(unchecked(data[i])))
-        result.write(",")
+        result.write(stringify(unchecked(data[i])));
+        result.write(",");
       }
-      result.write(stringify(unchecked(data[data.length - 1])))
-      result.write("]")
-      return result.toString()
+      result.write(stringify(unchecked(data[data.length - 1])));
+      result.write("]");
+      return result.toString();
     } else if (data instanceof Variant) {
       if (data.is<string>()) {
-        return JSON.stringify<string>(data.getUnchecked<string>())
+        return JSON.stringify<string>(data.getUnchecked<string>());
       } else if (data.is<boolean>()) {
-        return JSON.stringify<boolean>(data.getUnchecked<boolean>())
+        return JSON.stringify<boolean>(data.getUnchecked<boolean>());
       } else if (data.is<bool>()) {
-        return JSON.stringify<bool>(data.getUnchecked<bool>())
+        return JSON.stringify<bool>(data.getUnchecked<bool>());
       } else if (data.is<i8>()) {
-        return JSON.stringify<i8>(data.getUnchecked<i8>())
+        return JSON.stringify<i8>(data.getUnchecked<i8>());
       } else if (data.is<i16>()) {
-        return JSON.stringify<i16>(data.getUnchecked<i16>())
+        return JSON.stringify<i16>(data.getUnchecked<i16>());
       } else if (data.is<i32>()) {
-        return JSON.stringify<i32>(data.getUnchecked<i32>())
+        return JSON.stringify<i32>(data.getUnchecked<i32>());
       } else if (data.is<u8>()) {
-        return JSON.stringify<u8>(data.getUnchecked<u8>())
+        return JSON.stringify<u8>(data.getUnchecked<u8>());
       } else if (data.is<u16>()) {
-        return JSON.stringify<u16>(data.getUnchecked<u16>())
+        return JSON.stringify<u16>(data.getUnchecked<u16>());
       } else if (data.is<u32>()) {
-        return JSON.stringify<u32>(data.getUnchecked<u32>())
+        return JSON.stringify<u32>(data.getUnchecked<u32>());
       } else if (data.is<f32>()) {
-        return JSON.stringify<f32>(data.getUnchecked<f32>())
+        return JSON.stringify<f32>(data.getUnchecked<f32>());
       } else if (data.is<f64>()) {
-        return JSON.stringify<f64>(data.getUnchecked<f64>())
+        return JSON.stringify<f64>(data.getUnchecked<f64>());
         // @ts-ignore
       } else if (data.discriminator >= Discriminator.ManagedRef) {
         // TODO: We know it is a Object, but how to call __JSON_Stringify()?
       } else if (data.is<string[]>()) {
-        return JSON.stringify<string[]>(data.getUnchecked<string[]>())
+        return JSON.stringify<string[]>(data.getUnchecked<string[]>());
       } else if (data.is<boolean[]>()) {
-        return JSON.stringify<boolean[]>(data.getUnchecked<boolean[]>())
+        return JSON.stringify<boolean[]>(data.getUnchecked<boolean[]>());
       } else if (data.is<bool[]>()) {
-        return JSON.stringify<bool[]>(data.getUnchecked<bool[]>())
+        return JSON.stringify<bool[]>(data.getUnchecked<bool[]>());
       } else if (data.is<i8[]>()) {
-        return JSON.stringify<i8[]>(data.getUnchecked<i8[]>())
+        return JSON.stringify<i8[]>(data.getUnchecked<i8[]>());
       } else if (data.is<i16[]>()) {
-        return JSON.stringify<i16[]>(data.getUnchecked<i16[]>())
+        return JSON.stringify<i16[]>(data.getUnchecked<i16[]>());
       } else if (data.is<i32[]>()) {
-        return JSON.stringify<i32[]>(data.getUnchecked<i32[]>())
+        return JSON.stringify<i32[]>(data.getUnchecked<i32[]>());
       } else if (data.is<u8[]>()) {
-        return JSON.stringify<u8[]>(data.getUnchecked<u8[]>())
+        return JSON.stringify<u8[]>(data.getUnchecked<u8[]>());
       } else if (data.is<u16[]>()) {
-        return JSON.stringify<u16[]>(data.getUnchecked<u16[]>())
+        return JSON.stringify<u16[]>(data.getUnchecked<u16[]>());
       } else if (data.is<u32[]>()) {
-        return JSON.stringify<u32[]>(data.getUnchecked<u32[]>())
+        return JSON.stringify<u32[]>(data.getUnchecked<u32[]>());
       } else if (data.is<f32[]>()) {
-        return JSON.stringify<f32[]>(data.getUnchecked<f32[]>())
+        return JSON.stringify<f32[]>(data.getUnchecked<f32[]>());
       } else if (data.is<f64[]>()) {
-        return JSON.stringify<f64[]>(data.getUnchecked<f64[]>())
+        return JSON.stringify<f64[]>(data.getUnchecked<f64[]>());
       } else {
-        return "null"
+        return "null";
       }
     } else {
-      return "null"
+      return "null";
     }
   }
   /**
@@ -149,45 +149,45 @@ export namespace JSON {
     } else if (isFloat<T>() || isInteger<T>()) {
       return parseNumber<T>(data);
     } else if (isArrayLike<T>()) {
-      return parseArray<T>(data)
+      return parseArray<T>(data);
     } else if (type instanceof Map) {
       return parseMap<T>(data);
       // @ts-ignore
     } else if (type instanceof Variant) {
       // @ts-ignore
-      return Variant.from(JSON.parse<T>(data))
+      return Variant.from(JSON.parse<T>(data));
       // @ts-ignore
     } else if (isDefined(type.__JSON_Parse)) {
-      const result = new Map<string, Variant>()
-      let lastPos: u32 = 0
-      let char: u32 = 0
-      let i: u32 = 1
-      let key: string = ""
-      let isKey: boolean = false
+      const result = new Map<string, Variant>();
+      let lastPos: u32 = 0;
+      let char: u32 = 0;
+      let i: u32 = 1;
+      let key: string = "";
+      let isKey: boolean = false;
       for (; i < u32(data.length - 1); i++) {
-        char = data.charCodeAt(i)
+        char = data.charCodeAt(i);
         if (isKey == false) {
           if (char == colonCode) {
-            key = data.slice(lastPos + 2, i - 1)
+            key = data.slice(lastPos + 2, i - 1);
             //console.log(`Found Key: ${key}`)
-            lastPos = ++i
-            isKey = true
+            lastPos = ++i;
+            isKey = true;
           }
         } else {
           if (char == commaCode) {
-            const val = data.slice(lastPos, i)
-            lastPos = i
-            isKey = false
+            const val = data.slice(lastPos, i);
+            lastPos = i;
+            isKey = false;
             //console.log(`Found Val: ${val}`)
             // @ts-ignore
-            result.set(key, JSON.parse<Variant>(val))
+            result.set(key, JSON.parse<Variant>(val));
           }
         }
       }
       // @ts-ignore
-      result.set(key, JSON.parse<Variant>(data.slice(lastPos, data.length - 1)))
+      result.set(key, JSON.parse<Variant>(data.slice(lastPos, data.length - 1)));
       // @ts-ignore
-      return type.__JSON_Parse(result)
+      return type.__JSON_Parse(result);
     } else {
       // @ts-ignore
       return null;
@@ -198,42 +198,42 @@ export namespace JSON {
 // @ts-ignore
 //@inline
 function serializeString(data: string): string {
-  return "\"" + data.replaceAll("\"", "\\\"") + "\""
+  return "\"" + data.replaceAll("\"", "\\\"") + "\"";
 }
 // @ts-ignore
 //@inline
 function parseString(data: string): string {
-  return data.slice(1, data.length - 1).replaceAll("\\\"", "\"")
+  return data.slice(1, data.length - 1).replaceAll("\\\"", "\"");
 }
 
 // @ts-ignore
 //@inline
 function parseBoolean<T extends boolean>(data: string): T {
-  if (data.length > 3 && data.charCodeAt(0) == tCode && data.charCodeAt(1) == rCode && data.charCodeAt(2) == uCode && data.charCodeAt(3) == eCode) return <T>true;
-  else if (data.length > 4 && data.charCodeAt(0) == fCode && data.charCodeAt(1) == aCode && data.charCodeAt(2) == lCode && data.charCodeAt(3) == sCode && data.charCodeAt(4) == eCode) return <T>false;
-  else throw new Error(`JSON: Cannot parse "${data}" as boolean`)
+  if (data.length > 3 && data.startsWith("true")) return <T>true;
+  else if (data.length > 4 && data.startsWith("false")) return <T>false;
+  else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
 }
 // @ts-ignore
 //@inline
 function parseNumber<T>(data: string): T {
-  let type: T
+  let type: T;
   // @ts-ignore
-  if (type instanceof f64) return F64.parseFloat(data)
+  if (type instanceof f64) return F64.parseFloat(data);
   // @ts-ignore
-  else if (type instanceof f32) return F32.parseFloat(data)
+  else if (type instanceof f32) return F32.parseFloat(data);
   // @ts-ignore
-  else if (type instanceof i32) return I32.parseInt(data)
+  else if (type instanceof i32) return I32.parseInt(data);
   // @ts-ignore
-  else if (type instanceof u32) return U32.parseInt(data)
+  else if (type instanceof u32) return U32.parseInt(data);
   // @ts-ignore
-  else if (type instanceof u8) return U8.parseInt(data)
+  else if (type instanceof u8) return U8.parseInt(data);
   // @ts-ignore
-  else if (type instanceof u16) return U16.parseInt(data)
+  else if (type instanceof u16) return U16.parseInt(data);
   // @ts-ignore
-  else if (type instanceof i16) return I16.parseInt(data)
+  else if (type instanceof i16) return I16.parseInt(data);
   // @ts-ignore
-  else if (type instanceof i8) return I8.parseInt(data)
-  else throw new Error(`JSON: Cannot parse invalid data into a number. Either "${data}" is not a valid number, or <${nameof<T>()}> is an invald number type.`)
+  else if (type instanceof i8) return I8.parseInt(data);
+  else throw new Error(`JSON: Cannot parse invalid data into a number. Either "${data}" is not a valid number, or <${nameof<T>()}> is an invald number type.`);
 }
 
 // @ts-ignore
@@ -283,7 +283,7 @@ export function parseBooleanArray<T>(data: string): T {
 // @ts-ignore
 //@inline
 export function parseArray<T>(data: string): T {
-  const result = instantiate<T>()
+  const result = instantiate<T>();
   data = data.trim();
   let len: u32 = data.length - 1;
   let lastPos: u32 = 1;
@@ -298,7 +298,7 @@ export function parseArray<T>(data: string): T {
   let outDepth: u32 = 0;
   for (; i < len; i++) {
     char = data.charCodeAt(i);
-    if (char == quoteCode && data.charCodeAt(i - 1) != backSlashCode) isStr = !isStr
+    if (char == quoteCode && data.charCodeAt(i - 1) != backSlashCode) isStr = !isStr;
     if (char == leftBraceCode || char == leftBracketCode) {
       inDepth++;
       isStruct = true;
@@ -317,7 +317,7 @@ export function parseArray<T>(data: string): T {
         // This checks to see if we are dealing with structures such as Objects and Arrays
         if (char == commaCode) {
           // @ts-ignore 
-          result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i).trim()))
+          result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i).trim()));
           //offset = 0;
           lastPos = i + 1;
         }
@@ -347,77 +347,77 @@ export function parseArray<T>(data: string): T {
 
   // @ts-ignore
   // Handle empty arrays
-  data = data.slice(lastPos, len).trim()
+  data = data.slice(lastPos, len).trim();
   // @ts-ignore
-  if (data.length != 0) result.push(JSON.parse<valueof<T>>(data))
+  if (data.length != 0) result.push(JSON.parse<valueof<T>>(data));
   //if (data.length != 0) console.log(`Trailing-${data.slice(lastPos, len).trim()}-`)
   return result;
 }
 
 export function parseObject(data: string): void {
   //const obj = instantiate<T>()
-  const result = new Array<string>()
-  let lastPos: u32 = 0
-  let char: u32 = 0
-  let i: u32 = 1
-  let key: string = ""
-  let isKey: boolean = false
+  const result = new Array<string>();
+  let lastPos: u32 = 0;
+  let char: u32 = 0;
+  let i: u32 = 1;
+  let key: string = "";
+  let isKey: boolean = false;
   for (; i < u32(data.length - 1); i++) {
-    char = data.charCodeAt(i)
+    char = data.charCodeAt(i);
     if (isKey == false) {
       if (char == colonCode) {
-        key = data.slice(lastPos + 2, i - 1)
-        console.log(`Found Key: ${key}`)
-        result.push(key)
-        lastPos = ++i
-        isKey = true
+        key = data.slice(lastPos + 2, i - 1);
+        //console.log(`Found Key: ${key}`);
+        result.push(key);
+        lastPos = ++i;
+        isKey = true;
       }
     } else {
       if (char == commaCode) {
-        const val = data.slice(lastPos, i)
-        lastPos = i
-        isKey = false
-        console.log(`Found Val: ${val}`)
-        result.push(val)
+        const val = data.slice(lastPos, i);
+        lastPos = i;
+        isKey = false;
+        //console.log(`Found Val: ${val}`)
+        result.push(val);
       }
     }
   }
-  result.push(data.slice(lastPos, data.length - 1))
+  result.push(data.slice(lastPos, data.length - 1));
   //console.log(stringify(result))
   //return obj
 }
 
 export function parseMap<T>(data: string): T {
   //const obj = instantiate<T>()
-  const result = instantiate<T>()
-  let lastPos: u32 = 0
-  let char: u32 = 0
-  let i: u32 = 1
-  let key: string = ""
-  let isKey: boolean = false
+  const result = instantiate<T>();
+  let lastPos: u32 = 0;
+  let char: u32 = 0;
+  let i: u32 = 1;
+  let key: string = "";
+  let isKey: boolean = false;
   for (; i < u32(data.length - 1); i++) {
-    char = data.charCodeAt(i)
+    char = data.charCodeAt(i);
     if (isKey == false) {
       if (char == colonCode) {
-        key = data.slice(lastPos + 2, i - 1)
+        key = data.slice(lastPos + 2, i - 1);
         //console.log(`Found Key: ${key}`)
-        lastPos = ++i
-        isKey = true
+        lastPos = ++i;
+        isKey = true;
       }
     } else {
       if (char == commaCode) {
-        const val = data.slice(lastPos, i)
-        lastPos = i
-        isKey = false
+        const val = data.slice(lastPos, i);
+        lastPos = i;
+        isKey = false;
         //console.log(`Found Val: ${val}`)
         // @ts-ignore
-        result.set(key, JSON.parse<f32>(val))
+        result.set(key, JSON.parse<f32>(val));
       }
     }
   }
   // @ts-ignore
-  result.set(key, JSON.parse<f32>(data.slice(lastPos, data.length - 1)))
-  return result
+  result.set(key, JSON.parse<f32>(data.slice(lastPos, data.length - 1)));
+  return result;
 }
 
 class Nullable { }
