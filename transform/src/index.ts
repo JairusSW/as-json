@@ -1,28 +1,10 @@
 import {
-  ClassPrototype,
   IdentifierExpression,
-  ImportStatement,
   Parser,
-  Program,
-  FieldPrototype,
   ClassDeclaration,
-  MethodDeclaration,
   CommonFlags,
-  FunctionTypeNode,
   TypeName,
-  BlockStatement,
-  FunctionPrototype,
   NamedTypeNode,
-  ReturnStatement,
-  StringLiteralExpression,
-  VariableDeclaration,
-  VariableStatement,
-  BinaryExpression,
-  ExpressionStatement,
-  Token,
-  PropertyAccessExpression,
-  CallExpression,
-  ThisExpression,
   VariableLikeDeclarationStatement,
   DiagnosticCode,
   ObjectLiteralExpression,
@@ -30,10 +12,11 @@ import {
   Range,
   ParameterKind,
   Statement,
-} from "assemblyscript";
-import { Transform } from "assemblyscript/transform";
+} from "assemblyscript/dist/transform";
+import { Transform } from "assemblyscript/dist/transform";
 
 export default class MyTransform extends Transform {
+  // @ts-ignore
   readFile(filename: string, baseDir: string) {
     return null;
   }
@@ -42,13 +25,14 @@ export default class MyTransform extends Transform {
       if (s.isLibrary) return;
       s.statements.forEach((s) => {
         if (s instanceof ClassDeclaration) {
+          let __DECOR;
           if (
-            s.decorators?.find(
+            __DECOR=s.decorators?.find(
               (d) =>
                 d.name instanceof IdentifierExpression && d.name.text == "json"
             )
           ) {
-
+            const __DEFAULT_RANGE = __DECOR.range;
             const members = s.members.filter<VariableLikeDeclarationStatement>(
               (e): e is VariableLikeDeclarationStatement =>
                 e instanceof VariableLikeDeclarationStatement
@@ -65,30 +49,30 @@ export default class MyTransform extends Transform {
             const SimpleNames = ["u8", "u16", "string"];
             const Param = Expression.createIdentifierExpression(
               "param",
-              new Range(0, 0)
+              __DEFAULT_RANGE
             );
             const GenericMapType = Expression.createNamedType(
-              Expression.createSimpleTypeName("string", new Range(0, 0)),
+              Expression.createSimpleTypeName("string", __DEFAULT_RANGE),
               [
                 Expression.createNamedType(
                   new TypeName(
                     Expression.createIdentifierExpression(
                       "JSON",
-                      new Range(0, 0)
+                      __DEFAULT_RANGE
                     ),
                     Expression.createSimpleTypeName(
                       "_Variant",
-                      new Range(0, 0)
+                      __DEFAULT_RANGE
                     ),
-                    new Range(0, 0)
+                    __DEFAULT_RANGE
                   ),
                   null,
                   false,
-                  new Range(0, 0)
+                  __DEFAULT_RANGE
                 ),
               ],
               false,
-              new Range(0, 0)
+              __DEFAULT_RANGE
             );
             let kvr: [IdentifierExpression, Expression][] = [];
 
@@ -98,65 +82,67 @@ export default class MyTransform extends Transform {
                 m.type.name.next == null &&
                 SimpleNames.includes(m.type.name.identifier.text)
               ) {
-                // kvr.push([
-                //   Expression.createIdentifierExpression(m.name.text, m.range),
-                //   Expression.createCallExpression(
-                //     Expression.createElementAccessExpression(
-                //       Param,
-                //       Expression.createIdentifierExpression(
-                //         "get",
-                //         new Range(0, 0)
-                //       ),
-                //       new Range(0, 0)
-                //     ),
-                //     [m.type!],
-                //     [],
-                //     new Range(0, 0)
-                //   ),
-                // ]);
+                kvr.push([
+                  Expression.createIdentifierExpression(m.name.text, m.range),
+                  Expression.createCallExpression(
+                    Expression.createElementAccessExpression(
+                      Param,
+                      Expression.createIdentifierExpression(
+                        "get",
+                        __DEFAULT_RANGE
+                      ),
+                      __DEFAULT_RANGE
+                    ),
+                    [m.type!],
+                    [],
+                    __DEFAULT_RANGE
+                  ),
+                ]);
               } else {
-                // kvr.push([
-                //   Expression.createIdentifierExpression(m.name.text, m.range),
-                //   Expression.createCallExpression(
-                //     Expression.createPropertyAccessExpression(
-                //       m.type!,
-                //       Expression.createIdentifierExpression(
-                //         "__Json__Deserialize",
-                //         new Range(0, 0)
-                //       ),
-                //       new Range(0, 0)
-                //     ),
-                //     [],
-                //     [
-                //       Expression.createCallExpression(
-                //         Expression.createElementAccessExpression(
-                //           Param,
-                //           Expression.createIdentifierExpression(
-                //             "get",
-                //             new Range(0, 0)
-                //           ),
-                //           new Range(0, 0)
-                //         ),
-                //         [GenericMapType],
-                //         [],
-                //         new Range(0, 0)
-                //       ),
-                //     ],
-                //     new Range(0, 0)
-                //   ),
-                // ]);
+                kvr.push([
+                  Expression.createIdentifierExpression(m.name.text, m.range),
+                  Expression.createCallExpression(
+                    Expression.createPropertyAccessExpression(
+                      m.type!,
+                      Expression.createIdentifierExpression(
+                        "__Json__Deserialize",
+                        __DEFAULT_RANGE
+                      ),
+                      __DEFAULT_RANGE
+                    ),
+                    [],
+                    [
+                      Expression.createCallExpression(
+                        Expression.createElementAccessExpression(
+                          Param,
+                          Expression.createIdentifierExpression(
+                            "get",
+                            __DEFAULT_RANGE
+                          ),
+                          __DEFAULT_RANGE
+                        ),
+                        [GenericMapType],
+                        [],
+                        __DEFAULT_RANGE
+                      ),
+                    ],
+                    __DEFAULT_RANGE
+                  ),
+                ]);
               }
             });
             const objectliteral = new ObjectLiteralExpression(
               kvr.map((e) => e[0]),
               kvr.map((e) => e[1]),
-              new Range(0, 0)
+              __DEFAULT_RANGE
             );
+            console.log(kvr[0]?.map(e=>!!e))
+            console.log(kvr[1]?.map(e=>!!e))
             s.members.push(
               Expression.createMethodDeclaration(
                 Expression.createIdentifierExpression(
                   "__Json__Deserialize",
-                  new Range(0, 0)
+                  __DEFAULT_RANGE
                 ),
                 null,
                 CommonFlags.STATIC,
@@ -167,33 +153,33 @@ export default class MyTransform extends Transform {
                       ParameterKind.DEFAULT,
                       Expression.createIdentifierExpression(
                         "param",
-                        new Range(0, 0)
+                        __DEFAULT_RANGE
                       ),
                       GenericMapType,
                       null,
-                      new Range(0, 0)
+                      __DEFAULT_RANGE
                     ),
                   ],
                   Expression.createNamedType(
-                    Expression.createSimpleTypeName("this", new Range(0, 0)),
+                    (console.log(s.name.text),Expression.createSimpleTypeName(s.name.text+'1', __DEFAULT_RANGE)),
                     null,
                     false,
-                    new Range(0, 0)
+                    __DEFAULT_RANGE
                   ),
                   null,
                   false,
-                  new Range(0, 0)
+                  __DEFAULT_RANGE
                 ),
                 Statement.createBlockStatement(
                   [
                     Statement.createReturnStatement(
                       objectliteral,
-                      new Range(0, 0)
+                      __DEFAULT_RANGE
                     ),
                   ],
-                  new Range(0, 0)
+                  __DEFAULT_RANGE
                 ),
-                new Range(0, 0)
+                __DEFAULT_RANGE
               )
             );
           }
