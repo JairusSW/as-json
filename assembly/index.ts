@@ -389,7 +389,6 @@ export function parseObject(data: string): void {
 }
 
 export function parseMap<T>(data: string): T {
-  //const obj = instantiate<T>()
   const result = instantiate<T>();
   let lastPos: u32 = 0;
   let char: u32 = 0;
@@ -412,12 +411,12 @@ export function parseMap<T>(data: string): T {
         isKey = false;
         //console.log(`Found Val: ${val}`)
         // @ts-ignore
-        result.set(key, JSON.parse<f32>(val));
+        result.set(key, JSON.parse<Variant>(val));
       }
     }
   }
   // @ts-ignore
-  result.set(key, JSON.parse<f32>(data.slice(lastPos, data.length - 1)));
+  result.set(key, JSON.parse<Variant>(data.slice(lastPos, data.length - 1)));
   return result;
 }
 

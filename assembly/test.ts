@@ -1,19 +1,25 @@
 import { Variant } from "as-variant/assembly";
 import "wasi";
-import { JSON } from ".";
+import { JSON, parseMap } from ".";
 
 // @json
-class Obj {
-    hello: string;
-    static __Json__Deserialize(param: Map<string,JSON._Variant> ): Obj {
+class Vec {
+    name: string;
+    x: f32;
+    y: f32;
+    static __Json__Deserialize(param: Map<string,JSON._Variant>): Obj {
         return {
-            hello: param.get("hello").get<string>()
+            name: param.get("name").get<string>(),
+            x: param.get("x").get<f32>(),
+            y: param.get("y").get<f32>()
         }
     }
 }
 
-const obj: Obj = {
-    hello: "world"
+const vec: Vec = {
+    name: "Vector",
+    x: -2.4,
+    y: 3.1
 }
 
-console.log(Obj.__Json__Deserialize(new Map<string, Variant>().set("hello", Variant.from("world"))).hello)
+console.log(Vec.__Json__Deserialize(parseMap<Map<string, Variant>>('{"name":"Vector","x":-2.4,"y":3.1}').name)
