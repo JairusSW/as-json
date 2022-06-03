@@ -12,8 +12,8 @@ import {
   Range,
   ParameterKind,
   Statement,
-} from "assemblyscript/dist/transform";
-import { Transform } from "assemblyscript/dist/transform";
+} from "assemblyscript";
+import { Transform } from "assemblyscript/transform";
 
 export default class MyTransform extends Transform {
   // @ts-ignore
@@ -27,7 +27,7 @@ export default class MyTransform extends Transform {
         if (s instanceof ClassDeclaration) {
           let __DECOR;
           if (
-            __DECOR=s.decorators?.find(
+            __DECOR = s.decorators?.find(
               (d) =>
                 d.name instanceof IdentifierExpression && d.name.text == "json"
             )
@@ -42,11 +42,11 @@ export default class MyTransform extends Transform {
                 p.error(
                   DiagnosticCode.User_defined_0,
                   e.range,
-                  "Type information must be specified for JSON serialization.",""
+                  "Type information must be specified for JSON serialization.", ""
                 );
               }
             });
-            const SimpleNames = ["u8", "u16", "string"];
+            const SimpleNames = ["u8", "u16", "string", "f32"];
             const Param = Expression.createIdentifierExpression(
               "param",
               __DEFAULT_RANGE
@@ -136,8 +136,8 @@ export default class MyTransform extends Transform {
               kvr.map((e) => e[1]),
               __DEFAULT_RANGE
             );
-            console.log(kvr[0]?.map(e=>!!e))
-            console.log(kvr[1]?.map(e=>!!e))
+            console.log(kvr[0]?.map(e => !!e))
+            console.log(kvr[1]?.map(e => !!e))
             s.members.push(
               Expression.createMethodDeclaration(
                 Expression.createIdentifierExpression(
@@ -161,7 +161,7 @@ export default class MyTransform extends Transform {
                     ),
                   ],
                   Expression.createNamedType(
-                    (console.log(s.name.text),Expression.createSimpleTypeName(s.name.text+'1', __DEFAULT_RANGE)),
+                    (console.log(s.name.text), Expression.createSimpleTypeName(s.name.text + '1', __DEFAULT_RANGE)),
                     null,
                     false,
                     __DEFAULT_RANGE

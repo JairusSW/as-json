@@ -1,5 +1,5 @@
-import { IdentifierExpression, ClassDeclaration, CommonFlags, TypeName, NamedTypeNode, VariableLikeDeclarationStatement, DiagnosticCode, ObjectLiteralExpression, Expression, ParameterKind, Statement, } from "assemblyscript/dist/transform";
-import { Transform } from "assemblyscript/dist/transform";
+import { IdentifierExpression, ClassDeclaration, CommonFlags, TypeName, NamedTypeNode, VariableLikeDeclarationStatement, DiagnosticCode, ObjectLiteralExpression, Expression, ParameterKind, Statement, } from "assemblyscript";
+import { Transform } from "assemblyscript/transform";
 export default class MyTransform extends Transform {
     // @ts-ignore
     readFile(filename, baseDir) {
@@ -21,7 +21,7 @@ export default class MyTransform extends Transform {
                                 p.error(DiagnosticCode.User_defined_0, e.range, "Type information must be specified for JSON serialization.", "");
                             }
                         });
-                        const SimpleNames = ["u8", "u16", "string"];
+                        const SimpleNames = ["u8", "u16", "string", "f32"];
                         const Param = Expression.createIdentifierExpression("param", __DEFAULT_RANGE);
                         const GenericMapType = Expression.createNamedType(Expression.createSimpleTypeName("string", __DEFAULT_RANGE), [
                             Expression.createNamedType(new TypeName(Expression.createIdentifierExpression("JSON", __DEFAULT_RANGE), Expression.createSimpleTypeName("_Variant", __DEFAULT_RANGE), __DEFAULT_RANGE), null, false, __DEFAULT_RANGE),
