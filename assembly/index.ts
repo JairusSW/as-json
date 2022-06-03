@@ -2,7 +2,24 @@ import { StringSink } from "as-string-sink/assembly";
 import { Variant } from "as-variant/assembly";
 
 import { isSpace } from "util/string";
-import { aCode, backSlashCode, colonCode, commaCode, eCode, fCode, lCode, leftBraceCode, leftBracketCode, quoteCode, rCode, rightBraceCode, rightBracketCode, sCode, tCode, uCode } from "./chars";
+import {
+  aCode,
+  backSlashCode,
+  colonCode,
+  commaCode,
+  eCode,
+  fCode,
+  lCode,
+  leftBraceCode,
+  leftBracketCode,
+  quoteCode,
+  rCode,
+  rightBraceCode,
+  rightBracketCode,
+  sCode,
+  tCode,
+  uCode
+} from "./chars";
 // Discriminator from as-variant
 const enum Discriminator {
   Bool,
