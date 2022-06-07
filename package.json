@@ -11,14 +11,16 @@
   "scripts": {
     "bench:astral": "astral",
     "build:test": "asc assembly/test.ts --target test",
-    "build:test:watch": "onchange -d 5000 \"assembly/test.ts\" -- asc assembly/test.ts --target test",
     "build:transform": "tsc -w -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
-    "test:wasmtime:watch": "onchange -d 5000 \"build/test.wasm\" -- wasmtime ./build/test.wasm",
     "test:lunatic": "lunatic ./build/test.wasm",
-    "test:lunatic:watch": "onchange 'build/test.wasm' -- lunatic ./build/test.wasm",
+    "test:wasm3": "wasm3 ./build/test.wasm",
     "test:node": "",
-    "test:browser": "serve ."
+    "test:browser": "serve .",
+    "build:test:watch": "onchange -d 5000 \"assembly/test.ts\" -- asc assembly/test.ts --target test",
+    "test:wasmtime:watch": "onchange -d 5000 \"build/test.wasm\" -- wasmtime ./build/test.wasm",
+    "test:lunatic:watch": "onchange 'build/test.wasm' -- lunatic ./build/test.wasm",
+    "test:wasm3:watch": "onchange 'build/test.wasm' -- wasm3 ./build/test.wasm"
   },
   "devDependencies": {
     "@as-tral/cli": "^1.1.1",
