@@ -93,58 +93,8 @@ export namespace JSON {
       result.write(stringify(unchecked(data[data.length - 1])));
       result.write("]");
       return result.toString();
-    } else if (data instanceof Variant) {
-      if (data.is<string>()) {
-        return JSON.stringify<string>(data.getUnchecked<string>());
-      } else if (data.is<boolean>()) {
-        return JSON.stringify<boolean>(data.getUnchecked<boolean>());
-      } else if (data.is<bool>()) {
-        return JSON.stringify<bool>(data.getUnchecked<bool>());
-      } else if (data.is<i8>()) {
-        return JSON.stringify<i8>(data.getUnchecked<i8>());
-      } else if (data.is<i16>()) {
-        return JSON.stringify<i16>(data.getUnchecked<i16>());
-      } else if (data.is<i32>()) {
-        return JSON.stringify<i32>(data.getUnchecked<i32>());
-      } else if (data.is<u8>()) {
-        return JSON.stringify<u8>(data.getUnchecked<u8>());
-      } else if (data.is<u16>()) {
-        return JSON.stringify<u16>(data.getUnchecked<u16>());
-      } else if (data.is<u32>()) {
-        return JSON.stringify<u32>(data.getUnchecked<u32>());
-      } else if (data.is<f32>()) {
-        return JSON.stringify<f32>(data.getUnchecked<f32>());
-      } else if (data.is<f64>()) {
-        return JSON.stringify<f64>(data.getUnchecked<f64>());
-        // @ts-ignore
-      } else if (data.discriminator >= Discriminator.ManagedRef) {
-        // TODO: We know it is a Object, but how to call __JSON_Stringify()?
-      } else if (data.is<string[]>()) {
-        return JSON.stringify<string[]>(data.getUnchecked<string[]>());
-      } else if (data.is<boolean[]>()) {
-        return JSON.stringify<boolean[]>(data.getUnchecked<boolean[]>());
-      } else if (data.is<bool[]>()) {
-        return JSON.stringify<bool[]>(data.getUnchecked<bool[]>());
-      } else if (data.is<i8[]>()) {
-        return JSON.stringify<i8[]>(data.getUnchecked<i8[]>());
-      } else if (data.is<i16[]>()) {
-        return JSON.stringify<i16[]>(data.getUnchecked<i16[]>());
-      } else if (data.is<i32[]>()) {
-        return JSON.stringify<i32[]>(data.getUnchecked<i32[]>());
-      } else if (data.is<u8[]>()) {
-        return JSON.stringify<u8[]>(data.getUnchecked<u8[]>());
-      } else if (data.is<u16[]>()) {
-        return JSON.stringify<u16[]>(data.getUnchecked<u16[]>());
-      } else if (data.is<u32[]>()) {
-        return JSON.stringify<u32[]>(data.getUnchecked<u32[]>());
-      } else if (data.is<f32[]>()) {
-        return JSON.stringify<f32[]>(data.getUnchecked<f32[]>());
-      } else if (data.is<f64[]>()) {
-        return JSON.stringify<f64[]>(data.getUnchecked<f64[]>());
-      } else {
-        return "null";
-      }
-    } else {
+    } /*else if (data instanceof Variant) {
+    }*/ else {
       return "null";
     }
   }

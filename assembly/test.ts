@@ -1,6 +1,6 @@
 import { Variant } from "as-variant/assembly";
 import "wasi";
-import { JSON, parseMap } from ".";
+import { JSON } from ".";
 
 
 class Vec2 {
