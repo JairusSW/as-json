@@ -75,7 +75,7 @@ export namespace JSON {
       let result = new StringSink("{");
       let i = 0;
       const keys = data.keys();
-      const values = data.values();
+      const values = data.values();   
       for (; i < keys.length - 1; i++) {
         result.write(`"${unchecked(keys[i])}":${stringify(unchecked(values[i]))},`);
       }
