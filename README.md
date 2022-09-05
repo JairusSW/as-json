@@ -5,8 +5,10 @@
 ## Installation
 
 ```bash
-~ npm install JairusSW/as-json
-~ yarn add JairusSW/as-json
+~ npm install json-as
+```
+```bash
+~ npm install visitor-as
 ```
 
 Add the transform to your `asc` command
