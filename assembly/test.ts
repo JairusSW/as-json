@@ -7,16 +7,18 @@ class Vec2 {
   y: f32
 }
 @json
-class JSONSchema {
+class Player {
   firstName: string
   lastName: string
+  lastActive: i32[]
   age: i32
   pos: Vec2
 }
 
-const data: JSONSchema = {
-  firstName: 'Emmet',
-  lastName: 'Smith',
+const data: Player = {
+  firstName: "Emmet",
+  lastName: "West",
+  lastActive: [8, 27, 2022],
   age: 23,
   pos: {
     x: -3.4,
@@ -24,13 +26,10 @@ const data: JSONSchema = {
   }
 }
 
-if (isDefined(data.__JSON_Serialize)) {
-  const stringified = data.__JSON_Serialize() as string;
-  // '{"firstName":"Emmet","lastName":"Smith","age":23}'
-  console.log(`Stringified: ${stringified}`);
-}/*
+const stringified = JSON.stringify<Player>(data);
+// '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23}'
+console.log(`Stringified: ${stringified}`);
 
-// PARSING DOES NOT WORK QUITE YET!
-const parsed = JSON.parse<JSONSchema>(stringified)
-// { firstName: "Emmet", lastName: "Smith", age: 23 }
-console.log(`Parsed: ${JSON.stringify(parsed)}`)*/
+const parsed = JSON.parse<Player>(stringified)
+// { firstName: "Emmet", lastName: "West", "lastActive": [8,27,2022], age: 23 }
+console.log(`Parsed: ${JSON.stringify(parsed)}`)

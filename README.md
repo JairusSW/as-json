@@ -5,8 +5,8 @@
 ## Installation
 
 ```bash
-~ npm install json-as
-~ yarn add json-as
+~ npm install JairusSW/as-json
+~ yarn add JairusSW/as-json
 ```
 
 Add the transform to your `asc` command
@@ -32,42 +32,43 @@ Or, add it to `asconfig.json`
 - ✅ Numbers (Supported)
 - ✅ Integers (Supported)
 - ✅ Null (Supported)
-- ✅ Variants (Supported)
+- ❌ Dynamic Variants (Not supported)
 
 ## Usage
 
 ```js
-import { JSON } from 'json-as'
+import { JSON } from "json-as";
 
 @json
-class JSONSchema {
+class Vec2 {
+  x: f32
+  y: f32
+}
+@json
+class Player {
   firstName: string
   lastName: string
+  lastActive: i32[]
   age: i32
+  pos: Vec2
 }
 
-const data: JSONSchema = {
-  firstName: 'Emmet',
-  lastName: 'Smith',
+const data: Player = {
+  firstName: "Emmet",
+  lastName: "West",
+  lastActive: [8, 27, 2022],
   age: 23,
+  pos: {
+    x: -3.4,
+    y: 1.2
+  }
 }
 
-const stringified = JSON.stringify(data)
-// '{"firstName":"Emmet","lastName":"Smith","age":23}'
-console.log(`Stringified: ${stringified}`)
+const stringified = JSON.stringify<Player>(data);
+// '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23}'
+console.log(`Stringified: ${stringified}`);
 
-// PARSING DOES NOT WORK QUITE YET!
-const parsed = JSON.parse<JSONSchema>(stringified)
-// { firstName: "Emmet", lastName: "Smith", age: 23 }
+const parsed = JSON.parse<Player>(stringified)
+// { firstName: "Emmet", lastName: "West", "lastActive": [8,27,2022], age: 23 }
 console.log(`Parsed: ${JSON.stringify(parsed)}`)
 ```
-
-## Todo
-
-Add [Envy](https://github.com/jtenner/envy) as the testing framework. Remove as-pect
-
-Finish parsing objects into classes
-
-Work on jsonType and support dynamic types
-
-Optimize!
