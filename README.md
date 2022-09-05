@@ -1,6 +1,6 @@
 # AS-JSON
 
-**JSON encoder/decoder for AssemblyScript**
+**JSON serializer/deserializer for AssemblyScript**
 
 ## Installation
 
@@ -27,8 +27,8 @@ Or, add it to `asconfig.json`
 
 ## Support
 
-- ✅ Objects (Serializing only)
-- ✅ Arrays (Basic parsing. Serializing good)
+- ✅ Objects (Supported)
+- ✅ Arrays (Supported)
 - ✅ Numbers (Supported)
 - ✅ Integers (Supported)
 - ✅ Null (Supported)
@@ -72,3 +72,7 @@ const parsed = JSON.parse<Player>(stringified)
 // { firstName: "Emmet", lastName: "West", "lastActive": [8,27,2022], age: 23 }
 console.log(`Parsed: ${JSON.stringify(parsed)}`)
 ```
+
+## Issues
+
+Please submit an issue to https://github.com/JairusSW/as-json/issues if you find anything wrong with this library
