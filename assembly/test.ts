@@ -1,27 +1,36 @@
-import { Variant } from "as-variant/assembly";
 import "wasi";
 import { JSON } from ".";
 
-
+@json
 class Vec2 {
-    x: f32;
-    y: f32;
-    static __Json__Deserialize(param: Map<string, JSON._Variant>): Vec2 {
-        return {
-            x: param.get("x").get<f32>(),
-            y: param.get("y").get<f32>()
-        }
-    }
+  x: f32
+  y: f32
+}
+@json
+class JSONSchema {
+  firstName: string
+  lastName: string
+  age: i32
+  pos: Vec2
 }
 
-const vec: Vec2 = {
-    x: -2.4,
-    y: 3.1
+const data: JSONSchema = {
+  firstName: 'Emmet',
+  lastName: 'Smith',
+  age: 23,
+  pos: {
+    x: -3.4,
+    y: 1.2
+  }
 }
 
-console.log(isDefined(Vec2.__Json__Deserialize).toString())
-const map = new Map<string, Variant>()
-map.set("x", Variant.from<f32>(-2.4))
-map.set("y", Variant.from<f32>(3.1))
-console.log(Vec2.__Json__Deserialize(map).x.toString())
-console.log(JSON.stringify(124354231))
+if (isDefined(data.__JSON_Serialize)) {
+  const stringified = data.__JSON_Serialize() as string;
+  // '{"firstName":"Emmet","lastName":"Smith","age":23}'
+  console.log(`Stringified: ${stringified}`);
+}/*
+
+// PARSING DOES NOT WORK QUITE YET!
+const parsed = JSON.parse<JSONSchema>(stringified)
+// { firstName: "Emmet", lastName: "Smith", age: 23 }
+console.log(`Parsed: ${JSON.stringify(parsed)}`)*/

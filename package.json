@@ -11,7 +11,7 @@
   "scripts": {
     "bench:astral": "astral",
     "build:test": "asc assembly/test.ts --target test",
-    "build:transform": "tsc -w -p ./transform",
+    "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:lunatic": "lunatic ./build/test.wasm",
     "test:wasm3": "wasm3 ./build/test.wasm",
@@ -24,17 +24,18 @@
   },
   "devDependencies": {
     "@as-tral/cli": "^1.1.1",
-    "@envy-as/cli": "https://github.com/jtenner/envy",
-    "@wasmer/wasi": "^1.0.2",
     "as-console": "^6.0.2",
     "assemblyscript": "^0.20.7",
+    "assemblyscript-prettier": "^1.0.2",
     "benchmark": "^2.1.4",
+    "json-as": "^0.2.6",
     "microtime": "^3.0.0",
     "typescript": "^4.7.2"
   },
   "dependencies": {
     "as-string-sink": "^0.5.0",
-    "as-variant": "^0.3.0"
+    "as-variant": "^0.3.0",
+    "visitor-as": "^0.10.0"
   },
   "repository": {
     "type": "git",

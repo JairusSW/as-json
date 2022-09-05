@@ -18,16 +18,23 @@ import {
   rightBracketCode,
   sCode,
   tCode,
-  uCode
+  uCode,
 } from "./chars";
 // Discriminator from as-variant
 const enum Discriminator {
   Bool,
-  I8, I16, I32, I64,
-  U8, U16, U32, U64,
-  F32, F64,
+  I8,
+  I16,
+  I32,
+  I64,
+  U8,
+  U16,
+  U32,
+  U64,
+  F32,
+  F64,
   UnmanagedRef,
-  ManagedRef
+  ManagedRef,
 }
 
 //export declare let json: (...a: any) => any;
@@ -44,7 +51,7 @@ export namespace JSON {
    * ```
    * @param data T
    * @returns string
-  */
+   */
   export function stringify<T = Nullable | null>(data: T): string {
     // String
     if (isString(data)) {
@@ -75,11 +82,17 @@ export namespace JSON {
       let result = new StringSink("{");
       let i = 0;
       const keys = data.keys();
-      const values = data.values();   
+      const values = data.values();
       for (; i < keys.length - 1; i++) {
-        result.write(`"${unchecked(keys[i])}":${stringify(unchecked(values[i]))},`);
+        result.write(
+          `"${unchecked(keys[i])}":${stringify(unchecked(values[i]))},`
+        );
       }
-      result.write(`"${unchecked(keys[keys.length - 1])}":${stringify(unchecked(values[keys.length - 1]))}}`);
+      result.write(
+        `"${unchecked(keys[keys.length - 1])}":${stringify(
+          unchecked(values[keys.length - 1])
+        )}}`
+      );
       return result.toString();
     }
     // ArrayLike
@@ -107,7 +120,7 @@ export namespace JSON {
    * @returns T
    */
   export function parse<T = Variant>(data: string): T {
-    let type!: T
+    let type!: T;
     if (isString<T>()) {
       // @ts-ignore
       return parseString(data);
@@ -153,7 +166,10 @@ export namespace JSON {
         }
       }
       // @ts-ignore
-      result.set(key, JSON.parse<Variant>(data.slice(lastPos, data.length - 1)));
+      result.set(
+        key,
+        JSON.parse<Variant>(data.slice(lastPos, data.length - 1))
+      );
       // @ts-ignore
       return type.__JSON_Parse(result);
     } else {
@@ -166,12 +182,12 @@ export namespace JSON {
 // @ts-ignore
 //@inline
 function serializeString(data: string): string {
-  return "\"" + data.replaceAll("\"", "\\\"") + "\"";
+  return '"' + data.replaceAll('"', '\\"') + '"';
 }
 // @ts-ignore
 //@inline
 function parseString(data: string): string {
-  return data.slice(1, data.length - 1).replaceAll("\\\"", "\"");
+  return data.slice(1, data.length - 1).replaceAll('\\"', '"');
 }
 
 // @ts-ignore
@@ -201,7 +217,10 @@ function parseNumber<T>(data: string): T {
   else if (type instanceof i16) return I16.parseInt(data);
   // @ts-ignore
   else if (type instanceof i8) return I8.parseInt(data);
-  else throw new Error(`JSON: Cannot parse invalid data into a number. Either "${data}" is not a valid number, or <${nameof<T>()}> is an invald number type.`);
+  else
+    throw new Error(
+      `JSON: Cannot parse invalid data into a number. Either "${data}" is not a valid number, or <${nameof<T>()}> is an invald number type.`
+    );
 }
 
 // @ts-ignore
@@ -223,7 +242,9 @@ export function parseNumberArray<T>(data: string): T {
   }
   //console.log(data.slice(lastPos, data.length - 1))
   // @ts-ignore
-  result.push(parseNumber<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart()));
+  result.push(
+    parseNumber<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart())
+  );
   return result;
 }
 
@@ -244,7 +265,9 @@ export function parseBooleanArray<T>(data: string): T {
     }
   }
   // @ts-ignore
-  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart()));
+  result.push(
+    parseBoolean<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart())
+  );
   return result;
 }
 
@@ -266,7 +289,8 @@ export function parseArray<T>(data: string): T {
   let outDepth: u32 = 0;
   for (; i < len; i++) {
     char = data.charCodeAt(i);
-    if (char == quoteCode && data.charCodeAt(i - 1) != backSlashCode) isStr = !isStr;
+    if (char == quoteCode && data.charCodeAt(i - 1) != backSlashCode)
+      isStr = !isStr;
     if (char == leftBraceCode || char == leftBracketCode) {
       inDepth++;
       isStruct = true;
@@ -284,7 +308,7 @@ export function parseArray<T>(data: string): T {
         }*/
         // This checks to see if we are dealing with structures such as Objects and Arrays
         if (char == commaCode) {
-          // @ts-ignore 
+          // @ts-ignore
           result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i).trim()));
           //offset = 0;
           lastPos = i + 1;
@@ -387,4 +411,4 @@ export function parseMap<T>(data: string): T {
   return result;
 }
 
-class Nullable { }
+class Nullable {}

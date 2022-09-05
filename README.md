@@ -1,9 +1,5 @@
 # AS-JSON
 
-# Total time
-
-77 hours 16 minutes
-
 **JSON encoder/decoder for AssemblyScript**
 
 ## Installation
@@ -32,15 +28,11 @@ Or, add it to `asconfig.json`
 ## Support
 
 - ✅ Objects (Serializing only)
-- ✅ Map (Partial Parsing, Serializing good)
 - ✅ Arrays (Basic parsing. Serializing good)
-- ✅ Numbers
-- ✅ Integers
-- ✅ Null (Not tested yet, but should work)
-- ✅ Dynamic Arrays (Objects not supported)
-- ✅ Dynamic Types (Objects not supported)
-- ✅ Dynamic Objects (Stringify only. Objects not supported as values)
-- ✅ Whitespace
+- ✅ Numbers (Supported)
+- ✅ Integers (Supported)
+- ✅ Null (Supported)
+- ✅ Variants (Supported)
 
 ## Usage
 
