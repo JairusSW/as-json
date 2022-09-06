@@ -98,7 +98,13 @@ console.log(`Parsed: ${JSON.stringify(parsed)}`);
 - Does it support the full JSON spec?
   Yes, as-json supports the full JSON specification and trys to mimic the JSON API as much as possible
 - What are the differences between as-json and the JSON API?
-  as-json
+  The main difference between as-json and the JSON API is the ability to create new fields in objects during runtime. Since classes are static, Map ser/de support will be added soon allowing the user to parse and stringify dynamic objects and their properties
+- Does this support nested structures?
+  Yes, as-json supports nested structures
+- Does this support whitespace?
+  No, as-json does not support whitespace yet. That will come once we find a performant way to work around whitespace.
+- How fast is it?
+  Really fast. For example, here are some benchmarks for ser/de a Vec2 with as-json
 ## Issues
 
 Please submit an issue to https://github.com/JairusSW/as-json/issues if you find anything wrong with this library
