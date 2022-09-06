@@ -1,14 +1,21 @@
-export function isNumberCode(data: i32): boolean {
-    if (data == "0".charCodeAt(0)) return true;
-    else if (data == "1".charCodeAt(0)) return true;
-    else if (data == "2".charCodeAt(0)) return true;
-    else if (data == "3".charCodeAt(0)) return true;
-    else if (data == "4".charCodeAt(0)) return true;
-    else if (data == "5".charCodeAt(0)) return true;
-    else if (data == "6".charCodeAt(0)) return true;
-    else if (data == "7".charCodeAt(0)) return true;
-    else if (data == "8".charCodeAt(0)) return true;
-    else if (data == "9".charCodeAt(0)) return true;
-    else if (data == "-".charCodeAt(0)) return true;
-    else return false;
+import { StringSink } from "as-string-sink/assembly";
+import { isSpace } from "assemblyscript/std/assembly/util/string";
+import { backSlashCode, quoteCode } from "./chars";
+
+export function removeWhitespace(data: string): string {
+    const result = new StringSink()
+    let instr = false;
+    for (let i = 0; i < data.length; i++) {
+        const char = data.charCodeAt(i);
+        if (instr === false && char === quoteCode) instr = true
+        else if (instr === true && char === quoteCode && data.charCodeAt(i - 1) !== backSlashCode) instr = false;
+
+        if (instr === false) {
+            if (!isSpace(char)) result.write(data.charAt(i))
+        } else {
+            result.write(data.charAt(i))
+        }
+        
+    }
+    return result.toString()
 }

@@ -10,6 +10,7 @@ import {
   rightBraceCode,
   rightBracketCode
 } from "./chars";
+import { removeWhitespace } from "./util";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -77,6 +78,7 @@ export namespace JSON {
    * @returns T
    */
   export function parse<T = Variant>(data: string): T {
+    data = removeWhitespace(data);
     let type!: T;
     if (isString<T>()) {
       // @ts-ignore

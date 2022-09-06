@@ -1,5 +1,6 @@
 import "wasi";
 import { JSON } from ".";
+import { removeWhitespace } from "./util";
 
 // @ts-ignore
 @json
@@ -41,9 +42,26 @@ const stringified = JSON.stringify<Player>(data);
 //  }
 // }
 console.log(`Stringified: ${stringified}`);
-data.age = 16
-console.log(`Stringified2: ${JSON.stringify<Player>(data)}`);
-const parsed = JSON.parse<Player>(stringified);
+console.log(`Whitespace: ${removeWhitespace(`{
+    "firstName": "Emmet",
+    "lastName": "West",
+   "lastActive": [8, 27, 2022],
+    "age": 23,
+    "pos": {
+      "x": -3.4000000953674318,
+      "y": 1.2000000476837159
+    }
+  }`)}`)
+const parsed = JSON.parse<Player>(`{
+    "firstName": "Emmet",
+    "lastName": "West",
+   "lastActive": [8, 27, 2022],
+    "age": 23,
+    "pos": {
+      "x": -3.4000000953674318,
+      "y": 1.2000000476837159
+    }
+  }`);
 // Player {
 //  firstName: "Emmet",
 //  lastName: "West",

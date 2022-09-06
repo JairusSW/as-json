@@ -102,7 +102,7 @@ console.log(`Parsed: ${JSON.stringify(parsed)}`);
 - Does this support nested structures?
   Yes, as-json supports nested structures
 - Does this support whitespace?
-  No, as-json does not support whitespace yet. That will come once we find a performant way to work around whitespace.
+  Yes, as-json supports whitespace although the current implementation is deathly slow
 - How fast is it?
   Really fast. For example, here are some benchmarks for ser/de a Vec2 with as-json
 ## Issues

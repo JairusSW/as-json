@@ -77,7 +77,7 @@ class AsJSONTransform extends ClassDecorator {
     `;
         this.encodeStmts = [];
         this.decodeStmts = [];
-        console.log(serializeFunc, deserializeFunc)
+        //console.log(serializeFunc, deserializeFunc)
         const serializedProperty = SimpleParser.parseClassMember(serializedProp, node);
         node.members.push(serializedProperty);
 
