@@ -26,16 +26,12 @@ export namespace JSON {
    */
   export function stringify<T = Nullable | null>(data: T): string {
     // String
-    if (isString(data)) {
-      return serializeString(<string>data);
+    if (isString<T>()) {
+      return '"' + (<string>data).replaceAll('"', '\\"') + '"';
     }
     // Boolean
-    else if (isBoolean(data)) {
+    else if (isBoolean<T>()) {
       return data ? "true" : "false";
-    }
-    // Null
-    else if (isNullable<T>() && data == null) {
-      return "null";
     }
     // Integers/Floats
     // @ts-ignore
@@ -46,20 +42,28 @@ export namespace JSON {
     // Class-Based serialization
     // @ts-ignore
     else if (isDefined(data.__JSON_Serialize)) {
-      //@ts-ignore
+      // @ts-ignore
       return data.__JSON_Serialize();
     }
     // ArrayLike
-    else if (isArrayLike(data)) {
+    else if (isArrayLike<T>()) {
       let result = new StringSink("[");
+      // @ts-ignore
       if (data.length == 0) return "[]";
+      // @ts-ignore
       for (let i = 0; i < data.length - 1; i++) {
+        // @ts-ignore
         result.write(stringify(unchecked(data[i])));
         result.write(",");
       }
+      // @ts-ignore
       result.write(stringify(unchecked(data[data.length - 1])));
       result.write("]");
       return result.toString();
+    }
+    // Null
+    else if (isNullable<T>() && data == null) {
+      return "null";
     } else {
       return "null";
     }
@@ -91,14 +95,15 @@ export namespace JSON {
       const result = new Map<string, string>()
       let lastPos: u32 = 1
       let key: string = ''
-      let instr: u32 = 0
+      let instr: boolean = false
       let char: u32 = 0
       let depth: u32 = 0
       let fdepth: u32 = 0
       for (let i: u32 = 1; i < len; i++) {
-        char = data.charCodeAt(i)
-        if (char === "\"".charCodeAt(0) && data.charCodeAt(i - 1) !== "/".charCodeAt(0)) instr = (instr ? 0 : 1)
-        else if (instr === 0) {
+        char = data.charCodeAt(i);
+        if (instr === false && char === quoteCode) instr = true;
+        else if (instr === true && char === quoteCode && data.charCodeAt(i - 1) !== "/".charCodeAt(0)) instr = false;
+        if (instr === false) {
           if (char === leftBraceCode || char === leftBracketCode) depth++
           if (char === rightBraceCode || char === rightBracketCode) fdepth++
         }
@@ -110,12 +115,13 @@ export namespace JSON {
           // Set new lastPos
           lastPos = i + 1
         }
-        if (depth === 0) {
+        if (!instr && depth === 0) {
           if (char === colonCode) {
             key = data.slice(lastPos + 1, i - 1)
+            //console.log(`Found Colon: ${instr} ${data.slice(lastPos + 1, i - 1) }`)
             lastPos = i
-          }
-          else if (char === commaCode) {
+          } else if (char === commaCode) {
+            //console.log(`Found Comma: ${instr} ${data.slice(lastPos + 1, i) }`)
             if ((i - lastPos) > 0) result.set(key, data.slice(lastPos + 1, i))
             lastPos = i + 1
           }
@@ -132,11 +138,7 @@ export namespace JSON {
   }
 }
 
-// @ts-ignore
-@inline
-  function serializeString(data: string): string {
-  return '"' + data.replaceAll('"', '\\"') + '"';
-}
+
 // @ts-ignore
 @inline
   function parseString(data: string): string {
@@ -299,39 +301,6 @@ export namespace JSON {
   if (data.length != 0) result.push(JSON.parse<valueof<T>>(data));
   //if (data.length != 0) console.log(`Trailing-${data.slice(lastPos, len).trim()}-`)
   return result;
-}
-
-export function parseObject(data: string): void {
-  //const obj = instantiate<T>()
-  const result = new Array<string>();
-  let lastPos: u32 = 0;
-  let char: u32 = 0;
-  let i: u32 = 1;
-  let key: string = "";
-  let isKey: boolean = false;
-  for (; i < u32(data.length - 1); i++) {
-    char = data.charCodeAt(i);
-    if (isKey == false) {
-      if (char == colonCode) {
-        key = data.slice(lastPos + 2, i - 1);
-        //console.log(`Found Key: ${key}`);
-        result.push(key);
-        lastPos = ++i;
-        isKey = true;
-      }
-    } else {
-      if (char == commaCode) {
-        const val = data.slice(lastPos, i);
-        lastPos = i;
-        isKey = false;
-        //console.log(`Found Val: ${val}`)
-        result.push(val);
-      }
-    }
-  }
-  result.push(data.slice(lastPos, data.length - 1));
-  //console.log(stringify(result))
-  //return obj
 }
 
 class Nullable { }

@@ -6,6 +6,7 @@ class Vec2 {
   x: f32
   y: f32
 }
+
 @json
 class Player {
   firstName: string
@@ -17,7 +18,7 @@ class Player {
 
 const data: Player = {
   firstName: "Emmet",
-  lastName: "West",
+  lastName: "We:st",
   lastActive: [8, 27, 2022],
   age: 23,
   pos: {
@@ -27,9 +28,27 @@ const data: Player = {
 }
 
 const stringified = JSON.stringify<Player>(data);
-// '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23}'
+// {
+//  "firstName": "Emmet",
+//  "lastName": "West",
+// "lastActive": [8, 27, 2022],
+//  "age": 23,
+//  "pos": {
+//    "x": -3.4000000953674318,
+//    "y": 1.2000000476837159
+//  }
+// }
 console.log(`Stringified: ${stringified}`);
 
-const parsed = JSON.parse<Player>(stringified)
-// { firstName: "Emmet", lastName: "West", "lastActive": [8,27,2022], age: 23 }
-console.log(`Parsed: ${JSON.stringify(parsed)}`)
+const parsed = JSON.parse<Player>(stringified);
+// Player {
+//  firstName: "Emmet",
+//  lastName: "West",
+//  lastActive: [8, 27, 2022],
+//  age: 23,
+//  pos: {
+//    x: -3.4000000953674318,
+//    y: 1.2000000476837159
+//  }
+// }
+console.log(`Parsed: ${JSON.stringify(parsed)}`);

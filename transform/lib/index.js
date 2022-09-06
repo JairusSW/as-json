@@ -38,6 +38,7 @@ class AsJSONTransform extends ClassDecorator {
         let serializeFunc = ``;
         if (this.encodeStmts.has(name) && this.encodeStmts.get(name)) {
             serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         if (!this.__JSON_Serialized) {
           ${ // @ts-ignore
@@ -50,12 +51,14 @@ class AsJSONTransform extends ClassDecorator {
         }
         else {
             serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         return "{}";
       }
       `;
         }
         const deserializeFunc = `
+    @inline
     __JSON_Deserialize(values: Map<string, string>): ${name} {
         return {
           ${ // @ts-ignore
@@ -63,7 +66,7 @@ class AsJSONTransform extends ClassDecorator {
         }
     }
     `;
-        //console.log(serializedProp, serializeFunc, deserializeFunc)
+        console.log(serializedProp, serializeFunc, deserializeFunc);
         const serializedProperty = SimpleParser.parseClassMember(serializedProp, node);
         node.members.push(serializedProperty);
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);

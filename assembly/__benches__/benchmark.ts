@@ -1,11 +1,11 @@
-import { JSON, parseBooleanArray, parseMap, parseNumberArray } from "..";
+import { JSON } from "..";
 @json
-class Vector {
+class Vec2 {
   x: f32;
   y: f32;
 }
 
-const vec: Vector = blackbox<Vector>({
+const vec: Vec2 = blackbox<Vec2>({
   x: 0.0,
   y: 0.0,
 });
@@ -26,7 +26,7 @@ bench("Stringify Float", () => {
   blackbox(JSON.stringify(blackbox(3.14)));
 });
 
-bench("Stringify Vector", () => {
+bench("Stringify Object (Vec2)", () => {
   blackbox(JSON.stringify(vec));
 });
 
@@ -50,20 +50,20 @@ bench("Parse Float", () => {
   blackbox(JSON.parse<f32>(blackbox("3.14")));
 });
 
-bench("Parse Vector", () => {
-  blackbox(parseMap<Map<string, f32>>(blackbox('{"x":0.0,"y":0.0}')));
+bench("Parse Object (Vec2)", () => {
+  blackbox(JSON.parse<Vec2>(blackbox('{"x":0.0,"y":0.0}')));
 });
 
 bench("Parse Boolean Array", () => {
   blackbox(
-    parseBooleanArray<boolean[]>(blackbox("[true,false,true,false,true]"))
+    JSON.parse<boolean[]>(blackbox("[true,false,true,false,true]"))
   );
 });
 
 bench("Parse Integer Array", () => {
-  blackbox(parseNumberArray<u32[]>(blackbox("[1,2,3,4,5]")));
+  blackbox(JSON.parse<u32[]>(blackbox("[1,2,3,4,5]")));
 });
 
 bench("Parse Float Array", () => {
-  blackbox(parseNumberArray<f32[]>(blackbox("[1.0,2.0,3.0,4.0,5.0]")));
+  blackbox(JSON.parse<f32[]>(blackbox("[1.0,2.0,3.0,4.0,5.0]")));
 });

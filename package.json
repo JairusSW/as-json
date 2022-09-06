@@ -17,6 +17,7 @@
     "test:wasm3": "wasm3 ./build/test.wasm"
   },
   "devDependencies": {
+    "@as-pect/cli": "^7.0.7",
     "@as-tral/cli": "^1.1.1",
     "as-console": "^6.0.2",
     "assemblyscript": "^0.20.7",

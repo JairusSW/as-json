@@ -1,5 +1,5 @@
 export const commaCode = ",".charCodeAt(0);
-export const quoteCode = "".charCodeAt(0);
+export const quoteCode = "\"".charCodeAt(0);
 export const backSlashCode = "\\".charCodeAt(0);
 export const leftBraceCode = "{".charCodeAt(0);
 export const rightBraceCode = "}".charCodeAt(0);
