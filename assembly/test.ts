@@ -1,12 +1,14 @@
 import "wasi";
 import { JSON } from ".";
 
+// @ts-ignore
 @json
 class Vec2 {
   x: f32
   y: f32
 }
 
+// @ts-ignore
 @json
 class Player {
   firstName: string
@@ -18,7 +20,7 @@ class Player {
 
 const data: Player = {
   firstName: "Emmet",
-  lastName: "We:st",
+  lastName: "West",
   lastActive: [8, 27, 2022],
   age: 23,
   pos: {
