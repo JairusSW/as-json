@@ -43,7 +43,7 @@ const stringified = JSON.stringify<Player>(data);
 console.log(`Stringified: ${stringified}`);
 data.age = 16
 console.log(`Stringified2: ${JSON.stringify<Player>(data)}`);
-const parsed = JSON.parse<Player>(stringified + "\n");
+const parsed = JSON.parse<Player>(stringified);
 // Player {
 //  firstName: "Emmet",
 //  lastName: "West",
