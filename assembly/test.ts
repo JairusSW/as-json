@@ -41,8 +41,9 @@ const stringified = JSON.stringify<Player>(data);
 //  }
 // }
 console.log(`Stringified: ${stringified}`);
-
-const parsed = JSON.parse<Player>(stringified);
+data.age = 16
+console.log(`Stringified2: ${JSON.stringify<Player>(data)}`);
+const parsed = JSON.parse<Player>(stringified + "\n");
 // Player {
 //  firstName: "Emmet",
 //  lastName: "West",

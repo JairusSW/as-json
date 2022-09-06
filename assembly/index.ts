@@ -108,6 +108,7 @@ export namespace JSON {
           if (char === rightBraceCode || char === rightBracketCode) fdepth++
         }
         if (depth !== 0 && depth === fdepth) {
+          //console.log(`Found Struct: ${data.slice(lastPos + 1, i + 1)}`)
           result.set(key, data.slice(lastPos + 1, i + 1))
           // Reset the depth
           depth = 0
@@ -118,17 +119,20 @@ export namespace JSON {
         if (!instr && depth === 0) {
           if (char === colonCode) {
             key = data.slice(lastPos + 1, i - 1)
-            //console.log(`Found Colon: ${instr} ${data.slice(lastPos + 1, i - 1) }`)
+            //console.log(`Found Key: ${data.slice(lastPos + 1, i - 1)}`)
             lastPos = i
           } else if (char === commaCode) {
-            //console.log(`Found Comma: ${instr} ${data.slice(lastPos + 1, i) }`)
+            //console.log(`Found Value: ${data.slice(lastPos + 1, i)}`)
             if ((i - lastPos) > 0) result.set(key, data.slice(lastPos + 1, i))
             lastPos = i + 1
           }
         }
       }
 
-      if ((len - lastPos) > 0) result.set(key, data.slice(lastPos + 1, len))
+      if (len - (lastPos + 1) > 0) {
+        result.set(key, data.slice(lastPos + 1, len))
+        //console.log(`Found Trailing: ${data.slice(lastPos + 1, len)}`)
+      }
       // @ts-ignore
       return schema.__JSON_Deserialize(result)
     } else {

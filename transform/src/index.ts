@@ -11,8 +11,8 @@ import { SimpleParser } from "visitor-as/dist/index.js";
 class AsJSONTransform extends ClassDecorator {
     public currentClass!: ClassDeclaration;
     public sources: Source[] = [];
-    public encodeStmts = new Map<string, string[]>();
-    public decodeCode = new Map<string, string[]>();
+    public encodeStmts: string[] = [];
+    public decodeStmts: string[] = [];
 
     visitMethodDeclaration(node: MethodDeclaration): void {}
     visitFieldDeclaration(node: FieldDeclaration): void {
@@ -23,16 +23,13 @@ class AsJSONTransform extends ClassDecorator {
 
         const type = getName(node.type);
 
-        const className = this.currentClass!.name.text
-        if (!this.encodeStmts.has(className)) this.encodeStmts.set(className, [])
-        if (!this.decodeCode.has(className)) this.decodeCode.set(className, [])
         // @ts-ignore
-        this.encodeStmts.get(className).push(
-            `this.__JSON_Serialized += '' + '"' + '${name}' + '"' + ':' + JSON.stringify<${type}>(this.${name}) + ',';`
+        this.encodeStmts.push(
+            `"${name}":\${JSON.stringify<${type}>(this.${name})},`
         );
 
         // @ts-ignore
-        this.decodeCode.get(className).push(
+        this.decodeStmts.push(
             `${name}: JSON.parse<${type}>(values.get("${name}")),\n`
         );
     }
@@ -45,24 +42,19 @@ class AsJSONTransform extends ClassDecorator {
 
         const name = getName(node);
 
-        this.encodeStmts.delete(name);
-        this.decodeCode.delete(name);
         this.visit(node.members);
 
         const serializedProp = `__JSON_Serialized: string = "";`
 
         let serializeFunc = ``
 
-        if (this.encodeStmts.has(name) && this.encodeStmts.get(name)) {
+        if (this.encodeStmts.length > 0) {
+            const stmt = this.encodeStmts[this.encodeStmts.length - 1]!
+            this.encodeStmts[this.encodeStmts.length - 1] = stmt!.slice(0, stmt.length - 1)
             serializeFunc = `
       @inline
       __JSON_Serialize(): string {
-        if (!this.__JSON_Serialized) {
-          ${// @ts-ignore
-                this.encodeStmts.get(name).join("\n")};
-          this.__JSON_Serialized = "{" + this.__JSON_Serialized.slice(0, this.__JSON_Serialized.length - 1) + "}";
-        }
-        return this.__JSON_Serialized;
+        return \`{${this.encodeStmts.join("")}}\`;
       }
       `
         } else {
@@ -79,11 +71,13 @@ class AsJSONTransform extends ClassDecorator {
     __JSON_Deserialize(values: Map<string, string>): ${name} {
         return {
           ${// @ts-ignore
-            this.decodeCode.get(name) ? this.decodeCode.get(name).join("") : ""}
+            this.decodeStmts.join("")}
         }
     }
     `;
-        //console.log(serializedProp, serializeFunc, deserializeFunc)
+        this.encodeStmts = [];
+        this.decodeStmts = [];
+        console.log(serializeFunc, deserializeFunc)
         const serializedProperty = SimpleParser.parseClassMember(serializedProp, node);
         node.members.push(serializedProperty);
 
