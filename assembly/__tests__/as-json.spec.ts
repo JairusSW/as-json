@@ -1,7 +1,7 @@
-import { JSON } from "../"
+import { JSON } from ".."
 describe("JSON Stringify Test", () => {
   it("Stringify String", () => {
-    expect<string>().toBe(42, "19 + 23 is 42");
+    expect<string>(JSON.stringify<string>("Hello AS-JSON")).toBe("\"Hello AS-JSON\"", "19 + 23 is 42");
   });
 
   it("should be the same reference", () => {

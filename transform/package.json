@@ -8,7 +8,6 @@
         "DogWhich"
     ],
     "license": "MIT",
-    "scripts": {},
     "devDependencies": {},
     "dependencies": {
         "visitor-as": "^0.10.2"

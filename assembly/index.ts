@@ -78,7 +78,7 @@ export namespace JSON {
    * @returns T
    */
   export function parse<T = Variant>(data: string): T {
-    data = removeWhitespace(data);
+    //data = removeWhitespace(data);
     let type!: T;
     if (isString<T>()) {
       // @ts-ignore
@@ -121,7 +121,7 @@ export namespace JSON {
         if (!instr && depth === 0) {
           if (char === colonCode) {
             key = data.slice(lastPos + 1, i - 1)
-           //console.log(`Found Key: ${data.slice(lastPos + 1, i - 1)}`)
+            //console.log(`Found Key: ${data.slice(lastPos + 1, i - 1)}`)
             lastPos = i
           } else if (char === commaCode) {
             //console.log(`Found Comma: ${data.slice(lastPos + 1, i)}`)
@@ -185,6 +185,39 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
+  export function parseArray<T extends unknown[]>(data: string): T {
+  let type!: valueof<T>;
+  if (type instanceof String) {
+    return <T>parseStringArray(data);
+  } else if (isBoolean<valueof<T>>()) {
+    return <T>parseBooleanArray<T>(data)
+  } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
+    return <T>parseNumberArray<T>(data)
+  }
+}
+
+// @ts-ignore
+@inline
+  export function parseStringArray(data: string): string[] {
+  const result: string[] = [];
+  let lastPos: u32 = 0;
+  let instr: boolean = false;
+  for (let i = 1; i < data.length - 1; i++) {
+    if (data.charCodeAt(i) === quoteCode) {
+      if (instr === false) {
+        instr = true;
+        lastPos = i;
+      } else if (data.charCodeAt(i - 1) !== backSlashCode) {
+        instr = false;
+        //console.log(`Value: ${data.slice(lastPos + 1, i)}`);
+        result.push(data.slice(lastPos + 1, i));
+      }
+    }
+  }
+  return result;
+}
+// @ts-ignore
+@inline
   export function parseNumberArray<T>(data: string): T {
   const result = instantiate<T>();
   if (data.length == 0) return result;
@@ -194,7 +227,7 @@ export namespace JSON {
   for (; i < u32(data.length - 1); i++) {
     char = data.charCodeAt(i);
     if (char == commaCode) {
-      // console.log(data.slice(lastPos, i))
+      //console.log(`Data: ${data.slice(lastPos, i)}`)
       // @ts-ignore
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i).trim()));
       lastPos = ++i;
@@ -211,100 +244,18 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-  export function parseBooleanArray<T>(data: string): T {
+  export function parseBooleanArray<T extends boolean[]>(data: string): T {
   const result = instantiate<T>();
-  if (data.length == 0) return result;
-  let lastPos: u32 = 1;
-  let i: u32 = 1;
-  let char: u32 = 0;
-  for (; i < u32(data.length - 1); i++) {
-    char = data.charCodeAt(i);
-    if (char == commaCode) {
-      // @ts-ignore
-      result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i).trimStart()));
-      lastPos = ++i;
+  let lastPos: u32 = 0;
+  for (let i = 1; i < data.length - 1; i++) {
+    if (data.charCodeAt(i) === "t".charCodeAt(0) || data.charCodeAt(i) == "f".charCodeAt(0)) {
+      lastPos = i;
+    } else if (data.charCodeAt(i) == "e".charCodeAt(0)) {
+      i++;
+      //console.log(`Value: ${data.slice(lastPos, i)}`);
+      result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i)));
     }
   }
-  // @ts-ignore
-  result.push(
-    // @ts-ignore
-    parseBoolean<valueof<T>>(data.slice(lastPos, data.length - 1).trimStart())
-  );
-  return result;
-}
-
-// @ts-ignore
-@inline
-  export function parseArray<T>(data: string): T {
-  const result = instantiate<T>();
-  data = data.trim();
-  let len: u32 = data.length - 1;
-  let lastPos: u32 = 1;
-  let i: u32 = 1;
-  let char: u32 = 0;
-  // Is struct such as Object, or Array
-  let isStruct: boolean = false;
-  let isStr: boolean = false;
-  //let offset: u32 = 0;
-  // Depth for finding matching brackets
-  let inDepth: u32 = 0;
-  let outDepth: u32 = 0;
-  for (; i < len; i++) {
-    char = data.charCodeAt(i);
-    if (char == quoteCode && data.charCodeAt(i - 1) != backSlashCode)
-      isStr = !isStr;
-    if (char == leftBraceCode || char == leftBracketCode) {
-      inDepth++;
-      isStruct = true;
-    } else if (char == rightBraceCode || char == rightBracketCode) {
-      outDepth++;
-      isStruct = true;
-    }
-    if (!isStr) {
-      if (!isStruct) {
-        // This removes whitespace before and after an element
-        /*if (offset != 0 && isSpace(char)) {
-          lastPos++;
-        } else {
-          if (isSpace(char)) offset++;
-        }*/
-        // This checks to see if we are dealing with structures such as Objects and Arrays
-        if (char == commaCode) {
-          // @ts-ignore
-          result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i).trim()));
-          //offset = 0;
-          lastPos = i + 1;
-        }
-      } else {
-        if (inDepth == outDepth) {
-          i++;
-          //console.log(`Struct-${data.slice(lastPos, i).trim()}-`)
-          lastPos = i + 1;
-          inDepth = 0;
-          outDepth = 0;
-          isStruct = false;
-        }
-      }
-    }
-  }
-  /*char = data.charCodeAt(lastPos)
-  // Remove preceeding whitespace
-  while (isSpace(char)) {
-    lastPos++;
-    char = data.charCodeAt(lastPos);
-  }
-  char = data.charCodeAt(--len);
-  while (isSpace(char)) {
-    len--;
-    char = data.charCodeAt(len);
-  }*/
-
-  // @ts-ignore
-  // Handle empty arrays
-  data = data.slice(lastPos, len).trim();
-  // @ts-ignore
-  if (data.length != 0) result.push(JSON.parse<valueof<T>>(data));
-  //if (data.length != 0) console.log(`Trailing-${data.slice(lastPos, len).trim()}-`)
   return result;
 }
 
