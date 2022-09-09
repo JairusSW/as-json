@@ -1,7 +1,10 @@
-import { JSON } from ".."
+import { JSON } from "..";
 describe("JSON Stringify Test", () => {
   it("Stringify String", () => {
-    expect<string>(JSON.stringify<string>("Hello AS-JSON")).toBe("\"Hello AS-JSON\"", "19 + 23 is 42");
+    expect<string>(JSON.stringify<string>("Hello AS-JSON")).toBe(
+      '"Hello AS-JSON"',
+      "19 + 23 is 42"
+    );
   });
 
   it("should be the same reference", () => {
@@ -15,7 +18,7 @@ describe("JSON Stringify Test", () => {
 
     expect<Vec3>(a).toStrictEqual(
       b,
-      "a and b have the same values, (discluding child references)",
+      "a and b have the same values, (discluding child references)"
     );
   });
 

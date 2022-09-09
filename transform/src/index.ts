@@ -1,95 +1,109 @@
 import {
-    ClassDeclaration,
-    FieldDeclaration,
-    MethodDeclaration,
-    Source
+  ClassDeclaration,
+  FieldDeclaration,
+  MethodDeclaration,
+  Source,
 } from "assemblyscript/dist/assemblyscript";
-import { ClassDecorator, registerDecorator } from "visitor-as/dist/decorator.js";
+import {
+  ClassDecorator,
+  registerDecorator,
+} from "visitor-as/dist/decorator.js";
 import { getName } from "visitor-as/dist/utils.js";
 import { SimpleParser } from "visitor-as/dist/index.js";
 
 class AsJSONTransform extends ClassDecorator {
-    public currentClass!: ClassDeclaration;
-    public sources: Source[] = [];
-    public encodeStmts: string[] = [];
-    public decodeStmts: string[] = [];
+  public currentClass!: ClassDeclaration;
+  public sources: Source[] = [];
+  public encodeStmts: string[] = [];
+  public decodeStmts: string[] = [];
 
-    visitMethodDeclaration(node: MethodDeclaration): void {}
-    visitFieldDeclaration(node: FieldDeclaration): void {
-        const name = getName(node);
-        if (!node.type) {
-            throw new Error(`Field ${name} is missing a type declaration`);
-        }
-
-        const type = getName(node.type);
-
-        // @ts-ignore
-        this.encodeStmts.push(
-            `"${name}":\${JSON.stringify<${type}>(this.${name})},`
-        );
-
-        // @ts-ignore
-        this.decodeStmts.push(
-            `${name}: JSON.parse<${type}>(values.get("${name}")),\n`
-        );
+  visitMethodDeclaration(node: MethodDeclaration): void {}
+  visitFieldDeclaration(node: FieldDeclaration): void {
+    const name = getName(node);
+    if (!node.type) {
+      throw new Error(`Field ${name} is missing a type declaration`);
     }
-    visitClassDeclaration(node: ClassDeclaration): void {
-        if (!node.members) {
-            return;
-        }
 
-        this.currentClass = node;
+    const type = getName(node.type);
 
-        const name = getName(node);
+    // @ts-ignore
+    this.encodeStmts.push(
+      `"${name}":\${JSON.stringify<${type}>(this.${name})},`
+    );
 
-        this.visit(node.members);
+    // @ts-ignore
+    this.decodeStmts.push(
+      `${name}: JSON.parse<${type}>(values.get("${name}")),\n`
+    );
+  }
+  visitClassDeclaration(node: ClassDeclaration): void {
+    if (!node.members) {
+      return;
+    }
 
-        const serializedProp = `__JSON_Serialized: string = "";`
+    this.currentClass = node;
 
-        let serializeFunc = ``
+    const name = getName(node);
 
-        if (this.encodeStmts.length > 0) {
-            const stmt = this.encodeStmts[this.encodeStmts.length - 1]!
-            this.encodeStmts[this.encodeStmts.length - 1] = stmt!.slice(0, stmt.length - 1)
-            serializeFunc = `
+    this.visit(node.members);
+
+    const serializedProp = `__JSON_Serialized: string = "";`;
+
+    let serializeFunc = ``;
+
+    if (this.encodeStmts.length > 0) {
+      const stmt = this.encodeStmts[this.encodeStmts.length - 1]!;
+      this.encodeStmts[this.encodeStmts.length - 1] = stmt!.slice(
+        0,
+        stmt.length - 1
+      );
+      serializeFunc = `
       @inline
       __JSON_Serialize(): string {
         return \`{${this.encodeStmts.join("")}}\`;
       }
-      `
-        } else {
-            serializeFunc = `
+      `;
+    } else {
+      serializeFunc = `
       @inline
       __JSON_Serialize(): string {
         return "{}";
       }
-      `
-        }
+      `;
+    }
 
-        const deserializeFunc = `
+    const deserializeFunc = `
     @inline
     __JSON_Deserialize(values: Map<string, string>): ${name} {
         return {
-          ${// @ts-ignore
-            this.decodeStmts.join("")}
+          ${
+            // @ts-ignore
+            this.decodeStmts.join("")
+          }
         }
     }
     `;
-        this.encodeStmts = [];
-        this.decodeStmts = [];
-        //console.log(serializeFunc, deserializeFunc)
-        const serializedProperty = SimpleParser.parseClassMember(serializedProp, node);
-        node.members.push(serializedProperty);
+    this.encodeStmts = [];
+    this.decodeStmts = [];
+    //console.log(serializeFunc, deserializeFunc)
+    const serializedProperty = SimpleParser.parseClassMember(
+      serializedProp,
+      node
+    );
+    node.members.push(serializedProperty);
 
-        const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
-        node.members.push(serializeMethod);
+    const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
+    node.members.push(serializeMethod);
 
-        const deserializeMethod = SimpleParser.parseClassMember(deserializeFunc, node);
-        node.members.push(deserializeMethod);
-    }
-    get name(): string {
-        return "json";
-    }
+    const deserializeMethod = SimpleParser.parseClassMember(
+      deserializeFunc,
+      node
+    );
+    node.members.push(deserializeMethod);
+  }
+  get name(): string {
+    return "json";
+  }
 }
 
 export default registerDecorator(new AsJSONTransform());

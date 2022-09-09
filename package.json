@@ -14,7 +14,8 @@
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:lunatic": "lunatic ./build/test.wasm",
-    "test:wasm3": "wasm3 ./build/test.wasm"
+    "test:wasm3": "wasm3 ./build/test.wasm",
+    "prettier": "as-prettier -w ."
   },
   "devDependencies": {
     "@as-pect/cli": "^7.0.7",
