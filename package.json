@@ -38,7 +38,7 @@
     "json",
     "serialize",
     "deserialize",
-    "dynamic", 
+    "dynamic",
     "serde"
   ],
   "bugs": {

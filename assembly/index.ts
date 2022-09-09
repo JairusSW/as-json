@@ -97,59 +97,7 @@ export namespace JSON {
       return parseArray<T>(data);
       // @ts-ignore
     } else if (isDefined(type.__JSON_Deserialize)) {
-      const len: u32 = data.length - 1;
-      let schema!: T;
-      const result = new Map<string, string>();
-      let lastPos: u32 = 1;
-      let key: string = "";
-      let instr: boolean = false;
-      let char: u32 = 0;
-      let depth: u32 = 0;
-      let fdepth: u32 = 0;
-      for (let i: u32 = 1; i < len; i++) {
-        char = unsafeCharCodeAt(data, i);
-        if (instr === false && char === quoteCode) {
-          instr = true;
-          //lastPos = i;
-        } else if (
-          instr === true &&
-          char === quoteCode &&
-          unsafeCharCodeAt(data, i - 1) !== forwardSlashCode
-        ) {
-          instr = false;
-          //console.log("Found String: " + data.slice(lastPos + 1, i))
-        }
-        if (instr === false) {
-          if (char === leftBraceCode || char === leftBracketCode) depth++;
-          if (char === rightBraceCode || char === rightBracketCode) fdepth++;
-        }
-        if (depth !== 0 && depth === fdepth) {
-          //console.log(`Found Struct: ${data.slice(lastPos + 1, i + 1)}`)
-          result.set(key, data.slice(lastPos + 1, i + 1));
-          // Reset the depth
-          depth = 0;
-          fdepth = 0;
-          // Set new lastPos
-          lastPos = i + 1;
-        }
-        if (!instr && depth === 0) {
-          if (char === colonCode) {
-            key = data.slice(lastPos + 1, i - 1);
-            //console.log(`Found Key: ${data.slice(lastPos + 1, i - 1)}`)
-            lastPos = i;
-          } else if (char === commaCode) {
-            //console.log(`Found Comma: ${data.slice(lastPos + 1, i)}`)
-            if (i - lastPos > 0) result.set(key, data.slice(lastPos + 1, i));
-            lastPos = i + 1;
-          }
-        }
-      }
-
-      if (len - lastPos > 1 && len - lastPos !== 0) {
-        result.set(key, data.slice(lastPos + 1, len));
-      }
-      // @ts-ignore
-      return schema.__JSON_Deserialize(result);
+      return parseObject<T>(data);
     } else {
       // @ts-ignore
       return null;
@@ -197,18 +145,40 @@ function parseNumber<T>(data: string): T {
     );
 }
 
+export function parseObject<T>(data: string): T {
+  let schema!: T;
+  let lastPos = 0;
+  let depth = 1;
+  let char = 0;
+  for (let i = 1; i < data.length - 1; i++) {
+    char = unsafeCharCodeAt(data, i);
+    //if () {
+    //}
+  }
+  // @ts-ignore
+  return schema.__JSON_Deserialize(result);
+}
 // @ts-ignore
 @inline
 export function parseArray<T extends unknown[]>(data: string): T {
+  data = data.trimStart();
+  // TODO: Replace with opt
   let type!: valueof<T>;
   if (type instanceof String) {
     return <T>parseStringArray(data);
   } else if (isBoolean<valueof<T>>()) {
-    return <T>parseBooleanArray<T>(data);
+    // @ts-ignore
+    return parseBooleanArray<T>(data);
   } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
-    return <T>parseNumberArray<T>(data);
-  } else {
-    return <T>parseNestedArray<T>(data);
+    // @ts-ignore
+    return parseNumberArray<T>(data);
+  } else if (isArrayLike<valueof<T>>()) {
+    // @ts-ignore
+    return parseArrayArray<T>(data);
+    // @ts-ignore
+  } else if (isDefined(type.__JSON_Deserialize)) {
+    // @ts-ignore
+    return parseObjectArray<T>(data);
   }
 }
 
@@ -284,29 +254,60 @@ export function parseNumberArray<T extends number[]>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseNestedArray<T extends unknown[][]>(data: string): T {
+export function parseArrayArray<T extends unknown[][]>(data: string): T {
   const result = instantiate<T>();
   let char = 0;
   let lastPos = 0;
-  let depth = 0;
+  let depth = 1;
   let i = 1;
   // Find start of bracket
-  for (; unsafeCharCodeAt(data, i) !== leftBracketCode; i++) {}
-  i++;
+  //for (; unsafeCharCodeAt(data, i) !== leftBracketCode; i++) {}
+  //i++;
   for (; i < data.length - 1; i++) {
     char = unsafeCharCodeAt(data, i);
     if (char === leftBracketCode) {
-      if (depth === 0) {
+      if (depth === 1) {
         lastPos = i;
       }
       // Shifting is 6% faster than incrementing
       depth = depth << 1;
     } else if (char === rightBracketCode) {
       depth = depth >> 1;
-      if (depth === 0) {
+      if (depth === 1) {
         i++;
         //console.log(`Found Nested Array: -${data.slice(lastPos, i)}-`);
-        result.push(parseStringArray(data.slice(lastPos, i)));
+        result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
+      }
+    }
+  }
+  return result;
+}
+
+// @ts-ignore
+@inline
+export function parseObjectArray<T extends unknown[][]>(data: string): T {
+  const result = instantiate<T>();
+  let char = 0;
+  let lastPos = 1;
+  let depth = 1;
+  let i = 1;
+  // Find start of bracket
+  //for (; unsafeCharCodeAt(data, i) !== leftBracketCode; i++) { }
+  //i++;
+  for (; i < data.length - 1; i++) {
+    char = unsafeCharCodeAt(data, i);
+    if (char === leftBraceCode) {
+      if (depth === 1) {
+        lastPos = i;
+      }
+      // Shifting is 6% faster than incrementing
+      depth = depth << 1;
+    } else if (char === rightBraceCode) {
+      depth = depth >> 1;
+      if (depth === 1) {
+        i++;
+        //console.log(`Found Nested Object: -${data.slice(lastPos, i)}-`);
+        //result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
       }
     }
   }

@@ -1,5 +1,5 @@
 import "wasi";
-import { JSON, parseNestedArray } from ".";
+import { JSON, parseArrayArray, parseObjectArray } from ".";
 import { removeWhitespace } from "./util";
 
 // @ts-ignore
@@ -58,4 +58,16 @@ console.log(
   )
 );
 
-console.log(JSON.stringify<string[][]>(parseNestedArray<string[][]>('[["a","b","c"],["d","e","f"]]')))
+console.log(
+  JSON.stringify<string[][]>(
+    parseArrayArray<string[][]>('[["a","b","c"],["d","e","f"]]')
+  )
+);
+
+console.log(
+  JSON.stringify<Player[][]>(
+    parseObjectArray<Player[][]>(
+      '[{"firstName":"Emmet","lastName":"West","lastActive":[8,7],"age":23,"pos":{"x":-3.4000000953674318,"y":1.2000000476837159}}]'
+    )
+  )
+);
