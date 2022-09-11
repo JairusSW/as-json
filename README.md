@@ -53,6 +53,7 @@ class Player {
   lastActive: i32[]
   age: i32
   pos: Vec2
+  isVerified: boolean
 }
 
 const data: Player = {
@@ -63,19 +64,21 @@ const data: Player = {
   pos: {
     x: -3.4,
     y: 1.2
-  }
+  },
+  isVerified: true
 }
 
 const stringified = JSON.stringify<Player>(data);
 // {
 //  "firstName": "Emmet",
 //  "lastName": "West",
-// "lastActive": [8, 27, 2022],
+//  "lastActive": [8, 27, 2022],
 //  "age": 23,
 //  "pos": {
 //    "x": -3.4000000953674318,
 //    "y": 1.2000000476837159
-//  }
+//  },
+//  "isVerified": true
 // }
 console.log(`Stringified: ${stringified}`);
 
@@ -88,7 +91,8 @@ const parsed = JSON.parse<Player>(stringified);
 //  pos: {
 //    x: -3.4000000953674318,
 //    y: 1.2000000476837159
-//  }
+//  },
+//  isVerified: true
 // }
 console.log(`Parsed: ${JSON.stringify(parsed)}`);
 ```
@@ -102,7 +106,7 @@ console.log(`Parsed: ${JSON.stringify(parsed)}`);
 - Does this support nested structures?
   Yes, as-json supports nested structures
 - Does this support whitespace?
-  Yes, as-json supports whitespace although the current implementation is deathly slow
+  Yes, as-json supports whitespace!
 - How fast is it?
   Really fast. For example, here are some benchmarks for ser/de a Vec2 with as-json
 ## Issues

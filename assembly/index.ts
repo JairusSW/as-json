@@ -1,6 +1,7 @@
 import { StringSink } from "as-string-sink/assembly";
 import { Variant } from "as-variant/assembly";
 import { isSpace } from "assemblyscript/std/assembly/util/string";
+import { stringify } from "as-console/assembly";
 import {
   backSlashCode,
   colonCode,
@@ -20,8 +21,28 @@ import { removeWhitespace, unsafeCharCodeAt } from "./util";
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
-export namespace JSON {
-  export type _Variant = Variant;
+export class JSON {
+  private static parseObjectValue<T>(data: string): T {
+    let type!: T;
+    if (isString<T>()) {
+      // @ts-ignore
+      return data.replaceAll('\\"', '"');
+    } else if (isBoolean<T>()) {
+      // @ts-ignore
+      return parseBoolean<T>(data);
+    } else if (isFloat<T>() || isInteger<T>()) {
+      return parseNumber<T>(data);
+    } else if (isArrayLike<T>()) {
+      // @ts-ignore
+      return parseArray<T>(data);
+      // @ts-ignore
+    } else if (isDefined(type.__JSON_Deserialize)) {
+      return parseObject<T>(data);
+    } else {
+      // @ts-ignore
+      return null;
+    }
+  }
   /**
    * Stringifies valid JSON data.
    * ```js
@@ -30,7 +51,7 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  export function stringify<T = Nullable | null>(data: T): string {
+  static stringify<T = Nullable | null>(data: T): string {
     // String
     if (isString<T>()) {
       return '"' + (<string>data).replaceAll('"', '\\"') + '"';
@@ -82,7 +103,7 @@ export namespace JSON {
    * @param data string
    * @returns T
    */
-  export function parse<T = Variant>(data: string): T {
+  static parse<T = Variant>(data: string): T {
     let type!: T;
     if (isString<T>()) {
       // @ts-ignore
@@ -94,10 +115,10 @@ export namespace JSON {
       return parseNumber<T>(data);
     } else if (isArrayLike<T>()) {
       // @ts-ignore
-      return parseArray<T>(data);
+      return parseArray<T>(data.trimStart());
       // @ts-ignore
     } else if (isDefined(type.__JSON_Deserialize)) {
-      return parseObject<T>(data);
+      return parseObject<T>(data.trimStart());
     } else {
       // @ts-ignore
       return null;
@@ -147,31 +168,143 @@ function parseNumber<T>(data: string): T {
 
 export function parseObject<T>(data: string): T {
   let schema!: T;
-  let lastPos = 0;
+  const result = new Map<string, string>();
+  let key: usize = 0;
   let depth = 1;
   let char = 0;
-  for (let i = 1; i < data.length - 1; i++) {
-    char = unsafeCharCodeAt(data, i);
-    //if () {
-    //}
+  for (
+    let outerLoopIndex = 1;
+    outerLoopIndex < data.length - 1;
+    outerLoopIndex++
+  ) {
+    char = unsafeCharCodeAt(data, outerLoopIndex);
+    if (char === leftBracketCode) {
+      for (
+        let arrayValueIndex = outerLoopIndex;
+        arrayValueIndex < data.length - 1;
+        arrayValueIndex++
+      ) {
+        char = unsafeCharCodeAt(data, arrayValueIndex);
+        if (char === leftBracketCode) {
+          depth = depth << 1;
+        } else if (char === rightBracketCode) {
+          depth = depth >> 1;
+          if (depth === 1) {
+            ++arrayValueIndex;
+            result.set(
+              changetype<string>(key),
+              data.slice(outerLoopIndex, arrayValueIndex)
+            );
+            outerLoopIndex = arrayValueIndex;
+            key = 0;
+            break;
+          }
+        }
+      }
+    } else if (char === leftBraceCode) {
+      for (
+        let objectValueIndex = outerLoopIndex;
+        objectValueIndex < data.length - 1;
+        objectValueIndex++
+      ) {
+        char = unsafeCharCodeAt(data, objectValueIndex);
+        if (char === leftBraceCode) {
+          depth = depth << 1;
+        } else if (char === rightBraceCode) {
+          depth = depth >> 1;
+          if (depth === 1) {
+            ++objectValueIndex;
+            result.set(
+              changetype<string>(key),
+              data.slice(outerLoopIndex, objectValueIndex)
+            );
+            outerLoopIndex = objectValueIndex;
+            key = 0;
+            break;
+          }
+        }
+      }
+    } else if (char === quoteCode) {
+      for (
+        let stringValueIndex = ++outerLoopIndex;
+        stringValueIndex < data.length - 1;
+        stringValueIndex++
+      ) {
+        char = unsafeCharCodeAt(data, stringValueIndex);
+        if (
+          char === quoteCode &&
+          unsafeCharCodeAt(data, stringValueIndex - 1) !== backSlashCode
+        ) {
+          if (key === 0) {
+            key = changetype<usize>(
+              data.slice(outerLoopIndex, stringValueIndex)
+            );
+          } else {
+            result.set(
+              changetype<string>(key),
+              data.slice(outerLoopIndex, stringValueIndex)
+            );
+            key = 0;
+          }
+          outerLoopIndex = ++stringValueIndex;
+          break;
+        }
+      }
+    } else if (
+      char === tCode &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === "r".charCodeAt(0) &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === "u".charCodeAt(0) &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
+    ) {
+      result.set(changetype<string>(key), "true");
+      key = 0;
+    } else if (
+      char === fCode &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === "a".charCodeAt(0) &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === "l".charCodeAt(0) &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === "s".charCodeAt(0) &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
+    ) {
+      result.set(changetype<string>(key), "false");
+      key = 0;
+    } else if (char >= 48 && char <= 57) {
+      let numberValueIndex = ++outerLoopIndex;
+      for (; numberValueIndex < data.length - 1; numberValueIndex++) {
+        char = unsafeCharCodeAt(data, numberValueIndex);
+        if (
+          char === commaCode ||
+          isSpace(char) ||
+          numberValueIndex == data.length - 2
+        ) {
+          result.set(
+            changetype<string>(key),
+            data.slice(outerLoopIndex - 1, numberValueIndex)
+          );
+          outerLoopIndex = numberValueIndex;
+          key = 0;
+          break;
+        }
+      }
+    }
   }
   // @ts-ignore
   return schema.__JSON_Deserialize(result);
 }
+
 // @ts-ignore
 @inline
+// @ts-ignore
 export function parseArray<T extends unknown[]>(data: string): T {
-  data = data.trimStart();
   // TODO: Replace with opt
   let type!: valueof<T>;
   if (type instanceof String) {
     return <T>parseStringArray(data);
-  } else if (isBoolean<valueof<T>>()) {
-    // @ts-ignore
-    return parseBooleanArray<T>(data);
   } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
     // @ts-ignore
     return parseNumberArray<T>(data);
+  } else if (isBoolean<valueof<T>>()) {
+    // @ts-ignore
+    return parseBooleanArray<T>(data);
   } else if (isArrayLike<valueof<T>>()) {
     // @ts-ignore
     return parseArrayArray<T>(data);
@@ -195,7 +328,6 @@ export function parseStringArray(data: string): string[] {
         lastPos = i;
       } else if (unsafeCharCodeAt(data, i - 1) !== backSlashCode) {
         instr = false;
-        //console.log(`Value: ${data.slice(lastPos + 1, i)}`);
         result.push(data.slice(lastPos + 1, i).replaceAll('\\"', '"'));
       }
     }
@@ -225,7 +357,6 @@ export function parseBooleanArray<T extends boolean[]>(data: string): T {
       lastPos = i;
     } else if (char === eCode) {
       i++;
-      //console.log(`Value: ${data.slice(lastPos, i)}`);
       result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i)));
     }
   }
@@ -238,15 +369,21 @@ export function parseNumberArray<T extends number[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos = 0;
   let char = 0;
-  for (let i = 1; i < data.length - 1; i++) {
+  let i = 1;
+  for (; i < data.length - 1; i++) {
     char = unsafeCharCodeAt(data, i);
-    if (char >= 48 && char <= 57) {
-      //console.log(`Code: ${char} Char: ${data.charAt(i)} Index: ${i}`)
+    if (lastPos === 0 && char >= 48 && char <= 57) {
       lastPos = i;
     } else if ((isSpace(char) || char == commaCode) && lastPos > 0) {
-      //console.log(`Found Number: ${data.slice(lastPos, i)}`)
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i)));
       lastPos = 0;
+    }
+  }
+  for (; i > lastPos; i--) {
+    char = unsafeCharCodeAt(data, i);
+    if (char !== rightBracketCode) {
+      result.push(parseNumber<valueof<T>>(data.slice(lastPos, i + 1)));
+      break;
     }
   }
   return result;
@@ -275,7 +412,6 @@ export function parseArrayArray<T extends unknown[][]>(data: string): T {
       depth = depth >> 1;
       if (depth === 1) {
         i++;
-        //console.log(`Found Nested Array: -${data.slice(lastPos, i)}-`);
         result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
       }
     }
@@ -306,8 +442,7 @@ export function parseObjectArray<T extends unknown[][]>(data: string): T {
       depth = depth >> 1;
       if (depth === 1) {
         i++;
-        //console.log(`Found Nested Object: -${data.slice(lastPos, i)}-`);
-        //result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
+        result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
       }
     }
   }

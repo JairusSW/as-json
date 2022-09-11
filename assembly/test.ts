@@ -1,5 +1,11 @@
 import "wasi";
-import { JSON, parseArrayArray, parseObjectArray } from ".";
+import {
+  JSON,
+  parseArrayArray,
+  parseNumberArray,
+  parseObject,
+  parseObjectArray,
+} from ".";
 import { removeWhitespace } from "./util";
 
 // @ts-ignore
@@ -17,6 +23,7 @@ class Player {
   lastActive: i32[];
   age: i32;
   pos: Vec2;
+  isVerified: boolean;
 }
 
 const data: Player = {
@@ -28,10 +35,14 @@ const data: Player = {
     x: -3.4,
     y: 1.2,
   },
+  isVerified: true,
 };
 
-const stringified = JSON.stringify<Player>(data);
-console.log("Vec2 Stringify: " + stringified);
+const serialized = JSON.stringify<Player>(data);
+console.log("Serialized: " + serialized);
+const deserialized = JSON.parse<Player>(serialized);
+console.log("Deserialized: " + JSON.stringify(deserialized));
+/*
 const parsed = JSON.parse<Player>(stringified);
 console.log("Vec2 Parse: " + JSON.stringify<Player>(parsed));
 console.log(
@@ -71,3 +82,4 @@ console.log(
     )
   )
 );
+*/

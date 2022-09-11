@@ -1,4 +1,4 @@
-import { ClassDecorator, registerDecorator } from "visitor-as/dist/decorator.js";
+import { ClassDecorator, registerDecorator, } from "visitor-as/dist/decorator.js";
 import { getName } from "visitor-as/dist/utils.js";
 import { SimpleParser } from "visitor-as/dist/index.js";
 class AsJSONTransform extends ClassDecorator {
@@ -51,7 +51,8 @@ class AsJSONTransform extends ClassDecorator {
     @inline
     __JSON_Deserialize(values: Map<string, string>): ${name} {
         return {
-          ${ // @ts-ignore
+          ${
+        // @ts-ignore
         this.decodeStmts.join("")}
         }
     }
