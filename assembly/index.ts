@@ -166,6 +166,8 @@ function parseNumber<T>(data: string): T {
     );
 }
 
+// @ts-ignore
+@inline
 export function parseObject<T>(data: string): T {
   let schema!: T;
   const result = new Map<string, string>();

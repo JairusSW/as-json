@@ -1,7 +1,6 @@
 import {
   ClassDeclaration,
   FieldDeclaration,
-  MethodDeclaration,
   Source,
 } from "assemblyscript/dist/assemblyscript";
 import {
@@ -17,7 +16,7 @@ class AsJSONTransform extends ClassDecorator {
   public encodeStmts: string[] = [];
   public decodeStmts: string[] = [];
 
-  visitMethodDeclaration(node: MethodDeclaration): void {}
+  visitMethodDeclaration(): void {}
   visitFieldDeclaration(node: FieldDeclaration): void {
     const name = getName(node);
     if (!node.type) {
@@ -33,7 +32,7 @@ class AsJSONTransform extends ClassDecorator {
 
     // @ts-ignore
     this.decodeStmts.push(
-      `${name}: JSON.parse<${type}>(values.get("${name}")),\n`
+      `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
     );
   }
   visitClassDeclaration(node: ClassDeclaration): void {

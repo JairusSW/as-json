@@ -1,4 +1,4 @@
-import { JSON, parseBooleanArray, parseObject, parseStringArray } from "..";
+import { JSON } from "..";
 
 @json
 class Vec2 {
@@ -11,6 +11,7 @@ const vec: Vec2 = blackbox<Vec2>({
   y: 0.0,
 });
 
+/*
 bench("Stringify String", () => {
   blackbox(JSON.stringify(blackbox("Hello")));
 });
@@ -46,9 +47,9 @@ bench("Parse Float", () => {
 bench("Stringify Object (Vec2)", () => {
   blackbox(JSON.stringify(vec));
 });
-
+*/
 bench("Parse Object (Vec2)", () => {
-  blackbox(parseObject<Vec2>(blackbox('{"x":0.0,"y":0.0}')));
+  const obj = JSON.parse<Vec2>(blackbox('{"x":0.0,"y":0.0}'));
 });
 
 bench("Stringify Array", () => {

@@ -8,7 +8,7 @@ class AsJSONTransform extends ClassDecorator {
         this.encodeStmts = [];
         this.decodeStmts = [];
     }
-    visitMethodDeclaration(node) { }
+    visitMethodDeclaration() { }
     visitFieldDeclaration(node) {
         const name = getName(node);
         if (!node.type) {
@@ -18,7 +18,7 @@ class AsJSONTransform extends ClassDecorator {
         // @ts-ignore
         this.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
         // @ts-ignore
-        this.decodeStmts.push(`${name}: JSON.parse<${type}>(values.get("${name}")),\n`);
+        this.decodeStmts.push(`${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`);
     }
     visitClassDeclaration(node) {
         if (!node.members) {
