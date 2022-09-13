@@ -171,7 +171,8 @@ function parseNumber<T>(data: string): T {
 export function parseObject<T>(data: string): T {
   let schema!: T;
   const result = new Map<string, string>();
-  let key: usize = 0;
+  let key = "";
+  let isKey = false;
   let depth = 1;
   let char = 0;
   for (
@@ -194,11 +195,11 @@ export function parseObject<T>(data: string): T {
           if (depth === 1) {
             ++arrayValueIndex;
             result.set(
-              changetype<string>(key),
+              key,
               data.slice(outerLoopIndex, arrayValueIndex)
             );
             outerLoopIndex = arrayValueIndex;
-            key = 0;
+            isKey = false;
             break;
           }
         }
@@ -217,11 +218,11 @@ export function parseObject<T>(data: string): T {
           if (depth === 1) {
             ++objectValueIndex;
             result.set(
-              changetype<string>(key),
+              key,
               data.slice(outerLoopIndex, objectValueIndex)
             );
             outerLoopIndex = objectValueIndex;
-            key = 0;
+            isKey = false;
             break;
           }
         }
@@ -237,16 +238,15 @@ export function parseObject<T>(data: string): T {
           char === quoteCode &&
           unsafeCharCodeAt(data, stringValueIndex - 1) !== backSlashCode
         ) {
-          if (key === 0) {
-            key = changetype<usize>(
-              data.slice(outerLoopIndex, stringValueIndex)
-            );
+          if (isKey === false) {
+            key = data.slice(outerLoopIndex, stringValueIndex);
+            isKey = true;
           } else {
             result.set(
-              changetype<string>(key),
+              key,
               data.slice(outerLoopIndex, stringValueIndex)
             );
-            key = 0;
+            isKey = false;
           }
           outerLoopIndex = ++stringValueIndex;
           break;
@@ -258,8 +258,8 @@ export function parseObject<T>(data: string): T {
       unsafeCharCodeAt(data, ++outerLoopIndex) === "u".charCodeAt(0) &&
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
-      result.set(changetype<string>(key), "true");
-      key = 0;
+      result.set(key, "true");
+      isKey = false;
     } else if (
       char === fCode &&
       unsafeCharCodeAt(data, ++outerLoopIndex) === "a".charCodeAt(0) &&
@@ -267,8 +267,8 @@ export function parseObject<T>(data: string): T {
       unsafeCharCodeAt(data, ++outerLoopIndex) === "s".charCodeAt(0) &&
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
-      result.set(changetype<string>(key), "false");
-      key = 0;
+      result.set(key, "false");
+      isKey = false;
     } else if (char >= 48 && char <= 57) {
       let numberValueIndex = ++outerLoopIndex;
       for (; numberValueIndex < data.length - 1; numberValueIndex++) {
@@ -279,11 +279,11 @@ export function parseObject<T>(data: string): T {
           numberValueIndex == data.length - 2
         ) {
           result.set(
-            changetype<string>(key),
+            key,
             data.slice(outerLoopIndex - 1, numberValueIndex)
           );
           outerLoopIndex = numberValueIndex;
-          key = 0;
+          isKey = false;
           break;
         }
       }
