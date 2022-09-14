@@ -1,4 +1,4 @@
-7{
+{
     "name": "@json-as/transform",
     "version": "0.4.7",
     "description": "JSON encoder/decoder for AssemblyScript",
