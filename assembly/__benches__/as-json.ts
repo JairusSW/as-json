@@ -1,4 +1,5 @@
 import { JSON } from "..";
+import { rainbow } from "as-rainbow/assembly"
 
 @json
 class Vec2 {
@@ -11,7 +12,39 @@ const vec: Vec2 = blackbox<Vec2>({
   y: 0.0,
 });
 
-/*
+//console.log(rainbow.bgBlue("Running benchmark for as-json"));
+
+bench("Stringify Object (Vec2)", () => {
+  blackbox(JSON.stringify(vec));
+});
+
+bench("Parse Object (Vec2)", () => {
+  blackbox(JSON.parse<Vec2>(blackbox('{"x":0.0,"y":0.0}')));
+});
+
+bench("Stringify Array", () => {
+  blackbox(JSON.stringify(blackbox([1, 2, 3, 4, 5])));
+});
+
+bench("Parse Array", () => {
+  blackbox(JSON.parse<i32[]>(blackbox("[1,2,3,4]")));
+});
+
+bench("Stringify Nested Array", () => {
+  blackbox(
+    JSON.stringify<string[][]>(
+      blackbox([
+        ["a", "b", "c"],
+        ["d", "e", "f"],
+      ])
+    )
+  );
+});
+
+bench("Parse Nested Array", () => {
+  blackbox(JSON.parse<string[][]>(blackbox('[["a","b","c"],["d","e","f"]]')));
+});
+
 bench("Stringify String", () => {
   blackbox(JSON.stringify(blackbox("Hello")));
 });
@@ -42,34 +75,4 @@ bench("Stringify Float", () => {
 
 bench("Parse Float", () => {
   blackbox(JSON.parse<f32>(blackbox("3.14")));
-});
-
-bench("Stringify Object (Vec2)", () => {
-  blackbox(JSON.stringify(vec));
-});
-*/
-bench("Parse Object (Vec2)", () => {
-  const obj = JSON.parse<Vec2>(blackbox('{"x":0.0,"y":0.0}'));
-});
-
-bench("Stringify Array", () => {
-  blackbox(JSON.stringify(blackbox([1, 2, 3, 4, 5])));
-});
-
-bench("Parse Array", () => {
-  blackbox(JSON.parse<i32[]>(blackbox("[1,2,3,4]")));
-});
-
-bench("Stringify Nested Array", () => {
-  blackbox(
-    JSON.stringify<string[][]>(
-      blackbox([
-        ["a", "b", "c"],
-        ["d", "e", "f"],
-      ])
-    )
-  );
-});
-bench("Parse Nested Array", () => {
-  blackbox(JSON.parse<string[][]>(blackbox('[["a","b","c"],["d","e","f"]]')));
 });

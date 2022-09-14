@@ -1,7 +1,6 @@
 import { StringSink } from "as-string-sink/assembly";
 import { Variant } from "as-variant/assembly";
-import { isSpace } from "assemblyscript/std/assembly/util/string";
-import { stringify } from "as-console/assembly";
+import { isSpace } from "util/string";
 import {
   backSlashCode,
   colonCode,

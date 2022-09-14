@@ -1,6 +1,6 @@
 {
     "name": "@json-as/transform",
-    "version": "0.4.8",
+    "version": "0.4.9",
     "description": "JSON encoder/decoder for AssemblyScript",
     "main": "./lib/index.js",
     "author": "Jairus Tanaka",
@@ -21,7 +21,7 @@
         "json",
         "serialize",
         "deserialize",
-        "dynamic"
+        "serde"
     ],
     "bugs": {
         "url": "https://github.com/JairusSW/as-json/issues"
