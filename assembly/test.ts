@@ -3,18 +3,6 @@ import {
   JSON
 } from ".";
 
-function canSerde<T>(data: T): void {
-  const serialized = JSON.stringify<T>(data);
-  const deserialized = JSON.stringify<T>(JSON.parse<T>(serialized));
-  if (serialized !== deserialized) {
-    console.log(`Fail: ${JSON.stringify<T>(JSON.parse<T>(JSON.stringify<T>(data)))} !== ${JSON.stringify<T>(data)}`)
-  } else {
-    console.log(`Success: ${JSON.stringify<T>(JSON.parse<T>(JSON.stringify<T>(data)))} == ${JSON.stringify<T>(data)}`)
-  }
-}
-
-canSerde<i64[][]>([[100, 101], [-100, -101], [0]])
-/*
 // @ts-ignore
 @json
 class Vec2 {
@@ -58,4 +46,4 @@ const serializedVec2 = JSON.stringify<Vec2>(vec);
 console.log("Serialized Vec2: " + serializedVec2);
 const deserializedVec2 = JSON.parse<Vec2>(serializedVec2);
 
-console.log("Deserialized: " + JSON.stringify(deserializedVec2));*/
+console.log("Deserialized Vec2: " + JSON.stringify(deserializedVec2));
