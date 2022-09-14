@@ -80,11 +80,11 @@ export class JSON {
       // @ts-ignore
       for (let i = 0; i < data.length - 1; i++) {
         // @ts-ignore
-        result.write(stringify(unchecked(data[i])));
+        result.write(JSON.stringify(unchecked(data[i])));
         result.write(",");
       }
       // @ts-ignore
-      result.write(stringify(unchecked(data[data.length - 1])));
+      result.write(JSON.stringify(unchecked(data[data.length - 1])));
       result.write("]");
       return result.toString();
     }
@@ -128,13 +128,13 @@ export class JSON {
 
 // @ts-ignore
 @inline
-function parseString(data: string): string {
+  function parseString(data: string): string {
   return data.slice(1, data.length - 1).replaceAll('\\"', '"');
 }
 
 // @ts-ignore
 @inline
-function parseBoolean<T extends boolean>(data: string): T {
+  function parseBoolean<T extends boolean>(data: string): T {
   if (data.length > 3 && data.startsWith("true")) return <T>true;
   else if (data.length > 4 && data.startsWith("false")) return <T>false;
   else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
@@ -142,20 +142,24 @@ function parseBoolean<T extends boolean>(data: string): T {
 
 // @ts-ignore
 @inline
-function parseNumber<T>(data: string): T {
+  function parseNumber<T>(data: string): T {
   let type: T;
   // @ts-ignore
   if (type instanceof f64) return F64.parseFloat(data);
   // @ts-ignore
   else if (type instanceof f32) return F32.parseFloat(data);
   // @ts-ignore
-  else if (type instanceof i32) return I32.parseInt(data);
+  else if (type instanceof u64) return U64.parseInt(data);
   // @ts-ignore
   else if (type instanceof u32) return U32.parseInt(data);
   // @ts-ignore
   else if (type instanceof u8) return U8.parseInt(data);
   // @ts-ignore
   else if (type instanceof u16) return U16.parseInt(data);
+  // @ts-ignore
+  else if (type instanceof i64) return I64.parseInt(data);
+  // @ts-ignore
+  else if (type instanceof i32) return I32.parseInt(data);
   // @ts-ignore
   else if (type instanceof i16) return I16.parseInt(data);
   // @ts-ignore
@@ -168,7 +172,7 @@ function parseNumber<T>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseObject<T>(data: string): T {
+  export function parseObject<T>(data: string): T {
   let schema!: T;
   const result = new Map<string, string>();
   let key = "";
@@ -269,7 +273,7 @@ export function parseObject<T>(data: string): T {
     ) {
       result.set(key, "false");
       isKey = false;
-    } else if (char >= 48 && char <= 57) {
+    } else if ((char >= 48 && char <= 57) || char === 45) {
       let numberValueIndex = ++outerLoopIndex;
       for (; numberValueIndex < data.length - 1; numberValueIndex++) {
         char = unsafeCharCodeAt(data, numberValueIndex);
@@ -295,18 +299,18 @@ export function parseObject<T>(data: string): T {
 
 // @ts-ignore
 @inline
-// @ts-ignore
-export function parseArray<T extends unknown[]>(data: string): T {
+  // @ts-ignore
+  export function parseArray<T extends unknown[]>(data: string): T {
   // TODO: Replace with opt
   let type!: valueof<T>;
   if (type instanceof String) {
     return <T>parseStringArray(data);
-  } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
-    // @ts-ignore
-    return parseNumberArray<T>(data);
   } else if (isBoolean<valueof<T>>()) {
     // @ts-ignore
     return parseBooleanArray<T>(data);
+  } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
+    // @ts-ignore
+    return parseNumberArray<T>(data);
   } else if (isArrayLike<valueof<T>>()) {
     // @ts-ignore
     return parseArrayArray<T>(data);
@@ -319,7 +323,7 @@ export function parseArray<T extends unknown[]>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseStringArray(data: string): string[] {
+  export function parseStringArray(data: string): string[] {
   const result: string[] = [];
   let lastPos = 0;
   let instr = false;
@@ -339,7 +343,7 @@ export function parseStringArray(data: string): string[] {
 
 // @ts-ignore
 @inline
-export function parseBooleanArray<T extends boolean[]>(data: string): T {
+  export function parseBooleanArray<T extends boolean[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos = 1;
   let char = 0;
@@ -367,21 +371,21 @@ export function parseBooleanArray<T extends boolean[]>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseNumberArray<T extends number[]>(data: string): T {
+  export function parseNumberArray<T extends number[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos = 0;
   let char = 0;
   let i = 1;
   for (; i < data.length - 1; i++) {
     char = unsafeCharCodeAt(data, i);
-    if (lastPos === 0 && char >= 48 && char <= 57) {
+    if (lastPos === 0 && (char >= 48 && char <= 57) || char === 45) {
       lastPos = i;
     } else if ((isSpace(char) || char == commaCode) && lastPos > 0) {
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i)));
       lastPos = 0;
     }
   }
-  for (; i > lastPos; i--) {
+  for (; i > lastPos - 1; i--) {
     char = unsafeCharCodeAt(data, i);
     if (char !== rightBracketCode) {
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i + 1)));
@@ -393,7 +397,7 @@ export function parseNumberArray<T extends number[]>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseArrayArray<T extends unknown[][]>(data: string): T {
+  export function parseArrayArray<T extends unknown[][]>(data: string): T {
   const result = instantiate<T>();
   let char = 0;
   let lastPos = 0;
@@ -423,7 +427,7 @@ export function parseArrayArray<T extends unknown[][]>(data: string): T {
 
 // @ts-ignore
 @inline
-export function parseObjectArray<T extends unknown[][]>(data: string): T {
+  export function parseObjectArray<T extends unknown[][]>(data: string): T {
   const result = instantiate<T>();
   let char = 0;
   let lastPos = 1;
@@ -451,4 +455,4 @@ export function parseObjectArray<T extends unknown[][]>(data: string): T {
   return result;
 }
 
-class Nullable {}
+class Nullable { }

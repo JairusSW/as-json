@@ -2,8 +2,9 @@ import { JSON } from ".."
 function canSerde<T>(data: T): void {
     const serialized = JSON.stringify<T>(data);
     const deserialized = JSON.stringify<T>(JSON.parse<T>(serialized));
-    expect(serialized).toStrictEqual(deserialized)
+    expect(serialized).toBe(deserialized);
 }
+
 describe("Ser/de Numbers", () => {
     it("should ser/de integers", () => {
         canSerde<i32>(0)
@@ -62,7 +63,7 @@ describe("Ser/de Array", () => {
     })
 
     it("should ser/de string arrays", () => {
-        canSerde<string[]>(["abcdefg", "st\"ring\" w\"\"ith quotes\"", "string \t\r\\\"with ran\tdom spa\nces and \nnewlines\n\n\n", "string with colon : comma , brace [ ] bracket { } and quote \" and other quote \\\""])
+        canSerde<string[]>(["abcdefg", "st\"ring\" w\"\"ith quotes\"", "string \t\r\"with ran\tdom spa\nces and \nnewlines\n\n\n", "string with colon : comma , brace [ ] bracket { } and quote \" and other quote \""])
     });
 
     it("should ser/de nested integer arrays", () => {
