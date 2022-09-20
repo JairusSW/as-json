@@ -1,5 +1,4 @@
 import { JSON } from "..";
-import { rainbow } from "as-rainbow/assembly"
 
 @json
 class Vec2 {
@@ -11,8 +10,6 @@ const vec: Vec2 = blackbox<Vec2>({
   x: 0.0,
   y: 0.0,
 });
-
-//console.log(rainbow.bgBlue("Running benchmark for as-json"));
 
 bench("Stringify Object (Vec2)", () => {
   blackbox(JSON.stringify(vec));

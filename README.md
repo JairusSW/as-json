@@ -27,25 +27,17 @@ Or, add it to `asconfig.json`
 }
 ```
 
-## Support
-
-- ✅ Objects (Supported)
-- ✅ Arrays (Supported)
-- ✅ Numbers (Supported)
-- ✅ Integers (Supported)
-- ✅ Null (Supported)
-- ❌ Dynamic Variants (Not supported)
-
 ## Usage
 
 ```js
-import { JSON } from "json-as";
+import { JSON } from "json-as/assembly";
 
 @json
 class Vec2 {
   x: f32
   y: f32
 }
+
 @json
 class Player {
   firstName: string
@@ -69,46 +61,24 @@ const data: Player = {
 }
 
 const stringified = JSON.stringify<Player>(data);
-// {
-//  "firstName": "Emmet",
-//  "lastName": "West",
-//  "lastActive": [8, 27, 2022],
-//  "age": 23,
-//  "pos": {
-//    "x": -3.4000000953674318,
-//    "y": 1.2000000476837159
-//  },
-//  "isVerified": true
-// }
-console.log(`Stringified: ${stringified}`);
 
 const parsed = JSON.parse<Player>(stringified);
-// Player {
-//  firstName: "Emmet",
-//  lastName: "West",
-//  lastActive: [8, 27, 2022],
-//  age: 23,
-//  pos: {
-//    x: -3.4000000953674318,
-//    y: 1.2000000476837159
-//  },
-//  isVerified: true
-// }
-console.log(`Parsed: ${JSON.stringify(parsed)}`);
 ```
 
-## FAQ
+## Performance
 
-- Does it support the full JSON spec?
-  Yes, as-json supports the full JSON specification and trys to mimic the JSON API as much as possible
-- What are the differences between as-json and the JSON API?
-  The main difference between as-json and the JSON API is the ability to create new fields in objects during runtime. Since classes are static, Map ser/de support will be added soon allowing the user to parse and stringify dynamic objects and their properties
-- Does this support nested structures?
-  Yes, as-json supports nested structures
-- Does this support whitespace?
-  Yes, as-json supports whitespace!
-- How fast is it?
-  Really fast. For example, here are some benchmarks for ser/de a Vec2 with as-json
+**Serialize Object (Vec2):** ~7.29m ops/s
+
+**Deserialize Object (Vec2):** ~1.36m ops/s
+
+**Serialize Array (int[4]):** ~1.4m ops/s
+
+**Deserialize Array (int[4]):** ~2.8m ops/s
+
+**Serialize String (5):** ~5.2m ops/sw
+
+**Deserialize String (5):** ~1.36m ops/s
+
 ## Issues
 
 Please submit an issue to https://github.com/JairusSW/as-json/issues if you find anything wrong with this library

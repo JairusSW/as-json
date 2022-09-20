@@ -36,6 +36,8 @@ export class JSON {
       return parseArray<T>(data);
       // @ts-ignore
     } else if (isDefined(type.__JSON_Deserialize)) {
+      // @ts-ignore
+      if (isNullable<T>()) return null;
       return parseObject<T>(data);
     } else {
       // @ts-ignore
@@ -69,6 +71,8 @@ export class JSON {
     // @ts-ignore
     else if (isDefined(data.__JSON_Serialize)) {
       // @ts-ignore
+      if (isNullable<T>()) return null;
+      // @ts-ignore
       return data.__JSON_Serialize();
     }
     // ArrayLike
@@ -79,8 +83,7 @@ export class JSON {
       // @ts-ignore
       for (let i = 0; i < data.length - 1; i++) {
         // @ts-ignore
-        result.write(JSON.stringify(unchecked(data[i])));
-        result.write(",");
+        result.write(JSON.stringify(unchecked(data[i])) + ",");
       }
       // @ts-ignore
       result.write(JSON.stringify(unchecked(data[data.length - 1])));

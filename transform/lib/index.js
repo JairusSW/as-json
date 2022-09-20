@@ -1,5 +1,5 @@
 import { ClassDecorator, registerDecorator, } from "visitor-as/dist/decorator.js";
-import { getName } from "visitor-as/dist/utils.js";
+import { getName, toString } from "visitor-as/dist/utils.js";
 import { SimpleParser } from "visitor-as/dist/index.js";
 class AsJSONTransform extends ClassDecorator {
     constructor() {
@@ -10,6 +10,9 @@ class AsJSONTransform extends ClassDecorator {
     }
     visitMethodDeclaration() { }
     visitFieldDeclaration(node) {
+        const lineText = toString(node);
+        if (lineText.startsWith("private"))
+            return;
         const name = getName(node);
         if (!node.type) {
             throw new Error(`Field ${name} is missing a type declaration`);

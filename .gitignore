@@ -8,3 +8,6 @@ logs
 as-tral
 *.lockb
 *.log
+*.wasm
+*.wat
+*.lockb

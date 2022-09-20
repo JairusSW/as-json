@@ -6,7 +6,10 @@ import {
 // @ts-ignore
 @json
 class Vec2 {
-  x: f32;
+  /**
+   * x > 4 && x < 100
+   */
+  private x: f32 = 0;
   y: f32;
 }
 
@@ -27,14 +30,12 @@ const player: Player = {
   lastActive: [8, 27, 2022],
   age: 23,
   pos: {
-    x: -3.4,
     y: 1.2,
   },
   isVerified: true,
 };
 
 const vec: Vec2 = {
-  x: 0.0,
   y: 0.0
 }
 const serializedPlayer = JSON.stringify<Player>(player);

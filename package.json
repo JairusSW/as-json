@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.4.9",
+  "version": "0.5.0",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -9,6 +9,7 @@
   ],
   "license": "MIT",
   "scripts": {
+    "aspect": "asp",
     "bench:astral": "astral",
     "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -p ./transform",
@@ -20,9 +21,8 @@
   "devDependencies": {
     "@as-pect/cli": "^7.0.7",
     "@as-tral/cli": "^1.1.1",
-    "@serial-as/json": "^1.0.2",
-    "as-console": "^6.0.2",
-    "as-rainbow": "^0.1.0",
+    "@assemblyscript/loader": "^0.21.3",
+    "@serial-as/json": "^2.0.0",
     "assemblyscript": "^0.20.7",
     "assemblyscript-prettier": "^1.0.2",
     "typescript": "^4.7.2"
