@@ -1,5 +1,4 @@
 import { StringSink } from "as-string-sink/assembly";
-import { Variant } from "as-variant/assembly";
 import { isSpace } from "util/string";
 import { Type } from "./type";
 import {
@@ -299,8 +298,10 @@ export class JSON {
             }
         }
     }
-
-    return schema!.__JSON_Deserialize<T>(result);
+    // @ts-ignore
+    const deserialized = schema!.__JSON_Deserialize<T>(result);
+    heap.free(changetype<usize>(schema));
+    return deserialized;
 }
 
 // @ts-ignore
