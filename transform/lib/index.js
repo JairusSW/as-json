@@ -7,6 +7,7 @@ class AsJSONTransform extends ClassDecorator {
         this.sources = [];
         this.encodeStmts = [];
         this.decodeStmts = [];
+        this.checkDecodeStmts = [];
     }
     visitMethodDeclaration() { }
     visitFieldDeclaration(node) {
@@ -17,11 +18,14 @@ class AsJSONTransform extends ClassDecorator {
         if (!node.type) {
             throw new Error(`Field ${name} is missing a type declaration`);
         }
-        const type = getName(node.type);
+        console.log(node);
+        let type = getName(node.type);
         // @ts-ignore
         this.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
         // @ts-ignore
         this.decodeStmts.push(`${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`);
+        // @ts-ignore
+        this.checkDecodeStmts.push(` if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n`);
     }
     visitClassDeclaration(node) {
         if (!node.members) {
@@ -52,7 +56,8 @@ class AsJSONTransform extends ClassDecorator {
         }
         const deserializeFunc = `
     @inline
-    __JSON_Deserialize(values: Map<string, string>): ${name} {
+    __JSON_Deserialize<T>(values: Map<string, string>): T {
+        ${process.argv.includes("--debugJSON") ? this.checkDecodeStmts.join("else") : ""}
         return {
           ${
         // @ts-ignore
@@ -60,9 +65,9 @@ class AsJSONTransform extends ClassDecorator {
         }
     }
     `;
+        console.log(deserializeFunc, serializeFunc);
         this.encodeStmts = [];
         this.decodeStmts = [];
-        //console.log(serializeFunc, deserializeFunc)
         const serializedProperty = SimpleParser.parseClassMember(serializedProp, node);
         node.members.push(serializedProperty);
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);

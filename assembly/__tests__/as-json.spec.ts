@@ -5,6 +5,20 @@ function canSerde<T>(data: T): void {
     expect(serialized).toBe(deserialized);
 }
 
+// @ts-ignore
+@json
+class Vec2 {
+    x: f32;
+    y: f32;
+}
+
+class Nullable {}
+type Null = Nullable | null
+
+describe("Ser/de Nulls", () => {
+    canSerde<Null>(null)
+})
+
 describe("Ser/de Numbers", () => {
     it("should ser/de integers", () => {
         canSerde<i32>(0)
@@ -83,3 +97,13 @@ describe("Ser/de Array", () => {
         canSerde<string[][]>([["abcdefg"], ["st\"ring\" w\"\"ith quotes\""], ["string \t\r\\\"with ran\tdom spa\nces and \nnewlines\n\n\n"], ["string with colon : comma , brace [ ] bracket { } and quote \" and other quote \\\""]])
     });
 });
+
+describe("Ser/de Objects", () => {
+    it("should ser/de Vec2 Objects", () => {
+        canSerde<Vec2>({
+            x: 3.4,
+            y: 1.2
+        })
+    })
+
+})

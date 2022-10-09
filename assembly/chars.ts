@@ -15,3 +15,4 @@ export const fCode = "f".charCodeAt(0);
 export const aCode = "a".charCodeAt(0);
 export const lCode = "l".charCodeAt(0);
 export const sCode = "s".charCodeAt(0);
+export const nCode = "n".charCodeAt(0);
