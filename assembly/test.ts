@@ -2,7 +2,6 @@ import "wasi";
 import {
   JSON
 } from ".";
-import { parseObject } from "./json";
 
 // @ts-ignore
 @json

@@ -18,7 +18,7 @@ import {
     tCode,
     uCode,
 } from "./chars";
-import { removeWhitespace, unsafeCharCodeAt } from "./util";
+import { unsafeCharCodeAt } from "./util";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -299,7 +299,7 @@ export class JSON {
         }
     }
     // @ts-ignore
-    const deserialized = schema!.__JSON_Deserialize<T>(result);
+    const deserialized = changetype<nonnull<T>>(schema).__JSON_Deserialize<T>(result)
     heap.free(changetype<usize>(schema));
     return deserialized;
 }

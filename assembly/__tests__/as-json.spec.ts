@@ -105,5 +105,5 @@ describe("Ser/de Objects", () => {
             y: 1.2
         })
     })
-
+    
 })
