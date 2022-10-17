@@ -5,9 +5,10 @@ import {
 
 // @ts-ignore
 @json
-class Vec2 {
+class Vec3 {
   x: f32;
   y: f32;
+  z: f32;
 }
 
 // @ts-ignore
@@ -17,7 +18,7 @@ class Player {
   lastName: string;
   lastActive: i32[];
   age: i32;
-  pos: Vec2 | null;
+  pos: Vec3 | null;
   isVerified: boolean;
 }
 
@@ -29,16 +30,12 @@ const player: Player = {
   pos: {
     x: 3.4,
     y: 1.2,
+    z: 8.3
   },
   isVerified: true,
 };
 
-const vec: Vec2 = {
-  x: 3.4,
-  y: 1.2
-}
-
 const serializedPlayer = JSON.stringify<Player>(player);
 console.log("Serialized Player: " + serializedPlayer);
 const deserializedPlayer = JSON.parse<Player>(serializedPlayer);
-console.log("Deserialized Player: " + JSON.stringify(deserializedPlayer))
+console.log("Deserialized Player: " + JSON.stringify(deserializedPlayer));

@@ -65,6 +65,7 @@ const stringified = JSON.stringify<Player>(data);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
+
 ## Performance
 
 **Serialize Object (Vec2):** ~7.29m ops/s

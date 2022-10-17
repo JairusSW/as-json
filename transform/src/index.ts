@@ -38,7 +38,9 @@ class AsJSONTransform extends ClassDecorator {
     );
 
     // @ts-ignore
-    this.checkDecodeStmts.push(' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n')
+    this.checkDecodeStmts.push(
+      ' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n'
+    );
   }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.members) {
@@ -76,11 +78,15 @@ class AsJSONTransform extends ClassDecorator {
     const deserializeFunc = `
     @inline
     __JSON_Deserialize<T>(values: Map<string, string>): T {
-        ${process.argv.includes("--debugJSON") ? this.checkDecodeStmts.join("else") : ""}
+        ${
+          process.argv.includes("--debugJSON")
+            ? this.checkDecodeStmts.join("else")
+            : ""
+        }
         return {
           ${
-      // @ts-ignore
-      this.decodeStmts.join("")
+            // @ts-ignore
+            this.decodeStmts.join("")
           }
         }
     }
