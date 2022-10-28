@@ -1,1 +1,1 @@
-export { JSON } from "./assembly/json";
+export { JSON } from "./assembly/src/json";

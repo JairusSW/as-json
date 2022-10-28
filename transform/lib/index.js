@@ -6,9 +6,10 @@ class AsJSONTransform extends ClassDecorator {
         super(...arguments);
         this.sources = [];
         this.encodeStmts = [];
-        this.decodeStmts = [];
-        this.checkDecodeStmts = [];
+        //public decodeStmts: string[] = [];
+        this.setDataStmts = [];
     }
+    //public checkDecodeStmts: string[] = [];
     visitMethodDeclaration() { }
     visitFieldDeclaration(node) {
         const lineText = toString(node);
@@ -22,9 +23,19 @@ class AsJSONTransform extends ClassDecorator {
         // @ts-ignore
         this.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
         // @ts-ignore
-        this.decodeStmts.push(`${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`);
+        //this.decodeStmts.push(
+        //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
+        //);
         // @ts-ignore
-        this.checkDecodeStmts.push(' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n');
+        this.setDataStmts.push(`if (key.length === ${name.length} && (memory.compare(changetype<usize>("${name}"), changetype<usize>(key), ${name.length}) == 0)) {
+        this.${name} = JSON.parseObjectValue<${type}>(value);
+        return;
+      }
+      `);
+        // @ts-ignore
+        //this.checkDecodeStmts.push(
+        //  ' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n'
+        //);
     }
     visitClassDeclaration(node) {
         if (!node.members) {
@@ -38,7 +49,6 @@ class AsJSONTransform extends ClassDecorator {
             const stmt = this.encodeStmts[this.encodeStmts.length - 1];
             this.encodeStmts[this.encodeStmts.length - 1] = stmt.slice(0, stmt.length - 1);
             serializeFunc = `
-      @inline
       __JSON_Serialize(): string {
         return \`{${this.encodeStmts.join("")}}\`;
       }
@@ -46,31 +56,50 @@ class AsJSONTransform extends ClassDecorator {
         }
         else {
             serializeFunc = `
-      @inline
       __JSON_Serialize(): string {
         return "{}";
       }
       `;
         }
-        const deserializeFunc = `
-    @inline
-    __JSON_Deserialize<T>(values: Map<string, string>): T {
-        ${process.argv.includes("--debugJSON") ? this.checkDecodeStmts.join("else") : ""}
-        return {
-          ${
-        // @ts-ignore
-        this.decodeStmts.join("")}
+        /*const deserializeFunc = `
+        __JSON_Deserialize<T>(values: Map<string, string>): T {
+            ${
+              process.argv.includes("--debugJSON")
+                ? this.checkDecodeStmts.join("else")
+                : ""
+            }
+            return {
+              ${
+                // @ts-ignore
+                this.decodeStmts.join("")
+              }
+            }
         }
-    }
+        `;*/
+        const setKeyFunc = `
+      __JSON_Set_Key(key: string, value: string): void {
+        ${
+        // @ts-ignore
+        this.setDataStmts.join("")}
+        throw new Error("Cannot find key: " + key);
+      }
     `;
+        //console.log(setKeyFunc, deserializeFunc, serializeFunc)
         this.encodeStmts = [];
-        this.decodeStmts = [];
+        //this.decodeStmts = [];
+        this.setDataStmts = [];
+        //this.checkDecodeStmts = [];
         const serializedProperty = SimpleParser.parseClassMember(serializedProp, node);
         node.members.push(serializedProperty);
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
         node.members.push(serializeMethod);
-        const deserializeMethod = SimpleParser.parseClassMember(deserializeFunc, node);
-        node.members.push(deserializeMethod);
+        //const deserializeMethod = SimpleParser.parseClassMember(
+        //  deserializeFunc,
+        //  node
+        //);
+        //node.members.push(deserializeMethod);
+        const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
+        node.members.push(setDataMethod);
     }
     get name() {
         return "json";

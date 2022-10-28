@@ -1,3 +1,4 @@
+// Characters
 export const commaCode = ",".charCodeAt(0);
 export const quoteCode = '"'.charCodeAt(0);
 export const backSlashCode = "\\".charCodeAt(0);
@@ -16,3 +17,11 @@ export const aCode = "a".charCodeAt(0);
 export const lCode = "l".charCodeAt(0);
 export const sCode = "s".charCodeAt(0);
 export const nCode = "n".charCodeAt(0);
+// Strings
+export const trueWord = "true";
+export const falseWord = "false";
+export const nullWord = "null";
+export const leftBracketWord = "[";
+export const emptyArrayWord = "[]";
+export const commaWord = ",";
+export const rightBracketWord = "]";

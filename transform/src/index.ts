@@ -14,8 +14,9 @@ class AsJSONTransform extends ClassDecorator {
   public currentClass!: ClassDeclaration;
   public sources: Source[] = [];
   public encodeStmts: string[] = [];
-  public decodeStmts: string[] = [];
-  public checkDecodeStmts: string[] = [];
+  //public decodeStmts: string[] = [];
+  public setDataStmts: string[] = [];
+  //public checkDecodeStmts: string[] = [];
 
   visitMethodDeclaration(): void {}
   visitFieldDeclaration(node: FieldDeclaration): void {
@@ -33,14 +34,23 @@ class AsJSONTransform extends ClassDecorator {
     );
 
     // @ts-ignore
-    this.decodeStmts.push(
-      `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
+    //this.decodeStmts.push(
+   //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
+    //);
+
+    // @ts-ignore
+    this.setDataStmts.push(
+      `if (key.length === ${name.length} && (memory.compare(changetype<usize>("${name}"), changetype<usize>(key), ${name.length}) == 0)) {
+        this.${name} = JSON.parseObjectValue<${type}>(value);
+        return;
+      }
+      `
     );
 
     // @ts-ignore
-    this.checkDecodeStmts.push(
-      ' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n'
-    );
+    //this.checkDecodeStmts.push(
+    //  ' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n'
+    //);
   }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.members) {
@@ -62,21 +72,18 @@ class AsJSONTransform extends ClassDecorator {
         stmt.length - 1
       );
       serializeFunc = `
-      @inline
       __JSON_Serialize(): string {
         return \`{${this.encodeStmts.join("")}}\`;
       }
       `;
     } else {
       serializeFunc = `
-      @inline
       __JSON_Serialize(): string {
         return "{}";
       }
       `;
     }
-    const deserializeFunc = `
-    @inline
+    /*const deserializeFunc = `
     __JSON_Deserialize<T>(values: Map<string, string>): T {
         ${
           process.argv.includes("--debugJSON")
@@ -90,9 +97,21 @@ class AsJSONTransform extends ClassDecorator {
           }
         }
     }
-    `;
+    `;*/
+    const setKeyFunc = `
+      __JSON_Set_Key(key: string, value: string): void {
+        ${
+        // @ts-ignore
+        this.setDataStmts.join("")
+        }
+        throw new Error("Cannot find key: " + key);
+      }
+    `
+    //console.log(setKeyFunc, deserializeFunc, serializeFunc)
     this.encodeStmts = [];
-    this.decodeStmts = [];
+    //this.decodeStmts = [];
+    this.setDataStmts = [];
+    //this.checkDecodeStmts = [];
     const serializedProperty = SimpleParser.parseClassMember(
       serializedProp,
       node
@@ -102,11 +121,16 @@ class AsJSONTransform extends ClassDecorator {
     const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
     node.members.push(serializeMethod);
 
-    const deserializeMethod = SimpleParser.parseClassMember(
-      deserializeFunc,
+    //const deserializeMethod = SimpleParser.parseClassMember(
+    //  deserializeFunc,
+    //  node
+    //);
+    //node.members.push(deserializeMethod);
+    const setDataMethod = SimpleParser.parseClassMember(
+      setKeyFunc,
       node
     );
-    node.members.push(deserializeMethod);
+    node.members.push(setDataMethod);
   }
   get name(): string {
     return "json";
