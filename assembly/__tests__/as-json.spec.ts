@@ -1,4 +1,5 @@
 import { JSON } from "..";
+import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-bignum/assembly";
 function canSerde<T>(data: T): void {
   const serialized = JSON.stringify<T>(data);
   const deserialized = JSON.stringify<T>(JSON.parse<T>(serialized));
@@ -39,6 +40,34 @@ describe("Ser/de Numbers", () => {
     canSerde<u64>(101);
     canSerde<i32>(-100);
     canSerde<i64>(-101);
+
+    canSerde<u128>(u128.from("0"))
+    canSerde<u128>(u128.from("100"))
+    canSerde<u128>(u128.from("101"))
+
+    canSerde<u128Safe>(u128Safe.from("0"))
+    canSerde<u128Safe>(u128Safe.from("100"))
+    canSerde<u128Safe>(u128Safe.from("101"))
+    
+    canSerde<u256>(u256.fromU128(u128.from("0")))
+    canSerde<u256>(u256.fromU128(u128.from("100")))
+    canSerde<u256>(u256.fromU128(u128.from("101")))
+
+    canSerde<u256Safe>(u256Safe.fromU128(u128.from("0")))
+    canSerde<u256Safe>(u256Safe.fromU128(u128.from("100")))
+    canSerde<u256Safe>(u256Safe.fromU128(u128.from("101")))
+
+    canSerde<i128>(i128.from("0"))
+    canSerde<i128>(i128.from("100"))
+    canSerde<i128>(i128.from("101"))
+
+    canSerde<i128Safe>(i128Safe.from("0"))
+    canSerde<i128Safe>(i128Safe.from("100"))
+    canSerde<i128Safe>(i128Safe.from("101"))
+    canSerde<i128Safe>(i128Safe.from("-100"))
+    canSerde<i128Safe>(i128Safe.from("-101"))
+
+    canSerde<i256Safe>(new i256Safe(10, 11, 500, 501))
   });
 
   it("should ser/de floats", () => {
@@ -71,6 +100,21 @@ describe("Ser/de Numbers", () => {
       'string with colon : comma , brace [ ] bracket { } and quote " and other quote \\"'
     );
   });
+
+  it("should ser/de BigInt objects", () => {
+    canSerde<i32>(0);
+
+    canSerde<u32>(100);
+    canSerde<u64>(101);
+    canSerde<i32>(-100);
+    canSerde<i64>(-101);
+    canSerde<u128>(u128.from("0"))
+    canSerde<u128>(u128.from("100"))
+    canSerde<u128>(u128.from("101"))
+    canSerde<u128>(u128.from("-100"))
+    canSerde<u128>(u128.from("-101"))
+
+  })
 });
 
 describe("Ser/de Array", () => {

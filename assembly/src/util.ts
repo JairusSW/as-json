@@ -1,6 +1,21 @@
 import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "assemblyscript/std/assembly/util/string";
 import { backSlashCode, quoteCode } from "./chars";
+import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-bignum/assembly";
+
+// @ts-ignore
+@inline
+  export function isBigNum<T>(): boolean {
+  if (idof<T>() == idof<u128>()) return true;
+  if (idof<T>() == idof<u128Safe>()) return true;
+  if (idof<T>() == idof<u256>()) return true;
+  if (idof<T>() == idof<u256Safe>()) return true;
+  if (idof<T>() == idof<i128>()) return true;
+  if (idof<T>() == idof<i128Safe>()) return true;
+  if (idof<T>() == idof<i256Safe>()) return true;
+  return false;
+}
+
 // @ts-ignore
 @inline
 export function unsafeCharCodeAt(data: string, pos: i32): i32 {

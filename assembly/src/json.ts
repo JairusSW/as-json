@@ -1,3 +1,4 @@
+import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-bignum/assembly";
 import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
 import {
@@ -21,12 +22,12 @@ import {
     uCode,
     emptyArrayWord
 } from "./chars";
-import { unsafeCharCodeAt } from "./util";
+import { isBigNum, unsafeCharCodeAt } from "./util";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
-export class JSON {
+export namespace JSON {
     /**
      * Stringifies valid JSON data.
      * ```js
@@ -35,7 +36,7 @@ export class JSON {
      * @param data T
      * @returns string
      */
-    static stringify<T>(data: T): string {
+    export function stringify<T>(data: T): string {
         // String
         if (isString<T>()) {
             return '"' + (<string>data).replaceAll('"', '\\"') + '"';
@@ -77,6 +78,9 @@ export class JSON {
             result.write(JSON.stringify(unchecked(data[data.length - 1])));
             result.write(rightBracketWord);
             return result.toString();
+        } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
+            // @ts-ignore
+            return data.toString();
         } else {
             throw new Error(`Could not serialize data of type ${nameof<T>()}. Invalid data provided.`);
         }
@@ -89,7 +93,7 @@ export class JSON {
      * @param data string
      * @returns T
      */
-    static parse<T>(data: string): T {
+    export function parse<T>(data: string): T {
         let type!: T;
         if (isString<T>()) {
             // @ts-ignore
@@ -109,12 +113,15 @@ export class JSON {
             // @ts-ignore
         } else if (isDefined(type.__JSON_Set_Key)) {
             return parseObject<T>(data.trimStart());
+        } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
+            // @ts-ignore
+            return parseBigNum<T>(data);
         } else {
             // @ts-ignore
             throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Invalide data provided.`);
         }
     }
-    private static parseObjectValue<T>(data: string): T {
+    function parseObjectValue<T>(data: string): T {
         let type!: T;
         if (isString<T>()) {
             // @ts-ignore
@@ -136,12 +143,44 @@ export class JSON {
             // @ts-ignore
             //if (isNullable<T>()) return null;
             return parseObject<T>(data);
+        } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
+            // @ts-ignore
+            return parseBigNum<T>(data);
         } else {
             // @ts-ignore
             //return null;
             throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Invalide data provided.`)
         }
     }
+    /*export class Arr extends Array<Variant> {
+        public data: Variant[] = [];
+        push<T>(data: T): i32 {
+            return this.data.push(Variant.from<T>(data));
+        }
+        at<T>(index: i32): T {
+            return this.data.at(index).get<T>();
+        }
+    }*/
+}
+
+// @ts-ignore
+@inline
+        // @ts-ignore
+    function parseBigNum<T>(data: string): T {
+    // @ts-ignore
+    if (idof<T>() == idof<u128>()) return u128.fromString(data);
+        // @ts-ignore
+    if (idof<T>() == idof<u128Safe>()) return u128Safe.fromString(data);
+        // @ts-ignore
+    if (idof<T>() == idof<u256>()) return u128Safe.fromString(data);
+        // @ts-ignore
+    if (idof<T>() == idof<u256Safe>()) return u256Safe.fromString(data);
+        // @ts-ignore
+    if (idof<T>() == idof<i128>()) return i128.fromString(data);
+        // @ts-ignore
+    if (idof<T>() == idof<i128Safe>()) return i128Safe.fromString(data);
+        // @ts-ignore
+    if (idof<T>() == idof<i256Safe>()) return i256Safe.fromString(data);
 }
 
 // @ts-ignore
@@ -190,7 +229,7 @@ export class JSON {
 
 // @ts-ignore
 @inline
-export function parseObject<T>(data: string): T {
+    export function parseObject<T>(data: string): T {
     let schema: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
     let key = "";
     let isKey = false;

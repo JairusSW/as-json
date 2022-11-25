@@ -1,8 +1,15 @@
 import "wasi";
+import { u128 } from "as-bignum/assembly";
 import {
   JSON
 } from ".";
 
+// @ts-ignore
+@json
+class Stats {
+  wins: u128
+  loss: u128
+}
 // @ts-ignore
 @json
 class Vec3 {
@@ -20,6 +27,7 @@ class Player {
   age: i32;
   pos: Vec3 | null;
   isVerified: boolean;
+  stats: Stats
 }
 
 const player: Player = {
@@ -33,6 +41,10 @@ const player: Player = {
     z: 8.3
   },
   isVerified: true,
+  stats: {
+    wins: u128.fromString("443"),
+    loss: u128.fromString("693")
+  }
 };
 
 const serializedPlayer = JSON.stringify<Player>(player);

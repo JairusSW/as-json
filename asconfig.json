@@ -11,6 +11,8 @@
   },
   "options": {
     "transform": ["./transform"],
-    "bindings": "esm"
-  }
+    "bindings": "esm",
+    "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json"
+  },
+  "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json"
 }
