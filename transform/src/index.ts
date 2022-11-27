@@ -104,7 +104,6 @@ class AsJSONTransform extends ClassDecorator {
         // @ts-ignore
         this.setDataStmts.join("")
         }
-        throw new Error("Cannot find key: " + key);
       }
     `
     //console.log(setKeyFunc, deserializeFunc, serializeFunc)
