@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -11,7 +11,7 @@
   "scripts": {
     "aspect": "asp",
     "bench:astral": "astral",
-    "build:test": "asc assembly/test.ts --target test",
+    "build:test": "asc assembly/test.ts --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --transform \"./transform\" --exportStart _start -o ./build/test.wasm",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:lunatic": "lunatic ./build/test.wasm",
@@ -22,8 +22,9 @@
     "@as-pect/cli": "^7.0.7",
     "@as-tral/cli": "^1.1.1",
     "@assemblyscript/loader": "^0.21.3",
+    "@assemblyscript/wasi-shim": "^0.1.0",
     "@serial-as/json": "^2.0.0",
-    "assemblyscript": "^0.20.7",
+    "assemblyscript": "^0.24.1",
     "assemblyscript-prettier": "^1.0.2",
     "prettier": "^2.7.1",
     "typescript": "^4.7.2"

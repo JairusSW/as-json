@@ -165,8 +165,8 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-        // @ts-ignore
-    function parseBigNum<T>(data: string): T {
+// @ts-ignore
+function parseBigNum<T>(data: string): T {
     // @ts-ignore
     if (idof<T>() == idof<u128>()) return u128.fromString(data);
         // @ts-ignore
@@ -180,18 +180,18 @@ export namespace JSON {
         // @ts-ignore
     if (idof<T>() == idof<i128Safe>()) return i128Safe.fromString(data);
         // @ts-ignore
-    if (idof<T>() == idof<i256Safe>()) return i256Safe.fromString(data);
+    //if (idof<T>() == idof<i256Safe>()) return data.
 }
 
 // @ts-ignore
 @inline
-    function parseString(data: string): string {
+function parseString(data: string): string {
     return data.slice(1, data.length - 1).replaceAll('\\"', '"');
 }
 
 // @ts-ignore
 @inline
-    function parseBoolean<T extends boolean>(data: string): T {
+function parseBoolean<T extends boolean>(data: string): T {
     if (data.length > 3 && data.startsWith("true")) return <T>true;
     else if (data.length > 4 && data.startsWith("false")) return <T>false;
     else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
@@ -199,7 +199,7 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-    function parseNumber<T>(data: string): T {
+function parseNumber<T>(data: string): T {
     let type: T;
     // @ts-ignore
     if (type instanceof f64) return F64.parseFloat(data);
@@ -221,15 +221,15 @@ export namespace JSON {
     else if (type instanceof i16) return I16.parseInt(data);
     // @ts-ignore
     else if (type instanceof i8) return I8.parseInt(data);
-    else
-        throw new Error(
-            `JSON: Cannot parse invalid data into a number. Either "${data}" is not a valid number, or <${nameof<T>()}> is an invald number type.`
-        );
+
+    throw new Error(
+        `JSON: Cannot parse invalid data into a number. Either "${data}" is not a valid number, or <${nameof<T>()}> is an invald number type.`
+    );
 }
 
 // @ts-ignore
 @inline
-    export function parseObject<T>(data: string): T {
+export function parseObject<T>(data: string): T {
     let schema: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
     let key = "";
     let isKey = false;
@@ -251,6 +251,7 @@ export namespace JSON {
                     depth = depth >> 1;
                     if (depth === 1) {
                         ++arrayValueIndex;
+                        // @ts-ignore
                         schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, arrayValueIndex));
                         outerLoopIndex = arrayValueIndex;
                         isKey = false;
@@ -271,6 +272,7 @@ export namespace JSON {
                     depth = depth >> 1;
                     if (depth === 1) {
                         ++objectValueIndex;
+                        // @ts-ignore
                         schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, objectValueIndex));
                         outerLoopIndex = objectValueIndex;
                         isKey = false;
@@ -293,6 +295,7 @@ export namespace JSON {
                         key = data.slice(outerLoopIndex, stringValueIndex);
                         isKey = true;
                     } else {
+                        // @ts-ignore
                         schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, stringValueIndex));
                         isKey = false;
                     }
@@ -301,6 +304,7 @@ export namespace JSON {
                 }
             }
         } else if (char == nCode) {
+            // @ts-ignore
             schema.__JSON_Set_Key(key, nullWord);
             isKey = false;
         } else if (
@@ -309,6 +313,7 @@ export namespace JSON {
             unsafeCharCodeAt(data, ++outerLoopIndex) === uCode &&
             unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
         ) {
+            // @ts-ignore
             schema.__JSON_Set_Key(key, trueWord);
             isKey = false;
         } else if (
@@ -318,6 +323,7 @@ export namespace JSON {
             unsafeCharCodeAt(data, ++outerLoopIndex) === "s".charCodeAt(0) &&
             unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
         ) {
+            // @ts-ignore
             schema.__JSON_Set_Key(key, "false");
             isKey = false;
         } else if ((char >= 48 && char <= 57) || char === 45) {
@@ -325,6 +331,7 @@ export namespace JSON {
             for (; numberValueIndex < data.length; numberValueIndex++) {
                 char = unsafeCharCodeAt(data, numberValueIndex);
                 if (char === commaCode || char === rightBraceCode || isSpace(char)) {
+                    // @ts-ignore
                     schema.__JSON_Set_Key(key, data.slice(outerLoopIndex - 1, numberValueIndex));
                     outerLoopIndex = numberValueIndex;
                     isKey = false;
@@ -338,8 +345,8 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-    // @ts-ignore
-    export function parseArray<T extends unknown[]>(data: string): T {
+// @ts-ignore
+export function parseArray<T extends unknown[]>(data: string): T {
     let type!: valueof<T>;
     if (type instanceof String) {
         return <T>parseStringArray(data);
@@ -361,7 +368,7 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-    export function parseStringArray(data: string): string[] {
+export function parseStringArray(data: string): string[] {
     const result: string[] = [];
     let lastPos = 0;
     let instr = false;
@@ -381,7 +388,7 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-    export function parseBooleanArray<T extends boolean[]>(data: string): T {
+export function parseBooleanArray<T extends boolean[]>(data: string): T {
     const result = instantiate<T>();
     let lastPos = 1;
     let char = 0;
@@ -409,7 +416,7 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-    export function parseNumberArray<T extends number[]>(data: string): T {
+export function parseNumberArray<T extends number[]>(data: string): T {
     const result = instantiate<T>();
     let lastPos = 0;
     let char = 0;
@@ -435,7 +442,7 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-    export function parseArrayArray<T extends unknown[][]>(data: string): T {
+export function parseArrayArray<T extends unknown[][]>(data: string): T {
     const result = instantiate<T>();
     let char = 0;
     let lastPos = 0;
@@ -465,7 +472,7 @@ export namespace JSON {
 
 // @ts-ignore
 @inline
-    export function parseObjectArray<T extends unknown[][]>(data: string): T {
+export function parseObjectArray<T extends unknown[][]>(data: string): T {
     const result = instantiate<T>();
     let char = 0;
     let lastPos = 1;

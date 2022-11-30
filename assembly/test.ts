@@ -1,4 +1,4 @@
-import "wasi";
+import { wasi_console } from "@assemblyscript/wasi-shim/assembly/wasi_console"
 import { u128 } from "as-bignum/assembly";
 import {
   JSON
@@ -48,6 +48,6 @@ const player: Player = {
 };
 
 const serializedPlayer = JSON.stringify<Player>(player);
-console.log("Serialized Player: " + serializedPlayer);
+wasi_console.log("Serialized Player: " + serializedPlayer);
 const deserializedPlayer = JSON.parse<Player>(serializedPlayer);
-console.log("Deserialized Player: " + JSON.stringify(deserializedPlayer));
+wasi_console.log("Deserialized Player: " + JSON.stringify(deserializedPlayer));

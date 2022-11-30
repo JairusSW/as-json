@@ -10,15 +10,22 @@ import {
 import { getName, toString } from "visitor-as/dist/utils.js";
 import { SimpleParser } from "visitor-as/dist/index.js";
 
-class AsJSONTransform extends ClassDecorator {
-  public currentClass!: ClassDeclaration;
-  public sources: Source[] = [];
+class SchemaData {
+  public keys: string[] = [];
+  public values: string[] = [];
+  public types: string[] = [];
+  public name: string = "";
+  public parent: string = "";
+  public node!: ClassDeclaration;
   public encodeStmts: string[] = [];
-  //public decodeStmts: string[] = [];
   public setDataStmts: string[] = [];
-  //public checkDecodeStmts: string[] = [];
+}
+class AsJSONTransform extends ClassDecorator {
+  public schemasList: SchemaData[] = [];
+  public currentClass!: SchemaData;
+  public sources: Source[] = [];
 
-  visitMethodDeclaration(): void {}
+  visitMethodDeclaration(): void { }
   visitFieldDeclaration(node: FieldDeclaration): void {
     const lineText = toString(node);
     if (lineText.startsWith("private")) return;
@@ -29,17 +36,17 @@ class AsJSONTransform extends ClassDecorator {
 
     let type = getName(node.type);
     // @ts-ignore
-    this.encodeStmts.push(
+    this.currentClass.encodeStmts.push(
       `"${name}":\${JSON.stringify<${type}>(this.${name})},`
     );
 
     // @ts-ignore
     //this.decodeStmts.push(
-   //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
+    //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
     //);
 
     // @ts-ignore
-    this.setDataStmts.push(
+    this.currentClass.setDataStmts.push(
       `if (key.length === ${name.length} && (memory.compare(changetype<usize>("${name}"), changetype<usize>(key), ${name.length}) == 0)) {
         this.${name} = JSON.parseObjectValue<${type}>(value);
         return;
@@ -57,7 +64,30 @@ class AsJSONTransform extends ClassDecorator {
       return;
     }
 
-    this.currentClass = node;
+    this.currentClass = {
+      name: toString(node.name),
+      keys: [],
+      values: [],
+      types: [],
+      parent: node.extendsType ? toString(node.extendsType) : "",
+      node: node,
+      encodeStmts: [],
+      setDataStmts: []
+    }
+    
+    if (this.currentClass.parent.length > 0) {
+      const parentSchema = this.schemasList.map((v) => {
+        if (v.name == this.currentClass.parent) {
+          return v;
+        }
+      });
+      if (parentSchema.length > 0) {
+        parentSchema[0]?.encodeStmts.push(parentSchema[0]?.encodeStmts.pop() + ",")
+        this.currentClass.encodeStmts.push(...parentSchema[0]?.encodeStmts)
+      } else {
+        //console.log("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?")
+      }
+    }
 
     this.visit(node.members);
 
@@ -65,15 +95,15 @@ class AsJSONTransform extends ClassDecorator {
 
     let serializeFunc = "";
 
-    if (this.encodeStmts.length > 0) {
-      const stmt = this.encodeStmts[this.encodeStmts.length - 1]!;
-      this.encodeStmts[this.encodeStmts.length - 1] = stmt!.slice(
+    if (this.currentClass.encodeStmts.length > 0) {
+      const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1]!;
+      this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] = stmt!.slice(
         0,
         stmt.length - 1
       );
       serializeFunc = `
       __JSON_Serialize(): string {
-        return \`{${this.encodeStmts.join("")}}\`;
+        return \`{${this.currentClass.encodeStmts.join("")}}\`;
       }
       `;
     } else {
@@ -83,34 +113,16 @@ class AsJSONTransform extends ClassDecorator {
       }
       `;
     }
-    /*const deserializeFunc = `
-    __JSON_Deserialize<T>(values: Map<string, string>): T {
-        ${
-          process.argv.includes("--debugJSON")
-            ? this.checkDecodeStmts.join("else")
-            : ""
-        }
-        return {
-          ${
-            // @ts-ignore
-            this.decodeStmts.join("")
-          }
-        }
-    }
-    `;*/
+
     const setKeyFunc = `
       __JSON_Set_Key(key: string, value: string): void {
         ${
-        // @ts-ignore
-        this.setDataStmts.join("")
-        }
+      // @ts-ignore
+      this.currentClass.setDataStmts.join("")
+      }
       }
     `
-    //console.log(setKeyFunc, deserializeFunc, serializeFunc)
-    this.encodeStmts = [];
-    //this.decodeStmts = [];
-    this.setDataStmts = [];
-    //this.checkDecodeStmts = [];
+    //console.log(serializeFunc)
     const serializedProperty = SimpleParser.parseClassMember(
       serializedProp,
       node
@@ -120,16 +132,13 @@ class AsJSONTransform extends ClassDecorator {
     const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
     node.members.push(serializeMethod);
 
-    //const deserializeMethod = SimpleParser.parseClassMember(
-    //  deserializeFunc,
-    //  node
-    //);
-    //node.members.push(deserializeMethod);
     const setDataMethod = SimpleParser.parseClassMember(
       setKeyFunc,
       node
     );
     node.members.push(setDataMethod);
+
+    this.schemasList.push(this.currentClass);
   }
   get name(): string {
     return "json";
