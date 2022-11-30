@@ -81,6 +81,8 @@ export namespace JSON {
         } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
             // @ts-ignore
             return data.toString();
+        } else if (data instanceof Date) {
+            return data.toISOString();
         } else {
             throw new Error(`Could not serialize data of type ${nameof<T>()}. Invalid data provided.`);
         }
