@@ -12,7 +12,7 @@
   "options": {
     "transform": ["./transform"],
     "bindings": "esm",
-    "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json"
+    "exportStart": "_start"
   },
   "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json"
 }

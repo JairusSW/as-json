@@ -44,7 +44,7 @@ describe("Ser/de Numbers", () => {
     canSerde<u128>(u128.from("0"))
     canSerde<u128>(u128.from("100"))
     canSerde<u128>(u128.from("101"))
-
+`
     canSerde<u128Safe>(u128Safe.from("0"))
     canSerde<u128Safe>(u128Safe.from("100"))
     canSerde<u128Safe>(u128Safe.from("101"))

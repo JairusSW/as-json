@@ -11,19 +11,23 @@
   "scripts": {
     "aspect": "asp",
     "bench:astral": "astral",
-    "build:test": "asc assembly/test.ts --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --transform \"./transform\" --exportStart _start -o ./build/test.wasm",
+    "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:lunatic": "lunatic ./build/test.wasm",
     "test:wasm3": "wasm3 ./build/test.wasm",
-    "prettier": "as-prettier -w ."
+    "prettier": "as-prettier -w .",
+    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:release": "asc assembly/index.ts --target release",
+    "asbuild": "yarn asbuild:debug && yarn asbuild:release",
+    "test": "node tests",
+    "start": "npx serve ."
   },
   "devDependencies": {
     "@as-pect/cli": "^7.0.7",
-    "@as-tral/cli": "^1.1.1",
+    "@as-tral/cli": "^1.2.0",
     "@assemblyscript/loader": "^0.21.3",
     "@assemblyscript/wasi-shim": "^0.1.0",
-    "@serial-as/json": "^2.0.0",
     "assemblyscript": "^0.24.1",
     "assemblyscript-prettier": "^1.0.2",
     "prettier": "^2.7.1",
@@ -49,5 +53,11 @@
     "url": "https://github.com/JairusSW/as-json/issues"
   },
   "homepage": "https://github.com/JairusSW/as-json#readme",
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  }
 }
