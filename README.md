@@ -1,10 +1,6 @@
 # AS-JSON
 ![AssemblyScript](https://img.shields.io/badge/AssemblyScript-blue)
 ![WebAssembly](https://img.shields.io/badge/WebAssemby-purple)
-
-## Features
-
-Full
 ## Installation
 
 ```bash
@@ -90,6 +86,19 @@ const stringified = JSON.stringify<Player>(data);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
+# FAQ
+
+**Does it support the JSON specification?**
+Yes, it does. However, dynamic objects and arrays are not supported, but planned in the near future.
+
+**Is it fast?**
+Look below
+
+**How does it compare to other librarys?**
+Its pretty much the same as the other libraries out there (near/assemblyscript-json and @serial-as/json), but it focuses highly on performance
+
+**Will it catch invalid JSON?**
+No, it does not check for invalid JSON, but gives its best shot at parsing instead. Will probably throw an error.
 
 ## Performance
 

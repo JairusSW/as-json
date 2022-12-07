@@ -154,15 +154,11 @@ export namespace JSON {
             throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Invalide data provided.`)
         }
     }
-    /*export class Arr extends Array<Variant> {
-        public data: Variant[] = [];
-        push<T>(data: T): i32 {
-            return this.data.push(Variant.from<T>(data));
-        }
-        at<T>(index: i32): T {
-            return this.data.at(index).get<T>();
-        }
-    }*/
+    // @ts-ignore
+    @unsafe
+    export function createObjectUnsafe<T>(): T {
+        return changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()))
+    }
 }
 
 // @ts-ignore

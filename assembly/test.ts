@@ -4,9 +4,13 @@ import {
 } from ".";
 @json
 class Player {
-  firstName: string
-  lastName: string
-  age: i32
+  firstName: string;
+  lastName: string;
+  lastActive: i32[];
+  age: i32;
+  pos: Vec3 | null;
+  isVerified: boolean;
+  stats: Stats
 }
 
 @json
@@ -15,11 +19,11 @@ class Contacts {
   player: string
 }
 
-const player: Player = {
-  firstName: "John",
-  lastName: "West",
-  age: 23
-}
+const player = JSON.createObjectUnsafe<Player>()
+
+player.firstName = "John";
+player.lastName = "West";
+player.age = 23;
 
 const contact: Contacts = {
   player: JSON.stringify(player),
