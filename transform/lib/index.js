@@ -75,7 +75,7 @@ class AsJSONTransform extends ClassDecorator {
             }
         }
         this.visit(node.members);
-        const serializedProp = '__JSON_Serialized: string = "";';
+        // const serializedProp = '__JSON_Serialized: string = "";';
         let serializeFunc = "";
         if (this.currentClass.encodeStmts.length > 0) {
             const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1];
@@ -101,8 +101,11 @@ class AsJSONTransform extends ClassDecorator {
       }
     `;
         //console.log(serializeFunc)
-        const serializedProperty = SimpleParser.parseClassMember(serializedProp, node);
-        node.members.push(serializedProperty);
+        //const serializedProperty = SimpleParser.parseClassMember(
+        //  serializedProp,
+        //  node
+        //);
+        //node.members.push(serializedProperty);
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
         node.members.push(serializeMethod);
         const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
