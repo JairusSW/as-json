@@ -118,6 +118,9 @@ export namespace JSON {
         } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
             // @ts-ignore
             return parseBigNum<T>(data);
+        } else if (type instanceof Date) {
+            // @ts-ignore
+            return Date.fromString(data);
         } else {
             // @ts-ignore
             throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Invalide data provided.`);

@@ -27,7 +27,7 @@ Or, add it to `asconfig.json`
 ```
 {
   "options": {
-    "transform": "json-as/transform"
+    "transform": ["json-as/transform"]
   }
 }
 ```
@@ -36,14 +36,7 @@ Or, add it to `asconfig.json`
 
 ```js
 import { JSON } from "json-as/assembly";
-import { u128 } from "as-bignum/assembly";
 
-// @ts-ignore
-@json
-class Stats {
-  wins: u128
-  loss: u128
-}
 // @ts-ignore
 @json
 class Vec3 {
@@ -61,7 +54,6 @@ class Player {
   age: i32;
   pos: Vec3 | null;
   isVerified: boolean;
-  stats: Stats
 }
 
 const player: Player = {
@@ -74,14 +66,10 @@ const player: Player = {
     y: 1.2,
     z: 8.3
   },
-  isVerified: true,
-  stats: {
-    wins: u128.fromString("443"),
-    loss: u128.fromString("693")
-  }
+  isVerified: true
 };
 
-const stringified = JSON.stringify<Player>(data);
+const stringified = JSON.stringify<Player>(player);
 
 const parsed = JSON.parse<Player>(stringified);
 ```
@@ -89,17 +77,25 @@ const parsed = JSON.parse<Player>(stringified);
 # FAQ
 
 **Does it support the JSON specification?**
+
 Yes, it does. However, dynamic objects and arrays are not supported, but planned in the near future.
 
 **Is it fast?**
+
 Look below
 
-**How does it compare to other librarys?**
+**How does it compare to other libs?**
+
 Its pretty much the same as the other libraries out there (near/assemblyscript-json and @serial-as/json), but it focuses highly on performance
 
 **Will it catch invalid JSON?**
+
 No, it does not check for invalid JSON, but gives its best shot at parsing instead. Will probably throw an error.
 
+**How does it compare performance-wise to other libraries?**
+
+In my testing, parsing a Vector 2 runs at 2.2m ops/s with as-json and around 10,000 ops/s with assemblyscript-json and @serial-as/json.
+Both are great libraries however.
 ## Performance
 
 **Serialize Object (Vec2):** ~7.20m ops/s
