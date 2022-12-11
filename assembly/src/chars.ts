@@ -25,3 +25,5 @@ export const leftBracketWord = "[";
 export const emptyArrayWord = "[]";
 export const commaWord = ",";
 export const rightBracketWord = "]";
+// Escape Codes
+export const newLineCode = "\n".charCodeAt(0);

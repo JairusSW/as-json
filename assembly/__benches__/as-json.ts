@@ -1,4 +1,7 @@
-import { JSON } from "..";
+bench("1+1", () => {
+  blackbox("1+1".split("+w"))
+})
+/*import { JSON } from "..";
 
 @json
 class Vec2 {
@@ -73,3 +76,4 @@ bench("Stringify Float", () => {
 bench("Parse Float", () => {
   blackbox(JSON.parse<f32>(blackbox("3.14")));
 });
+*/

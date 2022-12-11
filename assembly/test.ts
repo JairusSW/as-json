@@ -1,5 +1,7 @@
 import { wasi_console } from "@assemblyscript/wasi-shim/assembly/wasi_console";
 import { u128 } from "as-bignum/assembly";
+import { Variant } from "as-variant/assembly";
+import { joinIntegerArray } from "assemblyscript/std/assembly/util/string";
 import {
   JSON
 } from ".";
@@ -7,15 +9,15 @@ import {
 // @ts-ignore
 @json
 class Stats {
-  wins!: u128
-  loss!: u128
+  wins: u128
+  loss: u128
 }
 // @ts-ignore
 @json
 class Vec3 {
-  x!: f32;
-  y!: f32;
-  z!: f32;
+  x: f32;
+  y: f32;
+  z: f32;
 }
 
 const vec: Vec3 = {
@@ -27,21 +29,19 @@ const vec: Vec3 = {
 // @ts-ignore
 @json
 class Player {
-  firstName!: string;
-  lastName!: string;
-  lastActive!: i32[];
-  createdAt!: Date;
-  age!: i32;
-  pos!: Vec3 | null;
-  isVerified!: boolean;
-  stats!: Stats
+  firstName: string;
+  lastName: string;
+  lastActive: i32[];
+  age: i32;
+  pos: Vec3 | null;
+  isVerified: boolean;
+  stats: Stats
 }
 
 const player: Player = {
   firstName: "Emmet",
   lastName: "West",
   lastActive: [8, 27, 2022],
-  createdAt: Date.fromString("2021-12-08T00:59:26.230Z"),
   age: 23,
   pos: {
     x: 3.4,
@@ -59,3 +59,5 @@ const serializedPlayer = JSON.stringify<Player>(player);
 wasi_console.log("Serialized Player: " + serializedPlayer);
 const deserializedPlayer = JSON.parse<Player>(serializedPlayer);
 wasi_console.log("Deserialized Player: " + JSON.stringify(deserializedPlayer));
+
+wasi_console.log(JSON.stringify("\n"))

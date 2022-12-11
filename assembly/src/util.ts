@@ -5,7 +5,7 @@ import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-big
 
 // @ts-ignore
 @inline
-  export function isBigNum<T>(): boolean {
+export function isBigNum<T>(): boolean {
   if (idof<T>() == idof<u128>()) return true;
   if (idof<T>() == idof<u128Safe>()) return true;
   if (idof<T>() == idof<u256>()) return true;
@@ -42,4 +42,20 @@ export function removeWhitespace(data: string): string {
     }
   }
   return result.toString();
+}
+
+// @ts-ignore
+@inline
+export function escapeChar(char: string): string {
+  switch (unsafeCharCodeAt(char, 0)) {
+    case 0x22: return '\\"';
+    case 0x5C: return "\\\\";
+    case 0x08: return "\\b";
+    case 0x0A: return "\\n";
+    case 0x0D: return "\\r";
+    case 0x09: return "\\t";
+    case 0x0C: return "\\f";
+    case 0x0B: return "\\u000b";
+    default: return char;
+  }
 }
