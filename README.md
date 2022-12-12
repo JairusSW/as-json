@@ -40,20 +40,20 @@ import { JSON } from "json-as/assembly";
 // @ts-ignore
 @json
 class Vec3 {
-  x: f32;
-  y: f32;
-  z: f32;
+  x!: f32;
+  y!: f32;
+  z!: f32;
 }
 
 // @ts-ignore
 @json
 class Player {
-  firstName: string;
-  lastName: string;
-  lastActive: i32[];
-  age: i32;
-  pos: Vec3 | null;
-  isVerified: boolean;
+  firstName!: string;
+  lastName!: string;
+  lastActive!: i32[];
+  age!: i32;
+  pos!: Vec3 | null;
+  isVerified!: boolean;
 }
 
 const player: Player = {
