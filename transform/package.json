@@ -1,19 +1,17 @@
 {
     "name": "@json-as/transform",
-    "version": "0.5.10",
+    "version": "0.5.11",
     "description": "JSON encoder/decoder for AssemblyScript",
     "main": "./lib/index.js",
     "author": "Jairus Tanaka",
     "contributors": [
         "DogWhich",
-        "Josh Tenner",
+        "Joshua Tenner",
         "Rom"
     ],
     "license": "MIT",
     "devDependencies": {},
-    "dependencies": {
-        "visitor-as": "^0.11.3"
-    },
+    "dependencies": {},
     "repository": {
         "type": "git",
         "url": "git+https://github.com/JairusSW/as-json.git"

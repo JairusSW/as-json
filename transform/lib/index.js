@@ -100,12 +100,7 @@ class AsJSONTransform extends ClassDecorator {
         this.currentClass.setDataStmts.join("")}
       }
     `;
-        //console.log(serializeFunc)
-        //const serializedProperty = SimpleParser.parseClassMember(
-        //  serializedProp,
-        //  node
-        //);
-        //node.members.push(serializedProperty);
+        //console.log(serializeFunc, setKeyFunc)
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
         node.members.push(serializeMethod);
         const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
