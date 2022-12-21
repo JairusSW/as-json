@@ -81,7 +81,7 @@ class AsJSONTransform extends ClassDecorator {
           return v;
         }
       });
-      if (parentSchema.length > 0) {
+      if (parentSchema.length > 0 && parentSchema[0]?.encodeStmts) {
         parentSchema[0]?.encodeStmts.push(parentSchema[0]?.encodeStmts.pop() + ",")
         this.currentClass.encodeStmts.push(...parentSchema[0]?.encodeStmts)
       } else {

@@ -31,7 +31,7 @@ type Null = Nullable | null;
 describe("Ser/de Nulls", () => {
   canSerde<Null>(null);
 });
-/*
+
 describe("Ser/de Numbers", () => {
   it("should ser/de integers", () => {
     canSerde<i32>(0);
@@ -41,10 +41,10 @@ describe("Ser/de Numbers", () => {
     canSerde<i32>(-100);
     canSerde<i64>(-101);
 
-    canSerde<u128>(u128.from("0"))
-    canSerde<u128>(u128.from("100"))
-    canSerde<u128>(u128.from("101"))
-`
+  //  canSerde<u128>(u128.from("0"))
+ //   canSerde<u128>(u128.from("100"))
+   // canSerde<u128>(u128.from("101"))
+
     canSerde<u128Safe>(u128Safe.from("0"))
     canSerde<u128Safe>(u128Safe.from("100"))
     canSerde<u128Safe>(u128Safe.from("101"))
@@ -199,4 +199,4 @@ describe("Ser/de Objects", () => {
       isVerified: true,
     });
   });
-});*/
+});
