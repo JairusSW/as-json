@@ -1,5 +1,5 @@
 import { StringSink } from "as-string-sink/assembly";
-import { isSpace } from "assemblyscript/std/assembly/util/string";
+import { isSpace } from "util/string";
 import { backSlashCode, quoteCode } from "./chars";
 import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-bignum/assembly";
 
@@ -56,6 +56,6 @@ export function escapeChar(char: string): string {
     case 0x09: return "\\t";
     case 0x0C: return "\\f";
     case 0x0B: return "\\u000b";
-    default: return char;
+    default: return char; 
   }
 }

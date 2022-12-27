@@ -64,6 +64,11 @@ class AsJSONTransform extends ClassDecorator {
       return;
     }
 
+    // Prevent from being triggered twice
+    for (const member of node.members) {
+      if (member.name.text == "__JSON_Serialize") return;
+    }
+
     this.currentClass = {
       name: toString(node.name),
       keys: [],

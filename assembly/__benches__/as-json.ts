@@ -31,15 +31,14 @@ bench("Stringify Nested Array", () => {
   blackbox(
     JSON.stringify<string[][]>(
       blackbox([
-        ["a", "b", "c"],
-        ["d", "e", "f"],
+        ["a", "b", "c"]
       ])
     )
   );
 });
 
 bench("Parse Nested Array", () => {
-  blackbox(JSON.parse<string[][]>(blackbox('[["a","b","c"],["d","e","f"]]')));
+  blackbox(JSON.parse<string[][]>(blackbox('[["a","b","c"]]')));
 });
 
 bench("Stringify String", () => {

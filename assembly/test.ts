@@ -32,7 +32,11 @@ class Player {
 const player: Player = {
   firstName: "Emmet",
   lastName: "West",
-  lastActive: [8, 27, 2022],
+  lastActive: [
+    8,
+    27,
+    2022
+  ],
   age: 23,
   isVerified: true,
   stats: {
@@ -44,4 +48,26 @@ const player: Player = {
 const serializedPlayer = JSON.stringify<Player>(player);
 console.log("Serialized Player: " + serializedPlayer);
 const deserializedPlayer = JSON.parse<Player>(serializedPlayer);
-console.log("Deserialized Player: " + JSON.stringify(deserializedPlayer));
+console.log("Deserialized Player: " + JSON.stringify(deserializedPlayer));/*
+
+@json
+class Vec2 {
+  x: f32;
+  y: f32;
+}
+
+const vec: Vec2 = {
+  x: 0.0,
+  y: 0.0,
+}
+
+let i = 5_000_000;
+while (i--) {
+  JSON.stringify<Vec2>(vec);
+}
+let start = Date.now();
+i = 10_000_000;
+while (i--) {
+  JSON.stringify<Vec2>(vec);
+}
+console.log(`Took: ${Date.now() - start}ms`)*/

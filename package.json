@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.5.11",
+  "version": "0.5.12",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -13,7 +13,7 @@
   "scripts": {
     "aspect": "asp",
     "bench:astral": "astral",
-    "build:test": "asc assembly/test.ts --target test",
+    "build:test": "asc assembly/test.ts --target test --runtime stub",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:lunatic": "lunatic ./build/test.wasm",
