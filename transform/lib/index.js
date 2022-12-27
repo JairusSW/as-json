@@ -20,6 +20,8 @@ class AsJSONTransform extends ClassDecorator {
     }
     visitMethodDeclaration() { }
     visitFieldDeclaration(node) {
+        if (toString(node).startsWith("static"))
+            return;
         const lineText = toString(node);
         if (lineText.startsWith("private"))
             return;
@@ -46,9 +48,14 @@ class AsJSONTransform extends ClassDecorator {
         //);
     }
     visitClassDeclaration(node) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         if (!node.members) {
             return;
+        }
+        // Prevent from being triggered twice
+        for (const member of node.members) {
+            if (member.name.text == "__JSON_Serialize")
+                return;
         }
         this.currentClass = {
             name: toString(node.name),
@@ -66,9 +73,9 @@ class AsJSONTransform extends ClassDecorator {
                     return v;
                 }
             });
-            if (parentSchema.length > 0) {
-                (_a = parentSchema[0]) === null || _a === void 0 ? void 0 : _a.encodeStmts.push(((_b = parentSchema[0]) === null || _b === void 0 ? void 0 : _b.encodeStmts.pop()) + ",");
-                this.currentClass.encodeStmts.push(...(_c = parentSchema[0]) === null || _c === void 0 ? void 0 : _c.encodeStmts);
+            if (parentSchema.length > 0 && ((_a = parentSchema[0]) === null || _a === void 0 ? void 0 : _a.encodeStmts)) {
+                (_b = parentSchema[0]) === null || _b === void 0 ? void 0 : _b.encodeStmts.push(((_c = parentSchema[0]) === null || _c === void 0 ? void 0 : _c.encodeStmts.pop()) + ",");
+                this.currentClass.encodeStmts.push(...(_d = parentSchema[0]) === null || _d === void 0 ? void 0 : _d.encodeStmts);
             }
             else {
                 //console.log("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?")
