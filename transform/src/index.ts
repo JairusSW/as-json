@@ -9,6 +9,7 @@ import {
 } from "visitor-as/dist/decorator.js";
 import { getName, toString } from "visitor-as/dist/utils.js";
 import { SimpleParser } from "visitor-as/dist/index.js";
+import { NodeKind } from "types:assemblyscript/src/ast";
 
 class SchemaData {
   public keys: string[] = [];
@@ -27,6 +28,7 @@ class AsJSONTransform extends ClassDecorator {
 
   visitMethodDeclaration(): void { }
   visitFieldDeclaration(node: FieldDeclaration): void {
+    if (toString(node).startsWith("static")) return;
     const lineText = toString(node);
     if (lineText.startsWith("private")) return;
     const name = getName(node);
