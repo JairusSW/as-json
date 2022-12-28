@@ -48,7 +48,9 @@ class AsJSONTransform extends BaseVisitor {
         //);
     }
     visitClassDeclaration(node) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e;
+        if (!((_a = node.decorators) === null || _a === void 0 ? void 0 : _a.length))
+            return;
         let foundDecorator = false;
         for (const decorator of node.decorators) {
             // @ts-ignore
@@ -81,9 +83,9 @@ class AsJSONTransform extends BaseVisitor {
                     return v;
                 }
             });
-            if (parentSchema.length > 0 && ((_a = parentSchema[0]) === null || _a === void 0 ? void 0 : _a.encodeStmts)) {
-                (_b = parentSchema[0]) === null || _b === void 0 ? void 0 : _b.encodeStmts.push(((_c = parentSchema[0]) === null || _c === void 0 ? void 0 : _c.encodeStmts.pop()) + ",");
-                this.currentClass.encodeStmts.push(...(_d = parentSchema[0]) === null || _d === void 0 ? void 0 : _d.encodeStmts);
+            if (parentSchema.length > 0 && ((_b = parentSchema[0]) === null || _b === void 0 ? void 0 : _b.encodeStmts)) {
+                (_c = parentSchema[0]) === null || _c === void 0 ? void 0 : _c.encodeStmts.push(((_d = parentSchema[0]) === null || _d === void 0 ? void 0 : _d.encodeStmts.pop()) + ",");
+                this.currentClass.encodeStmts.push(...(_e = parentSchema[0]) === null || _e === void 0 ? void 0 : _e.encodeStmts);
             }
             else {
                 //console.log("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?")

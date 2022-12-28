@@ -63,6 +63,7 @@ class AsJSONTransform extends BaseVisitor {
     //);
   }
   visitClassDeclaration(node: ClassDeclaration): void {
+    if (!node.decorators?.length) return;
     let foundDecorator = false;
     for (const decorator of node.decorators!) {
       // @ts-ignore
