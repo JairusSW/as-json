@@ -2,14 +2,15 @@ import {
   ClassDeclaration,
   FieldDeclaration,
   Source,
+  Parser
 } from "assemblyscript/dist/assemblyscript";
 import {
   ClassDecorator,
   registerDecorator,
 } from "visitor-as/dist/decorator.js";
 import { getName, toString } from "visitor-as/dist/utils.js";
-import { SimpleParser } from "visitor-as/dist/index.js";
-import { NodeKind } from "types:assemblyscript/src/ast";
+import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
+import { Transform } from "assemblyscript/dist/transform.js";
 
 class SchemaData {
   public keys: string[] = [];
@@ -21,7 +22,7 @@ class SchemaData {
   public encodeStmts: string[] = [];
   public setDataStmts: string[] = [];
 }
-class AsJSONTransform extends ClassDecorator {
+class AsJSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
   public currentClass!: SchemaData;
   public sources: Source[] = [];
@@ -62,6 +63,7 @@ class AsJSONTransform extends ClassDecorator {
     //);
   }
   visitClassDeclaration(node: ClassDeclaration): void {
+    if (node.decorators?.find(v => v?.name?.text?.toLowerCase() != "json")) return;
     if (!node.members) {
       return;
     }
@@ -143,9 +145,22 @@ class AsJSONTransform extends ClassDecorator {
 
     this.schemasList.push(this.currentClass);
   }
-  get name(): string {
-    return "json";
+  visitSource(node: Source): void {
+    super.visitSource(node);
   }
 }
 
-export default registerDecorator(new AsJSONTransform());
+export default class Transformer extends Transform {
+  // Trigger the transform after parse.
+  afterParse(parser: Parser): void {
+    // Create new transform
+    const transformer = new AsJSONTransform();
+    // Loop over every source
+    for (const source of parser.sources) {
+      // Ignore all lib (std lib). Visit everything else.
+      if (!source.isLibrary && !source.internalPath.startsWith(`~lib/`)) {
+        transformer.visit(source);
+      }
+    }
+  }
+};

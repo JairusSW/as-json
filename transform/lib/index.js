@@ -1,6 +1,6 @@
-import { ClassDecorator, registerDecorator, } from "visitor-as/dist/decorator.js";
 import { getName, toString } from "visitor-as/dist/utils.js";
-import { SimpleParser } from "visitor-as/dist/index.js";
+import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
+import { Transform } from "assemblyscript/dist/transform.js";
 class SchemaData {
     constructor() {
         this.keys = [];
@@ -12,7 +12,7 @@ class SchemaData {
         this.setDataStmts = [];
     }
 }
-class AsJSONTransform extends ClassDecorator {
+class AsJSONTransform extends BaseVisitor {
     constructor() {
         super(...arguments);
         this.schemasList = [];
@@ -48,7 +48,9 @@ class AsJSONTransform extends ClassDecorator {
         //);
     }
     visitClassDeclaration(node) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e;
+        if ((_a = node.decorators) === null || _a === void 0 ? void 0 : _a.find(v => { var _a, _b; return ((_b = (_a = v === null || v === void 0 ? void 0 : v.name) === null || _a === void 0 ? void 0 : _a.text) === null || _b === void 0 ? void 0 : _b.toLowerCase()) != "json"; }))
+            return;
         if (!node.members) {
             return;
         }
@@ -73,9 +75,9 @@ class AsJSONTransform extends ClassDecorator {
                     return v;
                 }
             });
-            if (parentSchema.length > 0 && ((_a = parentSchema[0]) === null || _a === void 0 ? void 0 : _a.encodeStmts)) {
-                (_b = parentSchema[0]) === null || _b === void 0 ? void 0 : _b.encodeStmts.push(((_c = parentSchema[0]) === null || _c === void 0 ? void 0 : _c.encodeStmts.pop()) + ",");
-                this.currentClass.encodeStmts.push(...(_d = parentSchema[0]) === null || _d === void 0 ? void 0 : _d.encodeStmts);
+            if (parentSchema.length > 0 && ((_b = parentSchema[0]) === null || _b === void 0 ? void 0 : _b.encodeStmts)) {
+                (_c = parentSchema[0]) === null || _c === void 0 ? void 0 : _c.encodeStmts.push(((_d = parentSchema[0]) === null || _d === void 0 ? void 0 : _d.encodeStmts.pop()) + ",");
+                this.currentClass.encodeStmts.push(...(_e = parentSchema[0]) === null || _e === void 0 ? void 0 : _e.encodeStmts);
             }
             else {
                 //console.log("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?")
@@ -114,8 +116,22 @@ class AsJSONTransform extends ClassDecorator {
         node.members.push(setDataMethod);
         this.schemasList.push(this.currentClass);
     }
-    get name() {
-        return "json";
+    visitSource(node) {
+        super.visitSource(node);
     }
 }
-export default registerDecorator(new AsJSONTransform());
+export default class Transformer extends Transform {
+    // Trigger the transform after parse.
+    afterParse(parser) {
+        // Create new transform
+        const transformer = new AsJSONTransform();
+        // Loop over every source
+        for (const source of parser.sources) {
+            // Ignore all lib (std lib). Visit everything else.
+            if (!source.isLibrary && !source.internalPath.startsWith(`~lib/`)) {
+                transformer.visit(source);
+            }
+        }
+    }
+}
+;
