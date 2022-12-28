@@ -4,7 +4,7 @@ import {
 } from ".";
 
 // @ts-ignore
-@json
+@JSON
 class Vec3 {
   x: f32 = 3.4;
   y: f32 = 1.2;
@@ -12,7 +12,7 @@ class Vec3 {
 }
 
 // @ts-ignore
-@json
+@JSON
 class Stats extends Vec3 {
   wins: u128
   loss: u128

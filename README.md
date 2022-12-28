@@ -37,16 +37,14 @@ Or, add it to `asconfig.json`
 ```js
 import { JSON } from "json-as/assembly";
 
-// @ts-ignore
-@json
+@JSON
 class Vec3 {
   x!: f32;
   y!: f32;
   z!: f32;
 }
 
-// @ts-ignore
-@json
+@JSON
 class Player {
   firstName!: string;
   lastName!: string;
