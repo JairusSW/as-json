@@ -37,6 +37,7 @@ Or, add it to `asconfig.json`
 ```js
 import { JSON } from "json-as/assembly";
 
+// @json or @serializable work here
 @JSON
 class Vec3 {
   x!: f32;
