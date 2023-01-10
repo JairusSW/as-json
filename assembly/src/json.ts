@@ -394,13 +394,15 @@ function parseArray<T extends unknown[]>(data: string): T {
         // @ts-ignore
         return parseArrayArray<T>(data);
         // @ts-ignore
-    }
-    const type = instantiate<T>();
-    // @ts-ignore
-    if (isDefined(type.__JSON_Set_Key)) {
+    } else if (isManaged<valueof<T>>() || isReference<valueof<T>>()) {
+        const type = changetype<nonnull<valueof<T>>>(__new(offsetof<nonnull<valueof<T>>>(), idof <nonnull<valueof<T>>>()));
         // @ts-ignore
-        return parseObjectArray<T>(data);
+        if (isDefined(type.__JSON_Set_Key)) {
+            // @ts-ignore
+            return parseObjectArray<T>(data);
+        }
     }
+    return unreachable();
 }
 
 // @ts-ignore
