@@ -59,3 +59,22 @@ export function escapeChar(char: string): string {
     default: return char; 
   }
 }
+
+/**
+ * A terrible function which finds the depth of a certain array.
+ * Suffers no overhead besides function calling and a if/else.
+ * @returns depth of array
+ */
+export function getArrayDepth<T>(depth: i32 = 1): i32 {
+  // @ts-ignore
+  if (isArray<T>()) {
+    return 0;
+    // @ts-ignore
+  } else if (isArray<valueof<T>>()) {
+    depth++;
+    // @ts-ignore
+    return getArrayDepth<valueof<T>>(depth);
+  } else {
+    return depth;
+  }
+}

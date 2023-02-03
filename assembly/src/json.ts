@@ -401,6 +401,7 @@ function parseArray<T extends unknown[]>(data: string): T {
             // @ts-ignore
             return parseObjectArray<T>(data);
         }
+        return unreachable();
     }
     return unreachable();
 }
@@ -510,29 +511,24 @@ function parseArrayArray<T extends unknown[][]>(data: string): T {
 }
 
 // @ts-ignore
-@inline
-function parseObjectArray<T extends unknown[][]>(data: string): T {
+export function parseObjectArray<T extends unknown[]>(data: string): T {
     const result = instantiate<T>();
     let char = 0;
-    let lastPos = 1;
-    let depth = 1;
-    let i = 1;
-    // Find start of bracket
-    //for (; unsafeCharCodeAt(data, i) !== leftBracketCode; i++) { }
-    //i++;
-    for (; i < data.length - 1; i++) {
-        char = unsafeCharCodeAt(data, i);
+    let lastPos: u32 = 1;
+    let depth: u32 = 0;
+    for (let pos: u32 = 0; pos < <u32>data.length; pos++) {
+        char = unsafeCharCodeAt(data, pos);
         if (char === leftBraceCode) {
-            if (depth === 1) {
-                lastPos = i;
+            if (depth === 0) {
+                lastPos = pos;
             }
-            // Shifting is 6% faster than incrementing
-            depth = depth << 1;
+            depth++;
         } else if (char === rightBraceCode) {
-            depth = depth >> 1;
-            if (depth === 1) {
-                i++;
-                result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
+            depth--;
+            if (depth === 0) {
+                pos++;
+                result.push(JSON.parse<valueof<T>>(data.slice(lastPos, pos)));
+                lastPos = pos + 2;
             }
         }
     }
