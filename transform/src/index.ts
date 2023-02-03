@@ -4,11 +4,7 @@ import {
   Source,
   Parser
 } from "assemblyscript/dist/assemblyscript";
-import {
-  ClassDecorator,
-  registerDecorator,
-} from "visitor-as/dist/decorator.js";
-import { getName, toString } from "visitor-as/dist/utils.js";
+import { getName, toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 
@@ -63,6 +59,7 @@ class AsJSONTransform extends BaseVisitor {
     //);
   }
   visitClassDeclaration(node: ClassDeclaration): void {
+    const className = node.name.text;
     if (!node.decorators?.length) return;
     let foundDecorator = false;
     for (const decorator of node.decorators!) {
@@ -70,9 +67,6 @@ class AsJSONTransform extends BaseVisitor {
       if (decorator.name.text.toLowerCase() == "json" || decorator.name.text.toLowerCase() == "serializable") foundDecorator = true;
     }
     if (!foundDecorator) return;
-    if (!node.members) {
-      return;
-    }
 
     // Prevent from being triggered twice
     for (const member of node.members) {
@@ -80,7 +74,7 @@ class AsJSONTransform extends BaseVisitor {
     }
 
     this.currentClass = {
-      name: toString(node.name),
+      name: className,
       keys: [],
       values: [],
       types: [],
@@ -89,24 +83,18 @@ class AsJSONTransform extends BaseVisitor {
       encodeStmts: [],
       setDataStmts: []
     }
-    
+
     if (this.currentClass.parent.length > 0) {
-      const parentSchema = this.schemasList.map((v) => {
-        if (v.name == this.currentClass.parent) {
-          return v;
-        }
-      });
-      if (parentSchema.length > 0 && parentSchema[0]?.encodeStmts) {
-        parentSchema[0]?.encodeStmts.push(parentSchema[0]?.encodeStmts.pop() + ",")
-        this.currentClass.encodeStmts.push(...parentSchema[0]?.encodeStmts)
+      const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
+      if (parentSchema?.encodeStmts) {
+        parentSchema?.encodeStmts.push(parentSchema?.encodeStmts.pop() + ",");
+        this.currentClass.encodeStmts.push(...parentSchema?.encodeStmts);
       } else {
-        //console.log("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?")
+        console.error("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?");
       }
     }
 
     this.visit(node.members);
-
-   // const serializedProp = '__JSON_Serialized: string = "";';
 
     let serializeFunc = "";
 
@@ -138,8 +126,6 @@ class AsJSONTransform extends BaseVisitor {
       }
     `
 
-    //console.log(serializeFunc, setKeyFunc)
-
     const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
     node.members.push(serializeMethod);
 
@@ -163,8 +149,8 @@ export default class Transformer extends Transform {
     const transformer = new AsJSONTransform();
     // Loop over every source
     for (const source of parser.sources) {
-      // Ignore all lib (std lib). Visit everything else.
-      if (!source.isLibrary && !source.internalPath.startsWith(`~lib/`)) {
+      // Ignore all lib and std. Visit everything else.
+      if (!isStdlib(source)) {
         transformer.visit(source);
       }
     }

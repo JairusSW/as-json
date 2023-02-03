@@ -1,4 +1,4 @@
-import { getName, toString } from "visitor-as/dist/utils.js";
+import { getName, toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 class SchemaData {
@@ -48,7 +48,8 @@ class AsJSONTransform extends BaseVisitor {
         //);
     }
     visitClassDeclaration(node) {
-        var _a, _b, _c, _d, _e;
+        var _a;
+        const className = node.name.text;
         if (!((_a = node.decorators) === null || _a === void 0 ? void 0 : _a.length))
             return;
         let foundDecorator = false;
@@ -59,16 +60,13 @@ class AsJSONTransform extends BaseVisitor {
         }
         if (!foundDecorator)
             return;
-        if (!node.members) {
-            return;
-        }
         // Prevent from being triggered twice
         for (const member of node.members) {
             if (member.name.text == "__JSON_Serialize")
                 return;
         }
         this.currentClass = {
-            name: toString(node.name),
+            name: className,
             keys: [],
             values: [],
             types: [],
@@ -78,21 +76,16 @@ class AsJSONTransform extends BaseVisitor {
             setDataStmts: []
         };
         if (this.currentClass.parent.length > 0) {
-            const parentSchema = this.schemasList.map((v) => {
-                if (v.name == this.currentClass.parent) {
-                    return v;
-                }
-            });
-            if (parentSchema.length > 0 && ((_b = parentSchema[0]) === null || _b === void 0 ? void 0 : _b.encodeStmts)) {
-                (_c = parentSchema[0]) === null || _c === void 0 ? void 0 : _c.encodeStmts.push(((_d = parentSchema[0]) === null || _d === void 0 ? void 0 : _d.encodeStmts.pop()) + ",");
-                this.currentClass.encodeStmts.push(...(_e = parentSchema[0]) === null || _e === void 0 ? void 0 : _e.encodeStmts);
+            const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
+            if (parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts) {
+                parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts.push((parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts.pop()) + ",");
+                this.currentClass.encodeStmts.push(...parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts);
             }
             else {
-                //console.log("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?")
+                console.error("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?");
             }
         }
         this.visit(node.members);
-        // const serializedProp = '__JSON_Serialized: string = "";';
         let serializeFunc = "";
         if (this.currentClass.encodeStmts.length > 0) {
             const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1];
@@ -117,7 +110,6 @@ class AsJSONTransform extends BaseVisitor {
         this.currentClass.setDataStmts.join("")}
       }
     `;
-        //console.log(serializeFunc, setKeyFunc)
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
         node.members.push(serializeMethod);
         const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
@@ -135,8 +127,8 @@ export default class Transformer extends Transform {
         const transformer = new AsJSONTransform();
         // Loop over every source
         for (const source of parser.sources) {
-            // Ignore all lib (std lib). Visit everything else.
-            if (!source.isLibrary && !source.internalPath.startsWith(`~lib/`)) {
+            // Ignore all lib and std. Visit everything else.
+            if (!isStdlib(source)) {
                 transformer.visit(source);
             }
         }
