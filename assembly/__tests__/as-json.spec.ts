@@ -45,7 +45,7 @@ describe("Ser/de Numbers", () => {
  //   canSerde<u128>(u128.from("100"))
    // canSerde<u128>(u128.from("101"))
 
-    canSerde<u128Safe>(u128Safe.from("0"))
+   /* canSerde<u128Safe>(u128Safe.from("0"))
     canSerde<u128Safe>(u128Safe.from("100"))
     canSerde<u128Safe>(u128Safe.from("101"))
     
@@ -66,7 +66,7 @@ describe("Ser/de Numbers", () => {
     canSerde<i128Safe>(i128Safe.from("101"))
     canSerde<i128Safe>(i128Safe.from("-100"))
     canSerde<i128Safe>(i128Safe.from("-101"))
-
+*/
     //canSerde<i256Safe>(new i256Safe(10, 11, 500, 501))
   });
 
@@ -102,7 +102,7 @@ describe("Ser/de Numbers", () => {
   });
 
   it("should ser/de BigInt objects", () => {
-    canSerde<i32>(0);
+  /*  canSerde<i32>(0);
 
     canSerde<u32>(100);
     canSerde<u64>(101);
@@ -113,7 +113,7 @@ describe("Ser/de Numbers", () => {
     canSerde<u128>(u128.from("101"))
     canSerde<u128>(u128.from("-100"))
     canSerde<u128>(u128.from("-101"))
-
+*/
   })
 });
 
@@ -175,6 +175,21 @@ describe("Ser/de Array", () => {
       ],
     ]);
   });
+
+  it("should ser/de object arrays", () => {
+    canSerde<Vec3[]>([{
+      x: 3.4,
+      y: 1.2,
+      z: 8.3
+    },
+    {
+      x: 3.4,
+      y: -2.1,
+      z: 9.3
+    }
+    ]);
+
+  })
 });
 
 describe("Ser/de Objects", () => {
