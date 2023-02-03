@@ -9,9 +9,9 @@ function canSerde<T>(data: T): void {
 // @ts-ignore
 @json
 class Vec3 {
-  x: f32;
-  y: f32;
-  z: f32;
+  x: f64;
+  y: f64;
+  z: f64;
 }
 
 // @ts-ignore
@@ -136,6 +136,7 @@ describe("Ser/de Array", () => {
   });
 
   it("should ser/de string arrays", () => {
+    // ["abcdefg","st\\"ring\\" w\\"\\"ith quotes\\"","string \\t\\r\\"with ran\\tdom spa\\nces and \\nnewlines\\n\\n\\n","string with colon : comma , brace [ ] bracket { } and quote \\" and other quote \\""]
     canSerde<string[]>([
       "abcdefg",
       'st"ring" w""ith quotes"',
