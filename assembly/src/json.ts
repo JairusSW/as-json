@@ -241,7 +241,7 @@ export function parseNumber<T>(data: string): T {
     // @ts-ignore
     const type: T = 0;
     // @ts-ignore
-    if (type instanceof f64) return f32.parse(data);
+    if (type instanceof f64) return f64.parse(data);
     // @ts-ignore
     else if (type instanceof f32) return f32.parse(data);
     // @ts-ignore
@@ -268,7 +268,7 @@ function parseObject<T>(data: string): T {
     let schema: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
     let key = "";
     let isKey = false;
-    let depth = 1;
+    let depth = 0;
     let char = 0;
     let outerLoopIndex = 1;
     for (; outerLoopIndex < data.length - 1; outerLoopIndex++) {
@@ -281,10 +281,10 @@ function parseObject<T>(data: string): T {
             ) {
                 char = unsafeCharCodeAt(data, arrayValueIndex);
                 if (char === leftBracketCode) {
-                    depth = depth << 1;
+                    depth++;
                 } else if (char === rightBracketCode) {
-                    depth = depth >> 1;
-                    if (depth === 1) {
+                    depth--;
+                    if (depth === 0) {
                         ++arrayValueIndex;
                         // @ts-ignore
                         schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, arrayValueIndex));
@@ -302,10 +302,10 @@ function parseObject<T>(data: string): T {
             ) {
                 char = unsafeCharCodeAt(data, objectValueIndex);
                 if (char === leftBraceCode) {
-                    depth = depth << 1;
+                    depth++;
                 } else if (char === rightBraceCode) {
-                    depth = depth >> 1;
-                    if (depth === 1) {
+                    depth--;
+                    if (depth === 0) {
                         ++objectValueIndex;
                         // @ts-ignore
                         schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, objectValueIndex));

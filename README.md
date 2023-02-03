@@ -73,28 +73,10 @@ const stringified = JSON.stringify<Player>(player);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
-# FAQ
+# Notes
 
-**Does it support the JSON specification?**
+Performance is nearly equal to the JavaScript JSON implementation which is in C++.
 
-Yes, it does. However, dynamic objects and arrays are not supported, but planned in the near future.
-
-**Is it fast?**
-
-Look below
-
-**How does it compare to other libs?**
-
-Its pretty much the same as the other libraries out there (near/assemblyscript-json and @serial-as/json), but it focuses highly on performance
-
-**Will it catch invalid JSON?**
-
-No, it does not check for invalid JSON, but gives its best shot at parsing instead. Will probably throw an error.
-
-**How does it compare performance-wise to other libraries?**
-
-In my testing, parsing a Vector 2 runs at 2.2m ops/s with as-json and around 10,000 ops/s with assemblyscript-json and @serial-as/json.
-Both are great libraries however.
 ## Performance
 
 **Serialize Object (Vec2):** ~7.20m ops/s

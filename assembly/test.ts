@@ -1,9 +1,17 @@
 import { u128 } from "as-bignum/assembly";
-import { Candle } from "./Candle";
 import {
   JSON
 } from ".";
 
+const exp = `["abcdefg","st\\"ring\\" w\\"\\"ith quotes\\"","string \\t\\r\\"with ran\\tdom spa\\nces and \\nnewlines\\n\\n\\n","string with colon : comma , brace [ ] bracket { } and quote \\" and other quote \\""]`;
+
+console.log(exp);
+console.log(JSON.stringify([
+  "abcdefg",
+  'st"ring" w""ith quotes"',
+  'string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n',
+  'string with colon : comma , brace [ ] bracket { } and quote " and other quote "',
+]))
 // @ts-ignore
 @JSON
 class Vec3 {
