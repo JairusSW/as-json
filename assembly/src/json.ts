@@ -528,7 +528,7 @@ export function parseObjectArray<T extends unknown[]>(data: string): T {
             if (depth === 0) {
                 pos++;
                 result.push(JSON.parse<valueof<T>>(data.slice(lastPos, pos)));
-                lastPos = pos + 2;
+                //lastPos = pos + 2;
             }
         }
     }
