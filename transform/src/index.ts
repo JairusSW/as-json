@@ -94,7 +94,9 @@ class AsJSONTransform extends BaseVisitor {
       }
     }
 
-    this.visit(node.members);
+    const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
+    const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])]
+    this.visit(members);
 
     let serializeFunc = "";
 
