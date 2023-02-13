@@ -486,7 +486,7 @@ function parseArrayArray<T extends unknown[][]>(data: string): T {
     const result = instantiate<T>();
     let char = 0;
     let lastPos = 0;
-    let depth = 1;
+    let depth = 0;
     let i = 1;
     // Find start of bracket
     //for (; unsafeCharCodeAt(data, i) !== leftBracketCode; i++) {}
@@ -494,14 +494,14 @@ function parseArrayArray<T extends unknown[][]>(data: string): T {
     for (; i < data.length - 1; i++) {
         char = unsafeCharCodeAt(data, i);
         if (char === leftBracketCode) {
-            if (depth === 1) {
+            if (depth === 0) {
                 lastPos = i;
             }
             // Shifting is 6% faster than incrementing
-            depth = depth << 1;
+            depth++;
         } else if (char === rightBracketCode) {
-            depth = depth >> 1;
-            if (depth === 1) {
+            depth--;
+            if (depth === 0) {
                 i++;
                 result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
             }
