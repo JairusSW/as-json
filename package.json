@@ -27,14 +27,14 @@
     "@assemblyscript/wasi-shim": "^0.1.0",
     "assemblyscript": "^0.27.0",
     "assemblyscript-prettier": "^1.0.7",
-    "prettier": "^2.8.3",
+    "prettier": "^2.8.4",
     "typescript": "^4.9.5",
     "visitor-as": "^0.11.4"
   },
   "dependencies": {
-    "as-string-sink": "^0.5.0",
-    "as-variant": "^0.4.1",
-    "as-bignum": "^0.2.23"
+    "as-bignum": "^0.2.23",
+    "as-string-sink": "^0.5.3",
+    "as-variant": "^0.4.1"
   },
   "repository": {
     "type": "git",
