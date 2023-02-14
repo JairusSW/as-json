@@ -85,7 +85,9 @@ class AsJSONTransform extends BaseVisitor {
                 console.error("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?");
             }
         }
-        this.visit(node.members);
+        const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
+        const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])];
+        this.visit(members);
         let serializeFunc = "";
         if (this.currentClass.encodeStmts.length > 0) {
             const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1];
