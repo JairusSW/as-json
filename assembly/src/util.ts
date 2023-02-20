@@ -67,7 +67,7 @@ export function escapeChar(char: string): string {
  */
 export function getArrayDepth<T>(depth: i32 = 1): i32 {
   // @ts-ignore
-  if (isArray<T>()) {
+  if (!isArray<T>()) {
     return 0;
     // @ts-ignore
   } else if (isArray<valueof<T>>()) {
