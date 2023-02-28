@@ -128,7 +128,7 @@ export namespace JSON {
             // @ts-ignore
             return data.toString();
         } else {
-            throw new Error(`Could not serialize data of type ${nameof<T>()}. Invalid data provided.`);
+            throw new Error(`Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
         }
     }
     /**
@@ -165,7 +165,7 @@ export namespace JSON {
             return parseBigNum<T>(data);
         } else {
             // @ts-ignore
-            throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Invalide data provided.`);
+            throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
         }
     }
     // @ts-ignore
@@ -194,8 +194,7 @@ export namespace JSON {
             return parseBigNum<T>(data);
         } else {
             // @ts-ignore
-            //return null;
-            throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Invalide data provided.`)
+            throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`)
         }
     }
 }
