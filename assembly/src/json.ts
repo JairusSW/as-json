@@ -39,7 +39,7 @@ export namespace JSON {
      */
     export function stringify<T>(data: T): string {
         // String
-        if (isString<T>()) {
+        if (isString<T>() && data != null) {
             let result = new StringSink("\"");
             // @ts-ignore
             for (let i = 0; i < data.length; i++) {
