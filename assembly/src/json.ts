@@ -40,57 +40,7 @@ export namespace JSON {
     export function stringify<T>(data: T): string {
         // String
         if (isString<T>() && data != null) {
-            // @ts-ignore
-            if (data.length === 0) return "\"\"";
-
-            let result = "\"";
-
-            let char: i32 = 0;
-            let last: i32 = 0;
-            let found: boolean = false;
-            // @ts-ignore
-            for (let i = 0; i < data.length; i++) {
-                char = unsafeCharCodeAt(<string>data, i);
-                if (char === 34 || char === 92) {
-                    result += (<string>data).slice(last, i) + "\\";
-                    last = i;
-                    found = true;
-                    i++;
-                } else if (char <= 13 && char >= 8) {
-                    result += (<string>data).slice(last, i);
-                    last = ++i;
-                    found = true;
-                    switch (char) {
-                        case 0x5C: {
-                            result += "\\\\";
-                            break;
-                        }
-                        case 0x08: {
-                            result += "\\b";
-                            break;
-                        }
-                        case 0x0D: {
-                            result += "\\r";
-                            break;
-                        }
-                        case 0x09: {
-                            result += "\\t";
-                            break;
-                        }
-                        case 0x0C: {
-                            result += "\\f";
-                            break;
-                        }
-                        case 0x0B: {
-                            result += "\\u000b";
-                            break;
-                        }
-                    }
-                }
-            }// 8 10 13 9 12
-            if (!found) return "\"" + data + "\"";
-            else result += (<string>data).slice(last);
-            return result + "\"";
+            return serializeString(data);
         }
         // Boolean
         else if (isBoolean<T>()) {
@@ -120,9 +70,27 @@ export namespace JSON {
             if (data.length == 0) {
                 return emptyArrayWord;
             } else if (isString<valueof<T>>()) {
-
+                let result = "[";
+                for (let i = 0; i < data.length - 1; i++) {
+                    // @ts-ignore
+                    result += serializeString(unchecked(data[i]));
+                    result += commaWord;
+                }
+                result += serializeString(unchecked(data[data.length - 1]));
+                result += rightBracketWord;
+                return result;
             } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
-
+                let result = new StringSink(leftBracketWord);
+                // @ts-ignore
+                for (let i = 0; i < data.length - 1; i++) {
+                    // @ts-ignore
+                    result.write(JSON.stringify(unchecked(data[i])));
+                    result.write(commaWord);
+                }
+                // @ts-ignore
+                result.write(JSON.stringify(unchecked(data[data.length - 1])));
+                result.write(rightBracketWord);
+                return result.toString();
             } else {
                 let result = new StringSink(leftBracketWord);
                 // @ts-ignore
@@ -214,6 +182,94 @@ export namespace JSON {
 // @ts-ignore
 @inline
 // @ts-ignore
+function serializeString(data: string): string {
+    // @ts-ignore
+    if (data.length === 0) return "\"\"";
+    // Fast path for Vectors (3)
+    let char: i32 = 0;
+    if (data.length === 1) {
+        char === unsafeCharCodeAt(data, 0);
+        if (char === 34) {
+            return "\\\"";
+        } else if (char === 92) {
+            return "\\n";
+        } else if (char <= 13 && char >= 8) {
+            switch (char) {
+                case 0x5C: {
+                    return "\\\\";
+                }
+                case 0x08: {
+                    return "\\b";
+                }
+                case 0x0D: {
+                    return "\\r";
+                }
+                case 0x09: {
+                    return "\\t";
+                }
+                case 0x0C: {
+                    return "\\f";
+                }
+                case 0x0B: {
+                    return "\\u000b";
+                }
+            }
+        } else {
+            return data;
+        }
+    }
+
+    let result = "\"";
+
+    let last: i32 = 0;
+    let found: boolean = false;
+    // @ts-ignore
+    for (let i = 0; i < data.length; i++) {
+        char = unsafeCharCodeAt(<string>data, i);
+        if (char === 34 || char === 92) {
+            result += (<string>data).slice(last, i) + "\\";
+            last = i;
+            found = true;
+            i++;
+        } else if (char <= 13 && char >= 8) {
+            result += (<string>data).slice(last, i);
+            last = ++i;
+            found = true;
+            switch (char) {
+                case 0x5C: {
+                    result += "\\\\";
+                    break;
+                }
+                case 0x08: {
+                    result += "\\b";
+                    break;
+                }
+                case 0x0D: {
+                    result += "\\r";
+                    break;
+                }
+                case 0x09: {
+                    result += "\\t";
+                    break;
+                }
+                case 0x0C: {
+                    result += "\\f";
+                    break;
+                }
+                case 0x0B: {
+                    result += "\\u000b";
+                    break;
+                }
+            }
+        }
+    }// 8 10 13 9 12
+    if (!found) return "\"" + data + "\"";
+    else result += (<string>data).slice(last);
+    return result + "\"";
+}
+// @ts-ignore
+@inline
+// @ts-ignore
 function parseBigNum<T>(data: string): T {
     // @ts-ignore
     if (idof<T>() == idof<u128>()) return u128.fromString(data);
@@ -234,7 +290,47 @@ function parseBigNum<T>(data: string): T {
 // @ts-ignore
 @inline
 function parseString(data: string): string {
-    return data.slice(1, data.length - 1).replaceAll('\\"', '"');
+    let result = "";
+    let last = 1;
+    let char = 0;
+    for (let i = 1; i < data.length - 1; i++) {
+        // \\"
+        if (unsafeCharCodeAt(data, i) === backSlashCode) {
+            char = unsafeCharCodeAt(data, ++i);
+            result += data.slice(last, i - 1)
+            if (char === 34) {
+                result += "\"";
+                last = ++i;
+            } else if (char === 110) {
+                result += "\n";
+                last = ++i;
+                // 92 98 114 116 102 117
+            } else if (char >= 92 && char <= 117) {
+                if (char === 92) {
+                    result += "\\";
+                    last = ++i;
+                } else if (char === 98) {
+                    result += "\b";
+                    last = ++i;
+                } else if (char === 102) {
+                    result += "\f";
+                    last = ++i;
+                } else if (char === 114) {
+                    result += "\r";
+                    last = ++i;
+                } else if (char === 116) {
+                    result += "\t";
+                    last = ++i;
+                } else if (char === 117 && load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) === 27584753879220272) {
+                    result += "\u000b";
+                    i += 4;
+                    last = ++i;
+                }
+            }
+        }
+    }
+    result += data.slice(last, data.length - 1);
+    return result;
 }
 
 // @ts-ignore
