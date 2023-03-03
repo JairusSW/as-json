@@ -40,6 +40,8 @@ export namespace JSON {
     export function stringify<T>(data: T): string {
         // String
         if (isString<T>() && data != null) {
+            // @ts-ignore
+            if (data.length === 0) return "\"\""; 
             let result = new StringSink("\"");
             // @ts-ignore
             for (let i = 0; i < data.length; i++) {
