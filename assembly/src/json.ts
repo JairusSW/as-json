@@ -61,20 +61,12 @@ export namespace JSON {
                     last = ++i;
                     found = true;
                     switch (char) {
-                        case 0x22: {
-                            result += "\\\"";
-                            break;
-                        }
                         case 0x5C: {
                             result += "\\\\";
                             break;
                         }
                         case 0x08: {
                             result += "\\b";
-                            break;
-                        }
-                        case 0x0A: {
-                            result += "\\n";
                             break;
                         }
                         case 0x0D: {
@@ -124,19 +116,26 @@ export namespace JSON {
         }
         // ArrayLike
         else if (isArrayLike<T>()) {
-            let result = new StringSink(leftBracketWord);
             // @ts-ignore
-            if (data.length == 0) return emptyArrayWord;
-            // @ts-ignore
-            for (let i = 0; i < data.length - 1; i++) {
+            if (data.length == 0) {
+                return emptyArrayWord;
+            } else if (isString<valueof<T>>()) {
+
+            } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
+
+            } else {
+                let result = new StringSink(leftBracketWord);
                 // @ts-ignore
-                result.write(JSON.stringify(unchecked(data[i])));
-                result.write(commaWord);
+                for (let i = 0; i < data.length - 1; i++) {
+                    // @ts-ignore
+                    result.write(JSON.stringify(unchecked(data[i])));
+                    result.write(commaWord);
+                }
+                // @ts-ignore
+                result.write(JSON.stringify(unchecked(data[data.length - 1])));
+                result.write(rightBracketWord);
+                return result.toString();
             }
-            // @ts-ignore
-            result.write(JSON.stringify(unchecked(data[data.length - 1])));
-            result.write(rightBracketWord);
-            return result.toString();
         } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
             // @ts-ignore
             return data.toString();

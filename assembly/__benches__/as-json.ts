@@ -19,7 +19,7 @@ bench("Stringify Object (Vec3)", () => {
 
 bench("Parse Object (Vec3)", () => {
   blackbox(JSON.parse<Vec3>(blackbox('{"x":0.0,"y":0.0,"z":0.0}')));
-});
+});*/
 
 bench("Stringify Array", () => {
   blackbox(JSON.stringify(blackbox([1, 2, 3, 4, 5])));
@@ -28,7 +28,7 @@ bench("Stringify Array", () => {
 bench("Parse Array", () => {
   blackbox(JSON.parse<i32[]>(blackbox("[1,2,3,4]")));
 });
-
+/*
 bench("Stringify Nested Array", () => {
   blackbox(
     JSON.stringify<string[][]>(

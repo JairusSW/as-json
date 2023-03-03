@@ -79,13 +79,13 @@ Performance is nearly equal to the JavaScript JSON implementation which is in C+
 
 ## Performance
 
-**Serialize Object (Vec2):** ~7.20m ops/s
+**Serialize Object (Vec3):** ~11.1m ops/s
 
-**Deserialize Object (Vec2):** ~2.2m ops/s
+**Deserialize Object (Vec3):** ~3.2m ops/s
 
-**Serialize Array (int[4]):** ~1.4m ops/s
+**Serialize Array (int[]):** ~1.4m ops/s
 
-**Deserialize Array (int[4]):** ~2.8m ops/s
+**Deserialize Array (int[]):** ~2.8m ops/s
 
 **Serialize String (5):** ~5.2m ops/sw
 
