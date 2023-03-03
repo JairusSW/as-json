@@ -31,13 +31,18 @@ class AsJSONTransform extends BaseVisitor {
         }
         let type = getName(node.type);
         // @ts-ignore
-        this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
+        if (["u8", "i8", "u16", "i16", "u32", "i32", "f32", "u64", "i64", "f64"].includes(type.toLowerCase())) {
+            this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
+        }
+        else {
+            this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
+        }
         // @ts-ignore
         //this.decodeStmts.push(
         //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
         //);
         // @ts-ignore
-        this.currentClass.setDataStmts.push(`if (key.length === ${name.length} && (memory.compare(changetype<usize>("${name}"), changetype<usize>(key), ${name.length}) == 0)) {
+        this.currentClass.setDataStmts.push(`if (key == "${name}") {
         this.${name} = JSON.parseObjectValue<${type}>(value);
         return;
       }
@@ -93,6 +98,7 @@ class AsJSONTransform extends BaseVisitor {
             const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1];
             this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] = stmt.slice(0, stmt.length - 1);
             serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
       }
@@ -100,12 +106,14 @@ class AsJSONTransform extends BaseVisitor {
         }
         else {
             serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         return "{}";
       }
       `;
         }
         const setKeyFunc = `
+      @inline
       __JSON_Set_Key(key: string, value: string): void {
         ${
         // @ts-ignore
@@ -117,6 +125,8 @@ class AsJSONTransform extends BaseVisitor {
         const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
         node.members.push(setDataMethod);
         this.schemasList.push(this.currentClass);
+        console.log(serializeFunc);
+        console.log(setKeyFunc);
     }
     visitSource(node) {
         super.visitSource(node);

@@ -35,9 +35,15 @@ class AsJSONTransform extends BaseVisitor {
 
     let type = getName(node.type);
     // @ts-ignore
-    this.currentClass.encodeStmts.push(
-      `"${name}":\${JSON.stringify<${type}>(this.${name})},`
-    );
+    if (["u8", "i8", "u16", "i16", "u32", "i32", "f32", "u64", "i64", "f64"].includes(type.toLowerCase())) {
+      this.currentClass.encodeStmts.push(
+        `"${name}":\${this.${name}.toString()},`
+      );
+    } else {
+      this.currentClass.encodeStmts.push(
+        `"${name}":\${JSON.stringify<${type}>(this.${name})},`
+      );
+    }
 
     // @ts-ignore
     //this.decodeStmts.push(
@@ -46,7 +52,7 @@ class AsJSONTransform extends BaseVisitor {
 
     // @ts-ignore
     this.currentClass.setDataStmts.push(
-      `if (key.length === ${name.length} && (memory.compare(changetype<usize>("${name}"), changetype<usize>(key), ${name.length}) == 0)) {
+      `if (key == "${name}") {
         this.${name} = JSON.parseObjectValue<${type}>(value);
         return;
       }
@@ -107,12 +113,14 @@ class AsJSONTransform extends BaseVisitor {
         stmt.length - 1
       );
       serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
       }
       `;
     } else {
       serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         return "{}";
       }
@@ -120,6 +128,7 @@ class AsJSONTransform extends BaseVisitor {
     }
 
     const setKeyFunc = `
+      @inline
       __JSON_Set_Key(key: string, value: string): void {
         ${
       // @ts-ignore
@@ -138,6 +147,9 @@ class AsJSONTransform extends BaseVisitor {
     node.members.push(setDataMethod);
 
     this.schemasList.push(this.currentClass);
+
+    console.log(serializeFunc);
+    console.log(setKeyFunc);
   }
   visitSource(node: Source): void {
     super.visitSource(node);
