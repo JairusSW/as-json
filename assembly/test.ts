@@ -5,13 +5,25 @@ import {
 
 const exp = `["abcdefg","st\\"ring\\" w\\"\\"ith quotes\\"","string \\t\\r\\"with ran\\tdom spa\\nces and \\nnewlines\\n\\n\\n","string with colon : comma , brace [ ] bracket { } and quote \\" and other quote \\""]`;
 
-console.log(exp);
-console.log(JSON.stringify([
+///console.log(exp);
+/*console.log(JSON.stringify([
   "abcdefg",
   'st"ring" w""ith quotes"',
   'string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n',
   'string with colon : comma , brace [ ] bracket { } and quote " and other quote "',
-]))
+]));*/
+
+console.log("abcdefg");
+console.log('st"ring" w""ith quotes"');
+console.log('string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n');
+console.log('string with colon : comma , brace [ ] bracket { } and quote " and other quote "');
+
+console.log(JSON.stringify("abcdefg"));
+console.log(JSON.stringify('st"ring" w""ith quotes"'));
+console.log(JSON.stringify('string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n'));
+console.log(JSON.stringify('string with colon : comma , brace [ ] bracket { } and quote " and other quote "'));
+
+console.log(JSON.stringify("Hello W\"orld!"));
 // @ts-ignore
 @JSON
 class Vec3 {
