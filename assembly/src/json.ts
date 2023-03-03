@@ -41,53 +41,64 @@ export namespace JSON {
         // String
         if (isString<T>() && data != null) {
             // @ts-ignore
-            if (data.length === 0) return "\"\""; 
-            let result = new StringSink("\"");
+            if (data.length === 0) return "\"\"";
+
+            let result = "\"";
+
+            let char: i32 = 0;
+            let last: i32 = 0;
+            let found: boolean = false;
             // @ts-ignore
             for (let i = 0; i < data.length; i++) {
-                // @ts-ignore
-                switch (unsafeCharCodeAt(data, i)) {
-                    case 0x22: {
-                        result.write("\\\"");
-                        break;
-                    }
-                    case 0x5C: {
-                        result.write("\\\\");
-                        break;
-                    }
-                    case 0x08: {
-                        result.write("\\b");
-                        break;
-                    }
-                    case 0x0A: {
-                        result.write("\\n");
-                        break;
-                    }
-                    case 0x0D: {
-                        result.write("\\r");
-                        break;
-                    }
-                    case 0x09: {
-                        result.write("\\t");
-                        break;
-                    }
-                    case 0x0C: {
-                        result.write("\\f");
-                        break;
-                    }
-                    case 0x0B: {
-                        result.write("\\u000b");
-                        break;
-                    }
-                    default: {
-                        // @ts-ignore
-                        result.write(data.charAt(i));
-                        break;
+                char = unsafeCharCodeAt(<string>data, i);
+                if (char === 34 || char === 92) {
+                    result += (<string>data).slice(last, i) + "\\";
+                    last = i;
+                    found = true;
+                    i++;
+                } else if (char <= 13 && char >= 8) {
+                    result += (<string>data).slice(last, i);
+                    last = ++i;
+                    found = true;
+                    switch (char) {
+                        case 0x22: {
+                            result += "\\\"";
+                            break;
+                        }
+                        case 0x5C: {
+                            result += "\\\\";
+                            break;
+                        }
+                        case 0x08: {
+                            result += "\\b";
+                            break;
+                        }
+                        case 0x0A: {
+                            result += "\\n";
+                            break;
+                        }
+                        case 0x0D: {
+                            result += "\\r";
+                            break;
+                        }
+                        case 0x09: {
+                            result += "\\t";
+                            break;
+                        }
+                        case 0x0C: {
+                            result += "\\f";
+                            break;
+                        }
+                        case 0x0B: {
+                            result += "\\u000b";
+                            break;
+                        }
                     }
                 }
-            }
-            result.write("\"");
-            return result.toString();
+            }// 8 10 13 9 12
+            if (!found) return "\"" + data + "\"";
+            else result += (<string>data).slice(last);
+            return result + "\"";
         }
         // Boolean
         else if (isBoolean<T>()) {
@@ -207,17 +218,17 @@ export namespace JSON {
 function parseBigNum<T>(data: string): T {
     // @ts-ignore
     if (idof<T>() == idof<u128>()) return u128.fromString(data);
-        // @ts-ignore
+    // @ts-ignore
     if (idof<T>() == idof<u128Safe>()) return u128Safe.fromString(data);
-        // @ts-ignore
+    // @ts-ignore
     if (idof<T>() == idof<u256>()) return u128Safe.fromString(data);
-        // @ts-ignore
+    // @ts-ignore
     if (idof<T>() == idof<u256Safe>()) return u256Safe.fromString(data);
-        // @ts-ignore
+    // @ts-ignore
     if (idof<T>() == idof<i128>()) return i128.fromString(data);
-        // @ts-ignore
+    // @ts-ignore
     if (idof<T>() == idof<i128Safe>()) return i128Safe.fromString(data);
-        // @ts-ignore
+    // @ts-ignore
     //if (idof<T>() == idof<i256Safe>()) return data.
 }
 
@@ -396,7 +407,7 @@ function parseArray<T extends unknown[]>(data: string): T {
         return parseArrayArray<T>(data);
         // @ts-ignore
     } else if (isManaged<valueof<T>>() || isReference<valueof<T>>()) {
-        const type = changetype<nonnull<valueof<T>>>(__new(offsetof<nonnull<valueof<T>>>(), idof <nonnull<valueof<T>>>()));
+        const type = changetype<nonnull<valueof<T>>>(__new(offsetof<nonnull<valueof<T>>>(), idof<nonnull<valueof<T>>>()));
         // @ts-ignore
         if (isDefined(type.__JSON_Set_Key)) {
             // @ts-ignore
