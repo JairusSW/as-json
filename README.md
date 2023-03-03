@@ -2,20 +2,20 @@
 ![AssemblyScript](https://img.shields.io/badge/AssemblyScript-blue)
 ![WebAssembly](https://img.shields.io/badge/WebAssemby-purple)
 
-Probably the fastest JSON parser for AssemblyScript with many more optimizations coming down the pipeline.
+Probably the fastest JSON implementation for AssemblyScript with many more optimizations coming down the pipeline.
 ## Installation
 
 ```bash
-~ npm install json-as
+npm install json-as
 ```
 ```bash
-~ npm install visitor-as
+npm install visitor-as --save-dev
 ```
 
 For arbitrary-length numbers, use
 
 ```bash
-~ npm install as-bignum
+npm install as-bignum
 ```
 
 Add the transform to your `asc` command
@@ -40,14 +40,14 @@ Or, add it to `asconfig.json`
 import { JSON } from "json-as/assembly";
 
 // @json or @serializable work here
-@JSON
+@json
 class Vec3 {
   x!: f32;
   y!: f32;
   z!: f32;
 }
 
-@JSON
+@json
 class Player {
   firstName!: string;
   lastName!: string;
@@ -75,10 +75,30 @@ const stringified = JSON.stringify<Player>(player);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
-# Notes
+## Notes
 
 Performance exceeds JavaScript JSON implementation by an average of 230% but this decreases with larger data packets.
 
+## Planned Features
+
+- [x] Serialize
+  - [x] Objects
+  - [x] Other Types
+  - [ ] Dynamic Types
+- [x] Deserialize
+  - [x] Objects
+  - [x] Other Types
+  - [ ] Dynamic Types
+- [ ] Streaming API
+- [ ] Whitespace support
+- [ ] Integrate features from SIMDJson
+- [x] Optimize
+  - [x] Strings
+  - [x] Int/Float
+  - [x] Bool
+  - [x] Object Serialization
+  - [ ] Object Parsing
+  - [ ] Arrays
 ## Performance
 
 **Serialize Object (Vec3):** ~11.1m ops/s
