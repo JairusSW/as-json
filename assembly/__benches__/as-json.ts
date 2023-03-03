@@ -1,22 +1,24 @@
 import { JSON } from "..";
 
 @json
-class Vec2 {
+class Vec3 {
   x: f32;
   y: f32;
+  z: f32;
 }
 
-const vec: Vec2 = blackbox<Vec2>({
+const vec: Vec3 = blackbox<Vec3>({
   x: 0.0,
   y: 0.0,
+  z: 0.0
 });
 
-bench("Stringify Object (Vec2)", () => {
+bench("Stringify Object (Vec3)", () => {
   blackbox(JSON.stringify(vec));
-});
+});/*
 
-bench("Parse Object (Vec2)", () => {
-  blackbox(JSON.parse<Vec2>(blackbox('{"x":0.0,"y":0.0}')));
+bench("Parse Object (Vec3)", () => {
+  blackbox(JSON.parse<Vec3>(blackbox('{"x":0.0,"y":0.0,"z":0.0}')));
 });
 
 bench("Stringify Array", () => {
@@ -39,14 +41,14 @@ bench("Stringify Nested Array", () => {
 
 bench("Parse Nested Array", () => {
   blackbox(JSON.parse<string[][]>(blackbox('[["a","b","c"]]')));
-});
+});*/
 
 bench("Stringify String", () => {
-  blackbox(JSON.stringify(blackbox("Hello")));
+  blackbox(JSON.stringify(blackbox("Hello \"World!")));
 });
 
 bench("Parse String", () => {
-  blackbox(JSON.parse<string>(blackbox('"Hello"')));
+  blackbox(JSON.parse<string>(blackbox('"Hello \"World!"')));
 });
 /*
 bench("Stringify Boolean", () => {
