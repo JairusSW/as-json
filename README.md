@@ -1,6 +1,8 @@
 # AS-JSON
 ![AssemblyScript](https://img.shields.io/badge/AssemblyScript-blue)
 ![WebAssembly](https://img.shields.io/badge/WebAssemby-purple)
+
+Probably the fastest JSON parser for AssemblyScript with many more optimizations coming down the pipeline.
 ## Installation
 
 ```bash
@@ -75,7 +77,7 @@ const parsed = JSON.parse<Player>(stringified);
 
 # Notes
 
-Performance is nearly equal to the JavaScript JSON implementation which is in C++.
+Performance exceeds JavaScript JSON implementation by an average of 230% but this decreases with larger data packets.
 
 ## Performance
 
@@ -87,9 +89,9 @@ Performance is nearly equal to the JavaScript JSON implementation which is in C+
 
 **Deserialize Array (int[]):** ~2.8m ops/s
 
-**Serialize String (5):** ~5.2m ops/sw
+**Serialize String (5):** ~4.2m ops/s
 
-**Deserialize String (5):** ~1.36m ops/s
+**Deserialize String (5):** ~12m ops/s
 
 ## Issues
 
