@@ -148,8 +148,8 @@ class AsJSONTransform extends BaseVisitor {
 
     this.schemasList.push(this.currentClass);
 
-    console.log(serializeFunc);
-    console.log(setKeyFunc);
+    //console.log(serializeFunc);
+    //console.log(setKeyFunc);
   }
   visitSource(node: Source): void {
     super.visitSource(node);

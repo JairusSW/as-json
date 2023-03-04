@@ -40,6 +40,7 @@ export namespace JSON {
     export function stringify<T>(data: T): string {
         // String
         if (isString<T>() && data != null) {
+            // @ts-ignore
             return serializeString(data);
         }
         // Boolean
@@ -64,21 +65,28 @@ export namespace JSON {
             // @ts-ignore
             return data.__JSON_Serialize();
         }
+        else if (data instanceof Date) {
+            return data.toISOString();
+        }
         // ArrayLike
         else if (isArrayLike<T>()) {
             // @ts-ignore
             if (data.length == 0) {
                 return emptyArrayWord;
+                // @ts-ignore
             } else if (isString<valueof<T>>()) {
                 let result = "[";
+                // @ts-ignore
                 for (let i = 0; i < data.length - 1; i++) {
                     // @ts-ignore
                     result += serializeString(unchecked(data[i]));
                     result += commaWord;
                 }
+                // @ts-ignore
                 result += serializeString(unchecked(data[data.length - 1]));
                 result += rightBracketWord;
                 return result;
+                // @ts-ignore
             } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
                 let result = new StringSink(leftBracketWord);
                 // @ts-ignore
@@ -140,6 +148,9 @@ export namespace JSON {
             // @ts-ignore
         } else if (isDefined(type.__JSON_Set_Key)) {
             return parseObject<T>(data.trimStart());
+        } else if (idof<nonnull<T>>() == idof<Date>()) {
+            // @ts-ignore
+            return Date.fromString(data);
         } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
             // @ts-ignore
             return parseBigNum<T>(data);
@@ -169,6 +180,9 @@ export namespace JSON {
             // @ts-ignore
         } else if (isDefined(type.__JSON_Set_Key)) {
             return parseObject<T>(data.trimStart());
+        } else if (idof<nonnull<T>>() == idof<Date>()) {
+            // @ts-ignore
+            return Date.fromString(data);
         } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
             // @ts-ignore
             return parseBigNum<T>(data);
