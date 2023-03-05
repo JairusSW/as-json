@@ -87,18 +87,13 @@ export namespace JSON {
                 result += rightBracketWord;
                 return result;
                 // @ts-ignore
+            } else if (isBoolean<valueof<T>>()) {
+                // @ts-ignore
+                return leftBracketWord + data.join(commaWord) + rightBracketWord;
+                // @ts-ignore
             } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
-                let result = new StringSink(leftBracketWord);
                 // @ts-ignore
-                for (let i = 0; i < data.length - 1; i++) {
-                    // @ts-ignore
-                    result.write(JSON.stringify(unchecked(data[i])));
-                    result.write(commaWord);
-                }
-                // @ts-ignore
-                result.write(JSON.stringify(unchecked(data[data.length - 1])));
-                result.write(rightBracketWord);
-                return result.toString();
+                return leftBracketWord + data.join(commaWord) + rightBracketWord;
             } else {
                 let result = new StringSink(leftBracketWord);
                 // @ts-ignore

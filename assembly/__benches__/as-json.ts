@@ -12,22 +12,31 @@ const vec: Vec3 = blackbox<Vec3>({
   y: 0,
   z: 0
 });
-
+/*
 bench("Stringify Object (Vec3)", () => {
   blackbox(JSON.stringify(vec));
 });
 
 bench("Parse Object (Vec3)", () => {
   blackbox(JSON.parse<Vec3>(blackbox('{"x":0,"y":0,"z":0}')));
-});/*
+});*/
 
-bench("Stringify Array", () => {
-  blackbox(JSON.stringify(blackbox([1, 2, 3, 4, 5])));
+bench("Stringify Number Array", () => {
+  blackbox(JSON.stringify<i32[]>([1, 2, 3]));
 });
+
+bench("Stringify Boolean Array", () => {
+  blackbox(JSON.stringify<boolean[]>([true, false, true]));
+});
+
+bench("Stringify String Array", () => {
+  blackbox(JSON.stringify<string[]>(["a", "b", "c"]));
+});
+/*
 bench("Stringify String Array", () => {
   blackbox(JSON.stringify(blackbox(["a", "b", "c", "d", "e"])));
 });
-/*
+
 bench("Parse Array", () => {
   blackbox(JSON.parse<i32[]>(blackbox("[1,2,3,4]")));
 });
@@ -45,7 +54,7 @@ bench("Stringify Nested Array", () => {
 bench("Parse Nested Array", () => {
   blackbox(JSON.parse<string[][]>(blackbox('[["a","b","c"]]')));
 });
-*/
+
 bench("Stringify String", () => {
   blackbox(JSON.stringify(blackbox("Hello \"World!")));
 });
