@@ -36,9 +36,3 @@ console.log(stringified);
 
 const parsed = JSON.parse<Player>(stringified);
 console.log(JSON.stringify(parsed));
-
-const stringifiedDate = JSON.stringify(new Date(1677961186339));
-console.log(stringifiedDate);
-
-const parsedDate = JSON.parse<Date>(stringifiedDate);
-console.log(JSON.stringify(parsedDate));
