@@ -159,7 +159,48 @@ export namespace JSON {
         let type: T;
         if (isString<T>()) {
             // @ts-ignore
-            return data.replaceAll('\\"', '"');
+            let result = "";
+            let last = 0;
+            let char = 0;
+            for (let i = 0; i < data.length; i++) {
+                // \\"
+                if (unsafeCharCodeAt(data, i) === backSlashCode) {
+                    char = unsafeCharCodeAt(data, ++i);
+                    result += data.slice(last, i - 1)
+                    if (char === 34) {
+                        result += "\"";
+                        last = ++i;
+                    } else if (char === 110) {
+                        result += "\n";
+                        last = ++i;
+                        // 92 98 114 116 102 117
+                    } else if (char >= 92 && char <= 117) {
+                        if (char === 92) {
+                            result += "\\";
+                            last = ++i;
+                        } else if (char === 98) {
+                            result += "\b";
+                            last = ++i;
+                        } else if (char === 102) {
+                            result += "\f";
+                            last = ++i;
+                        } else if (char === 114) {
+                            result += "\r";
+                            last = ++i;
+                        } else if (char === 116) {
+                            result += "\t";
+                            last = ++i;
+                        } else if (char === 117 && load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) === 27584753879220272) {
+                            result += "\u000b";
+                            i += 4;
+                            last = ++i;
+                        }
+                    }
+                }
+            }
+            result += data.slice(last);
+            // @ts-ignore
+            return result;
         } else if (isBoolean<T>()) {
             // @ts-ignore
             return parseBoolean<T>(data);
