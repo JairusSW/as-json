@@ -12,7 +12,7 @@
   "license": "MIT",
   "scripts": {
     "aspect": "asp",
-    "bench:astral": "astral",
+    "bench:astral": "astral -Ospeed --noAssert --uncheckedBehavior always",
     "build:test": "asc assembly/test.ts --target test --runtime stub",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
@@ -23,9 +23,9 @@
   "devDependencies": {
     "@as-pect/cli": "^8.0.1",
     "@as-tral/cli": "^2.0.0",
-    "@assemblyscript/loader": "^0.27.0",
+    "@assemblyscript/loader": "^0.27.1",
     "@assemblyscript/wasi-shim": "^0.1.0",
-    "assemblyscript": "^0.27.0",
+    "assemblyscript": "^0.27.1",
     "assemblyscript-prettier": "^1.0.7",
     "prettier": "^2.8.4",
     "typescript": "^4.9.5",

@@ -1,5 +1,5 @@
 import { StringSink } from "as-string-sink/assembly";
-import { isSpace } from "util/string";
+import { CharCode, isSpace } from "util/string";
 import { backSlashCode, quoteCode } from "./chars";
 import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-bignum/assembly";
 
@@ -78,3 +78,24 @@ export function getArrayDepth<T>(depth: i32 = 1): i32 {
     return depth;
   }
 }
+
+/**
+ * Implementation of ATOI. Can be much much faster with SIMD.
+ * Its pretty fast. (173m ops (atoi_fast) vs 89 ops (parseInt))
+*/
+@unsafe
+@inline
+export function atoi_fast<T extends number>(str: string): T {
+  // @ts-ignore
+  let val: T = 0;
+  for (let pos = 0; pos < str.length; pos += 2) {
+    // @ts-ignore
+    val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>pos) - 48);
+    // We use load because in this case, there is no need to have bounds-checking
+  }
+  return val;
+}
+
+/**
+ * 
+ */

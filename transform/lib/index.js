@@ -37,6 +37,8 @@ class AsJSONTransform extends BaseVisitor {
         else {
             this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
         }
+        this.currentClass.keys.push(name);
+        this.currentClass.types.push(type);
         // @ts-ignore
         //this.decodeStmts.push(
         //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
@@ -125,8 +127,6 @@ class AsJSONTransform extends BaseVisitor {
         const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
         node.members.push(setDataMethod);
         this.schemasList.push(this.currentClass);
-        //console.log(serializeFunc);
-        //console.log(setKeyFunc);
     }
     visitSource(node) {
         super.visitSource(node);

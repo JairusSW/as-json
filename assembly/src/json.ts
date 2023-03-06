@@ -23,7 +23,7 @@ import {
     uCode,
     emptyArrayWord
 } from "./chars";
-import { escapeChar, isBigNum, unsafeCharCodeAt } from "./util";
+import { atoi_fast, escapeChar, isBigNum, unsafeCharCodeAt } from "./util";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -42,34 +42,21 @@ export namespace JSON {
         if (isString<T>() && data != null) {
             // @ts-ignore
             return serializeString(data);
-        }
-        // Boolean
-        else if (isBoolean<T>()) {
+        } else if (isBoolean<T>()) {
             return data ? "true" : "false";
-        }
-        // Nullable
-        else if (isNullable<T>() && data == null) {
+        } else if (isNullable<T>() && data == null) {
             return "null";
-        }
-        // Integers/Floats
-        // @ts-ignore
-        else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
+            // @ts-ignore
+        } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
             // @ts-ignore
             return data.toString();
-        }
-        // Class-Based serialization
-        // @ts-ignore
-        else if (isDefined(data.__JSON_Serialize)) {
             // @ts-ignore
-            //if (isNullable<T>()) return "null";
+        } else if (isDefined(data.__JSON_Serialize)) {
             // @ts-ignore
             return data.__JSON_Serialize();
-        }
-        else if (data instanceof Date) {
+        } else if (data instanceof Date) {
             return data.toISOString();
-        }
-        // ArrayLike
-        else if (isArrayLike<T>()) {
+        } else if (isArrayLike<T>()) {
             // @ts-ignore
             if (data.length == 0) {
                 return emptyArrayWord;
@@ -395,28 +382,16 @@ function parseBoolean<T extends boolean>(data: string): T {
 @inline
 // @ts-ignore
 export function parseNumber<T>(data: string): T {
+    if (isInteger<T>()) {
+        // @ts-ignore
+        return atoi_fast<T>(data);
+    }
     // @ts-ignore
     const type: T = 0;
     // @ts-ignore
     if (type instanceof f64) return f64.parse(data);
     // @ts-ignore
     else if (type instanceof f32) return f32.parse(data);
-    // @ts-ignore
-    else if (type instanceof u64) return u64.parse(data);
-    // @ts-ignore
-    else if (type instanceof u32) return u32.parse(data);
-    // @ts-ignore
-    else if (type instanceof u8) return u8.parse(data);
-    // @ts-ignore
-    else if (type instanceof u16) return u16.parse(data);
-    // @ts-ignore
-    else if (type instanceof i64) return i64.parse(data);
-    // @ts-ignore
-    else if (type instanceof i32) return i32.parse(data);
-    // @ts-ignore
-    else if (type instanceof i16) return i16.parse(data);
-    // @ts-ignore
-    else if (type instanceof i8) return i8.parse(data);
 }
 
 // @ts-ignore
