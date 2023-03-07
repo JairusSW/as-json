@@ -1,6 +1,7 @@
 import { JSON } from "..";
 import { backSlashCode, quoteCode } from "../src/chars";
 import { atoi_fast, unsafeCharCodeAt } from "../src/util";
+import { HASH } from "util/hash";
 
 @json
 class Vec3 {
@@ -23,28 +24,28 @@ class Vec3 {
       if (inStr === false && char === quoteCode) {
         if (key != null) {
           if (unsafeCharCodeAt(key, 0) == 120) {
-            to.x = atoi_fast<i32>(data.slice(last, pos - 1))
+            to.x = atoi_fast<i32>(data.substring(last, pos - 1))
           } else if (unsafeCharCodeAt(key, 0) == 121) {
-            to.y = atoi_fast<i32>(data.slice(last, pos - 1))
+            to.y = atoi_fast<i32>(data.substring(last, pos - 1))
           } else if (unsafeCharCodeAt(key, 0) == 122) {
-            to.z = atoi_fast<i32>(data.slice(last, pos - 1))
+            to.z = atoi_fast<i32>(data.substring(last, pos - 1))
           }
         }
         last = ++pos;
         inStr = true;
       } else if (char === quoteCode && unsafeCharCodeAt(data, pos - 1) != backSlashCode) {
         inStr = false;
-        key = data.slice(last, pos);
+        key = data.substring(last, pos);
         last = pos += 2;
       }
     }
     if (key != null) {
       if (unsafeCharCodeAt(key, 0) == 120) {
-        to.x = atoi_fast<i32>(data.slice(last, pos - 1))
+        to.x = atoi_fast<i32>(data.substring(last, pos - 1))
       } else if (unsafeCharCodeAt(key, 0) == 121) {
-        to.y = atoi_fast<i32>(data.slice(last, pos - 1))
+        to.y = atoi_fast<i32>(data.substring(last, pos - 1))
       } else if (unsafeCharCodeAt(key, 0) == 122) {
-        to.z = atoi_fast<i32>(data.slice(last, pos - 1))
+        to.z = atoi_fast<i32>(data.substring(last, pos - 1))
       }
     }
     return to;
@@ -65,6 +66,9 @@ bench("Stringify Object (Vec3)", () => {
   blackbox<string>(vec.__JSON_Serialize(vec));
 });*/
 
+bench("HASH String", () => {
+  blackbox<number>(HASH("Hello"));
+})
 // TODO: Make this allocate without crashing
 bench("Parse Object (Vec3)", () => {
   blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}', vec));

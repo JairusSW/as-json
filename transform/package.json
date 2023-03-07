@@ -1,6 +1,6 @@
 {
     "name": "@json-as/transform",
-    "version": "0.5.32",
+    "version": "0.5.33",
     "description": "JSON encoder/decoder for AssemblyScript",
     "main": "./lib/index.js",
     "author": "Jairus Tanaka",
@@ -10,7 +10,9 @@
         "Rom"
     ],
     "license": "MIT",
-    "devDependencies": {},
+    "devDependencies": {
+        "assemblyscript": "^0.27.1"
+    },
     "dependencies": {},
     "repository": {
         "type": "git",

@@ -1,4 +1,4 @@
-import { getName, toString, isStdlib } from "visitor-as/dist/utils.js";
+import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 class SchemaData {
@@ -19,41 +19,6 @@ class AsJSONTransform extends BaseVisitor {
         this.sources = [];
     }
     visitMethodDeclaration() { }
-    visitFieldDeclaration(node) {
-        if (toString(node).startsWith("static"))
-            return;
-        const lineText = toString(node);
-        if (lineText.startsWith("private"))
-            return;
-        const name = getName(node);
-        if (!node.type) {
-            throw new Error(`Field ${name} is missing a type declaration`);
-        }
-        let type = getName(node.type);
-        // @ts-ignore
-        if (["u8", "i8", "u16", "i16", "u32", "i32", "f32", "u64", "i64", "f64"].includes(type.toLowerCase())) {
-            this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
-        }
-        else {
-            this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
-        }
-        this.currentClass.keys.push(name);
-        this.currentClass.types.push(type);
-        // @ts-ignore
-        //this.decodeStmts.push(
-        //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
-        //);
-        // @ts-ignore
-        this.currentClass.setDataStmts.push(`if (key == "${name}") {
-        this.${name} = JSON.parseObjectValue<${type}>(value);
-        return;
-      }
-      `);
-        // @ts-ignore
-        //this.checkDecodeStmts.push(
-        //  ' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n'
-        //);
-    }
     visitClassDeclaration(node) {
         var _c;
         const className = node.name.text;
@@ -67,7 +32,7 @@ class AsJSONTransform extends BaseVisitor {
         }
         if (!foundDecorator)
             return;
-        // Prevent from being triggered twice
+        // Prevent from being triggered twice.
         for (const member of node.members) {
             if (member.name.text == "__JSON_Serialize")
                 return;
@@ -94,7 +59,35 @@ class AsJSONTransform extends BaseVisitor {
         }
         const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
         const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])];
-        this.visit(members);
+        for (const mem of members) {
+            if (mem.type && mem.type.name && mem.type.name.identifier.text) {
+                const member = mem;
+                if (toString(member).startsWith("static"))
+                    return;
+                const lineText = toString(member);
+                if (lineText.startsWith("private"))
+                    return;
+                // @ts-ignore
+                const type = member.type.name.identifier.text;
+                const name = member.name.text;
+                this.currentClass.keys.push(name);
+                // @ts-ignore
+                this.currentClass.types.push(type);
+                // @ts-ignore
+                if (["u8", "i8", "u16", "i16", "u32", "i32", "f32", "u64", "i64", "f64"].includes(type.toLowerCase())) {
+                    this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
+                }
+                else {
+                    this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
+                }
+                // @ts-ignore
+                this.currentClass.setDataStmts.push(`if (key == "${name}") {
+        this.${name} = JSON.parseObjectValue<${type}>(value);
+        return;
+      }
+      `);
+            }
+        }
         let serializeFunc = "";
         if (this.currentClass.encodeStmts.length > 0) {
             const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1];
