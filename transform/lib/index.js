@@ -68,7 +68,7 @@ class AsJSONTransform extends BaseVisitor {
                 if (lineText.startsWith("private"))
                     return;
                 // @ts-ignore
-                const type = member.type.name.identifier.text;
+                let type = toString(member.type);
                 const name = member.name.text;
                 this.currentClass.keys.push(name);
                 // @ts-ignore
