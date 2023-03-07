@@ -216,16 +216,16 @@ export namespace JSON {
     }
 }
 
+
 // @ts-ignore
 @inline
-// @ts-ignore
 function serializeString(data: string): string {
     // @ts-ignore
     if (data.length === 0) return "\"\"";
     // Fast path for Vectors (3)
     let char: i32 = 0;
     if (data.length === 1) {
-        char === unsafeCharCodeAt(data, 0);
+        char = unsafeCharCodeAt(data, 0);
         if (char === 34) {
             return "\\\"";
         } else if (char === 92) {

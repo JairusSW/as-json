@@ -18,13 +18,13 @@ For arbitrary-length numbers, use
 npm install as-bignum
 ```
 
-Add the transform to your `asc` command
+Add the transform to your `asc` command (e.g. in package.json)
 
 ```bash
 --transform json-as/transform
 ```
 
-Or, add it to `asconfig.json`
+Alternatively, add it to your `asconfig.json`
 
 ```
 {
