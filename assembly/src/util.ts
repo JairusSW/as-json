@@ -88,7 +88,7 @@ export function getArrayDepth<T>(depth: i32 = 1): i32 {
 export function atoi_fast<T extends number>(str: string): T {
   // @ts-ignore
   let val: T = 0;
-  for (let pos = 0; pos < str.length; pos += 2) {
+  for (let pos = 0; pos < (str.length << 1); pos += 2) {
     // @ts-ignore
     val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>pos) - 48);
     // We use load because in this case, there is no need to have bounds-checking
