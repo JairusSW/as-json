@@ -1,6 +1,6 @@
 import { JSON } from "..";
 import { backSlashCode, quoteCode } from "../src/chars";
-import { parseJSONInt, parseJSONInt, unsafeCharCodeAt } from "../src/util";
+import { parseJSONInt, unsafeCharCodeAt } from "../src/util";
 import { HASH } from "util/hash";
 
 @json
