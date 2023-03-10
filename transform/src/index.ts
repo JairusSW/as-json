@@ -61,7 +61,7 @@ class AsJSONTransform extends BaseVisitor {
     }
 
     const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
-    const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])]
+    const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])];
 
     for (const mem of members) {
       if (mem.type && mem.type.name && mem.type.name.identifier.text) {
@@ -129,7 +129,7 @@ class AsJSONTransform extends BaseVisitor {
       this.currentClass.setDataStmts.join("")
       }
       }
-    `
+    `;
 
     const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
     node.members.push(serializeMethod);
@@ -164,7 +164,7 @@ export default class Transformer extends Transform {
       } else {
         return 0;
       }
-    })
+    });
 
     // Loop over every source
     for (const source of sources) {

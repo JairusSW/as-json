@@ -6,8 +6,10 @@
   "author": "Jairus Tanaka",
   "contributors": [
     "DogWhich",
-    "Joshua Tenner",
-    "Rom"
+    "Romdotdog",
+    "Derek Barrera",
+    "Frankk Taylor",
+    "lekiano"
   ],
   "license": "MIT",
   "scripts": {
@@ -23,7 +25,6 @@
   "devDependencies": {
     "@as-pect/cli": "^8.0.1",
     "@as-tral/cli": "^2.0.0",
-    "@assemblyscript/loader": "^0.27.1",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "assemblyscript": "^0.27.1",
     "assemblyscript-prettier": "^1.0.7",
