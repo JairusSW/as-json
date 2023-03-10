@@ -1,6 +1,6 @@
 import { StringSink } from "as-string-sink/assembly";
 import { CharCode, isSpace } from "util/string";
-import { backSlashCode, quoteCode } from "./chars";
+import { backSlashCode, quoteCode, rCode } from "./chars";
 import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-bignum/assembly";
 
 // @ts-ignore
@@ -85,17 +85,74 @@ export function getArrayDepth<T>(depth: i32 = 1): i32 {
 */
 @unsafe
 @inline
-export function atoi_fast<T extends number>(str: string): T {
+export function atoi_fast<T extends number>(str: string, offset: i32 = 0): T {
   // @ts-ignore
   let val: T = 0;
-  for (let pos = 0; pos < (str.length << 1); pos += 2) {
+  for (; offset < (str.length << 1); offset += 2) {
     // @ts-ignore
-    val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>pos) - 48);
+    val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
     // We use load because in this case, there is no need to have bounds-checking
   }
   return val;
 }
 
 /**
- * 
- */
+ * Implementation of ATOI. Can be much much faster with SIMD.
+ * Its pretty fast. (173m ops (atoi_fast) vs 89 ops (parseInt))
+*/
+@unsafe
+@inline
+export function parseJSONInt<T extends number>(str: string): T {
+  // @ts-ignore
+  let val: T = 0;
+  let char: u16 = load<u16>(changetype<usize>(str));
+  let pos = 2;
+  let neg = char === 45;
+  // @ts-ignore
+  val = (val << 1) + (val << 3) + (char - 48);
+  for (; pos < (str.length << 1); pos += 2) {
+    char = load<u16>(changetype<usize>(str) + <usize>pos);
+    if (char === 101 || char === 69) {
+      char = load<u16>(changetype<usize>(str) + <usize>(pos += 2));
+      if (char === 45) {
+        // @ts-ignore
+        val /= sciNote<T>(atoi_fast<T>(str, pos += 2));
+        if (neg === true) {
+          // @ts-ignore
+          return ~val + 1;
+        }
+        return val;
+      } else {
+        // @ts-ignore
+        val *= sciNote<T>(atoi_fast<T>(str, pos += 2));
+        if (neg === true) {
+          // @ts-ignore
+          return ~val + 1;
+        }
+        return val;
+      }
+    }
+    // @ts-ignore
+    val = (val << 1) + (val << 3) + (char - 48);
+  }
+  if (neg === true) {
+    // @ts-ignore
+    val = ~val + 1;
+  }
+  return val;
+}
+
+function sciNote<T extends number>(num: T): T {
+  let res = 1;
+  if (num > 0) {
+    for (let i = 0; i < num; i++) {
+      res *= 10;
+    }
+  } else {
+    for (let i = 0; i < num; i++) {
+      res /= 10;
+    }
+  }
+  // @ts-ignore
+  return res;
+}

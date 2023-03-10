@@ -1,6 +1,6 @@
 import { JSON } from "..";
 import { backSlashCode, quoteCode } from "../src/chars";
-import { atoi_fast, unsafeCharCodeAt } from "../src/util";
+import { parseJSONInt, parseJSONInt, unsafeCharCodeAt } from "../src/util";
 import { HASH } from "util/hash";
 
 @json
@@ -24,11 +24,11 @@ class Vec3 {
       if (inStr === false && char === quoteCode) {
         if (key != null) {
           if (unsafeCharCodeAt(key, 0) == 120) {
-            to.x = atoi_fast<i32>(data.substring(last, pos - 1))
+            to.x = parseJSONInt<i32>(data.substring(last, pos - 1))
           } else if (unsafeCharCodeAt(key, 0) == 121) {
-            to.y = atoi_fast<i32>(data.substring(last, pos - 1))
+            to.y = parseJSONInt<i32>(data.substring(last, pos - 1))
           } else if (unsafeCharCodeAt(key, 0) == 122) {
-            to.z = atoi_fast<i32>(data.substring(last, pos - 1))
+            to.z = parseJSONInt<i32>(data.substring(last, pos - 1))
           }
         }
         last = ++pos;
@@ -41,11 +41,11 @@ class Vec3 {
     }
     if (key != null) {
       if (unsafeCharCodeAt(key, 0) == 120) {
-        to.x = atoi_fast<i32>(data.substring(last, pos - 1))
+        to.x = parseJSONInt<i32>(data.substring(last, pos - 1))
       } else if (unsafeCharCodeAt(key, 0) == 121) {
-        to.y = atoi_fast<i32>(data.substring(last, pos - 1))
+        to.y = parseJSONInt<i32>(data.substring(last, pos - 1))
       } else if (unsafeCharCodeAt(key, 0) == 122) {
-        to.z = atoi_fast<i32>(data.substring(last, pos - 1))
+        to.z = parseJSONInt<i32>(data.substring(last, pos - 1))
       }
     }
     return to;

@@ -23,7 +23,7 @@ import {
     uCode,
     emptyArrayWord
 } from "./chars";
-import { atoi_fast, escapeChar, isBigNum, unsafeCharCodeAt } from "./util";
+import { parseJSONInt, escapeChar, isBigNum, unsafeCharCodeAt } from "./util";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -384,7 +384,7 @@ function parseBoolean<T extends boolean>(data: string): T {
 export function parseNumber<T>(data: string): T {
     if (isInteger<T>()) {
         // @ts-ignore
-        return atoi_fast<T>(data);
+        return parseJSONInt<T>(data);
     }
     // @ts-ignore
     const type: T = 0;
