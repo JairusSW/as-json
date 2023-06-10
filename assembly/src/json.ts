@@ -1,5 +1,5 @@
 import { StringSink } from "as-string-sink/assembly";
-import { isSpace } from "util/string";
+import { isSpace, CharCode } from "util/string";
 import {
     backSlashCode,
     commaCode,
@@ -19,7 +19,7 @@ import {
     tCode,
     trueWord,
     uCode,
-    emptyArrayWord
+    emptyArrayWord,
 } from "./chars";
 import { parseSciInteger, unsafeCharCodeAt } from "./util";
 
@@ -35,7 +35,8 @@ export namespace JSON {
      * @param data T
      * @returns string
      */
-    export function stringify<T>(data: T): string {
+    // @ts-ignore
+    @inline export function stringify<T>(data: T): string {
         // String
         if (isString<T>() && data != null) {
             // @ts-ignore
@@ -93,7 +94,9 @@ export namespace JSON {
                 return result.toString();
             }
         } else {
-            throw new Error(`Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
+            throw new Error(
+                `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
+            );
         }
     }
     /**
@@ -104,8 +107,9 @@ export namespace JSON {
      * @param data string
      * @returns T
      */
+    
     // @ts-ignore
-    export function parse<T>(data: string): T {
+    @inline export function parse<T>(data: string): T {
         let type: T;
         if (isString<T>()) {
             // @ts-ignore
@@ -130,11 +134,13 @@ export namespace JSON {
             return Date.fromString(data);
         } else {
             // @ts-ignore
-            throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
+            throw new Error(
+                `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
+            );
         }
     }
     // @ts-ignore
-    function parseObjectValue<T>(data: string): T {
+    @inline function parseObjectValue<T>(data: string): T {
         let type: T;
         if (isString<T>()) {
             // @ts-ignore
@@ -145,9 +151,9 @@ export namespace JSON {
                 // \\"
                 if (unsafeCharCodeAt(data, i) === backSlashCode) {
                     char = unsafeCharCodeAt(data, ++i);
-                    result += data.slice(last, i - 1)
+                    result += data.slice(last, i - 1);
                     if (char === 34) {
-                        result += "\"";
+                        result += '"';
                         last = ++i;
                     } else if (char === 110) {
                         result += "\n";
@@ -169,7 +175,11 @@ export namespace JSON {
                         } else if (char === 116) {
                             result += "\t";
                             last = ++i;
-                        } else if (char === 117 && load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) === 27584753879220272) {
+                        } else if (
+                            char === 117 &&
+                            load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
+                            27584753879220272
+                        ) {
                             result += "\u000b";
                             i += 4;
                             last = ++i;
@@ -200,52 +210,52 @@ export namespace JSON {
             return Date.fromString(data);
         } else {
             // @ts-ignore
-            throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`)
+            throw new Error(
+                `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
+            );
         }
     }
 }
 
-
 // @ts-ignore
-@inline
-function serializeString(data: string): string {
+@inline function serializeString(data: string): string {
     // @ts-ignore
     //if (data.length === 0) return "\"\"";
-   /*
-    let char: i32 = 0;
-    if (data.length === 1) {
-        char = unsafeCharCodeAt(data, 0);
-        if (char === 34) {
-            return "\\\"";
-        } else if (char === 92) {
-            return "\\n";
-        } else if (char <= 13 && char >= 8) {
-            switch (char) {
-                case 0x5C: {
-                    return "\\\\";
-                }
-                case 0x08: {
-                    return "\\b";
-                }
-                case 0x0D: {
-                    return "\\r";
-                }
-                case 0x09: {
-                    return "\\t";
-                }
-                case 0x0C: {
-                    return "\\f";
-                }
-                case 0x0B: {
-                    return "\\u000b";
-                }
-            }
-        } else {
-            return data;
-        }
-    }*/
+    /*
+       let char: i32 = 0;
+       if (data.length === 1) {
+           char = unsafeCharCodeAt(data, 0);
+           if (char === 34) {
+               return "\\\"";
+           } else if (char === 92) {
+               return "\\n";
+           } else if (char <= 13 && char >= 8) {
+               switch (char) {
+                   case 0x5C: {
+                       return "\\\\";
+                   }
+                   case 0x08: {
+                       return "\\b";
+                   }
+                   case 0x0D: {
+                       return "\\r";
+                   }
+                   case 0x09: {
+                       return "\\t";
+                   }
+                   case 0x0C: {
+                       return "\\f";
+                   }
+                   case 0x0B: {
+                       return "\\u000b";
+                   }
+               }
+           } else {
+               return data;
+           }
+       }*/
 
-    let result = "\"";
+    let result = '"';
 
     let last: i32 = 0;
     // @ts-ignore
@@ -260,14 +270,14 @@ function serializeString(data: string): string {
             last = ++i;
             switch (char) {
                 /*case 0x5C: {
-                    result += "\\\\";
-                    break;
-                }*/
+                            result += "\\\\";
+                            break;
+                        }*/
                 case 0x08: {
                     result += "\\b";
                     break;
                 }
-                case 0x0D: {
+                case 0x0d: {
                     result += "\\r";
                     break;
                 }
@@ -275,34 +285,34 @@ function serializeString(data: string): string {
                     result += "\\t";
                     break;
                 }
-                case 0x0C: {
+                case 0x0c: {
                     result += "\\f";
                     break;
                 }
-                case 0x0B: {
+                // This is actually not within bounds of the previous branch, so it is not checked.
+                case 0x0b: {
                     result += "\\u000b";
                     break;
                 }
             }
         }
-    }// 8 10 13 9 12
-    if (result.length === 1) return "\"" + data + "\"";
+    }
+    if (result.length === 1) return '"' + data + '"';
     else result += (<string>data).slice(last);
-    return result + "\"";
+    return result + '"';
 }
 
 // @ts-ignore
-@inline
-function parseString(data: string): string {
+@inline function parseString(data: string): string {
     let result = "";
     let last = 1;
     for (let i = 1; i < data.length - 1; i++) {
         // \\"
         if (unsafeCharCodeAt(data, i) === backSlashCode) {
             const char = unsafeCharCodeAt(data, ++i);
-            result += data.slice(last, i - 1)
+            result += data.slice(last, i - 1);
             if (char === 34) {
-                result += "\"";
+                result += '"';
                 last = ++i;
             } else if (char === 110) {
                 result += "\n";
@@ -336,7 +346,11 @@ function parseString(data: string): string {
                         break;
                     }
                     default: {
-                        if (char === 117 && load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) === 27584753879220272) {
+                        if (
+                            char === 117 &&
+                            load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
+                            27584753879220272
+                        ) {
                             result += "\u000b";
                             i += 4;
                             last = ++i;
@@ -352,17 +366,14 @@ function parseString(data: string): string {
 }
 
 // @ts-ignore
-@inline
-function parseBoolean<T extends boolean>(data: string): T {
+@inline function parseBoolean<T extends boolean>(data: string): T {
     if (data.length > 3 && data.startsWith("true")) return <T>true;
     else if (data.length > 4 && data.startsWith("false")) return <T>false;
     else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
 }
 
 // @ts-ignore
-@inline
-// @ts-ignore
-export function parseNumber<T>(data: string): T {
+@inline export function parseNumber<T>(data: string): T {
     if (isInteger<T>()) {
         // @ts-ignore
         return parseSciInteger<T>(data);
@@ -376,9 +387,10 @@ export function parseNumber<T>(data: string): T {
 }
 
 // @ts-ignore
-@inline
-function parseObject<T>(data: string): T {
-    let schema: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
+@inline function parseObject<T>(data: string): T {
+    let schema: nonnull<T> = changetype<nonnull<T>>(
+        __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
+    );
     let key = "";
     let isKey = false;
     let depth = 0;
@@ -400,7 +412,10 @@ function parseObject<T>(data: string): T {
                     if (depth === 0) {
                         ++arrayValueIndex;
                         // @ts-ignore
-                        schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, arrayValueIndex));
+                        schema.__JSON_Set_Key(
+                            key,
+                            data.slice(outerLoopIndex, arrayValueIndex)
+                        );
                         outerLoopIndex = arrayValueIndex;
                         isKey = false;
                         break;
@@ -421,7 +436,10 @@ function parseObject<T>(data: string): T {
                     if (depth === 0) {
                         ++objectValueIndex;
                         // @ts-ignore
-                        schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, objectValueIndex));
+                        schema.__JSON_Set_Key(
+                            key,
+                            data.slice(outerLoopIndex, objectValueIndex)
+                        );
                         outerLoopIndex = objectValueIndex;
                         isKey = false;
                         break;
@@ -444,7 +462,10 @@ function parseObject<T>(data: string): T {
                         isKey = true;
                     } else {
                         // @ts-ignore
-                        schema.__JSON_Set_Key(key, data.slice(outerLoopIndex, stringValueIndex));
+                        schema.__JSON_Set_Key(
+                            key,
+                            data.slice(outerLoopIndex, stringValueIndex)
+                        );
                         isKey = false;
                     }
                     outerLoopIndex = ++stringValueIndex;
@@ -480,7 +501,10 @@ function parseObject<T>(data: string): T {
                 char = unsafeCharCodeAt(data, numberValueIndex);
                 if (char === commaCode || char === rightBraceCode || isSpace(char)) {
                     // @ts-ignore
-                    schema.__JSON_Set_Key(key, data.slice(outerLoopIndex - 1, numberValueIndex));
+                    schema.__JSON_Set_Key(
+                        key,
+                        data.slice(outerLoopIndex - 1, numberValueIndex)
+                    );
                     outerLoopIndex = numberValueIndex;
                     isKey = false;
                     break;
@@ -492,9 +516,7 @@ function parseObject<T>(data: string): T {
 }
 
 // @ts-ignore
-@inline
-// @ts-ignore
-function parseArray<T extends unknown[]>(data: string): T {
+@inline function parseArray<T extends unknown[]>(data: string): T {
     if (isString<valueof<T>>()) {
         return <T>parseStringArray(data);
     } else if (isBoolean<valueof<T>>()) {
@@ -508,7 +530,10 @@ function parseArray<T extends unknown[]>(data: string): T {
         return parseArrayArray<T>(data);
         // @ts-ignore
     } else if (isManaged<valueof<T>>() || isReference<valueof<T>>()) {
-        const type = changetype<nonnull<valueof<T>>>(__new(offsetof<nonnull<valueof<T>>>(), idof<nonnull<valueof<T>>>()));
+        // We instantiate the required memory for the class and fill it. This is extremely unsafe and uses "a bit of magic".
+        const type = changetype<nonnull<valueof<T>>>(
+            __new(offsetof<nonnull<valueof<T>>>(), idof<nonnull<valueof<T>>>())
+        );
         // @ts-ignore
         if (isDefined(type.__JSON_Set_Key)) {
             // @ts-ignore
@@ -520,8 +545,7 @@ function parseArray<T extends unknown[]>(data: string): T {
 }
 
 // @ts-ignore
-@inline
-function parseStringArray(data: string): string[] {
+@inline function parseStringArray(data: string): string[] {
     const result: string[] = [];
     let lastPos = 0;
     let instr = false;
@@ -540,23 +564,22 @@ function parseStringArray(data: string): string[] {
 }
 
 // @ts-ignore
-@inline
-function parseBooleanArray<T extends boolean[]>(data: string): T {
+@inline function parseBooleanArray<T extends boolean[]>(data: string): T {
     const result = instantiate<T>();
     let lastPos = 1;
     let char = 0;
     for (let i = 1; i < data.length - 1; i++) {
         char = unsafeCharCodeAt(data, i);
         /*// if char == "t" && i+3 == "e"
-            if (char === tCode && data.charCodeAt(i + 3) === eCode) {
-              //i += 3;
-              result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+2)));
-              //i++;
-            } else if (char === fCode && data.charCodeAt(i + 4) === eCode) {
-              //i += 4;
-              result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+3)));
-              //i++;
-            }*/
+                if (char === tCode && data.charCodeAt(i + 3) === eCode) {
+                  //i += 3;
+                  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+2)));
+                  //i++;
+                } else if (char === fCode && data.charCodeAt(i + 4) === eCode) {
+                  //i += 4;
+                  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+3)));
+                  //i++;
+                }*/
         if (char === tCode || char === fCode) {
             lastPos = i;
         } else if (char === eCode) {
@@ -568,8 +591,7 @@ function parseBooleanArray<T extends boolean[]>(data: string): T {
 }
 
 // @ts-ignore
-@inline
-function parseNumberArray<T extends number[]>(data: string): T {
+@inline function parseNumberArray<T extends number[]>(data: string): T {
     const result = instantiate<T>();
     let lastPos = 0;
     let char = 0;
@@ -594,8 +616,7 @@ function parseNumberArray<T extends number[]>(data: string): T {
 }
 
 // @ts-ignore
-@inline
-function parseArrayArray<T extends unknown[][]>(data: string): T {
+@inline function parseArrayArray<T extends unknown[][]>(data: string): T {
     const result = instantiate<T>();
     let char = 0;
     let lastPos = 0;
@@ -624,7 +645,7 @@ function parseArrayArray<T extends unknown[][]>(data: string): T {
 }
 
 // @ts-ignore
-export function parseObjectArray<T extends unknown[]>(data: string): T {
+@inline export function parseObjectArray<T extends unknown[]>(data: string): T {
     const result = instantiate<T>();
     let char = 0;
     let lastPos: u32 = 1;

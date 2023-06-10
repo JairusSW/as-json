@@ -1,8 +1,10 @@
 # AS-JSON
+
 ![AssemblyScript](https://img.shields.io/badge/AssemblyScript-blue)
 ![WebAssembly](https://img.shields.io/badge/WebAssemby-purple)
 
 JSON for AssemblyScript focused on performance, low-overhead, and ease-of-use.
+
 ## Installation
 
 ```bash

@@ -2,7 +2,7 @@ import {
   ClassDeclaration,
   FieldDeclaration,
   Source,
-  Parser
+  Parser,
 } from "assemblyscript/dist/assemblyscript";
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
@@ -47,21 +47,32 @@ class AsJSONTransform extends BaseVisitor {
       parent: node.extendsType ? toString(node.extendsType) : "",
       node: node,
       encodeStmts: [],
-      setDataStmts: []
-    }
+      setDataStmts: [],
+    };
 
     if (this.currentClass.parent.length > 0) {
-      const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
+      const parentSchema = this.schemasList.find(
+        (v) => v.name == this.currentClass.parent
+      );
       if (parentSchema?.encodeStmts) {
         parentSchema?.encodeStmts.push(parentSchema?.encodeStmts.pop() + ",");
         this.currentClass.encodeStmts.push(...parentSchema?.encodeStmts);
       } else {
-        console.error("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?");
+        console.error(
+          "Class extends " +
+          this.currentClass.parent +
+          ", but parent class not found. Maybe add the @json decorator over parent class?"
+        );
       }
     }
 
-    const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
-    const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])];
+    const parentSchema = this.schemasList.find(
+      (v) => v.name == this.currentClass.parent
+    );
+    const members = [
+      ...node.members,
+      ...(parentSchema ? parentSchema.node.members : []),
+    ];
 
     for (const mem of members) {
       if (mem.type && mem.type.name && mem.type.name.identifier.text) {
@@ -72,13 +83,26 @@ class AsJSONTransform extends BaseVisitor {
 
         // @ts-ignore
         let type = toString(member.type);
-        
+
         const name = member.name.text;
         this.currentClass.keys.push(name);
         // @ts-ignore
         this.currentClass.types.push(type);
         // @ts-ignore
-        if (["u8", "i8", "u16", "i16", "u32", "i32", "f32", "u64", "i64", "f64"].includes(type.toLowerCase())) {
+        if (
+          [
+            "u8",
+            "i8",
+            "u16",
+            "i16",
+            "u32",
+            "i32",
+            "f32",
+            "u64",
+            "i64",
+            "f64",
+          ].includes(type.toLowerCase())
+        ) {
           this.currentClass.encodeStmts.push(
             `"${name}":\${this.${name}.toString()},`
           );
@@ -101,11 +125,12 @@ class AsJSONTransform extends BaseVisitor {
     let serializeFunc = "";
 
     if (this.currentClass.encodeStmts.length > 0) {
-      const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1]!;
-      this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] = stmt!.slice(
-        0,
-        stmt.length - 1
-      );
+      const stmt =
+        this.currentClass.encodeStmts[
+        this.currentClass.encodeStmts.length - 1
+        ]!;
+      this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
+        stmt!.slice(0, stmt.length - 1);
       serializeFunc = `
       @inline
       __JSON_Serialize(): string {
@@ -134,10 +159,7 @@ class AsJSONTransform extends BaseVisitor {
     const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
     node.members.push(serializeMethod);
 
-    const setDataMethod = SimpleParser.parseClassMember(
-      setKeyFunc,
-      node
-    );
+    const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
     node.members.push(setDataMethod);
 
     this.schemasList.push(this.currentClass);
@@ -154,17 +176,19 @@ export default class Transformer extends Transform {
     const transformer = new AsJSONTransform();
 
     // Sort the sources so that user scripts are visited last
-    const sources = parser.sources.filter(source => !isStdlib(source)).sort((_a, _b) => {
-      const a = _a.internalPath
-      const b = _b.internalPath
-      if (a[0] === "~" && b[0] !== "~") {
-        return -1;
-      } else if (a[0] !== "~" && b[0] === "~") {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
+    const sources = parser.sources
+      .filter((source) => !isStdlib(source))
+      .sort((_a, _b) => {
+        const a = _a.internalPath;
+        const b = _b.internalPath;
+        if (a[0] === "~" && b[0] !== "~") {
+          return -1;
+        } else if (a[0] !== "~" && b[0] === "~") {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
 
     // Loop over every source
     for (const source of sources) {
@@ -174,4 +198,4 @@ export default class Transformer extends Transform {
       }
     }
   }
-};
+}

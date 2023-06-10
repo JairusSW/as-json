@@ -10,9 +10,7 @@
     }
   },
   "options": {
-    "transform": [
-      "./transform"
-    ],
+    "transform": ["./transform"],
     "bindings": "esm",
     "exportStart": "_start"
   },

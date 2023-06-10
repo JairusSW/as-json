@@ -45,7 +45,7 @@ class AsJSONTransform extends BaseVisitor {
             parent: node.extendsType ? toString(node.extendsType) : "",
             node: node,
             encodeStmts: [],
-            setDataStmts: []
+            setDataStmts: [],
         };
         if (this.currentClass.parent.length > 0) {
             const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
@@ -54,11 +54,16 @@ class AsJSONTransform extends BaseVisitor {
                 this.currentClass.encodeStmts.push(...parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts);
             }
             else {
-                console.error("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?");
+                console.error("Class extends " +
+                    this.currentClass.parent +
+                    ", but parent class not found. Maybe add the @json decorator over parent class?");
             }
         }
         const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
-        const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])];
+        const members = [
+            ...node.members,
+            ...(parentSchema ? parentSchema.node.members : []),
+        ];
         for (const mem of members) {
             if (mem.type && mem.type.name && mem.type.name.identifier.text) {
                 const member = mem;
@@ -74,7 +79,18 @@ class AsJSONTransform extends BaseVisitor {
                 // @ts-ignore
                 this.currentClass.types.push(type);
                 // @ts-ignore
-                if (["u8", "i8", "u16", "i16", "u32", "i32", "f32", "u64", "i64", "f64"].includes(type.toLowerCase())) {
+                if ([
+                    "u8",
+                    "i8",
+                    "u16",
+                    "i16",
+                    "u32",
+                    "i32",
+                    "f32",
+                    "u64",
+                    "i64",
+                    "f64",
+                ].includes(type.toLowerCase())) {
                     this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
                 }
                 else {
@@ -91,7 +107,8 @@ class AsJSONTransform extends BaseVisitor {
         let serializeFunc = "";
         if (this.currentClass.encodeStmts.length > 0) {
             const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1];
-            this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] = stmt.slice(0, stmt.length - 1);
+            this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
+                stmt.slice(0, stmt.length - 1);
             serializeFunc = `
       @inline
       __JSON_Serialize(): string {
@@ -131,7 +148,9 @@ export default class Transformer extends Transform {
         // Create new transform
         const transformer = new AsJSONTransform();
         // Sort the sources so that user scripts are visited last
-        const sources = parser.sources.filter(source => !isStdlib(source)).sort((_a, _b) => {
+        const sources = parser.sources
+            .filter((source) => !isStdlib(source))
+            .sort((_a, _b) => {
             const a = _a.internalPath;
             const b = _b.internalPath;
             if (a[0] === "~" && b[0] !== "~") {
@@ -153,4 +172,3 @@ export default class Transformer extends Transform {
         }
     }
 }
-;

@@ -1,36 +1,36 @@
 {
-    "name": "@json-as/transform",
-    "version": "0.5.37",
-    "description": "JSON encoder/decoder for AssemblyScript",
-    "main": "./lib/index.js",
-    "author": "Jairus Tanaka",
-    "contributors": [
-        "DogWhich",
-        "Romdotdog",
-        "Derek Barrera",
-        "Frankk Taylor",
-        "lekiano"
-    ],
-    "license": "MIT",
-    "devDependencies": {
-        "assemblyscript": "^0.27.1"
-    },
-    "dependencies": {},
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/JairusSW/as-json.git"
-    },
-    "keywords": [
-        "assemblyscript",
-        "json",
-        "serialize",
-        "deserialize",
-        "serde"
-    ],
-    "bugs": {
-        "url": "https://github.com/JairusSW/as-json/issues"
-    },
-    "homepage": "https://github.com/JairusSW/as-json#readme",
-    "type": "module",
-    "exports": "./lib/index.js"
+  "name": "@json-as/transform",
+  "version": "0.5.37",
+  "description": "JSON encoder/decoder for AssemblyScript",
+  "main": "./lib/index.js",
+  "author": "Jairus Tanaka",
+  "contributors": [
+    "DogWhich",
+    "Romdotdog",
+    "Derek Barrera",
+    "Frankk Taylor",
+    "lekiano"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "assemblyscript": "^0.27.1"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JairusSW/as-json.git"
+  },
+  "keywords": [
+    "assemblyscript",
+    "json",
+    "serialize",
+    "deserialize",
+    "serde"
+  ],
+  "bugs": {
+    "url": "https://github.com/JairusSW/as-json/issues"
+  },
+  "homepage": "https://github.com/JairusSW/as-json#readme",
+  "type": "module",
+  "exports": "./lib/index.js"
 }
