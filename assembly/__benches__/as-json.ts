@@ -1,6 +1,6 @@
 import { JSON } from "..";
 import { backSlashCode, quoteCode } from "../src/chars";
-import { parseJSONInt, unsafeCharCodeAt } from "../src/util";
+import { atoi_fast, parseSciInteger, unsafeCharCodeAt } from "../src/util";
 import { HASH } from "util/hash";
 
 @json
@@ -24,11 +24,11 @@ class Vec3 {
       if (inStr === false && char === quoteCode) {
         if (key != null) {
           if (unsafeCharCodeAt(key, 0) == 120) {
-            to.x = parseJSONInt<i32>(data.substring(last, pos - 1))
+            to.x = parseSciInteger<i32>(data.substring(last, pos - 1))
           } else if (unsafeCharCodeAt(key, 0) == 121) {
-            to.y = parseJSONInt<i32>(data.substring(last, pos - 1))
+            to.y = parseSciInteger<i32>(data.substring(last, pos - 1))
           } else if (unsafeCharCodeAt(key, 0) == 122) {
-            to.z = parseJSONInt<i32>(data.substring(last, pos - 1))
+            to.z = parseSciInteger<i32>(data.substring(last, pos - 1))
           }
         }
         last = ++pos;
@@ -41,11 +41,11 @@ class Vec3 {
     }
     if (key != null) {
       if (unsafeCharCodeAt(key, 0) == 120) {
-        to.x = parseJSONInt<i32>(data.substring(last, pos - 1))
+        to.x = parseSciInteger<i32>(data.substring(last, pos - 1))
       } else if (unsafeCharCodeAt(key, 0) == 121) {
-        to.y = parseJSONInt<i32>(data.substring(last, pos - 1))
+        to.y = parseSciInteger<i32>(data.substring(last, pos - 1))
       } else if (unsafeCharCodeAt(key, 0) == 122) {
-        to.z = parseJSONInt<i32>(data.substring(last, pos - 1))
+        to.z = parseSciInteger<i32>(data.substring(last, pos - 1))
       }
     }
     return to;
@@ -63,8 +63,8 @@ const vecOut = new Vec3();
 const i32Max = blackbox("429496729");
 /*
 bench("Stringify Object (Vec3)", () => {
-  blackbox<string>(vec.__JSON_Serialize(vec));
-});*/
+  blackbox<string>(vec.__JSON_Serialize());
+});
 
 bench("HASH String", () => {
   blackbox<number>(HASH("Hello"));
@@ -89,7 +89,7 @@ bench("Stringify Boolean Array", () => {
 bench("Stringify String Array", () => {
   blackbox(JSON.stringify<string[]>(["a", "b", "c"]));
 });
-
+*/
 bench("Stringify String", () => {
   blackbox(JSON.stringify(blackbox("Hello \"World!")));
 });
@@ -97,7 +97,7 @@ bench("Stringify String", () => {
 bench("Parse String", () => {
   blackbox(JSON.parse<string>(blackbox('"Hello \"World!"')));
 });
-
+/*
 bench("Stringify Boolean", () => {
   blackbox(JSON.stringify(blackbox(true)));
 });
@@ -120,4 +120,4 @@ bench("Stringify Float", () => {
 
 bench("Parse Float", () => {
   blackbox(JSON.parse<f32>(blackbox("3.14")));
-});
+});*/
