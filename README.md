@@ -8,15 +8,6 @@ JSON for AssemblyScript focused on performance, low-overhead, and ease-of-use.
 ```bash
 npm install json-as
 ```
-```bash
-npm install visitor-as --save-dev
-```
-
-For arbitrary-length numbers, use
-
-```bash
-npm install as-bignum
-```
 
 Add the transform to your `asc` command (e.g. in package.json)
 
@@ -75,26 +66,29 @@ const stringified = JSON.stringify<Player>(player);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
-## Planned Features
+## Deviations from the spec
 
-- [x] Serialize
-  - [x] Objects
-  - [x] Other Types
-  - [ ] Dynamic Types
-- [x] Deserialize
-  - [x] Objects
-  - [x] Other Types
-  - [ ] Dynamic Types
-- [ ] Streaming API
-- [ ] Whitespace support
-- [ ] Integrate features from SIMDJson
-- [x] Optimize
-  - [x] Strings
-  - [x] Int/Float
-  - [x] Bool
-  - [x] Object Serialization
-  - [ ] Object Parsing
-  - [ ] Arrays
+This implementation does not hold strongly to the JSON specification. Rather, design and behavior are inspired by the JSON implementation found in Google's v8 engine.
+
+- No support for dynamic types
+- Unsafe by design--parser assumes valid JSON
+- Partial whitespace support--parser prefers speed over handling whitespace effectively. Users may use the `removeWhitespace` function provided by `json-as/src/util.ts`
+- Is not based off of the official spec, but rather the behavior of the JSON C implementation found in google's v8 engine
+- Support for scientific notation on integers. Float support coming soon.
+
+## Implemented features
+
+Fully supports:
+
+- Strings
+- Integers
+- Floats (Scientific notation not implemented)
+- Booleans
+- Arrays
+- Objects
+- Date
+- Null
+
 ## Performance
 
 Number parsing speed has doubled over the last 5 versions due to the use of a `atoi_fast` function found in `assembly/util.ts`. This can be further optimized with SIMD.
@@ -107,7 +101,7 @@ Schema (object) parsing is being optimized on GitHub and should be at least doub
 
 **Serialize Object (Vec3):** 6.7m ops/5s
 
-**Deserialize Object (Vec3):** 3.8m ops/5s
+**Deserialize Object (Vec3):** 5.1m ops/5s
 
 **Serialize Array (int[]):** 6.6m ops/5s
 
