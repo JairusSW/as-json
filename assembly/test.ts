@@ -1,6 +1,5 @@
-import { backSlashCode, quoteCode } from "./src/chars";
 import { JSON } from "./src/json";
-import { atoi_fast, parseJSONInt, unsafeCharCodeAt } from "./src/util";
+import { atoi_fast, parseSciInteger } from "./src/util";
 
 @json
 class Vec3 {
@@ -53,8 +52,10 @@ console.log(`atoi_fast("429496729"): ${atoi_fast<i32>("429496729")}`);
 
 console.log(`strtol("429496729"): ${i32.parse("429496729")}`);
 
-console.log(parseJSONInt<i32>("321").toString());
-console.log(parseJSONInt<i32>("321e1").toString());
-console.log(parseJSONInt<i32>("321e2").toString());
-console.log(parseJSONInt<i32>("321e3").toString());
-console.log(parseJSONInt<i32>("321e-1").toString());
+console.log(parseSciInteger<i32>("321").toString());
+console.log(parseSciInteger<i32>("321e1").toString());
+console.log(parseSciInteger<i32>("321e2").toString());
+console.log(parseSciInteger<i32>("321e3").toString());
+console.log(parseSciInteger<i32>("321e-1").toString());
+
+console.log(atoi_fast<i32>("321e1").toString());
