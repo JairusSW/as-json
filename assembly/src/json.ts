@@ -1,6 +1,4 @@
-import { u128, u128Safe, u256, u256Safe, i128, i128Safe } from "as-bignum/assembly";
 import { StringSink } from "as-string-sink/assembly";
-import { itoa32, itoa64, dtoa, dtoa_buffered } from "util/number";
 import { isSpace } from "util/string";
 import {
     backSlashCode,
@@ -23,7 +21,7 @@ import {
     uCode,
     emptyArrayWord
 } from "./chars";
-import { parseJSONInt, escapeChar, isBigNum, unsafeCharCodeAt } from "./util";
+import { parseSciInteger, unsafeCharCodeAt } from "./util";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -94,9 +92,6 @@ export namespace JSON {
                 result.write(rightBracketWord);
                 return result.toString();
             }
-        } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
-            // @ts-ignore
-            return data.toString();
         } else {
             throw new Error(`Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
         }
@@ -133,9 +128,6 @@ export namespace JSON {
         } else if (idof<nonnull<T>>() == idof<Date>()) {
             // @ts-ignore
             return Date.fromString(data);
-        } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
-            // @ts-ignore
-            return parseBigNum<T>(data);
         } else {
             // @ts-ignore
             throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
@@ -206,9 +198,6 @@ export namespace JSON {
         } else if (idof<nonnull<T>>() == idof<Date>()) {
             // @ts-ignore
             return Date.fromString(data);
-        } else if ((isManaged<T>() || isReference<T>()) && isBigNum<T>()) {
-            // @ts-ignore
-            return parseBigNum<T>(data);
         } else {
             // @ts-ignore
             throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`)
@@ -221,8 +210,8 @@ export namespace JSON {
 @inline
 function serializeString(data: string): string {
     // @ts-ignore
-    if (data.length === 0) return "\"\"";
-    // Fast path for Vectors (3)
+    //if (data.length === 0) return "\"\"";
+   /*
     let char: i32 = 0;
     if (data.length === 1) {
         char = unsafeCharCodeAt(data, 0);
@@ -254,29 +243,26 @@ function serializeString(data: string): string {
         } else {
             return data;
         }
-    }
+    }*/
 
     let result = "\"";
 
     let last: i32 = 0;
-    let found: boolean = false;
     // @ts-ignore
     for (let i = 0; i < data.length; i++) {
-        char = unsafeCharCodeAt(<string>data, i);
+        const char = unsafeCharCodeAt(<string>data, i);
         if (char === 34 || char === 92) {
             result += (<string>data).slice(last, i) + "\\";
             last = i;
-            found = true;
             i++;
         } else if (char <= 13 && char >= 8) {
             result += (<string>data).slice(last, i);
             last = ++i;
-            found = true;
             switch (char) {
-                case 0x5C: {
+                /*case 0x5C: {
                     result += "\\\\";
                     break;
-                }
+                }*/
                 case 0x08: {
                     result += "\\b";
                     break;
@@ -300,28 +286,9 @@ function serializeString(data: string): string {
             }
         }
     }// 8 10 13 9 12
-    if (!found) return "\"" + data + "\"";
+    if (result.length === 1) return "\"" + data + "\"";
     else result += (<string>data).slice(last);
     return result + "\"";
-}
-// @ts-ignore
-@inline
-// @ts-ignore
-function parseBigNum<T>(data: string): T {
-    // @ts-ignore
-    if (idof<T>() == idof<u128>()) return u128.fromString(data);
-    // @ts-ignore
-    if (idof<T>() == idof<u128Safe>()) return u128Safe.fromString(data);
-    // @ts-ignore
-    if (idof<T>() == idof<u256>()) return u128Safe.fromString(data);
-    // @ts-ignore
-    if (idof<T>() == idof<u256Safe>()) return u256Safe.fromString(data);
-    // @ts-ignore
-    if (idof<T>() == idof<i128>()) return i128.fromString(data);
-    // @ts-ignore
-    if (idof<T>() == idof<i128Safe>()) return i128Safe.fromString(data);
-    // @ts-ignore
-    //if (idof<T>() == idof<i256Safe>()) return data.
 }
 
 // @ts-ignore
@@ -329,11 +296,10 @@ function parseBigNum<T>(data: string): T {
 function parseString(data: string): string {
     let result = "";
     let last = 1;
-    let char = 0;
     for (let i = 1; i < data.length - 1; i++) {
         // \\"
         if (unsafeCharCodeAt(data, i) === backSlashCode) {
-            char = unsafeCharCodeAt(data, ++i);
+            const char = unsafeCharCodeAt(data, ++i);
             result += data.slice(last, i - 1)
             if (char === 34) {
                 result += "\"";
@@ -343,25 +309,40 @@ function parseString(data: string): string {
                 last = ++i;
                 // 92 98 114 116 102 117
             } else if (char >= 92 && char <= 117) {
-                if (char === 92) {
-                    result += "\\";
-                    last = ++i;
-                } else if (char === 98) {
-                    result += "\b";
-                    last = ++i;
-                } else if (char === 102) {
-                    result += "\f";
-                    last = ++i;
-                } else if (char === 114) {
-                    result += "\r";
-                    last = ++i;
-                } else if (char === 116) {
-                    result += "\t";
-                    last = ++i;
-                } else if (char === 117 && load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) === 27584753879220272) {
-                    result += "\u000b";
-                    i += 4;
-                    last = ++i;
+                switch (char) {
+                    case 92: {
+                        result += "\\";
+                        last = ++i;
+                        break;
+                    }
+                    case 98: {
+                        result += "\b";
+                        last = ++i;
+                        break;
+                    }
+                    case 102: {
+                        result += "\f";
+                        last = ++i;
+                        break;
+                    }
+                    case 114: {
+                        result += "\r";
+                        last = ++i;
+                        break;
+                    }
+                    case 116: {
+                        result += "\t";
+                        last = ++i;
+                        break;
+                    }
+                    default: {
+                        if (char === 117 && load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) === 27584753879220272) {
+                            result += "\u000b";
+                            i += 4;
+                            last = ++i;
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -384,7 +365,7 @@ function parseBoolean<T extends boolean>(data: string): T {
 export function parseNumber<T>(data: string): T {
     if (isInteger<T>()) {
         // @ts-ignore
-        return parseJSONInt<T>(data);
+        return parseSciInteger<T>(data);
     }
     // @ts-ignore
     const type: T = 0;
