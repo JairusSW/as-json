@@ -1,20 +1,6 @@
 import { StringSink } from "as-string-sink/assembly";
 import { CharCode, isSpace } from "util/string";
-import { backSlashCode, quoteCode, rCode } from "./chars";
-import { u128, u128Safe, u256, u256Safe, i128, i128Safe, i256Safe } from "as-bignum/assembly";
-
-// @ts-ignore
-@inline
-export function isBigNum<T>(): boolean {
-  if (idof<T>() == idof<u128>()) return true;
-  if (idof<T>() == idof<u128Safe>()) return true;
-  if (idof<T>() == idof<u256>()) return true;
-  if (idof<T>() == idof<u256Safe>()) return true;
-  if (idof<T>() == idof<i128>()) return true;
-  if (idof<T>() == idof<i128Safe>()) return true;
-  if (idof<T>() == idof<i256Safe>()) return true;
-  return false;
-}
+import { backSlashCode, quoteCode } from "./chars";
 
 // @ts-ignore
 @inline
@@ -56,7 +42,7 @@ export function escapeChar(char: string): string {
     case 0x09: return "\\t";
     case 0x0C: return "\\f";
     case 0x0B: return "\\u000b";
-    default: return char; 
+    default: return char;
   }
 }
 
@@ -81,7 +67,7 @@ export function getArrayDepth<T>(depth: i32 = 1): i32 {
 
 /**
  * Implementation of ATOI. Can be much much faster with SIMD.
- * Its pretty fast. (173m ops (atoi_fast) vs 89 ops (parseInt))
+ * Benchmark: 40-46m ops/s
 */
 @unsafe
 @inline
@@ -97,47 +83,36 @@ export function atoi_fast<T extends number>(str: string, offset: i32 = 0): T {
 }
 
 /**
- * Implementation of ATOI. Can be much much faster with SIMD.
- * Its pretty fast. (173m ops (atoi_fast) vs 89 ops (parseInt))
-*/
-@unsafe
+ * Parses an integer using atoi_fast and applies the appended exponential number to it as scientific notation.
+ * Benchmark: Hovers around 30m ops/s
+ * Only safe if the string is valid.
+ * @param str integer to parse. example: 123e1, 123e-1, 123E100
+ * @returns 
+ */
 @inline
-export function parseJSONInt<T extends number>(str: string): T {
+export function parseSciInteger<T extends number>(str: string): T {
   // @ts-ignore
   let val: T = 0;
-  let char: u16 = load<u16>(changetype<usize>(str));
-  let pos = 2;
-  let neg = char === 45;
-  // @ts-ignore
-  val = (val << 1) + (val << 3) + (char - 48);
-  for (; pos < (str.length << 1); pos += 2) {
-    char = load<u16>(changetype<usize>(str) + <usize>pos);
+  let offset = 0;
+  for (; offset < (str.length << 1); offset += 2) {
+    const char = load<u16>(changetype<usize>(str) + <usize>offset);
     if (char === 101 || char === 69) {
-      char = load<u16>(changetype<usize>(str) + <usize>(pos += 2));
+      const char = load<u16>(changetype<usize>(str) + <usize>(offset += 2));
       if (char === 45) {
         // @ts-ignore
-        val /= sciNote<T>(atoi_fast<T>(str, pos += 2));
-        if (neg === true) {
-          // @ts-ignore
-          return ~val + 1;
-        }
+        val /= sciNote<T>(atoi_fast<T>(str, offset += 2));
+        // @ts-ignore
         return val;
       } else {
         // @ts-ignore
-        val *= sciNote<T>(atoi_fast<T>(str, pos += 2));
-        if (neg === true) {
-          // @ts-ignore
-          return ~val + 1;
-        }
+        val *= sciNote<T>(atoi_fast<T>(str, offset));
+        // @ts-ignore
         return val;
       }
     }
     // @ts-ignore
     val = (val << 1) + (val << 3) + (char - 48);
-  }
-  if (neg === true) {
-    // @ts-ignore
-    val = ~val + 1;
+    // We use load because in this case, there is no need to have bounds-checking
   }
   return val;
 }
