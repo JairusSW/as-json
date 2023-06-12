@@ -53,10 +53,31 @@ const vec: Vec3 = {
   z: 8,
 };
 
-const vecOut = new Vec3();
+@inline function istr8<T extends number>(int: T): string {
+  if (int >= 100) {
+    const str = changetype<string>(__new(6, idof<String>()));
+    store<u16>(changetype<usize>(str), ((int / 100) % 10) + 48);
+    store<u16>(changetype<usize>(str), ((int / 10) % 10) + 48, 2);
+    store<u16>(changetype<usize>(str), (int % 10) + 48, 4);
+    return str;
+  } else if (int >= 10) {
+    const str = changetype<string>(__new(4, idof<String>()));
+    store<u16>(changetype<usize>(str), ((int / 10) % 10) + 48);
+    store<u16>(changetype<usize>(str), (int % 10) + 48, 2);
+    return str;
+  } else {
+    const str = changetype<string>(__new(2, idof<String>()));
+    store<u16>(changetype<usize>(str), (int % 10) + 48);
+    return str;
+  }
+}
 
-const i32Max = blackbox("429496729");
-
+bench("strint", () => {
+  blackbox<string>(istr8<i32>(123));
+})
+bench("tostr", () => {
+  blackbox<string>((<i32>123).toString());
+})
 bench("Stringify Object (Vec3)", () => {
   blackbox<string>(vec.__JSON_Serialize());
 });
