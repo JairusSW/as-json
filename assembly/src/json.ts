@@ -269,29 +269,28 @@ export namespace JSON {
             result += (<string>data).slice(last, i);
             last = ++i;
             switch (char) {
-                /*case 0x5C: {
-                            result += "\\\\";
-                            break;
-                        }*/
-                case 0x08: {
+                case 8: {
                     result += "\\b";
                     break;
                 }
-                case 0x0d: {
-                    result += "\\r";
-                    break;
-                }
-                case 0x09: {
+                case 9: {
                     result += "\\t";
                     break;
                 }
-                case 0x0c: {
+                case 10: {
+                    result += "\\n";
+                    break;
+                }
+                case 11: {
+                    result += "\\x0B"; // \\u000b
+                    break;
+                }
+                case 12: {
                     result += "\\f";
                     break;
                 }
-                // This is actually not within bounds of the previous branch, so it is not checked.
-                case 0x0b: {
-                    result += "\\u000b";
+                case 13: {
+                    result += "\\r";
                     break;
                 }
             }
@@ -329,6 +328,10 @@ export namespace JSON {
                         result += "\b";
                         last = ++i;
                         break;
+                    }
+                    case 110: {
+                        result += "\n";
+                        last = ++i;
                     }
                     case 102: {
                         result += "\f";

@@ -238,3 +238,5 @@ export function istr64<T extends number>(int: T): string {
 // 7 = 55
 // 8 = 56
 // 9 = 57
+
+console.log(JSON.stringify("h\\i from gray\bson"))
