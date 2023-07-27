@@ -23,14 +23,19 @@ class AsJSONTransform extends BaseVisitor {
   public currentClass!: SchemaData;
   public sources: Source[] = [];
 
-  visitMethodDeclaration(): void { }
+  visitMethodDeclaration(): void {}
   visitClassDeclaration(node: ClassDeclaration): void {
     const className = node.name.text;
     if (!node.decorators?.length) return;
     let foundDecorator = false;
     for (const decorator of node.decorators!) {
-      // @ts-ignore
-      if (decorator.name.text.toLowerCase() == "json" || decorator.name.text.toLowerCase() == "serializable") foundDecorator = true;
+      if (
+        // @ts-ignore
+        decorator.name.text.toLowerCase() == "json" ||
+        // @ts-ignore
+        decorator.name.text.toLowerCase() == "serializable"
+      )
+        foundDecorator = true;
     }
     if (!foundDecorator) return;
 
@@ -60,8 +65,8 @@ class AsJSONTransform extends BaseVisitor {
       } else {
         console.error(
           "Class extends " +
-          this.currentClass.parent +
-          ", but parent class not found. Maybe add the @json decorator over parent class?"
+            this.currentClass.parent +
+            ", but parent class not found. Maybe add the @json decorator over parent class?"
         );
       }
     }
@@ -75,8 +80,9 @@ class AsJSONTransform extends BaseVisitor {
     ];
 
     for (const mem of members) {
+      // @ts-ignore
       if (mem.type && mem.type.name && mem.type.name.identifier.text) {
-        const member: FieldDeclaration = mem;
+        const member = mem as FieldDeclaration;
         if (toString(member).startsWith("static")) return;
         const lineText = toString(member);
         if (lineText.startsWith("private")) return;
@@ -127,7 +133,7 @@ class AsJSONTransform extends BaseVisitor {
     if (this.currentClass.encodeStmts.length > 0) {
       const stmt =
         this.currentClass.encodeStmts[
-        this.currentClass.encodeStmts.length - 1
+          this.currentClass.encodeStmts.length - 1
         ]!;
       this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
         stmt!.slice(0, stmt.length - 1);
@@ -150,9 +156,9 @@ class AsJSONTransform extends BaseVisitor {
       @inline
       __JSON_Set_Key(key: string, value: string): void {
         ${
-      // @ts-ignore
-      this.currentClass.setDataStmts.join("")
-      }
+          // @ts-ignore
+          this.currentClass.setDataStmts.join("")
+        }
       }
     `;
 

@@ -1,6 +1,6 @@
 import { JSON } from "./src/json";
 import { atoi_fast, parseSciInteger } from "./src/util";
-import * as a from "util/number"
+import * as a from "util/number";
 @json
 class Vec3 {
   x!: f32;
@@ -63,7 +63,9 @@ console.log("3 - " + istr8(3));
 
 console.log(Uint8Array.wrap(changetype<ArrayBuffer>(istr8(12))).join(" "));
 console.log(load<u32>(changetype<usize>(istr8(12))).toString());
-@inline function istr8<T extends number>(int: T): string {
+@inline function istr8<
+  T extends number
+>(int: T): string {
   if (int >= 100) {
     const str = changetype<string>(__new(6, idof<String>()));
     store<u16>(changetype<usize>(str), ((int / 100) % 10) + 48);
@@ -222,9 +224,11 @@ export function istr32<T extends number>(int: T): string {
 export function istr64<T extends number>(int: T): string {
   const val = new ArrayBuffer(6);
   store<u16>(changetype<usize>(val), (int % 10) + 48, 4);
-  if ((int = int / 10 as T) > 0) store<u16>(changetype<usize>(val), (int % 10) + 48, 2);
+  if ((int = (int / 10) as T) > 0)
+    store<u16>(changetype<usize>(val), (int % 10) + 48, 2);
   else return changetype<string>(val);
-  if ((int = int / 10 as T) > 0) store<u16>(changetype<usize>(val), (int % 10) + 48);
+  if ((int = (int / 10) as T) > 0)
+    store<u16>(changetype<usize>(val), (int % 10) + 48);
   return changetype<string>(val);
 }
 
@@ -239,4 +243,4 @@ export function istr64<T extends number>(int: T): string {
 // 8 = 56
 // 9 = 57
 
-console.log(JSON.stringify("h\\i from gray\bson"))
+console.log(JSON.stringify("h\\i from gray\bson"));

@@ -26,8 +26,11 @@ class AsJSONTransform extends BaseVisitor {
             return;
         let foundDecorator = false;
         for (const decorator of node.decorators) {
+            if (
             // @ts-ignore
-            if (decorator.name.text.toLowerCase() == "json" || decorator.name.text.toLowerCase() == "serializable")
+            decorator.name.text.toLowerCase() == "json" ||
+                // @ts-ignore
+                decorator.name.text.toLowerCase() == "serializable")
                 foundDecorator = true;
         }
         if (!foundDecorator)
@@ -65,6 +68,7 @@ class AsJSONTransform extends BaseVisitor {
             ...(parentSchema ? parentSchema.node.members : []),
         ];
         for (const mem of members) {
+            // @ts-ignore
             if (mem.type && mem.type.name && mem.type.name.identifier.text) {
                 const member = mem;
                 if (toString(member).startsWith("static"))

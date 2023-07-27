@@ -8,7 +8,10 @@ class Vec3 {
   x: i32;
   y: i32;
   z: i32;
-  @inline __JSON_Deserialize(data: string, to: Vec3): Vec3 {
+  @inline __JSON_Deserialize(
+    data: string,
+    to: Vec3
+  ): Vec3 {
     let last = 1;
     let char = 0;
     let inStr = false;
@@ -19,16 +22,19 @@ class Vec3 {
       if (inStr === false && char === quoteCode) {
         if (key != null) {
           if (unsafeCharCodeAt(key, 0) == 120) {
-            to.x = parseSciInteger<i32>(data.substring(last, pos - 1))
+            to.x = parseSciInteger<i32>(data.substring(last, pos - 1));
           } else if (unsafeCharCodeAt(key, 0) == 121) {
-            to.y = parseSciInteger<i32>(data.substring(last, pos - 1))
+            to.y = parseSciInteger<i32>(data.substring(last, pos - 1));
           } else if (unsafeCharCodeAt(key, 0) == 122) {
-            to.z = parseSciInteger<i32>(data.substring(last, pos - 1))
+            to.z = parseSciInteger<i32>(data.substring(last, pos - 1));
           }
         }
         last = ++pos;
         inStr = true;
-      } else if (char === quoteCode && unsafeCharCodeAt(data, pos - 1) != backSlashCode) {
+      } else if (
+        char === quoteCode &&
+        unsafeCharCodeAt(data, pos - 1) != backSlashCode
+      ) {
         inStr = false;
         key = data.substring(last, pos);
         last = pos += 2;
@@ -36,11 +42,11 @@ class Vec3 {
     }
     if (key != null) {
       if (unsafeCharCodeAt(key, 0) == 120) {
-        to.x = parseSciInteger<i32>(data.substring(last, pos - 1))
+        to.x = parseSciInteger<i32>(data.substring(last, pos - 1));
       } else if (unsafeCharCodeAt(key, 0) == 121) {
-        to.y = parseSciInteger<i32>(data.substring(last, pos - 1))
+        to.y = parseSciInteger<i32>(data.substring(last, pos - 1));
       } else if (unsafeCharCodeAt(key, 0) == 122) {
-        to.z = parseSciInteger<i32>(data.substring(last, pos - 1))
+        to.z = parseSciInteger<i32>(data.substring(last, pos - 1));
       }
     }
     return to;
@@ -53,7 +59,9 @@ const vec: Vec3 = {
   z: 8,
 };
 
-@inline function istr8<T extends number>(int: T): string {
+@inline function istr8<
+  T extends number
+>(int: T): string {
   if (int >= 100) {
     const str = changetype<string>(__new(6, idof<String>()));
     store<u16>(changetype<usize>(str), ((int / 100) % 10) + 48);
@@ -74,10 +82,10 @@ const vec: Vec3 = {
 
 bench("strint", () => {
   blackbox<string>(istr8<i32>(123));
-})
+});
 bench("tostr", () => {
   blackbox<string>((<i32>123).toString());
-})
+});
 bench("Stringify Object (Vec3)", () => {
   blackbox<string>(vec.__JSON_Serialize());
 });
