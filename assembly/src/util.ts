@@ -114,6 +114,10 @@ export function parseSciInteger<T extends number>(str: string): T {
   // @ts-ignore
   let val: T = 0;
   let offset = 0;
+  let firstChar = load<u16>(changetype<usize>(str) + <usize>offset);
+  if (firstChar === 45) {
+    offset = 2;
+  }
   for (; offset < str.length << 1; offset += 2) {
     const char = load<u16>(changetype<usize>(str) + <usize>offset);
     if (char === 101 || char === 69) {
@@ -134,6 +138,9 @@ export function parseSciInteger<T extends number>(str: string): T {
     val = (val << 1) + (val << 3) + (char - 48);
     // We use load because in this case, there is no need to have bounds-checking
   }
+  if (firstChar === 45) {
+    val = -val;
+  }
   return val;
 }
 
@@ -141,15 +148,16 @@ export function parseSciInteger<T extends number>(str: string): T {
 @inline
 function sciNote<T extends number>(num: T): T {
   let res = 1;
-  if (num > 0) {
-    for (let i = 0; i < num; i++) {
-      res *= 10;
+  // @ts-ignore
+    if (num > 0) {
+      for (let i: T = 0; i < num; i++) {
+        res *= 10;
+      }
+    } else {
+      for (let i: T = 0; i < num; i++) {
+        res /= 10;
+      }
     }
-  } else {
-    for (let i = 0; i < num; i++) {
-      res /= 10;
-    }
-  }
   // @ts-ignore
   return res;
 }

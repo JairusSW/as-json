@@ -54,7 +54,30 @@ console.log("1230 - " + parseSciInteger<i32>("123e1").toString());
 console.log("12300 - " + parseSciInteger<i32>("123e2").toString());
 console.log("123000 - " + parseSciInteger<i32>("123e3").toString());
 console.log("32 - " + parseSciInteger<i32>("123e-1").toString());
+console.log(parseSciInteger<i32>("100").toString());
+console.log(parseSciInteger<i32>("-100").toString());
 
+console.log(
+  JSON.stringify([
+    "abcdefg",
+    'st"ring" w""ith quotes"',
+    'string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n',
+    'string with colon : comma , brace [ ] bracket { } and quote " and other quote "',
+  ])
+);/*
+console.log(
+  JSON.stringify(
+    JSON.parse<string[]>(
+      JSON.stringify([
+        "abcdefg",
+        'st"ring" w""ith quotes"',
+        'string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n',
+        'string with colon : comma , brace [ ] bracket { } and quote " and other quote "',
+      ])
+    )
+  )
+);
+/*
 const str = changetype<string>(new ArrayBuffer(6));
 console.log("istr:");
 console.log("123 - " + istr8(123));
@@ -244,3 +267,4 @@ export function istr64<T extends number>(int: T): string {
 // 9 = 57
 
 console.log(JSON.stringify("h\\i from gray\bson"));
+*/
