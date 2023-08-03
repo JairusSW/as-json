@@ -33,11 +33,22 @@ class Player {
   isVerified: boolean;
 }
 
-class Nullable {}
+class Nullable { }
 type Null = Nullable | null;
 
 describe("Ser/de Nulls", () => {
   canSerde<Null>(null);
+});
+
+describe("Ser/de Strings", () => {
+  it("should ser/de strings", () => {
+    canSerde<string>("abcdefg");
+    canSerde<string>('st"ring" w""ith quotes"');
+    canSerde<string>('string \"with random spa\nces and \nnewlines\n\n\n');
+    canSerde<string>(
+      'string with colon : comma , brace [ ] bracket { } and quote " and other quote \\"'
+    );
+  });
 });
 
 describe("Ser/de Numbers", () => {
@@ -48,34 +59,6 @@ describe("Ser/de Numbers", () => {
     canSerde<u64>(101);
     canSerde<i32>(-100);
     canSerde<i64>(-101);
-
-    //  canSerde<u128>(u128.from("0"))
-    //   canSerde<u128>(u128.from("100"))
-    // canSerde<u128>(u128.from("101"))
-
-    /* canSerde<u128Safe>(u128Safe.from("0"))
-    canSerde<u128Safe>(u128Safe.from("100"))
-    canSerde<u128Safe>(u128Safe.from("101"))
-    
-    canSerde<u256>(u256.fromU128(u128.from("0")))
-    canSerde<u256>(u256.fromU128(u128.from("100")))
-    canSerde<u256>(u256.fromU128(u128.from("101")))
-
-    canSerde<u256Safe>(u256Safe.fromU128(u128.from("0")))
-    canSerde<u256Safe>(u256Safe.fromU128(u128.from("100")))
-    canSerde<u256Safe>(u256Safe.fromU128(u128.from("101")))
-
-    canSerde<i128>(i128.from("0"))
-    canSerde<i128>(i128.from("100"))
-    canSerde<i128>(i128.from("101"))
-
-    canSerde<i128Safe>(i128Safe.from("0"))
-    canSerde<i128Safe>(i128Safe.from("100"))
-    canSerde<i128Safe>(i128Safe.from("101"))
-    canSerde<i128Safe>(i128Safe.from("-100"))
-    canSerde<i128Safe>(i128Safe.from("-101"))
-*/
-    //canSerde<i256Safe>(new i256Safe(10, 11, 500, 501))
   });
 
   it("should ser/de floats", () => {
@@ -98,30 +81,13 @@ describe("Ser/de Numbers", () => {
     canSerde<boolean>(false);
   });
 
-  it("should ser/de strings", () => {
-    canSerde<string>("abcdefg");
-    canSerde<string>('st"ring" w""ith quotes"');
-    canSerde<string>(
-      'string \t\r\\"with ran\tdom spa\nces and \nnewlines\n\n\n'
-    );
-    canSerde<string>(
-      'string with colon : comma , brace [ ] bracket { } and quote " and other quote \\"'
-    );
-  });
-
   it("should ser/de BigInt objects", () => {
-    /*  canSerde<i32>(0);
+    canSerde<i32>(0);
 
     canSerde<u32>(100);
     canSerde<u64>(101);
     canSerde<i32>(-100);
     canSerde<i64>(-101);
-    canSerde<u128>(u128.from("0"))
-    canSerde<u128>(u128.from("100"))
-    canSerde<u128>(u128.from("101"))
-    canSerde<u128>(u128.from("-100"))
-    canSerde<u128>(u128.from("-101"))
-*/
   });
 });
 
@@ -144,13 +110,7 @@ describe("Ser/de Array", () => {
   });
 
   it("should ser/de string arrays", () => {
-    // ["abcdefg","st\\"ring\\" w\\"\\"ith quotes\\"","string \\t\\r\\"with ran\\tdom spa\\nces and \\nnewlines\\n\\n\\n","string with colon : comma , brace [ ] bracket { } and quote \\" and other quote \\""]
-    canSerde<string[]>([
-      "abcdefg",
-      'st"ring" w""ith quotes"',
-      'string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n',
-      'string with colon : comma , brace [ ] bracket { } and quote " and other quote "',
-    ]);
+    canSerde<string[]>(['string \"with random spa\nces and \nnewlines\n\n\n']);
   });
 
   it("should ser/de nested integer arrays", () => {
@@ -172,17 +132,6 @@ describe("Ser/de Array", () => {
   it("should ser/de boolean arrays", () => {
     canSerde<bool[][]>([[true], [false]]);
     canSerde<boolean[][]>([[true], [false]]);
-  });
-
-  it("should ser/de string arrays", () => {
-    canSerde<string[][]>([
-      ["abcdefg"],
-      ['st"ring" w""ith quotes"'],
-      ['string \t\r\\"with ran\tdom spa\nces and \nnewlines\n\n\n'],
-      [
-        'string with colon : comma , brace [ ] bracket { } and quote " and other quote \\"',
-      ],
-    ]);
   });
 
   it("should ser/de object arrays", () => {

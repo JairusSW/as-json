@@ -272,10 +272,10 @@ export namespace JSON {
     if (char === 34 || char === 92) {
       result += (<string>data).slice(last, i) + "\\";
       last = i;
-      i++;
+      //i++;
     } else if (char <= 13 && char >= 8) {
       result += (<string>data).slice(last, i);
-      last = ++i;
+      last = i + 1;
       switch (char) {
         case 8: {
           result += "\\b";
@@ -322,40 +322,37 @@ export namespace JSON {
       result += data.slice(last, i - 1);
       if (char === 34) {
         result += '"';
-        last = ++i;
-      } else if (char === 110) {
-        result += "\n";
-        last = ++i;
-        // 92 98 114 116 102 117
+        last = i + 1;
       } else if (char >= 92 && char <= 117) {
         switch (char) {
           case 92: {
             result += "\\";
-            last = ++i;
+            last = i + 1;
             break;
           }
           case 98: {
             result += "\b";
-            last = ++i;
+            last = i + 1;
+            break;
+          }
+          case 102: {
+            result += "\f";
+            last = i + 1;
             break;
           }
           case 110: {
             result += "\n";
-            last = ++i;
-          }
-          case 102: {
-            result += "\f";
-            last = ++i;
+            last = i + 1;
             break;
           }
           case 114: {
             result += "\r";
-            last = ++i;
+            last = i + 1;
             break;
           }
           case 116: {
             result += "\t";
-            last = ++i;
+            last = i + 1;
             break;
           }
           default: {
@@ -366,7 +363,7 @@ export namespace JSON {
             ) {
               result += "\u000b";
               i += 4;
-              last = ++i;
+              last = i + 1;
             }
             break;
           }
@@ -579,7 +576,7 @@ export namespace JSON {
         lastPos = i;
       } else if (unsafeCharCodeAt(data, i - 1) !== backSlashCode) {
         instr = false;
-        result.push(data.slice(lastPos + 1, i).replaceAll('\\"', '"'));
+        result.push(parseString(data.slice(lastPos, i)));
       }
     }
   }

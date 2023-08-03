@@ -89,13 +89,28 @@ export function getArrayDepth<T>(depth: i32 = 1): i32 {
 export function atoi_fast<T extends number>(str: string, offset: i32 = 0): T {
   // @ts-ignore
   let val: T = 0;
-  for (; offset < str.length << 1; offset += 2) {
+  let firstChar = load<u16>(changetype<usize>(str) + <usize>offset);
+  if (firstChar === 45) {
+    offset += 2;
+    for (; offset < str.length << 1; offset += 2) {
+      // @ts-ignore
+      val =
+        (val << 1) +
+        (val << 3) +
+        (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
+      // We use load because in this case, there is no need to have bounds-checking
+    }
     // @ts-ignore
-    val =
-      (val << 1) +
-      (val << 3) +
-      (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
-    // We use load because in this case, there is no need to have bounds-checking
+    val = -val;
+  } else {
+    for (; offset < str.length << 1; offset += 2) {
+      // @ts-ignore
+      val =
+        (val << 1) +
+        (val << 3) +
+        (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
+      // We use load because in this case, there is no need to have bounds-checking
+    }
   }
   return val;
 }

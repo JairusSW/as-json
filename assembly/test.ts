@@ -1,6 +1,8 @@
 import { JSON } from "./src/json";
 import { atoi_fast, parseSciInteger } from "./src/util";
 import * as a from "util/number";
+// "st\"ring\" w\"\"ith quotes\""
+
 @json
 class Vec3 {
   x!: f32;
@@ -53,18 +55,25 @@ console.log("123 - " + parseSciInteger<i32>("123").toString());
 console.log("1230 - " + parseSciInteger<i32>("123e1").toString());
 console.log("12300 - " + parseSciInteger<i32>("123e2").toString());
 console.log("123000 - " + parseSciInteger<i32>("123e3").toString());
-console.log("32 - " + parseSciInteger<i32>("123e-1").toString());
+console.log("12 - " + parseSciInteger<i32>("123e-1").toString());
 console.log(parseSciInteger<i32>("100").toString());
 console.log(parseSciInteger<i32>("-100").toString());
 
-console.log(
-  JSON.stringify([
-    "abcdefg",
-    'st"ring" w""ith quotes"',
-    'string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n',
-    'string with colon : comma , brace [ ] bracket { } and quote " and other quote "',
-  ])
-);/*
+console.log(JSON.stringify("abcdefg"));
+console.log('"abcdefg"')
+console.log(JSON.stringify('st"ring" w""ith quotes"'));
+console.log('"st\\"ring\\" w\\"\\"ith quotes\\""')
+console.log(JSON.stringify(['string "with random spa\nces and \nnewlines\n\n\n']));
+console.log(JSON.stringify(JSON.parse<string[]>(JSON.stringify(['string "with random spa\nces and \nnewlines\n\n\n']))));
+console.log('"string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"')
+console.log(JSON.stringify('string with colon : comma , brace [ ] bracket { } and quote " and other quote "'));
+/*console.log(JSON.stringify(JSON.parse<string[]>(JSON.stringify([
+  "abcdefg",
+  'st"ring" w""ith quotes"',
+  'string \t\r"with ran\tdom spa\nces and \nnewlines\n\n\n',
+  'string with colon : comma , brace [ ] bracket { } and quote " and other quote "',
+]))));
+console.log('["abcdefg","st\"ring\" w\"\"ith quotes\"","string \t\r\"with ran\tdom spa\nces and \nnewlines\n\n\n","string with colon : comma , brace [ ] bracket { } and quote \" and other quote \""]');/*
 console.log(
   JSON.stringify(
     JSON.parse<string[]>(
