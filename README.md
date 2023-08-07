@@ -93,25 +93,34 @@ Fully supports:
 
 ## Performance
 
-Number parsing speed has doubled over the last 5 versions due to the use of a `atoi_fast` function found in `assembly/util.ts`. This can be further optimized with SIMD.
+Here are some benchmarks I took with `tinybench` (JavaScript) and `astral` (AssemblyScript).
+I took the benchmarks using the minimal runtime which doesn't call the Garbage Collector, so you may expect a 10% to 40% decrease from low to high throughput.
 
-String serialization has more than tripled in performance (+360%). The algorithm was rewritten for less if statements and more traps.
+Tests are run on Ubuntu/WSL2 with a AMD Ryzen 9 CPU
 
-String deserialization was quadrupled from 3.4m ops to 14.8 ops (435%). It went from using `.replaceAll` to a specialized algorithm.
+JavaScript Results (TinyBench/NodeJS 19)
+┌───────────────────────────┬─────────────┬────────────────────┬──────────┐
+│         Task Name         │  ops / sec  │  Average Time(ns)  │  Margin  │
+├───────────────────────────┼─────────────┼────────────────────┼──────────┤
+│ 'Stringify Object (Vec3)' │  '817,816'  │      1222.76       │ '±3.55%' │
+│   'Parse Object (Vec3)'   │  '726,115'  │      1377.19       │ '±3.21%' │
+│ 'Stringify Number Array'  │ '1,104,036' │      905.77        │ '±6.48%' │
+│   'Parse Number Array'    │ '1,114,053' │      897.62        │ '±2.58%' │
+│    'Stringify String'     │ '1,565,716' │      638.69        │ '±2.04%' │
+│      'Parse String'       │  '69,568'   │      14374.22      │ '±2.55%' │
+└───────────────────────────┴─────────────┴────────────────────┴──────────┘
 
-Schema (object) parsing is being optimized on GitHub and should be at least doubled if not tripled. (Current speed of barely-optimized version is 6.9m ops) This is due to taking advantage of the types with a type map and eliminating extra checking.
-
-**Serialize Object (Vec3):** 6.7m ops/5s
-
-**Deserialize Object (Vec3):** 5.1m ops/5s
-
-**Serialize Array (int[]):** 6.6m ops/5s
-
-**Deserialize Array (int[]):** 8.6m ops/5s
-
-**Serialize String (5):** 5.9m ops/5s
-
-**Deserialize String (5):** 16.3m ops/5s
+AssemblyScript Results (Runtime Minimal)
+┌───────────────────────────┬─────────────┬────────────────────┬──────────┐
+│         Task Name         │  ops / sec  │  Average Time(ns)  │   Diff   │
+├───────────────────────────┼─────────────┼────────────────────┼──────────┤
+│ 'Stringify Object (Vec3)' │ '2,091,000' │       417.22       │  -805ns  │
+│   'Parse Object (Vec3)'   │ '1,780,000' │       539.02       │  -838ns  |
+│ 'Stringify Number Array'  │ '1,920,000' │       445.43       │  -460ns  │
+│   'Parse Number Array'    │ '1,660,000' │       597.17       │  -300ns  │
+│    'Stringify String'     │ '1,280,000' │       736.27       │   +97ns  │
+│      'Parse String'       │ '4,230,000' │       239.21       │ -14135ns │
+└───────────────────────────┴─────────────┴────────────────────┴──────────┘
 
 ## Issues
 
