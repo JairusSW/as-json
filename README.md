@@ -99,6 +99,7 @@ I took the benchmarks using the minimal runtime which doesn't call the Garbage C
 Tests are run on Ubuntu/WSL2 with a AMD Ryzen 9 CPU
 
 JavaScript Results (TinyBench/NodeJS 19)
+```
 ┌───────────────────────────┬─────────────┬────────────────────┬──────────┐
 │         Task Name         │  ops / sec  │  Average Time(ns)  │  Margin  │
 ├───────────────────────────┼─────────────┼────────────────────┼──────────┤
@@ -109,8 +110,10 @@ JavaScript Results (TinyBench/NodeJS 19)
 │    'Stringify String'     │ '1,565,716' │      638.69        │ '±2.04%' │
 │      'Parse String'       │  '69,568'   │      14374.22      │ '±2.55%' │
 └───────────────────────────┴─────────────┴────────────────────┴──────────┘
+```
 
 AssemblyScript Results (Runtime Minimal)
+```
 ┌───────────────────────────┬─────────────┬────────────────────┬──────────┐
 │         Task Name         │  ops / sec  │  Average Time(ns)  │   Diff   │
 ├───────────────────────────┼─────────────┼────────────────────┼──────────┤
@@ -121,6 +124,7 @@ AssemblyScript Results (Runtime Minimal)
 │    'Stringify String'     │ '1,280,000' │       736.27       │   +97ns  │
 │      'Parse String'       │ '4,230,000' │       239.21       │ -14135ns │
 └───────────────────────────┴─────────────┴────────────────────┴──────────┘
+```
 
 ## Issues
 
