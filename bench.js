@@ -1,7 +1,5 @@
 import { Bench } from "tinybench";
 // Trying a new benchmarking lib.
-// It seems to not warmup long at all, so its probably bad.
-// benchmark will probably be best here
 
 // JavaScript Results
 // ┌─────────┬───────────────────────────┬─────────────┬────────────────────┬──────────┬─────────┐
@@ -35,7 +33,7 @@ const vec = {
 
 let data;
 
-const bench = new Bench({ time: 100 })
+const bench = new Bench({ time: 1000 })
 
     .add("Stringify Object (Vec3)", () => {
         data = JSON.stringify(vec);
