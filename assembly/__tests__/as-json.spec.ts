@@ -1,13 +1,4 @@
 import { JSON } from "..";
-import {
-  u128,
-  u128Safe,
-  u256,
-  u256Safe,
-  i128,
-  i128Safe,
-  i256Safe,
-} from "as-bignum/assembly";
 function canSerde<T>(data: T): void {
   const serialized = JSON.stringify<T>(data);
   const deserialized = JSON.stringify<T>(JSON.parse<T>(serialized));

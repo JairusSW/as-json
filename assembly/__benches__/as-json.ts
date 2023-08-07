@@ -3,6 +3,13 @@ import { backSlashCode, quoteCode } from "../src/chars";
 import { atoi_fast, parseSciInteger, unsafeCharCodeAt } from "../src/util";
 import { HASH } from "util/hash";
 
+
+let last = 1;
+let char = 0;
+let inStr = false;
+let key: string | null = null;
+let pos = 0;
+
 @json
 class Vec3 {
   x: i32;
@@ -12,20 +19,15 @@ class Vec3 {
     data: string,
     to: Vec3
   ): Vec3 {
-    let last = 1;
-    let char = 0;
-    let inStr = false;
-    let key: string | null = null;
-    let pos = 0;
     for (; pos < data.length - 1; pos++) {
       char = unsafeCharCodeAt(data, pos);
       if (inStr === false && char === quoteCode) {
         if (key != null) {
-          if (unsafeCharCodeAt(key, 0) == 120) {
+          if (unsafeCharCodeAt(key!, 0) == 120) {
             to.x = parseSciInteger<i32>(data.substring(last, pos - 1));
-          } else if (unsafeCharCodeAt(key, 0) == 121) {
+          } else if (unsafeCharCodeAt(key!, 0) == 121) {
             to.y = parseSciInteger<i32>(data.substring(last, pos - 1));
-          } else if (unsafeCharCodeAt(key, 0) == 122) {
+          } else if (unsafeCharCodeAt(key!, 0) == 122) {
             to.z = parseSciInteger<i32>(data.substring(last, pos - 1));
           }
         }
@@ -41,14 +43,20 @@ class Vec3 {
       }
     }
     if (key != null) {
-      if (unsafeCharCodeAt(key, 0) == 120) {
+      if (unsafeCharCodeAt(key!, 0) == 120) {
         to.x = parseSciInteger<i32>(data.substring(last, pos - 1));
-      } else if (unsafeCharCodeAt(key, 0) == 121) {
+      } else if (unsafeCharCodeAt(key!, 0) == 121) {
         to.y = parseSciInteger<i32>(data.substring(last, pos - 1));
-      } else if (unsafeCharCodeAt(key, 0) == 122) {
+      } else if (unsafeCharCodeAt(key!, 0) == 122) {
         to.z = parseSciInteger<i32>(data.substring(last, pos - 1));
       }
     }
+
+    last = 1;
+    char = 0;
+    inStr = false;
+    key = null;
+    pos = 0;
     return to;
   }
 }
@@ -57,35 +65,8 @@ const vec: Vec3 = {
   x: 3,
   y: 1,
   z: 8,
-};
-
-@inline function istr8<
-  T extends number
->(int: T): string {
-  if (int >= 100) {
-    const str = changetype<string>(__new(6, idof<String>()));
-    store<u16>(changetype<usize>(str), ((int / 100) % 10) + 48);
-    store<u16>(changetype<usize>(str), ((int / 10) % 10) + 48, 2);
-    store<u16>(changetype<usize>(str), (int % 10) + 48, 4);
-    return str;
-  } else if (int >= 10) {
-    const str = changetype<string>(__new(4, idof<String>()));
-    store<u16>(changetype<usize>(str), ((int / 10) % 10) + 48);
-    store<u16>(changetype<usize>(str), (int % 10) + 48, 2);
-    return str;
-  } else {
-    const str = changetype<string>(__new(2, idof<String>()));
-    store<u16>(changetype<usize>(str), (int % 10) + 48);
-    return str;
-  }
 }
-
-bench("strint", () => {
-  blackbox<string>(istr8<i32>(123));
-});
-bench("tostr", () => {
-  blackbox<string>((<i32>123).toString());
-});
+/*
 bench("Stringify Object (Vec3)", () => {
   blackbox<string>(vec.__JSON_Serialize());
 });
@@ -99,24 +80,24 @@ bench("Stringify Number Array", () => {
   blackbox(JSON.stringify<i32[]>([1, 2, 3]));
 });
 
-bench("Parse Array", () => {
+bench("Parse Number Array", () => {
   blackbox(JSON.parse<i32[]>(blackbox("[1,2,3]")));
 });
 
+bench("Stringify String", () => {
+  blackbox(JSON.stringify(blackbox('Hello "World!')));
+});
+*/
+bench("Parse String", () => {
+  blackbox(JSON.parse<string>(blackbox('"Hello "World!"')));
+});
+/*
 bench("Stringify Boolean Array", () => {
   blackbox(JSON.stringify<boolean[]>([true, false, true]));
 });
 
 bench("Stringify String Array", () => {
   blackbox(JSON.stringify<string[]>(["a", "b", "c"]));
-});
-
-bench("Stringify String", () => {
-  blackbox(JSON.stringify(blackbox('Hello "World!')));
-});
-
-bench("Parse String", () => {
-  blackbox(JSON.parse<string>(blackbox('"Hello "World!"')));
 });
 
 bench("Stringify Boolean", () => {
@@ -142,3 +123,4 @@ bench("Stringify Float", () => {
 bench("Parse Float", () => {
   blackbox(JSON.parse<f32>(blackbox("3.14")));
 });
+*/
