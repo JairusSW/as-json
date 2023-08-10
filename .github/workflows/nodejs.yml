@@ -1,0 +1,25 @@
+name: Node.js CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: yarn
+
+      - name: Test to see if the project compiles
+        run: yarn build:test
+
+      - name: Perform tests
+        run: yarn run test:aspect

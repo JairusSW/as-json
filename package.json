@@ -13,7 +13,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "aspect": "asp",
+    "test:aspect": "asp",
     "bench:astral": "astral -Ospeed --noAssert --uncheckedBehavior always --runtime stub",
     "build:test": "asc assembly/test.ts --target test",
     "build:transform": "tsc -p ./transform",
@@ -27,13 +27,13 @@
     "@as-tral/cli": "^2.0.0",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "assemblyscript": "^0.27.8",
-    "assemblyscript-prettier": "^1.0.7",
+    "assemblyscript-prettier": "^2.0.2",
     "benchmark": "^2.1.4",
     "kati": "^0.6.2",
     "microtime": "^3.1.1",
-    "prettier": "^2.8.4",
+    "prettier": "^3.0.1",
     "tinybench": "^2.5.0",
-    "typescript": "^4.9.5",
+    "typescript": "^5.1.6",
     "visitor-as": "^0.11.4"
   },
   "dependencies": {

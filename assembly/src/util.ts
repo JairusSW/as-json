@@ -96,7 +96,7 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
   let val: T = 0 as T;
   const len = u32(str.length << 1);
   if (isNegative) {
-    if ((ch >> 16) === 48) return -0 as T;
+    //if ((ch >> 16) === 48) return -0 as T;
     offset += 2;
     if (len >= 4) {
       // 32-bit route
