@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.5.51",
+  "version": "0.5.52",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
