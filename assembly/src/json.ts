@@ -1,5 +1,5 @@
 import { StringSink } from "as-string-sink/assembly";
-import { isSpace, CharCode } from "util/string";
+import { isSpace } from "util/string";
 import {
   backSlashCode,
   commaCode,
@@ -21,7 +21,7 @@ import {
   uCode,
   emptyArrayWord,
 } from "./chars";
-import { parseSciInteger, unsafeCharCodeAt } from "./util";
+import { snip_fast, unsafeCharCodeAt } from "./util";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -184,7 +184,7 @@ export namespace JSON {
             } else if (
               char === 117 &&
               load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
-                27584753879220272
+              27584753879220272
             ) {
               result += "\u000b";
               i += 4;
@@ -359,7 +359,7 @@ export namespace JSON {
             if (
               char === 117 &&
               load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
-                27584753879220272
+              27584753879220272
             ) {
               result += "\u000b";
               i += 4;
@@ -385,12 +385,10 @@ export namespace JSON {
 }
 
 // @ts-ignore
-@inline export function parseNumber<
-  T
->(data: string): T {
+@inline export function parseNumber<T>(data: string): T {
   if (isInteger<T>()) {
     // @ts-ignore
-    return parseSciInteger<T>(data);
+    return snip_fast<T>(data);
   }
   // @ts-ignore
   const type: T = 0;
@@ -401,9 +399,7 @@ export namespace JSON {
 }
 
 // @ts-ignore
-@inline function parseObject<
-  T
->(data: string): T {
+@inline function parseObject<T>(data: string): T {
   let schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );

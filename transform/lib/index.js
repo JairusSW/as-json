@@ -1,4 +1,4 @@
-import { getName, toString, isStdlib } from "visitor-as/dist/utils.js";
+import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 class SchemaData {
@@ -19,48 +19,23 @@ class AsJSONTransform extends BaseVisitor {
         this.sources = [];
     }
     visitMethodDeclaration() { }
-    visitFieldDeclaration(node) {
-        if (toString(node).startsWith("static"))
-            return;
-        const lineText = toString(node);
-        if (lineText.startsWith("private"))
-            return;
-        const name = getName(node);
-        if (!node.type) {
-            throw new Error(`Field ${name} is missing a type declaration`);
-        }
-        let type = getName(node.type);
-        // @ts-ignore
-        this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
-        // @ts-ignore
-        //this.decodeStmts.push(
-        //   `${name}: JSON.parseObjectValue<${type}>(values.get("${name}")),\n`
-        //);
-        // @ts-ignore
-        this.currentClass.setDataStmts.push(`if (key.length === ${name.length} && (memory.compare(changetype<usize>("${name}"), changetype<usize>(key), ${name.length}) == 0)) {
-        this.${name} = JSON.parseObjectValue<${type}>(value);
-        return;
-      }
-      `);
-        // @ts-ignore
-        //this.checkDecodeStmts.push(
-        //  ' if (!values.has("${name}")) throw new Error("Key "${name}" was not found. Cannot instantiate object.");\n'
-        //);
-    }
     visitClassDeclaration(node) {
-        var _a;
+        var _c;
         const className = node.name.text;
-        if (!((_a = node.decorators) === null || _a === void 0 ? void 0 : _a.length))
+        if (!((_c = node.decorators) === null || _c === void 0 ? void 0 : _c.length))
             return;
         let foundDecorator = false;
         for (const decorator of node.decorators) {
+            if (
             // @ts-ignore
-            if (decorator.name.text.toLowerCase() == "json" || decorator.name.text.toLowerCase() == "serializable")
+            decorator.name.text.toLowerCase() == "json" ||
+                // @ts-ignore
+                decorator.name.text.toLowerCase() == "serializable")
                 foundDecorator = true;
         }
         if (!foundDecorator)
             return;
-        // Prevent from being triggered twice
+        // Prevent from being triggered twice.
         for (const member of node.members) {
             if (member.name.text == "__JSON_Serialize")
                 return;
@@ -73,7 +48,7 @@ class AsJSONTransform extends BaseVisitor {
             parent: node.extendsType ? toString(node.extendsType) : "",
             node: node,
             encodeStmts: [],
-            setDataStmts: []
+            setDataStmts: [],
         };
         if (this.currentClass.parent.length > 0) {
             const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
@@ -82,17 +57,64 @@ class AsJSONTransform extends BaseVisitor {
                 this.currentClass.encodeStmts.push(...parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts);
             }
             else {
-                console.error("Class extends " + this.currentClass.parent + ", but parent class not found. Maybe add the @json decorator over parent class?");
+                console.error("Class extends " +
+                    this.currentClass.parent +
+                    ", but parent class not found. Maybe add the @json decorator over parent class?");
             }
         }
         const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
-        const members = [...node.members, ...(parentSchema ? parentSchema.node.members : [])];
-        this.visit(members);
+        const members = [
+            ...node.members,
+            ...(parentSchema ? parentSchema.node.members : []),
+        ];
+        for (const mem of members) {
+            // @ts-ignore
+            if (mem.type && mem.type.name && mem.type.name.identifier.text) {
+                const member = mem;
+                if (toString(member).startsWith("static"))
+                    return;
+                const lineText = toString(member);
+                if (lineText.startsWith("private"))
+                    return;
+                // @ts-ignore
+                let type = toString(member.type);
+                const name = member.name.text;
+                this.currentClass.keys.push(name);
+                // @ts-ignore
+                this.currentClass.types.push(type);
+                // @ts-ignore
+                if ([
+                    "u8",
+                    "i8",
+                    "u16",
+                    "i16",
+                    "u32",
+                    "i32",
+                    "f32",
+                    "u64",
+                    "i64",
+                    "f64",
+                ].includes(type.toLowerCase())) {
+                    this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
+                }
+                else {
+                    this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
+                }
+                // @ts-ignore
+                this.currentClass.setDataStmts.push(`if (key == "${name}") {
+        this.${name} = JSON.parseObjectValue<${type}>(value);
+        return;
+      }
+      `);
+            }
+        }
         let serializeFunc = "";
         if (this.currentClass.encodeStmts.length > 0) {
             const stmt = this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1];
-            this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] = stmt.slice(0, stmt.length - 1);
+            this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
+                stmt.slice(0, stmt.length - 1);
             serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
       }
@@ -100,16 +122,18 @@ class AsJSONTransform extends BaseVisitor {
         }
         else {
             serializeFunc = `
+      @inline
       __JSON_Serialize(): string {
         return "{}";
       }
       `;
         }
         const setKeyFunc = `
+      @inline
       __JSON_Set_Key(key: string, value: string): void {
         ${
-            // @ts-ignore
-            this.currentClass.setDataStmts.join("")}
+        // @ts-ignore
+        this.currentClass.setDataStmts.join("")}
       }
     `;
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
@@ -127,18 +151,23 @@ export default class Transformer extends Transform {
     afterParse(parser) {
         // Create new transform
         const transformer = new AsJSONTransform();
-        // Loop over every source
-        const sources = parser.sources.filter(source => !isStdlib(source)).sort((_a, _b) => {
-            const a = _a.internalPath
-            const b = _b.internalPath
+        // Sort the sources so that user scripts are visited last
+        const sources = parser.sources
+            .filter((source) => !isStdlib(source))
+            .sort((_a, _b) => {
+            const a = _a.internalPath;
+            const b = _b.internalPath;
             if (a[0] === "~" && b[0] !== "~") {
                 return -1;
-            } else if (a[0] !== "~" && b[0] === "~") {
+            }
+            else if (a[0] !== "~" && b[0] === "~") {
                 return 1;
-            } else {
+            }
+            else {
                 return 0;
             }
-        })
+        });
+        // Loop over every source
         for (const source of sources) {
             // Ignore all lib and std. Visit everything else.
             if (!isStdlib(source)) {

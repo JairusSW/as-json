@@ -1,6 +1,6 @@
 import { JSON } from "..";
 import { backSlashCode, quoteCode } from "../src/chars";
-import { atoi_fast, parseSciInteger, unsafeCharCodeAt } from "../src/util";
+import { atoi_fast, parseSciInteger, snip_fast, unsafeCharCodeAt } from "../src/util";
 import { HASH } from "util/hash";
 
 
@@ -66,15 +66,31 @@ const vec: Vec3 = {
   y: 1,
   z: 8,
 }
-/*
+
+bench("Parse Number SNIP", () => {
+  blackbox<i32>(snip_fast<i32>("12345"));
+});
+
+bench("Parse Number ATOI", () => {
+  blackbox<i32>(atoi_fast<i32>("12345"));
+})
+
+bench("Parse Number STDLIB", () => {
+  blackbox<i32>(i32.parse("12345"));
+});
+
+bench("Parse Number OLD", () => {
+  blackbox<i32>(parseSciInteger<i32>("12345"));
+});
+
 bench("Stringify Object (Vec3)", () => {
   blackbox<string>(vec.__JSON_Serialize());
 });
 
 // TODO: Make this allocate without crashing
-bench("Parse Object (Vec3)", () => {
+/*bench("Parse Object (Vec3)", () => {
   blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}', vec));
-});
+});*/
 
 bench("Stringify Number Array", () => {
   blackbox(JSON.stringify<i32[]>([1, 2, 3]));
@@ -87,7 +103,7 @@ bench("Parse Number Array", () => {
 bench("Stringify String", () => {
   blackbox(JSON.stringify(blackbox('Hello "World!')));
 });
-*/
+
 bench("Parse String", () => {
   blackbox(JSON.parse<string>(blackbox('"Hello "World!"')));
 });

@@ -1,8 +1,8 @@
 import { JSON } from "..";
-function canSerde<T>(data: T): void {
-  const serialized = JSON.stringify<T>(data);
-  const deserialized = JSON.stringify<T>(JSON.parse<T>(serialized));
-  expect(serialized).toBe(deserialized);
+function canSerde<T>(data: T, toBe: string = ""): void {
+  if (!toBe) toBe = JSON.stringify<T>(data);
+  const deserialized = JSON.stringify<T>(JSON.parse<T>(JSON.stringify(data)));
+  expect(deserialized).toBe(toBe);
 }
 
 // @ts-ignore
@@ -53,16 +53,13 @@ describe("Ser/de Numbers", () => {
   });
 
   it("should ser/de floats", () => {
-    canSerde<f64>(7.23);
-    canSerde<f64>(10e2);
-    canSerde<f64>(10e2);
+    canSerde<f64>(7.23, "7.23");
+    canSerde<f64>(10e2, "1000.0");
 
-    canSerde<f64>(123456e-5);
+    canSerde<f64>(123456e-5, "1.23456");
 
-    canSerde<f64>(123456e-5);
-
-    canSerde<f64>(0.0);
-    canSerde<f64>(7.23);
+    canSerde<f64>(0.0, "0.0");
+    canSerde<f64>(7.23, "7.23");
   });
 
   it("should ser/de booleans", () => {
@@ -161,6 +158,6 @@ describe("Ser/de Objects", () => {
         z: 8.3,
       },
       isVerified: true,
-    });
+    }, '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}');
   });
 });

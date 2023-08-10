@@ -1,5 +1,5 @@
 import { StringSink } from "as-string-sink/assembly";
-import { isSpace } from "util/string";
+import { CharCode, isSpace } from "util/string";
 import { backSlashCode, quoteCode } from "./chars";
 
 // @ts-ignore
@@ -79,6 +79,159 @@ export function getArrayDepth<T>(depth: i32 = 1): i32 {
   }
 }
 
+// Scientific Notation Integer Parsing - SNIP
+// This is absolutely the fastest algorithm I could think of while adding full support for Scientific Notation
+// Loads 32 bits and retrieves the high/low bits
+// Here are some benchmarks
+// Parsing: "12345"
+// Results are spread over 5000ms
+// SNIP: 207M iterations
+// ATOI: 222M iterations
+// STD (parseInt): 162M iterations
+export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
+  let ch: u32 = load<u32>(changetype<usize>(str));
+  const h = ch & 0xFFFF;
+  if (h === 48) return 0 as T;
+  const isNegative = h === 45; // Check if the number is negative
+  let val: T = 0 as T;
+  const len = u32(str.length << 1);
+  if (isNegative) {
+    if ((ch >> 16) === 48) return -0 as T;
+    offset += 2;
+    if (len >= 4) {
+      // 32-bit route
+      for (; offset < (len - 3); offset += 4) {
+        ch = load<u32>(changetype<usize>(str) + <usize>offset);
+        const low = ch & 0xFFFF;
+        const high = ch >> 16;
+        // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
+        if (low > 57) {
+          // The first char (f) is E or e
+          // We push the offset up by two and apply the notation.
+          offset += 2;
+          let exp: i32 = atoi_fast<i32>(str, offset);
+          if (exp < 0) {
+            for (let i = 0; i < exp; i++) {
+              val = (val / 10) as T;
+            }
+          } else {
+            for (let i = 0; i < exp; i++) {
+              val = (val * 10) as T;
+            }
+          }
+          return -val as T;
+        } else if (high > 57) {
+          // The first char (f) is E or e
+          // We push the offset up by two and apply the notation.
+          offset += 4;
+          let exp: i32 = atoi_fast<i32>(str, offset);
+          if (exp < 0) {
+            for (let i = 0; i < exp; i++) {
+              val = (val / 10) as T;
+            }
+          } else {
+            for (let i = 0; i < exp; i++) {
+              val = (val * 10) as T;
+            }
+          }
+          return -val as T;
+        } else {
+          val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
+        }
+      }
+    }
+    // Finish up the remainder with 16 bits.
+    for (; offset < len; offset += 2) {
+      ch = load<u16>(changetype<usize>(str) + <usize>offset);
+      // 9 is 57. E and e are larger. Assumes valid JSON.
+      if (ch > 57) {
+        // The first char (f) is E or e
+        // We push the offset up by two and apply the notation.
+        offset += 2;
+        let exp: i32 = atoi_fast<i32>(str, offset);
+        if (exp < 0) {
+          for (let i = 0; i > exp; i--) {
+            val = (val / 10) as T;
+          }
+        } else {
+          for (let i = 0; i < exp; i++) {
+            val = (val * 10) as T;
+          }
+        }
+        return -val as T;
+      } else {
+        val = (val * 10) + (ch - 48) as T;
+      }
+    }
+    return -val as T;
+  } else {
+    if (len >= 4) {
+      // Duplet 16 bit lane load
+      for (; offset < (len - 3); offset += 4) {
+        ch = load<u32>(changetype<usize>(str) + <usize>offset);
+        const low = ch & 0xFFFF;
+        const high = ch >> 16;
+        // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
+        if (low > 57) {
+          // The first char (f) is E or e
+          // We push the offset up by two and apply the notation.
+          offset += 2;
+          let exp: i32 = atoi_fast<i32>(str, offset);
+          if (exp < 0) {
+            for (let i = 0; i < exp; i++) {
+              val = (val / 10) as T;
+            }
+          } else {
+            for (let i = 0; i < exp; i++) {
+              val = (val * 10) as T;
+            }
+          }
+          return val as T;
+        } else if (high > 57) {
+          offset += 4;
+          let exp: i32 = atoi_fast<i32>(str, offset);
+          if (exp < 0) {
+            for (let i = 0; i < exp; i++) {
+              val = (val / 10) as T;
+            }
+          } else {
+            for (let i = 0; i < exp; i++) {
+              val = (val * 10) as T;
+            }
+          }
+          return val as T;
+        } else {
+          // Optimized with multiplications and shifts.
+          val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
+        }
+      }
+    }
+    // Cover the remaining numbers with 16 bit loads.
+    for (; offset < len; offset += 2) {
+      ch = load<u16>(changetype<usize>(str) + <usize>offset);
+      // 0's char is 48 and 9 is 57. Anything above this range would signify an exponent (e or E).
+      // e is 101 and E is 69.
+      if (ch > 57) {
+        offset += 2;
+        let exp: i32 = atoi_fast<i32>(str, offset);
+        if (exp < 0) {
+          for (let i = 0; i > exp; i--) {
+            val = (val / 10) as T;
+          }
+        } else {
+          for (let i = 0; i < exp; i++) {
+            val = (val * 10) as T;
+          }
+        }
+        return val as T;
+      } else {
+        val = (val * 10) + (ch - 48) as T;
+      }
+    }
+    return val as T;
+  }
+}
+
 /**
  * Implementation of ATOI. Can be much much faster with SIMD.
  * Benchmark: 40-46m ops/s
@@ -86,33 +239,25 @@ export function getArrayDepth<T>(depth: i32 = 1): i32 {
 
 // @ts-ignore
 @inline
-export function atoi_fast<T extends number>(str: string, offset: i32 = 0): T {
+export function atoi_fast<T extends number>(str: string, offset: u32 = 0): T {
   // @ts-ignore
   let val: T = 0;
-  let firstChar = load<u16>(changetype<usize>(str) + <usize>offset);
-  if (firstChar === 45) {
+  const len = u32(str.length << 1);
+  if (load<u16>(changetype<usize>(str) + <usize>offset) === 45) {
     offset += 2;
-    for (; offset < str.length << 1; offset += 2) {
+    for (; offset < len; offset += 2) {
       // @ts-ignore
-      val =
-        (val << 1) +
-        (val << 3) +
-        (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
-      // We use load because in this case, there is no need to have bounds-checking
+      val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
     }
     // @ts-ignore
-    val = -val;
+    return -val;
   } else {
-    for (; offset < str.length << 1; offset += 2) {
+    for (; offset < len; offset += 2) {
       // @ts-ignore
-      val =
-        (val << 1) +
-        (val << 3) +
-        (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
-      // We use load because in this case, there is no need to have bounds-checking
+      val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
     }
+    return val;
   }
-  return val;
 }
 
 /**
@@ -164,15 +309,15 @@ export function parseSciInteger<T extends number>(str: string): T {
 function sciNote<T extends number>(num: T): T {
   let res = 1;
   // @ts-ignore
-    if (num > 0) {
-      for (let i: T = 0; i < num; i++) {
-        res *= 10;
-      }
-    } else {
-      for (let i: T = 0; i < num; i++) {
-        res /= 10;
-      }
+  if (num > 0) {
+    for (let i: T = 0; i < num; i++) {
+      res *= 10;
     }
+  } else {
+    for (let i: T = 0; i < num; i++) {
+      res /= 10;
+    }
+  }
   // @ts-ignore
   return res;
 }
