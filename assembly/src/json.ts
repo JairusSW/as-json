@@ -35,25 +35,20 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  // @ts-ignore
-  @inline export function stringify<
-    T
-  >(data: T): string {
+  // @ts-ignore: Decorator
+  @inline export function stringify<T>(data: T): string {
     // String
     if (isString<T>() && data != null) {
-      // @ts-ignore
-      return serializeString(data);
+      return serializeString(data as string);
     } else if (isBoolean<T>()) {
       return data ? "true" : "false";
     } else if (isNullable<T>() && data == null) {
       return "null";
-      // @ts-ignore
-    } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
-      // @ts-ignore
-      return data.toString();
-      // @ts-ignore
+    } else if ((isInteger<T>() || isFloat<T>()) && isFinite(<number>data)) {
+      return (<number>data).toString();
+      // @ts-ignore: Hidden function
     } else if (isDefined(data.__JSON_Serialize)) {
-      // @ts-ignore
+      // @ts-ignore: Hidden function
       return data.__JSON_Serialize();
     } else if (data instanceof Date) {
       return data.toISOString();
@@ -110,10 +105,8 @@ export namespace JSON {
    * @returns T
    */
 
-  // @ts-ignore
-  @inline export function parse<
-    T
-  >(data: string): T {
+  // @ts-ignore: Decorator
+  @inline export function parse<T>(data: string): T {
     let type: T;
     if (isString<T>()) {
       // @ts-ignore
@@ -143,20 +136,17 @@ export namespace JSON {
       );
     }
   }
-  // @ts-ignore
-  @inline function parseObjectValue<
-    T
-  >(data: string): T {
+  // @ts-ignore: Decorator
+  @inline function parseObjectValue<T>(data: string): T {
     let type: T;
     if (isString<T>()) {
       // @ts-ignore
       let result = "";
       let last = 0;
-      let char = 0;
       for (let i = 0; i < data.length; i++) {
         // \\"
         if (unsafeCharCodeAt(data, i) === backSlashCode) {
-          char = unsafeCharCodeAt(data, ++i);
+          const char = unsafeCharCodeAt(data, ++i);
           result += data.slice(last, i - 1);
           if (char === 34) {
             result += '"';
@@ -223,10 +213,8 @@ export namespace JSON {
   }
 }
 
-// @ts-ignore
-@inline function serializeString(
-  data: string
-): string {
+// @ts-ignore: Decorator
+@inline function serializeString(data: string): string {
   // @ts-ignore
   //if (data.length === 0) return "\"\"";
   /*
@@ -309,10 +297,8 @@ export namespace JSON {
   return result + '"';
 }
 
-// @ts-ignore
-@inline function parseString(
-  data: string
-): string {
+// @ts-ignore: Decorator
+@inline function parseString(data: string): string {
   let result = "";
   let last = 1;
   for (let i = 1; i < data.length - 1; i++) {
@@ -375,16 +361,14 @@ export namespace JSON {
   return result;
 }
 
-// @ts-ignore
-@inline function parseBoolean<
-  T extends boolean
->(data: string): T {
+// @ts-ignore: Decorator
+@inline function parseBoolean<T extends boolean>(data: string): T {
   if (data.length > 3 && data.startsWith("true")) return <T>true;
   else if (data.length > 4 && data.startsWith("false")) return <T>false;
   else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
 }
 
-// @ts-ignore
+// @ts-ignore: Decorator
 @inline export function parseNumber<T>(data: string): T {
   if (isInteger<T>()) {
     // @ts-ignore
@@ -398,7 +382,7 @@ export namespace JSON {
   else if (type instanceof f32) return f32.parse(data);
 }
 
-// @ts-ignore
+// @ts-ignore: Decorator
 @inline function parseObject<T>(data: string): T {
   let schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
@@ -406,17 +390,16 @@ export namespace JSON {
   let key = "";
   let isKey = false;
   let depth = 0;
-  let char = 0;
   let outerLoopIndex = 1;
   for (; outerLoopIndex < data.length - 1; outerLoopIndex++) {
-    char = unsafeCharCodeAt(data, outerLoopIndex);
+    const char = unsafeCharCodeAt(data, outerLoopIndex);
     if (char === leftBracketCode) {
       for (
         let arrayValueIndex = outerLoopIndex;
         arrayValueIndex < data.length - 1;
         arrayValueIndex++
       ) {
-        char = unsafeCharCodeAt(data, arrayValueIndex);
+        const char = unsafeCharCodeAt(data, arrayValueIndex);
         if (char === leftBracketCode) {
           depth++;
         } else if (char === rightBracketCode) {
@@ -440,7 +423,7 @@ export namespace JSON {
         objectValueIndex < data.length - 1;
         objectValueIndex++
       ) {
-        char = unsafeCharCodeAt(data, objectValueIndex);
+        const char = unsafeCharCodeAt(data, objectValueIndex);
         if (char === leftBraceCode) {
           depth++;
         } else if (char === rightBraceCode) {
@@ -464,7 +447,7 @@ export namespace JSON {
         stringValueIndex < data.length - 1;
         stringValueIndex++
       ) {
-        char = unsafeCharCodeAt(data, stringValueIndex);
+        const char = unsafeCharCodeAt(data, stringValueIndex);
         if (
           char === quoteCode &&
           unsafeCharCodeAt(data, stringValueIndex - 1) !== backSlashCode
@@ -510,7 +493,7 @@ export namespace JSON {
     } else if ((char >= 48 && char <= 57) || char === 45) {
       let numberValueIndex = ++outerLoopIndex;
       for (; numberValueIndex < data.length; numberValueIndex++) {
-        char = unsafeCharCodeAt(data, numberValueIndex);
+        const char = unsafeCharCodeAt(data, numberValueIndex);
         if (char === commaCode || char === rightBraceCode || isSpace(char)) {
           // @ts-ignore
           schema.__JSON_Set_Key(
@@ -527,10 +510,8 @@ export namespace JSON {
   return schema;
 }
 
-// @ts-ignore
-@inline function parseArray<
-  T extends unknown[]
->(data: string): T {
+// @ts-ignore: Decorator
+@inline function parseArray<T extends unknown[]>(data: string): T {
   if (isString<valueof<T>>()) {
     return <T>parseStringArray(data);
   } else if (isBoolean<valueof<T>>()) {
@@ -558,10 +539,8 @@ export namespace JSON {
   return unreachable();
 }
 
-// @ts-ignore
-@inline function parseStringArray(
-  data: string
-): string[] {
+// @ts-ignore: Decorator
+@inline function parseStringArray(data: string): string[] {
   const result: string[] = [];
   let lastPos = 0;
   let instr = false;
@@ -579,15 +558,12 @@ export namespace JSON {
   return result;
 }
 
-// @ts-ignore
-@inline function parseBooleanArray<
-  T extends boolean[]
->(data: string): T {
+// @ts-ignore: Decorator
+@inline function parseBooleanArray<T extends boolean[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos = 1;
-  let char = 0;
   for (let i = 1; i < data.length - 1; i++) {
-    char = unsafeCharCodeAt(data, i);
+    const char = unsafeCharCodeAt(data, i);
     /*// if char == "t" && i+3 == "e"
                 if (char === tCode && data.charCodeAt(i + 3) === eCode) {
                   //i += 3;
@@ -608,16 +584,13 @@ export namespace JSON {
   return result;
 }
 
-// @ts-ignore
-@inline function parseNumberArray<
-  T extends number[]
->(data: string): T {
+// @ts-ignore: Decorator
+@inline function parseNumberArray<T extends number[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos = 0;
-  let char = 0;
   let i = 1;
   for (; i < data.length - 1; i++) {
-    char = unsafeCharCodeAt(data, i);
+    const char = unsafeCharCodeAt(data, i);
     if ((lastPos === 0 && char >= 48 && char <= 57) || char === 45) {
       lastPos = i;
     } else if ((isSpace(char) || char == commaCode) && lastPos > 0) {
@@ -626,7 +599,7 @@ export namespace JSON {
     }
   }
   for (; i > lastPos - 1; i--) {
-    char = unsafeCharCodeAt(data, i);
+    const char = unsafeCharCodeAt(data, i);
     if (char !== rightBracketCode) {
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i + 1)));
       break;
@@ -635,12 +608,9 @@ export namespace JSON {
   return result;
 }
 
-// @ts-ignore
-@inline function parseArrayArray<
-  T extends unknown[][]
->(data: string): T {
+// @ts-ignore: Decorator
+@inline function parseArrayArray<T extends unknown[][]>(data: string): T {
   const result = instantiate<T>();
-  let char = 0;
   let lastPos = 0;
   let depth = 0;
   let i = 1;
@@ -648,7 +618,7 @@ export namespace JSON {
   //for (; unsafeCharCodeAt(data, i) !== leftBracketCode; i++) {}
   //i++;
   for (; i < data.length - 1; i++) {
-    char = unsafeCharCodeAt(data, i);
+    const char = unsafeCharCodeAt(data, i);
     if (char === leftBracketCode) {
       if (depth === 0) {
         lastPos = i;
@@ -666,16 +636,13 @@ export namespace JSON {
   return result;
 }
 
-// @ts-ignore
-@inline export function parseObjectArray<
-  T extends unknown[]
->(data: string): T {
+// @ts-ignore: Decorator
+@inline export function parseObjectArray<T extends unknown[]>(data: string): T {
   const result = instantiate<T>();
-  let char = 0;
   let lastPos: u32 = 1;
   let depth: u32 = 0;
   for (let pos: u32 = 0; pos < <u32>data.length; pos++) {
-    char = unsafeCharCodeAt(data, pos);
+    const char = unsafeCharCodeAt(data, pos);
     if (char === leftBraceCode) {
       if (depth === 0) {
         lastPos = pos;

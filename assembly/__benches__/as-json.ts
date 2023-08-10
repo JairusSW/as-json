@@ -15,50 +15,6 @@ class Vec3 {
   x: i32;
   y: i32;
   z: i32;
-  @inline __JSON_Deserialize(
-    data: string,
-    to: Vec3
-  ): Vec3 {
-    for (; pos < data.length - 1; pos++) {
-      char = unsafeCharCodeAt(data, pos);
-      if (inStr === false && char === quoteCode) {
-        if (key != null) {
-          if (unsafeCharCodeAt(key!, 0) == 120) {
-            to.x = parseSciInteger<i32>(data.substring(last, pos - 1));
-          } else if (unsafeCharCodeAt(key!, 0) == 121) {
-            to.y = parseSciInteger<i32>(data.substring(last, pos - 1));
-          } else if (unsafeCharCodeAt(key!, 0) == 122) {
-            to.z = parseSciInteger<i32>(data.substring(last, pos - 1));
-          }
-        }
-        last = ++pos;
-        inStr = true;
-      } else if (
-        char === quoteCode &&
-        unsafeCharCodeAt(data, pos - 1) != backSlashCode
-      ) {
-        inStr = false;
-        key = data.substring(last, pos);
-        last = pos += 2;
-      }
-    }
-    if (key != null) {
-      if (unsafeCharCodeAt(key!, 0) == 120) {
-        to.x = parseSciInteger<i32>(data.substring(last, pos - 1));
-      } else if (unsafeCharCodeAt(key!, 0) == 121) {
-        to.y = parseSciInteger<i32>(data.substring(last, pos - 1));
-      } else if (unsafeCharCodeAt(key!, 0) == 122) {
-        to.z = parseSciInteger<i32>(data.substring(last, pos - 1));
-      }
-    }
-
-    last = 1;
-    char = 0;
-    inStr = false;
-    key = null;
-    pos = 0;
-    return to;
-  }
 }
 
 const vec: Vec3 = {
@@ -66,7 +22,7 @@ const vec: Vec3 = {
   y: 1,
   z: 8,
 }
-
+/*
 bench("Parse Number SNIP", () => {
   blackbox<i32>(snip_fast<i32>("12345"));
 });
@@ -83,19 +39,19 @@ bench("Parse Number OLD", () => {
   blackbox<i32>(parseSciInteger<i32>("12345"));
 });
 
-bench("Stringify Object (Vec3)", () => {
-  blackbox<string>(vec.__JSON_Serialize());
-});
+//bench("Stringify Object (Vec3)", () => {
+//  blackbox<string>(vec.__JSON_Serialize());
+//});
 
 // TODO: Make this allocate without crashing
-/*bench("Parse Object (Vec3)", () => {
-  blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}', vec));
-});*/
+//bench("Parse Object (Vec3)", () => {
+//  blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}', vec));
+//});
 
 bench("Stringify Number Array", () => {
   blackbox(JSON.stringify<i32[]>([1, 2, 3]));
 });
-
+*/
 bench("Parse Number Array", () => {
   blackbox(JSON.parse<i32[]>(blackbox("[1,2,3]")));
 });
@@ -126,12 +82,12 @@ bench("Parse Boolean", () => {
 
 bench("Stringify Integer", () => {
   blackbox(JSON.stringify(blackbox(314)));
-});
+});*/
 
 bench("Parse Integer", () => {
   blackbox(JSON.parse<i32>(blackbox("314")));
 });
-
+/*
 bench("Stringify Float", () => {
   blackbox(JSON.stringify(blackbox(3.14)));
 });

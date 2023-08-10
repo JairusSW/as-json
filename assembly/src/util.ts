@@ -1,27 +1,23 @@
 import { StringSink } from "as-string-sink/assembly";
-import { CharCode, isSpace } from "util/string";
+import { isSpace } from "util/string";
 import { backSlashCode, quoteCode } from "./chars";
 
-// @ts-ignore
-@inline
-export function unsafeCharCodeAt(data: string, pos: i32): i32 {
+// @ts-ignore: Decorator
+@inline export function unsafeCharCodeAt(data: string, pos: i32): i32 {
   return load<u16>(changetype<usize>(data) + ((<usize>pos) << 1));
 }
 
-// @ts-ignore
-@inline
-export function removeWhitespace(data: string): string {
+// @ts-ignore: Decorator
+@inline export function removeWhitespace(data: string): string {
   const result = new StringSink();
   let instr = false;
   for (let i = 0; i < data.length; i++) {
     const char = data.charCodeAt(i);
     if (instr === false && char === quoteCode) instr = true;
     else if (
-      instr === true &&
-      char === quoteCode &&
-      data.charCodeAt(i - 1) !== backSlashCode
-    )
-      instr = false;
+      instr === true && char === quoteCode
+      && data.charCodeAt(i - 1) !== backSlashCode
+    ) instr = false;
 
     if (instr === false) {
       if (!isSpace(char)) result.write(data.charAt(i));
@@ -32,9 +28,8 @@ export function removeWhitespace(data: string): string {
   return result.toString();
 }
 
-// @ts-ignore
-@inline
-export function escapeChar(char: string): string {
+// @ts-ignore: Decorator
+@inline export function escapeChar(char: string): string {
   switch (unsafeCharCodeAt(char, 0)) {
     case 0x22:
       return '\\"';
@@ -63,45 +58,47 @@ export function escapeChar(char: string): string {
  * @returns depth of array
  */
 
-// @ts-ignore
-@inline
-export function getArrayDepth<T>(depth: i32 = 1): i32 {
-  // @ts-ignore
+// @ts-ignore: Decorator
+@inline export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
   if (!isArray<T>()) {
     return 0;
-    // @ts-ignore
   } else if (isArray<valueof<T>>()) {
     depth++;
-    // @ts-ignore
     return getArrayDepth<valueof<T>>(depth);
   } else {
     return depth;
   }
 }
 
-// Scientific Notation Integer Parsing - SNIP
-// This is absolutely the fastest algorithm I could think of while adding full support for Scientific Notation
-// Loads 32 bits and retrieves the high/low bits
-// Here are some benchmarks
-// Parsing: "12345"
-// Results are spread over 5000ms
-// SNIP: 207M iterations
-// ATOI: 222M iterations
-// STD (parseInt): 162M iterations
-export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
-  let ch: u32 = load<u32>(changetype<usize>(str));
-  const h = ch & 0xFFFF;
-  if (h === 48) return 0 as T;
-  const isNegative = h === 45; // Check if the number is negative
+/** Scientific Notation Integer Parsing - SNIP
+ * This is absolutely the fastest algorithm I could think of while adding full support for Scientific Notation
+ * Loads 32 bits and retrieves the high/low bits.
+ * The reason why we only load 4 bytes at a time is that numbers in the 32-bit range are 7 chars long at most.
+ * Using SIMD or 64 bit loads would only work well when parsing large 128+ numbers.
+ * 
+ * Here are some benchmarks
+ * Parsing: "12345" 
+ * Results are spread over 5000ms
+ * 
+ * SNIP: 261M iterations
+ * ATOI: 285M iterations
+ * ParseInt: 176M iterations 
+ * 
+ * @param str - Any number. Can include scientific notation.
+*/
+// @ts-ignore: Decorator
+@inline export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u32 = 0): T {
+  const firstChar: u32 = load<u16>(changetype<usize>(str));
+  if (firstChar === 48) return 0 as T;
+  const isNegative = firstChar === 45; // Check if the number is negative
   let val: T = 0 as T;
-  const len = u32(str.length << 1);
+  if (len == 0) len = u32(str.length << 1);
   if (isNegative) {
-    //if ((ch >> 16) === 48) return -0 as T;
     offset += 2;
     if (len >= 4) {
       // 32-bit route
       for (; offset < (len - 3); offset += 4) {
-        ch = load<u32>(changetype<usize>(str) + <usize>offset);
+        const ch = load<u32>(changetype<usize>(str) + <usize>offset);
         const low = ch & 0xFFFF;
         const high = ch >> 16;
         // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
@@ -109,7 +106,7 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
           offset += 2;
-          let exp: i32 = atoi_fast<i32>(str, offset);
+          const exp: i32 = atoi_fast<i32>(str, offset);
           if (exp < 0) {
             for (let i = 0; i < exp; i++) {
               val = (val / 10) as T;
@@ -124,7 +121,7 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
           offset += 4;
-          let exp: i32 = atoi_fast<i32>(str, offset);
+          const exp: i32 = atoi_fast<i32>(str, offset);
           if (exp < 0) {
             for (let i = 0; i < exp; i++) {
               val = (val / 10) as T;
@@ -142,13 +139,13 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
     }
     // Finish up the remainder with 16 bits.
     for (; offset < len; offset += 2) {
-      ch = load<u16>(changetype<usize>(str) + <usize>offset);
+      const ch = load<u16>(changetype<usize>(str) + <usize>offset);
       // 9 is 57. E and e are larger. Assumes valid JSON.
       if (ch > 57) {
         // The first char (f) is E or e
         // We push the offset up by two and apply the notation.
         offset += 2;
-        let exp: i32 = atoi_fast<i32>(str, offset);
+        const exp: i32 = atoi_fast<i32>(str, offset);
         if (exp < 0) {
           for (let i = 0; i > exp; i--) {
             val = (val / 10) as T;
@@ -168,7 +165,7 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
     if (len >= 4) {
       // Duplet 16 bit lane load
       for (; offset < (len - 3); offset += 4) {
-        ch = load<u32>(changetype<usize>(str) + <usize>offset);
+        const ch = load<u32>(changetype<usize>(str) + <usize>offset);
         const low = ch & 0xFFFF;
         const high = ch >> 16;
         // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
@@ -176,7 +173,7 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
           offset += 2;
-          let exp: i32 = atoi_fast<i32>(str, offset);
+          const exp: i32 = atoi_fast<i32>(str, offset);
           if (exp < 0) {
             for (let i = 0; i < exp; i++) {
               val = (val / 10) as T;
@@ -189,7 +186,7 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
           return val as T;
         } else if (high > 57) {
           offset += 4;
-          let exp: i32 = atoi_fast<i32>(str, offset);
+          const exp: i32 = atoi_fast<i32>(str, offset);
           if (exp < 0) {
             for (let i = 0; i < exp; i++) {
               val = (val / 10) as T;
@@ -208,12 +205,12 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
     }
     // Cover the remaining numbers with 16 bit loads.
     for (; offset < len; offset += 2) {
-      ch = load<u16>(changetype<usize>(str) + <usize>offset);
+      const ch = load<u16>(changetype<usize>(str) + <usize>offset);
       // 0's char is 48 and 9 is 57. Anything above this range would signify an exponent (e or E).
       // e is 101 and E is 69.
       if (ch > 57) {
         offset += 2;
-        let exp: i32 = atoi_fast<i32>(str, offset);
+        const exp: i32 = atoi_fast<i32>(str, offset);
         if (exp < 0) {
           for (let i = 0; i > exp; i--) {
             val = (val / 10) as T;
@@ -234,29 +231,26 @@ export function snip_fast<T extends number>(str: string, offset: u32 = 0): T {
 
 /**
  * Implementation of ATOI. Can be much much faster with SIMD.
- * Benchmark: 40-46m ops/s
  */
 
 // @ts-ignore
-@inline
-export function atoi_fast<T extends number>(str: string, offset: u32 = 0): T {
+@inline export function atoi_fast<T extends number>(str: string, offset: u32 = 0): T {
   // @ts-ignore
   let val: T = 0;
   const len = u32(str.length << 1);
+  // Negative path
   if (load<u16>(changetype<usize>(str) + <usize>offset) === 45) {
     offset += 2;
     for (; offset < len; offset += 2) {
-      // @ts-ignore
-      val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
+      val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48) as T;
     }
-    // @ts-ignore
-    return -val;
+    return -val as T;
   } else {
     for (; offset < len; offset += 2) {
       // @ts-ignore
-      val = (val << 1) + (val << 3) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
+      val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
     }
-    return val;
+    return -val as T;
   }
 }
 
@@ -269,8 +263,7 @@ export function atoi_fast<T extends number>(str: string, offset: u32 = 0): T {
  */
 
 // @ts-ignore
-@inline
-export function parseSciInteger<T extends number>(str: string): T {
+@inline export function parseSciInteger<T extends number>(str: string): T {
   // @ts-ignore
   let val: T = 0;
   let offset = 0;
@@ -299,22 +292,21 @@ export function parseSciInteger<T extends number>(str: string): T {
     // We use load because in this case, there is no need to have bounds-checking
   }
   if (firstChar === 45) {
-    val = -val;
+    val = -val as T;
   }
   return val;
 }
 
 // @ts-ignore
-@inline
-function sciNote<T extends number>(num: T): T {
+@inline function sciNote<T extends number>(num: T): T {
   let res = 1;
   // @ts-ignore
   if (num > 0) {
-    for (let i: T = 0; i < num; i++) {
+    for (let i: T = <T>0; i < num; i++) {
       res *= 10;
     }
   } else {
-    for (let i: T = 0; i < num; i++) {
+    for (let i: T = <T>0; i < num; i++) {
       res /= 10;
     }
   }
