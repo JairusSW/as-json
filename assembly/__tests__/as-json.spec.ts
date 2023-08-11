@@ -46,10 +46,10 @@ describe("Ser/de Numbers", () => {
   it("should ser/de integers", () => {
     canSerde<i32>(0);
 
-    canSerde<u32>(100);
-    canSerde<u64>(101);
-    canSerde<i32>(-100);
-    canSerde<i64>(-101);
+    canSerde<u32>(100, "100");
+    canSerde<u64>(101, "101");
+    canSerde<i32>(-100, "-100");
+    canSerde<i64>(-101, "-101");
   });
 
   it("should ser/de floats", () => {
@@ -67,15 +67,6 @@ describe("Ser/de Numbers", () => {
     canSerde<bool>(false);
     canSerde<boolean>(true);
     canSerde<boolean>(false);
-  });
-
-  it("should ser/de BigInt objects", () => {
-    canSerde<i32>(0);
-
-    canSerde<u32>(100);
-    canSerde<u64>(101);
-    canSerde<i32>(-100);
-    canSerde<i64>(-101);
   });
 });
 

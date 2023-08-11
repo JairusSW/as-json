@@ -234,10 +234,10 @@ import { backSlashCode, quoteCode } from "./chars";
       // e is 101 and E is 69.
       if (ch > 57) {
         if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-          return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+          return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
         } else {
           // Inlined this operation instead of using a loop
-          return -(val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+          return (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
         }
       } else {
         val = (val * 10) + (ch - 48) as T;

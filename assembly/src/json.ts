@@ -44,8 +44,10 @@ export namespace JSON {
       return data ? "true" : "false";
     } else if (isNullable<T>() && data == null) {
       return "null";
-    } else if ((isInteger<T>() || isFloat<T>()) && isFinite(<number>data)) {
-      return (<number>data).toString();
+      // @ts-ignore
+    } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
+      // @ts-ignore
+      return data.toString();
       // @ts-ignore: Hidden function
     } else if (isDefined(data.__JSON_Serialize)) {
       // @ts-ignore: Hidden function

@@ -68,29 +68,6 @@ const stringified = JSON.stringify<Player>(player);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
-## Deviations from the spec
-
-This implementation does not hold strongly to the JSON specification. Rather, design and behavior are inspired by the JSON implementation found in Google's v8 engine.
-
-- No support for dynamic types
-- Unsafe by design--parser assumes valid JSON
-- Partial whitespace support--parser prefers speed over handling whitespace effectively. Users may use the `removeWhitespace` function provided by `json-as/src/util.ts`
-- Is not based off of the official spec, but rather the behavior of the JSON C implementation found in google's v8 engine
-- Support for scientific notation on integers. Float support coming soon.
-
-## Implemented features
-
-Fully supports:
-
-- Strings
-- Integers
-- Floats (Scientific notation not implemented)
-- Booleans
-- Arrays
-- Objects
-- Date
-- Null
-
 ## Performance
 
 Here are some benchmarks I took with `tinybench` (JavaScript) and `astral` (AssemblyScript).
