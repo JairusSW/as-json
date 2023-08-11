@@ -80,7 +80,7 @@ import { backSlashCode, quoteCode } from "./chars";
  * Parsing: "12345" 
  * Results are spread over 5000ms
  * 
- * SNIP: 261M iterations
+ * SNIP: 270M iterations
  * ATOI: 285M iterations
  * ParseInt: 176M iterations 
  * 
@@ -88,80 +88,116 @@ import { backSlashCode, quoteCode } from "./chars";
 */
 // @ts-ignore: Decorator
 @inline export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u32 = 0): T {
-  const firstChar: u32 = load<u16>(changetype<usize>(str));
-  if (firstChar === 48) return 0 as T;
-  const isNegative = firstChar === 45; // Check if the number is negative
-  let val: T = 0 as T;
-  if (len == 0) len = u32(str.length << 1);
-  if (isNegative) {
-    offset += 2;
-    if (len >= 4) {
-      // 32-bit route
-      for (; offset < (len - 3); offset += 4) {
-        const ch = load<u32>(changetype<usize>(str) + <usize>offset);
-        const low = ch & 0xFFFF;
-        const high = ch >> 16;
-        // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
-        if (low > 57) {
-          // The first char (f) is E or e
-          // We push the offset up by two and apply the notation.
-          offset += 2;
-          const exp: i32 = atoi_fast<i32>(str, offset);
-          if (exp < 0) {
-            for (let i = 0; i < exp; i++) {
-              val = (val / 10) as T;
+  if (isSigned<T>()) {
+    const firstChar: u32 = load<u16>(changetype<usize>(str));
+    if (firstChar === 48) return 0 as T;
+    const isNegative = firstChar === 45; // Check if the number is negative
+    let val: T = 0 as T;
+    if (len == 0) len = u32(str.length << 1);
+    if (isNegative) {
+      offset += 2;
+      if (len >= 4) {
+        // 32-bit route
+        for (; offset < (len - 3); offset += 4) {
+          const ch = load<u32>(changetype<usize>(str) + <usize>offset);
+          const low = ch & 0xFFFF;
+          const high = ch >> 16;
+          // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
+          if (low > 57) {
+            // The first char (f) is E or e
+            // We push the offset up by two and apply the notation.
+            if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
+              return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            } else {
+              // Inlined this operation instead of using a loop
+              return -(val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+            }
+          } else if (high > 57) {
+            // The first char (f) is E or e
+            // We push the offset up by two and apply the notation.
+            if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
+              return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            } else {
+              // Inlined this operation instead of using a loop
+              return -(val * (10 ** (atoi_fast<u32>(str, offset + 4) + 1))) as T;
             }
           } else {
-            for (let i = 0; i < exp; i++) {
-              val = (val * 10) as T;
-            }
+            val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
           }
-          return -val as T;
-        } else if (high > 57) {
+        }
+      }
+      // Finish up the remainder with 16 bits.
+      for (; offset < len; offset += 2) {
+        const ch = load<u16>(changetype<usize>(str) + <usize>offset);
+        // 9 is 57. E and e are larger. Assumes valid JSON.
+        if (ch > 57) {
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
-          offset += 4;
-          const exp: i32 = atoi_fast<i32>(str, offset);
-          if (exp < 0) {
-            for (let i = 0; i < exp; i++) {
-              val = (val / 10) as T;
+          if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
+            return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+          } else {
+            // Inlined this operation instead of using a loop
+            return -(val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+          }
+        } else {
+          val = (val * 10) + (ch - 48) as T;
+        }
+      }
+      return -val as T;
+    } else {
+      if (len >= 4) {
+        // Duplet 16 bit lane load
+        for (; offset < (len - 3); offset += 4) {
+          const ch = load<u32>(changetype<usize>(str) + <usize>offset);
+          const low = ch & 0xFFFF;
+          const high = ch >> 16;
+          // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
+          if (low > 57) {
+            // The first char (f) is E or e
+            // We push the offset up by two and apply the notation.
+            if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
+              return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            } else {
+              // Inlined this operation instead of using a loop
+              return (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+            }
+          } else if (high > 57) {
+            if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
+              return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            } else {
+              // Inlined this operation instead of using a loop
+              return (val * (10 ** (atoi_fast<u32>(str, offset + 4) + 1))) as T;
             }
           } else {
-            for (let i = 0; i < exp; i++) {
-              val = (val * 10) as T;
-            }
-          }
-          return -val as T;
-        } else {
-          val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
-        }
-      }
-    }
-    // Finish up the remainder with 16 bits.
-    for (; offset < len; offset += 2) {
-      const ch = load<u16>(changetype<usize>(str) + <usize>offset);
-      // 9 is 57. E and e are larger. Assumes valid JSON.
-      if (ch > 57) {
-        // The first char (f) is E or e
-        // We push the offset up by two and apply the notation.
-        offset += 2;
-        const exp: i32 = atoi_fast<i32>(str, offset);
-        if (exp < 0) {
-          for (let i = 0; i > exp; i--) {
-            val = (val / 10) as T;
-          }
-        } else {
-          for (let i = 0; i < exp; i++) {
-            val = (val * 10) as T;
+            // Optimized with multiplications and shifts.
+            val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
           }
         }
-        return -val as T;
-      } else {
-        val = (val * 10) + (ch - 48) as T;
       }
+      // Cover the remaining numbers with 16 bit loads.
+      for (; offset < len; offset += 2) {
+        const ch = load<u16>(changetype<usize>(str) + <usize>offset);
+        // 0's char is 48 and 9 is 57. Anything above this range would signify an exponent (e or E).
+        // e is 101 and E is 69.
+        if (ch > 57) {
+          if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
+            val = (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+          } else {
+            // Inlined this operation instead of using a loop
+            val = (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+          }
+          return val as T;
+        } else {
+          val = (val * 10) + (ch - 48) as T;
+        }
+      }
+      return val as T;
     }
-    return -val as T;
   } else {
+    const firstChar: u32 = load<u16>(changetype<usize>(str));
+    if (firstChar === 48) return 0 as T;
+    let val: T = 0 as T;
+    if (len == 0) len = u32(str.length << 1);
     if (len >= 4) {
       // Duplet 16 bit lane load
       for (; offset < (len - 3); offset += 4) {
@@ -172,31 +208,19 @@ import { backSlashCode, quoteCode } from "./chars";
         if (low > 57) {
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
-          offset += 2;
-          const exp: i32 = atoi_fast<i32>(str, offset);
-          if (exp < 0) {
-            for (let i = 0; i < exp; i++) {
-              val = (val / 10) as T;
-            }
+          if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
+            return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
           } else {
-            for (let i = 0; i < exp; i++) {
-              val = (val * 10) as T;
-            }
+            // Inlined this operation instead of using a loop
+            return (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
           }
-          return val as T;
         } else if (high > 57) {
-          offset += 4;
-          const exp: i32 = atoi_fast<i32>(str, offset);
-          if (exp < 0) {
-            for (let i = 0; i < exp; i++) {
-              val = (val / 10) as T;
-            }
+          if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
+            return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
           } else {
-            for (let i = 0; i < exp; i++) {
-              val = (val * 10) as T;
-            }
+            // Inlined this operation instead of using a loop
+            return (val * (10 ** (atoi_fast<u32>(str, offset + 4) + 1))) as T;
           }
-          return val as T;
         } else {
           // Optimized with multiplications and shifts.
           val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
@@ -209,18 +233,12 @@ import { backSlashCode, quoteCode } from "./chars";
       // 0's char is 48 and 9 is 57. Anything above this range would signify an exponent (e or E).
       // e is 101 and E is 69.
       if (ch > 57) {
-        offset += 2;
-        const exp: i32 = atoi_fast<i32>(str, offset);
-        if (exp < 0) {
-          for (let i = 0; i > exp; i--) {
-            val = (val / 10) as T;
-          }
+        if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
+          return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
         } else {
-          for (let i = 0; i < exp; i++) {
-            val = (val * 10) as T;
-          }
+          // Inlined this operation instead of using a loop
+          return -(val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
         }
-        return val as T;
       } else {
         val = (val * 10) + (ch - 48) as T;
       }
@@ -238,19 +256,25 @@ import { backSlashCode, quoteCode } from "./chars";
   // @ts-ignore
   let val: T = 0;
   const len = u32(str.length << 1);
-  // Negative path
-  if (load<u16>(changetype<usize>(str) + <usize>offset) === 45) {
-    offset += 2;
-    for (; offset < len; offset += 2) {
-      val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48) as T;
+  if (isSigned<T>()) {
+    // Negative path
+    if (load<u16>(changetype<usize>(str) + <usize>offset) === 45) {
+      offset += 2;
+      for (; offset < len; offset += 2) {
+        val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48) as T;
+      }
+      return -val as T;
+    } else {
+      for (; offset < len; offset += 2) {
+        val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48)) as T;
+      }
+      return val as T;
     }
-    return -val as T;
   } else {
     for (; offset < len; offset += 2) {
-      // @ts-ignore
-      val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48);
+      val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48)) as T;
     }
-    return -val as T;
+    return val as T;
   }
 }
 
