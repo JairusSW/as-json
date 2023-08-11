@@ -11,3 +11,5 @@ as-tral
 *.wasm
 *.wat
 *.lockb
+.vscode/
+asconfig.json

@@ -10,6 +10,6 @@
     }
   },
   "options": {
-    "transform": ["./transform"],
-    "bindings": "esm"}
+    "transform": ["./transform"]
+  }
 }
