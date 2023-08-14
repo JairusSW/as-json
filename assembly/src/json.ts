@@ -217,42 +217,6 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function serializeString(data: string): string {
-  // @ts-ignore
-  //if (data.length === 0) return "\"\"";
-  /*
-       let char: i32 = 0;
-       if (data.length === 1) {
-           char = unsafeCharCodeAt(data, 0);
-           if (char === 34) {
-               return "\\\"";
-           } else if (char === 92) {
-               return "\\n";
-           } else if (char <= 13 && char >= 8) {
-               switch (char) {
-                   case 0x5C: {
-                       return "\\\\";
-                   }
-                   case 0x08: {
-                       return "\\b";
-                   }
-                   case 0x0D: {
-                       return "\\r";
-                   }
-                   case 0x09: {
-                       return "\\t";
-                   }
-                   case 0x0C: {
-                       return "\\f";
-                   }
-                   case 0x0B: {
-                       return "\\u000b";
-                   }
-               }
-           } else {
-               return data;
-           }
-       }*/
-
   let result = '"';
 
   let last: i32 = 0;

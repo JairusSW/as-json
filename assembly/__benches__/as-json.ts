@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { snip_fast } from "../src/util";
+import { atoi_fast, snip_fast } from "../src/util";
 @json
 class Vec3 {
   x: i32;
@@ -12,11 +12,11 @@ const vec: Vec3 = {
   y: 1,
   z: 8,
 }
-
+/*
 bench("Parse Number SNIP", () => {
   blackbox<i32>(snip_fast<i32>("12345"));
 });
-/*
+
 bench("Parse Number ATOI", () => {
   blackbox<i32>(atoi_fast<i32>("12345"));
 })
@@ -28,7 +28,7 @@ bench("Parse Number STDLIB", () => {
 bench("Parse Number OLD", () => {
   blackbox<i32>(parseSciInteger<i32>("12345"));
 });
-*/
+
 bench("Stringify Object (Vec3)", () => {
   blackbox<string>(vec.__JSON_Serialize());
 });
@@ -37,7 +37,7 @@ bench("Stringify Object (Vec3)", () => {
 //bench("Parse Object (Vec3)", () => {
 //  blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}', vec));
 //});
-
+*/
 bench("Stringify Number Array", () => {
   blackbox(JSON.stringify<i32[]>([1, 2, 3]));
 });

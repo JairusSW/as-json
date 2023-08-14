@@ -1,29 +1,55 @@
 // Characters
-export const commaCode = ",".charCodeAt(0);
-export const quoteCode = '"'.charCodeAt(0);
-export const backSlashCode = "\\".charCodeAt(0);
-export const forwardSlashCode = "/".charCodeAt(0);
-export const leftBraceCode = "{".charCodeAt(0);
-export const rightBraceCode = "}".charCodeAt(0);
-export const leftBracketCode = "[".charCodeAt(0);
-export const rightBracketCode = "]".charCodeAt(0);
-export const colonCode = ":".charCodeAt(0);
-export const tCode = "t".charCodeAt(0);
-export const rCode = "r".charCodeAt(0);
-export const uCode = "u".charCodeAt(0);
-export const eCode = "e".charCodeAt(0);
-export const fCode = "f".charCodeAt(0);
-export const aCode = "a".charCodeAt(0);
-export const lCode = "l".charCodeAt(0);
-export const sCode = "s".charCodeAt(0);
-export const nCode = "n".charCodeAt(0);
+// @ts-ignore = Decorator is valid here
+@inline export const commaCode = 44;
+// @ts-ignore = Decorator is valid here
+@inline export const quoteCode = 34;
+// @ts-ignore = Decorator is valid here
+@inline export const backSlashCode = 92;
+// @ts-ignore: Decorator is valid here
+@inline export const forwardSlashCode = 47;
+// @ts-ignore: Decorator is valid here
+@inline export const leftBraceCode = 123;
+// @ts-ignore: Decorator is valid here
+@inline export const rightBraceCode = 125;
+// @ts-ignore: Decorator is valid here
+@inline export const leftBracketCode = 91;
+// @ts-ignore: Decorator is valid here
+@inline export const rightBracketCode = 93;
+// @ts-ignore: Decorator is valid here
+@inline export const colonCode = 58;
+// @ts-ignore: Decorator is valid here
+@inline export const tCode = 116;
+// @ts-ignore: Decorator is valid here
+@inline export const rCode = 114;
+// @ts-ignore: Decorator is valid here
+@inline export const uCode = 117;
+// @ts-ignore: Decorator is valid here
+@inline export const eCode = 101;
+// @ts-ignore: Decorator is valid here
+@inline export const fCode = 102;
+// @ts-ignore: Decorator is valid here
+@inline export const aCode = 97;
+// @ts-ignore: Decorator is valid here
+@inline export const lCode = 108;
+// @ts-ignore: Decorator is valid here
+@inline export const sCode = 115;
+// @ts-ignore = Decorator is valid here
+@inline export const nCode = 110;
 // Strings
-export const trueWord = "true";
-export const falseWord = "false";
-export const nullWord = "null";
-export const leftBracketWord = "[";
-export const emptyArrayWord = "[]";
-export const commaWord = ",";
-export const rightBracketWord = "]";
+// @ts-ignore: Decorator is valid here
+@inline export const trueWord = "true";
+// @ts-ignore: Decorator is valid here
+@inline export const falseWord = "false";
+// @ts-ignore: Decorator is valid here
+@inline export const nullWord = "null";
+// @ts-ignore: Decorator is valid here
+@inline export const leftBracketWord = "[";
+// @ts-ignore: Decorator is valid here
+@inline export const emptyArrayWord = "[]";
+// @ts-ignore: Decorator is valid here
+@inline export const commaWord = ",";
+// @ts-ignore: Decorator is valid here
+@inline export const rightBracketWord = "]";
 // Escape Codes
-export const newLineCode = "\n".charCodeAt(0);
+// @ts-ignore: Decorator is valid here
+@inline export const newLineCode = 10;

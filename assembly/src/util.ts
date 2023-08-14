@@ -1,6 +1,7 @@
 import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
 import { backSlashCode, quoteCode } from "./chars";
+import { decimalCount32, utoa32_dec_core } from "util/number";
 
 // @ts-ignore: Decorator
 @inline export function unsafeCharCodeAt(data: string, pos: i32): i32 {
@@ -336,4 +337,17 @@ import { backSlashCode, quoteCode } from "./chars";
   }
   // @ts-ignore
   return res;
+}
+
+// @ts-ignore
+@inline export function fast_itoa32(value: i32): string {
+  if (!value) return "0";
+
+  let sign = (value >>> 31) << 1;
+  if (sign) value = -value;
+
+  let decimals = decimalCount32(value);
+  const out = changetype<String>(__new((decimals << 1) + sign, idof<String>()));
+  utoa32_dec_core(changetype<usize>(out) + sign, value, decimals);
+  return out as string;
 }
