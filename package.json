@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.5.56",
+  "version": "0.5.57",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -31,6 +31,7 @@
     "@as-pect/cli": "^8.0.1",
     "@as-tral/cli": "^2.0.1",
     "@assemblyscript/wasi-shim": "^0.1.0",
+    "as-bench": "^0.0.0-alpha",
     "assemblyscript": "^0.27.9",
     "assemblyscript-prettier": "^2.0.2",
     "benchmark": "^2.1.4",
@@ -44,7 +45,7 @@
   "dependencies": {
     "as-string-sink": "^0.5.3",
     "as-variant": "^0.4.1",
-    "as-virtual": "^0.1.8"
+    "as-virtual": "^0.1.9"
   },
   "repository": {
     "type": "git",
