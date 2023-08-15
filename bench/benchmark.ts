@@ -1,5 +1,5 @@
 import { bench, blackbox } from "../../../WebAssembly/benchmark-wasm/assembly/bench";
-import { atoi_fast, snip_fast, unsafeCharCodeAt } from "../assembly/src/util";
+import { __atoi_fast, snip_fast, unsafeCharCodeAt } from "../assembly/src/util";
 import { JSON } from "../assembly";
 import { backSlashCode, commaCode, eCode, fCode, leftBraceCode, leftBracketCode, nCode, nullWord, quoteCode, rCode, rightBraceCode, rightBracketCode, tCode, trueWord, uCode } from "../assembly/src/chars";
 import { isSpace } from "util/string";
@@ -14,15 +14,15 @@ class Vec3 {
     @inline
     __JSON_Set_Key(key: string, value: string): void {
         if (key == "x") {
-            this.x = JSON.parseObjectValue<i32>(value);
+            this.x = ____parseObjectValue<i32>(value);
             return;
         }
         if (key == "y") {
-            this.y = JSON.parseObjectValue<i32>(value);
+            this.y = ____parseObjectValue<i32>(value);
             return;
         }
         if (key == "z") {
-            this.z = JSON.parseObjectValue<i32>(value);
+            this.z = ____parseObjectValue<i32>(value);
             return;
         }
     }
@@ -166,7 +166,7 @@ bench("Parse Number SNIP", () => {
 });
 
 bench("Parse Number ATOI", () => {
-    blackbox<i32>(atoi_fast<i32>("12345"));
+    blackbox<i32>(__atoi_fast<i32>("12345"));
 })
 
 bench("Parse Number STDLIB", () => {
@@ -178,7 +178,7 @@ bench("Stringify Object (Vec3)", () => {
 });*/
 
 bench("Parse Object (Vec3)", () => {
-  blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}'));
+    blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}'));
 });
 
 bench("Stringify Number Array", () => {
@@ -198,9 +198,9 @@ bench("Parse String", () => {
 });
 
 bench("Stringify Boolean Array", () => {
-  blackbox(JSON.stringify<boolean[]>([true, false, true]));
+    blackbox(JSON.stringify<boolean[]>([true, false, true]));
 });
 
 bench("Stringify String Array", () => {
-  blackbox(JSON.stringify<string[]>(["a", "b", "c"]));
+    blackbox(JSON.stringify<string[]>(["a", "b", "c"]));
 });

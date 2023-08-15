@@ -20,6 +20,7 @@ import {
   trueWord,
   uCode,
   emptyArrayWord,
+  falseWord,
 } from "./chars";
 import { snip_fast, unsafeCharCodeAt } from "./util";
 import { Virtual } from "as-virtual/assembly";
@@ -139,80 +140,81 @@ export namespace JSON {
       );
     }
   }
-  // @ts-ignore: Decorator
-  @inline function parseObjectValue<T>(data: string): T {
-    let type: T;
-    if (isString<T>()) {
-      // @ts-ignore
-      let result = "";
-      let last = 0;
-      for (let i = 0; i < data.length; i++) {
-        // \\"
-        if (unsafeCharCodeAt(data, i) === backSlashCode) {
-          const char = unsafeCharCodeAt(data, ++i);
-          result += data.slice(last, i - 1);
-          if (char === 34) {
-            result += '"';
+}
+
+// @ts-ignore: Decorator
+@global @inline function __parseObjectValue<T>(data: string): T {
+  let type: T;
+  if (isString<T>()) {
+    // @ts-ignore
+    let result = "";
+    let last = 0;
+    for (let i = 0; i < data.length; i++) {
+      // \\"
+      if (unsafeCharCodeAt(data, i) === backSlashCode) {
+        const char = unsafeCharCodeAt(data, ++i);
+        result += data.slice(last, i - 1);
+        if (char === 34) {
+          result += '"';
+          last = ++i;
+        } else if (char === 110) {
+          result += "\n";
+          last = ++i;
+          // 92 98 114 116 102 117
+        } else if (char >= 92 && char <= 117) {
+          if (char === 92) {
+            result += "\\";
             last = ++i;
-          } else if (char === 110) {
-            result += "\n";
+          } else if (char === 98) {
+            result += "\b";
             last = ++i;
-            // 92 98 114 116 102 117
-          } else if (char >= 92 && char <= 117) {
-            if (char === 92) {
-              result += "\\";
-              last = ++i;
-            } else if (char === 98) {
-              result += "\b";
-              last = ++i;
-            } else if (char === 102) {
-              result += "\f";
-              last = ++i;
-            } else if (char === 114) {
-              result += "\r";
-              last = ++i;
-            } else if (char === 116) {
-              result += "\t";
-              last = ++i;
-            } else if (
-              char === 117 &&
-              load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
-              27584753879220272
-            ) {
-              result += "\u000b";
-              i += 4;
-              last = ++i;
-            }
+          } else if (char === 102) {
+            result += "\f";
+            last = ++i;
+          } else if (char === 114) {
+            result += "\r";
+            last = ++i;
+          } else if (char === 116) {
+            result += "\t";
+            last = ++i;
+          } else if (
+            char === 117 &&
+            load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
+            27584753879220272
+          ) {
+            result += "\u000b";
+            i += 4;
+            last = ++i;
           }
         }
       }
-      result += data.slice(last);
-      // @ts-ignore
-      return result;
-    } else if (isBoolean<T>()) {
-      // @ts-ignore
-      return parseBoolean<T>(data);
-    } else if (isFloat<T>() || isInteger<T>()) {
-      return parseNumber<T>(data);
-    } else if (isArrayLike<T>()) {
-      // @ts-ignore
-      return parseArray<T>(data);
-      // @ts-ignore
-    } else if (isNullable<T>() && data == "null") {
-      // @ts-ignore
-      return null;
-      // @ts-ignore
-    } else if (isDefined(type.__JSON_Set_Key)) {
-      return parseObject<T>(data.trimStart());
-    } else if (idof<nonnull<T>>() == idof<Date>()) {
-      // @ts-ignore
-      return Date.fromString(data);
-    } else {
-      // @ts-ignore
-      throw new Error(
-        `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
     }
+    result += data.slice(last);
+    // @ts-ignore
+    return result;
+  } else if (isBoolean<T>()) {
+    // @ts-ignore
+    return parseBoolean<T>(data);
+  } else if (isFloat<T>() || isInteger<T>()) {
+    return parseNumber<T>(data);
+  } else if (isArrayLike<T>()) {
+    // @ts-ignore
+    return parseArray<T>(data);
+    // @ts-ignore
+  } else if (isNullable<T>() && data == "null") {
+    // @ts-ignore
+    return null;
+    // @ts-ignore
+  } else if (isDefined(type.__JSON_Set_Key)) {
+    return parseObject<T>(data.trimStart());
+  } else if (idof<nonnull<T>>() == idof<Date>()) {
+    // @ts-ignore
+    return Date.fromString(data);
+  } else {
+    // @ts-ignore
+    throw new Error(
+      `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
+    );
   }
 }
 
@@ -374,10 +376,7 @@ export namespace JSON {
           if (depth === 0) {
             ++arrayValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key(
-              key.copyOut(),
-              data.slice(outerLoopIndex, arrayValueIndex)
-            );
+            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, arrayValueIndex);
             outerLoopIndex = arrayValueIndex;
             isKey = false;
             break;
@@ -398,10 +397,7 @@ export namespace JSON {
           if (depth === 0) {
             ++objectValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key(
-              key.copyOut(),
-              data.slice(outerLoopIndex, objectValueIndex)
-            );
+            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, objectValueIndex);
             outerLoopIndex = objectValueIndex;
             isKey = false;
             break;
@@ -424,10 +420,7 @@ export namespace JSON {
             isKey = true;
           } else {
             // @ts-ignore
-            schema.__JSON_Set_Key(
-              key.copyOut(),
-              data.slice(outerLoopIndex, stringValueIndex)
-            );
+            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, stringValueIndex);
             isKey = false;
           }
           outerLoopIndex = ++stringValueIndex;
@@ -436,7 +429,7 @@ export namespace JSON {
       }
     } else if (char == nCode) {
       // @ts-ignore
-      schema.__JSON_Set_Key(key.copyOut(), nullWord);
+      schema.__JSON_Set_Key<Virtual<string>>(key, nullWord, 0, 4);
       isKey = false;
     } else if (
       char === tCode &&
@@ -445,7 +438,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key(key.copyOut(), trueWord);
+      schema.__JSON_Set_Key<Virtual<string>>(key, trueWord, 0, 4);
       isKey = false;
     } else if (
       char === fCode &&
@@ -455,7 +448,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key(key.copyOut(), "false");
+      schema.__JSON_Set_Key<Virtual<string>>(key, falseWord, 0, 5);
       isKey = false;
     } else if ((char >= 48 && char <= 57) || char === 45) {
       let numberValueIndex = ++outerLoopIndex;
@@ -463,10 +456,7 @@ export namespace JSON {
         const char = unsafeCharCodeAt(data, numberValueIndex);
         if (char === commaCode || char === rightBraceCode || isSpace(char)) {
           // @ts-ignore
-          schema.__JSON_Set_Key(
-            key.copyOut(),
-            data.slice(outerLoopIndex - 1, numberValueIndex)
-          );
+          schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex - 1, numberValueIndex);
           outerLoopIndex = numberValueIndex;
           isKey = false;
           break;

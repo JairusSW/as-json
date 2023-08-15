@@ -15,7 +15,7 @@
   "scripts": {
     "test:aspect": "asp",
     "bench:astral": "astral --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior never --runtime stub",
-    "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform/lib/index.js --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --noAssert --uncheckedBehavior always --runtime stub",
+    "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform/lib/index.js --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --noAssert --uncheckedBehavior always --converge --runtime stub",
     "build:test:debug": "asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always --runtime stub",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
@@ -29,14 +29,14 @@
   },
   "devDependencies": {
     "@as-pect/cli": "^8.0.1",
-    "@as-tral/cli": "^2.0.0",
+    "@as-tral/cli": "^2.0.1",
     "@assemblyscript/wasi-shim": "^0.1.0",
-    "assemblyscript": "^0.27.8",
+    "assemblyscript": "^0.27.9",
     "assemblyscript-prettier": "^2.0.2",
     "benchmark": "^2.1.4",
     "kati": "^0.6.2",
     "microtime": "^3.1.1",
-    "prettier": "^3.0.1",
+    "prettier": "^3.0.2",
     "tinybench": "^2.5.0",
     "typescript": "^5.1.6",
     "visitor-as": "^0.11.4"
@@ -44,7 +44,7 @@
   "dependencies": {
     "as-string-sink": "^0.5.3",
     "as-variant": "^0.4.1",
-    "as-virtual": "^0.1.4"
+    "as-virtual": "^0.1.7"
   },
   "repository": {
     "type": "git",

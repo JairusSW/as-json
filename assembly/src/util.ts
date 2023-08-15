@@ -1,7 +1,6 @@
 import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
 import { backSlashCode, quoteCode } from "./chars";
-import { decimalCount32, utoa32_dec_core } from "util/number";
 
 // @ts-ignore: Decorator
 @inline export function unsafeCharCodeAt(data: string, pos: i32): i32 {
@@ -108,19 +107,19 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
             // The first char (f) is E or e
             // We push the offset up by two and apply the notation.
             if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-              return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+              return -(val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return -(val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+              return -(val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
             }
           } else if (high > 57) {
             // The first char (f) is E or e
             // We push the offset up by two and apply the notation.
             if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
-              return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+              return -(val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return -(val * (10 ** (atoi_fast<u32>(str, offset + 4) + 1))) as T;
+              return -(val * (10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1))) as T;
             }
           } else {
             val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
@@ -135,10 +134,10 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
           if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-            return -(val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            return -(val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
           } else {
             // Inlined this operation instead of using a loop
-            return -(val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+            return -(val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
           }
         } else {
           val = (val * 10) + (ch - 48) as T;
@@ -157,17 +156,17 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
             // The first char (f) is E or e
             // We push the offset up by two and apply the notation.
             if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-              return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+              return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+              return (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
             }
           } else if (high > 57) {
             if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
-              return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+              return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return (val * (10 ** (atoi_fast<u32>(str, offset + 4) + 1))) as T;
+              return (val * (10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1))) as T;
             }
           } else {
             // Optimized with multiplications and shifts.
@@ -182,10 +181,10 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
         // e is 101 and E is 69.
         if (ch > 57) {
           if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-            val = (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            val = (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
           } else {
             // Inlined this operation instead of using a loop
-            val = (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+            val = (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
           }
           return val as T;
         } else {
@@ -210,17 +209,17 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
           if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-            return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
           } else {
             // Inlined this operation instead of using a loop
-            return (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+            return (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
           }
         } else if (high > 57) {
           if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
-            return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+            return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
           } else {
             // Inlined this operation instead of using a loop
-            return (val * (10 ** (atoi_fast<u32>(str, offset + 4) + 1))) as T;
+            return (val * (10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1))) as T;
           }
         } else {
           // Optimized with multiplications and shifts.
@@ -235,10 +234,10 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
       // e is 101 and E is 69.
       if (ch > 57) {
         if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-          return (val / (10 ** (atoi_fast<u32>(str, offset + 6) - 1))) as T;
+          return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
         } else {
           // Inlined this operation instead of using a loop
-          return (val * (10 ** (atoi_fast<u32>(str, offset + 2) + 1))) as T;
+          return (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
         }
       } else {
         val = (val * 10) + (ch - 48) as T;
@@ -253,34 +252,34 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
  */
 
 // @ts-ignore
-@inline export function atoi_fast<T extends number>(str: string, offset: u32 = 0): T {
+@global @inline export function __atoi_fast<T extends number>(str: string, start: u32 = 0, end: u32 = 0): T {
   // @ts-ignore
   let val: T = 0;
-  const len = u32(str.length << 1);
+  if (!end) end = start + u32(str.length << 1);
   if (isSigned<T>()) {
     // Negative path
-    if (load<u16>(changetype<usize>(str) + <usize>offset) === 45) {
-      offset += 2;
-      for (; offset < len; offset += 2) {
-        val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48) as T;
+    if (load<u16>(changetype<usize>(str) + <usize>start) === 45) {
+      start += 2;
+      for (; start < end; start += 2) {
+        val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>start) - 48) as T;
       }
       return -val as T;
     } else {
-      for (; offset < len; offset += 2) {
-        val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48)) as T;
+      for (; start < end; start += 2) {
+        val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
       }
       return val as T;
     }
   } else {
-    for (; offset < len; offset += 2) {
-      val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>offset) - 48)) as T;
+    for (; start < end; start += 2) {
+      val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
     }
     return val as T;
   }
 }
 
 /**
- * Parses an integer using atoi_fast and applies the appended exponential number to it as scientific notation.
+ * Parses an integer using __atoi_fast and applies the appended exponential number to it as scientific notation.
  * Benchmark: Hovers around 30m ops/s
  * Only safe if the string is valid.
  * @param str integer to parse. example: 123e1, 123e-1, 123E100
@@ -302,12 +301,12 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
       const char = load<u16>(changetype<usize>(str) + <usize>(offset += 2));
       if (char === 45) {
         // @ts-ignore
-        val /= sciNote<T>(atoi_fast<T>(str, (offset += 2)));
+        val /= sciNote<T>(__atoi_fast<T>(str, (offset += 2)));
         // @ts-ignore
         return val;
       } else {
         // @ts-ignore
-        val *= sciNote<T>(atoi_fast<T>(str, offset));
+        val *= sciNote<T>(__atoi_fast<T>(str, offset));
         // @ts-ignore
         return val;
       }
@@ -340,14 +339,12 @@ import { decimalCount32, utoa32_dec_core } from "util/number";
 }
 
 // @ts-ignore
-@inline export function fast_itoa32(value: i32): string {
-  if (!value) return "0";
-
-  let sign = (value >>> 31) << 1;
-  if (sign) value = -value;
-
-  let decimals = decimalCount32(value);
-  const out = changetype<String>(__new((decimals << 1) + sign, idof<String>()));
-  utoa32_dec_core(changetype<usize>(out) + sign, value, decimals);
-  return out as string;
+@inline function equalsSlice(p1_data: string, p1_start: i32, p1_end: i32, p2_data: string, p2_start: i32, p2_end: i32): boolean {
+  const p1_len = p1_end - p1_start;
+  const p2_len = p2_end - p2_start;
+  if (p1_len != p2_len) return false;
+  if (p1_len == 2) {
+    return load<u16>(changetype<usize>(p1_data) + p1_start) == load<u16>(changetype<usize>(p2_data) + p2_start)
+  }
+  return memory.compare(changetype<usize>(p1_data) + p1_start, changetype<usize>(p2_data) + p2_start, p1_len) === 0;
 }

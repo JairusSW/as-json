@@ -90,22 +90,39 @@ class AsJSONTransform extends BaseVisitor {
                     "i16",
                     "u32",
                     "i32",
-                    "f32",
                     "u64",
                     "i64",
-                    "f64",
                 ].includes(type.toLowerCase())) {
                     this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
-                }
-                else {
-                    this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
-                }
-                // @ts-ignore
-                this.currentClass.setDataStmts.push(`if (key == "${name}") {
-        this.${name} = JSON.parseObjectValue<${type}>(value);
+                    // @ts-ignore
+                    this.currentClass.setDataStmts.push(`if (key.equals("${name}")) {
+        this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
         return;
       }
       `);
+                }
+                else // @ts-ignore
+                 if ([
+                    "f32",
+                    "f64",
+                ].includes(type.toLowerCase())) {
+                    this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
+                    // @ts-ignore
+                    this.currentClass.setDataStmts.push(`if (key.equals("${name}")) {
+        this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end));
+        return;
+      }
+      `);
+                }
+                else {
+                    this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
+                    // @ts-ignore
+                    this.currentClass.setDataStmts.push(`if (key.equals("${name}")) {
+        this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data);
+        return;
+      }
+      `);
+                }
             }
         }
         let serializeFunc = "";
@@ -114,23 +131,20 @@ class AsJSONTransform extends BaseVisitor {
             this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
                 stmt.slice(0, stmt.length - 1);
             serializeFunc = `
-      @inline
-      __JSON_Serialize(): string {
+      @inline __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
       }
       `;
         }
         else {
             serializeFunc = `
-      @inline
-      __JSON_Serialize(): string {
+      @inline __JSON_Serialize(): string {
         return "{}";
       }
       `;
         }
         const setKeyFunc = `
-      @inline
-      __JSON_Set_Key(key: string, value: string): void {
+      @inline __JSON_Set_Key<T>(key: T, data: string, val_start: i32, val_end: i32): void {
         ${
         // @ts-ignore
         this.currentClass.setDataStmts.join("")}
@@ -141,7 +155,7 @@ class AsJSONTransform extends BaseVisitor {
         const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
         node.members.push(setDataMethod);
         this.schemasList.push(this.currentClass);
-        console.log(toString(node));
+        //console.log(toString(node));
     }
     visitSource(node) {
         super.visitSource(node);

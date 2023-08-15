@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { atoi_fast, snip_fast } from "../src/util";
+import { __atoi_fast, snip_fast } from "../src/util";
 @json
 class Vec3 {
   x: i32;
@@ -18,7 +18,7 @@ bench("Parse Number SNIP", () => {
 });
 
 bench("Parse Number ATOI", () => {
-  blackbox<i32>(atoi_fast<i32>("12345"));
+  blackbox<i32>(__atoi_fast<i32>("12345"));
 })
 
 bench("Parse Number STDLIB", () => {
@@ -31,13 +31,13 @@ bench("Parse Number OLD", () => {
 
 bench("Stringify Object (Vec3)", () => {
   blackbox<string>(vec.__JSON_Serialize());
-});
+});*/
 
 // TODO: Make this allocate without crashing
-//bench("Parse Object (Vec3)", () => {
-//  blackbox<Vec3>(vec.__JSON_Deserialize('{"x":0,"y":0,"z":0}', vec));
-//});
-*/
+bench("Parse Object (Vec3)", () => {
+  blackbox<Vec3>(JSON.parse<Vec3>('{"x":0,"y":0,"z":0}'));
+});
+/*
 bench("Stringify Number Array", () => {
   blackbox(JSON.stringify<i32[]>([1, 2, 3]));
 });
