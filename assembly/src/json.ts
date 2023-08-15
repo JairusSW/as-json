@@ -220,7 +220,7 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline export function serializeString(data: string): string {
+@inline function serializeString(data: string): string {
   let result = new StringSink('"');
 
   let last: i32 = 0;
@@ -269,7 +269,7 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline export function parseString(data: string): string {
+@inline function parseString(data: string): string {
   let result = new StringSink();
   let last = 1;
   for (let i = 1; i < data.length - 1; i++) {
@@ -340,7 +340,7 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline export function parseNumber<T>(data: string): T {
+@inline function parseNumber<T>(data: string): T {
   if (isInteger<T>()) {
     // @ts-ignore
     return snip_fast<T>(data);
@@ -596,7 +596,7 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline export function parseObjectArray<T extends unknown[]>(data: string): T {
+@inline function parseObjectArray<T extends unknown[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos: u32 = 1;
   let depth: u32 = 0;
