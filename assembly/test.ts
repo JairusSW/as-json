@@ -1,5 +1,5 @@
 import { bench, blackbox } from "../../../WebAssembly/benchmark-wasm/assembly/bench";
-import { JSON, parseString, serializeString } from "./src/json";
+import { JSON, parseString, parseStringArray, parseStringArrayVirtual, serializeString } from "./src/json";
 // @ts-ignore
 @json
 class Vec3 {
@@ -47,14 +47,23 @@ console.log("Original: " + JSON.stringify(player));
 console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}')));
 
 console.log("Serialized String: " + serializeString('st"ring" w""ith quotes"'));
-
+console.log("Parsed Array: " + JSON.stringify(parseStringArray('["st\\"ring\\" w\\"\\"ith quotes\\""]')));
+console.log("Parsed Array: " + JSON.stringify(parseStringArrayVirtual('["st\\"ring\\" w\\"\\"ith quotes\\""]')));
 bench("New Stringify String", () => {
     blackbox<string>(serializeString(blackbox<string>('st"ring" w""ith quotes"')));
 });
 
 bench("New Parse String", () => {
     blackbox<string>(parseString(blackbox<string>('"st\\"ring\\" w\\"\\"ith quotes\\""')))
+});
+
+bench("Old Parse String Array", () => {
+    blackbox<string[]>(parseStringArray('["st\\"ring\\" w\\"\\"ith quotes\\""]'));
 })
+
+bench("New Parse String Array", () => {
+    blackbox<string[]>(parseStringArrayVirtual('["st\\"ring\\" w\\"\\"ith quotes\\""]'));
+});
 /*
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {
