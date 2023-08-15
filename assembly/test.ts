@@ -1,5 +1,5 @@
 import { bench, blackbox } from "../../../WebAssembly/benchmark-wasm/assembly/bench";
-import { JSON, serializeString } from "./src/json";
+import { JSON, parseString, serializeString } from "./src/json";
 // @ts-ignore
 @json
 class Vec3 {
@@ -51,6 +51,10 @@ console.log("Serialized String: " + serializeString('st"ring" w""ith quotes"'));
 bench("New Stringify String", () => {
     blackbox<string>(serializeString(blackbox<string>('st"ring" w""ith quotes"')));
 });
+
+bench("New Parse String", () => {
+    blackbox<string>(parseString(blackbox<string>('"st\\"ring\\" w\\"\\"ith quotes\\""')))
+})
 /*
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {
