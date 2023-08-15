@@ -22,6 +22,7 @@ import {
   emptyArrayWord,
 } from "./chars";
 import { snip_fast, unsafeCharCodeAt } from "./util";
+import { Virtual } from "as-virtual/assembly";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -353,7 +354,7 @@ export namespace JSON {
   let schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );
-  let key = "";
+  let key = Virtual.createEmpty<string>();
   let isKey = false;
   let depth = 0;
   let outerLoopIndex = 1;
@@ -374,7 +375,7 @@ export namespace JSON {
             ++arrayValueIndex;
             // @ts-ignore
             schema.__JSON_Set_Key(
-              key,
+              key.copyOut(),
               data.slice(outerLoopIndex, arrayValueIndex)
             );
             outerLoopIndex = arrayValueIndex;
@@ -398,7 +399,7 @@ export namespace JSON {
             ++objectValueIndex;
             // @ts-ignore
             schema.__JSON_Set_Key(
-              key,
+              key.copyOut(),
               data.slice(outerLoopIndex, objectValueIndex)
             );
             outerLoopIndex = objectValueIndex;
@@ -419,12 +420,12 @@ export namespace JSON {
           unsafeCharCodeAt(data, stringValueIndex - 1) !== backSlashCode
         ) {
           if (isKey === false) {
-            key = data.slice(outerLoopIndex, stringValueIndex);
+            key.reinst(data, outerLoopIndex, stringValueIndex);
             isKey = true;
           } else {
             // @ts-ignore
             schema.__JSON_Set_Key(
-              key,
+              key.copyOut(),
               data.slice(outerLoopIndex, stringValueIndex)
             );
             isKey = false;
@@ -435,7 +436,7 @@ export namespace JSON {
       }
     } else if (char == nCode) {
       // @ts-ignore
-      schema.__JSON_Set_Key(key, nullWord);
+      schema.__JSON_Set_Key(key.copyOut(), nullWord);
       isKey = false;
     } else if (
       char === tCode &&
@@ -444,7 +445,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key(key, trueWord);
+      schema.__JSON_Set_Key(key.copyOut(), trueWord);
       isKey = false;
     } else if (
       char === fCode &&
@@ -454,7 +455,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key(key, "false");
+      schema.__JSON_Set_Key(key.copyOut(), "false");
       isKey = false;
     } else if ((char >= 48 && char <= 57) || char === 45) {
       let numberValueIndex = ++outerLoopIndex;
@@ -463,7 +464,7 @@ export namespace JSON {
         if (char === commaCode || char === rightBraceCode || isSpace(char)) {
           // @ts-ignore
           schema.__JSON_Set_Key(
-            key,
+            key.copyOut(),
             data.slice(outerLoopIndex - 1, numberValueIndex)
           );
           outerLoopIndex = numberValueIndex;

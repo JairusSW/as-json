@@ -1,10 +1,15 @@
 import { backSlashCode, commaCode, eCode, fCode, leftBraceCode, leftBracketCode, nCode, nullWord, quoteCode, rCode, rightBraceCode, rightBracketCode, tCode, trueWord, uCode } from "./src/chars";
 import { isSpace } from "util/string";
 import { JSON } from "./src/json";
-import { fast_itoa32, snip_fast, unsafeCharCodeAt } from "./src/util";
+import { snip_fast, unsafeCharCodeAt } from "./src/util";
 
 import { bench, blackbox } from "../../../WebAssembly/benchmark-wasm/assembly/bench";
-import { decimalCount32 } from "util/number";
+
+import { Virtual } from "as-virtual/assembly";
+let schema: nonnull<Vec3> = changetype<nonnull<Vec3>>(
+    __new(offsetof<nonnull<Vec3>>(), idof<nonnull<Vec3>>())
+);
+
 class Vec3 {
     x: i32;
     y: i32;
@@ -15,25 +20,22 @@ class Vec3 {
     }
     @inline
     __JSON_Set_Key(key: string, value: string): void {
-        if (unsafeCharCodeAt(key, 0) == 120) {
-            this.x = snip_fast<i32>(value);
+        if (key == "x") {
+            this.x = JSON.parseObjectValue<i32>(value);
             return;
         }
-        if (unsafeCharCodeAt(key, 0) == 121) {
-            this.y = snip_fast<i32>(value);
+        if (key == "y") {
+            this.y = JSON.parseObjectValue<i32>(value);
             return;
         }
-        if (unsafeCharCodeAt(key, 0) == 122) {
-            this.z = snip_fast<i32>(value);
+        if (key == "z") {
+            this.z = JSON.parseObjectValue<i32>(value);
             return;
         }
     }
     @inline
     __JSON_Deserialize(data: string): Vec3 {
-        let schema: nonnull<Vec3> = changetype<nonnull<Vec3>>(
-            __new(offsetof<nonnull<Vec3>>(), idof<nonnull<Vec3>>())
-        );
-        let key = "";
+        let key: Virtual<string> = Virtual.createEmpty<string>();
         let isKey = false;
         let outerLoopIndex = 1;
         for (; outerLoopIndex < data.length - 1; outerLoopIndex++) {
@@ -50,16 +52,16 @@ class Vec3 {
                         unsafeCharCodeAt(data, stringValueIndex - 1) !== backSlashCode
                     ) {
                         if (isKey === false) {
-                            key = data.slice(outerLoopIndex, stringValueIndex);
+                            key.reinst(data, outerLoopIndex, stringValueIndex);
                             isKey = true;
-                        } else {
+                        } /*else {
                             // @ts-ignore
                             schema.__JSON_Set_Key(
                                 key,
                                 data.slice(outerLoopIndex, stringValueIndex)
                             );
                             isKey = false;
-                        }
+                        }*/
                         outerLoopIndex = ++stringValueIndex;
                         break;
                     }
@@ -69,11 +71,11 @@ class Vec3 {
                 for (; numberValueIndex < data.length; numberValueIndex++) {
                     const char = unsafeCharCodeAt(data, numberValueIndex);
                     if (char === commaCode || char === rightBraceCode || isSpace(char)) {
-                        if (key == "x") {
+                        if (key.equals("x")) {
                             schema.x = snip_fast<i32>(data, numberValueIndex << 1, (outerLoopIndex - 1) << 1);
-                        } else if (key == "y") {
+                        } else if (key.equals("y")) {
                             schema.y = snip_fast<i32>(data, numberValueIndex << 1, (outerLoopIndex - 1) << 1);
-                        } else if (key == "z") {
+                        } else if (key.equals("z")) {
                             schema.z = snip_fast<i32>(data, numberValueIndex << 1, (outerLoopIndex - 1) << 1);
                         }
                         outerLoopIndex = numberValueIndex;
@@ -83,6 +85,7 @@ class Vec3 {
                 }
             }
         }
+        key.destroy();
         return schema;
     }
 }
@@ -94,7 +97,7 @@ const vec: Vec3 = {
 }
 
 console.log(vec.__JSON_Serialize());
-console.log(vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize())
+console.log(JSON.stringify(JSON.parse<Vec3>('{"x":3,"y":1,"z":8}')));
 
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {
