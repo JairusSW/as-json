@@ -75,8 +75,8 @@ Below are benchmark results comparing JavaScript, WAVM (WebAssembly Virtual Mach
 
 JavaScript Results
 
-```
 NodeJS v20.5.1 - TinyBench v2.5.0 (V8)
+```
 ┌───────────────────────────┬───────────────┐
 │         Task Name         │   ops / sec   │
 ├───────────────────────────┼───────────────┤
@@ -91,8 +91,8 @@ NodeJS v20.5.1 - TinyBench v2.5.0 (V8)
 
 AssemblyScript Results
 
-```
 WAVM v0.0.0-prerelease - as-bench v0.0.0-alpha (LLVM)
+```
 ┌───────────────────────────┬───────────────┐
 │         Task Name         │   ops / sec   │
 ├───────────────────────────┼───────────────┤
@@ -105,8 +105,8 @@ WAVM v0.0.0-prerelease - as-bench v0.0.0-alpha (LLVM)
 └───────────────────────────┴───────────────┘
 ```
 
-```
 Wasmtime v11.0.1 - as-bench v0.0.0-alpha (Cranelift)
+```
 ┌───────────────────────────┬───────────────┐
 │         Task Name         │   ops / sec   │
 ├───────────────────────────┼───────────────┤
