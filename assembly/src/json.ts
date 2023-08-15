@@ -328,7 +328,7 @@ export namespace JSON {
       }
     }
   }
-  result.write(data, last, data.length - 1);
+  if ((data.length - 1) > last) result.write(data, last, data.length - 1);
   return result.toString();
 }
 
