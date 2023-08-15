@@ -71,36 +71,54 @@ const parsed = JSON.parse<Player>(stringified);
 ## Performance
 
 Here are some benchmarks I took with `tinybench` (JavaScript) and `astral` (AssemblyScript).
-I took the benchmarks using the minimal runtime which doesn't call the Garbage Collector, so you may expect a 10% to 40% decrease from low to high throughput.
+I took the benchmarks using the stub runtime which doesn't call the Garbage Collector, so you may expect a 10% to 40% decrease from low to high throughput.
 
 Tests are run on Ubuntu/WSL2 with a AMD Ryzen 9 CPU
 
-JavaScript Results (TinyBench/NodeJS 19)
+JavaScript Results
+
 ```
-┌───────────────────────────┬─────────────┬────────────────────┬──────────┐
-│         Task Name         │  ops / sec  │  Average Time(ns)  │  Margin  │
-├───────────────────────────┼─────────────┼────────────────────┼──────────┤
-│ 'Stringify Object (Vec3)' │  '817,816'  │      1222.76       │ '±3.55%' │
-│   'Parse Object (Vec3)'   │  '726,115'  │      1377.19       │ '±3.21%' │
-│ 'Stringify Number Array'  │ '1,104,036' │      905.77        │ '±6.48%' │
-│   'Parse Number Array'    │ '1,114,053' │      897.62        │ '±2.58%' │
-│    'Stringify String'     │ '1,565,716' │      638.69        │ '±2.04%' │
-│      'Parse String'       │  '69,568'   │      14374.22      │ '±2.55%' │
-└───────────────────────────┴─────────────┴────────────────────┴──────────┘
+NodeJS v20.5.1 - TinyBench v2.5.0 (V8)
+┌───────────────────────────┬───────────────┐
+│         Task Name         │   ops / sec   │
+├───────────────────────────┼───────────────┤
+│ 'Stringify Object (Vec3)' │  '1,191,221'  │
+│   'Parse Object (Vec3)'   │  '897,759'    │
+│ 'Stringify Number Array'  │  '1,552,255'  │
+│   'Parse Number Array'    │  '1,225,325'  │
+│    'Stringify String'     │  '1,761,011'  │
+│      'Parse String'       │  '80,845'     │
+└───────────────────────────┴───────────────┘
 ```
 
-AssemblyScript Results (Runtime Minimal)
+AssemblyScript Results
+
 ```
-┌───────────────────────────┬─────────────┬────────────────────┬──────────┐
-│         Task Name         │  ops / sec  │  Average Time(ns)  │   Diff   │
-├───────────────────────────┼─────────────┼────────────────────┼──────────┤
-│ 'Stringify Object (Vec3)' │ '2,091,000' │       417.22       │  -805ns  │
-│   'Parse Object (Vec3)'   │ '1,780,000' │       539.02       │  -838ns  |
-│ 'Stringify Number Array'  │ '1,920,000' │       445.43       │  -460ns  │
-│   'Parse Number Array'    │ '1,660,000' │       597.17       │  -300ns  │
-│    'Stringify String'     │ '1,280,000' │       736.27       │   +97ns  │
-│      'Parse String'       │ '4,230,000' │       239.21       │ -14135ns │
-└───────────────────────────┴─────────────┴────────────────────┴──────────┘
+WAVM v0.0.0-prerelease - as-bench v0.0.0-alpha (LLVM)
+┌───────────────────────────┬───────────────┐
+│         Task Name         │   ops / sec   │
+├───────────────────────────┼───────────────┤
+│ 'Stringify Object (Vec3)' │  '6,270,322'  │
+│   'Parse Object (Vec3)'   │  '8,000,195'  |
+│ 'Stringify Number Array'  │  '6,664,937'  │
+│   'Parse Number Array'    │  '6,557,357'  │
+│    'Stringify String'     │  '6,946,947'  │
+│      'Parse String'       │  '10,952,502' │
+└───────────────────────────┴───────────────┘
+```
+
+```
+Wasmtime v11.0.1 - as-bench v0.0.0-alpha (Cranelift)
+┌───────────────────────────┬───────────────┐
+│         Task Name         │   ops / sec   │
+├───────────────────────────┼───────────────┤
+│ 'Stringify Object (Vec3)' │  '2,038,684'  │
+│   'Parse Object (Vec3)'   │  '4,623,337'  |
+│ 'Stringify Number Array'  │  '2,500,947'  │
+│   'Parse Number Array'    │  '2,959,180'  │
+│    'Stringify String'     │  '3,236,896'  │
+│      'Parse String'       │  '5,634,594'  │
+└───────────────────────────┴───────────────┘
 ```
 
 ## Issues
