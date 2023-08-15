@@ -219,51 +219,53 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline function serializeString(data: string): string {
-  let result = '"';
+@inline export function serializeString(data: string): string {
+  let result = new StringSink('"');
 
   let last: i32 = 0;
   // @ts-ignore
   for (let i = 0; i < data.length; i++) {
     const char = unsafeCharCodeAt(<string>data, i);
     if (char === 34 || char === 92) {
-      result += (<string>data).slice(last, i) + "\\";
+      result.write(<string>data, last, i);
+      result.writeCodePoint(backSlashCode);
       last = i;
       //i++;
     } else if (char <= 13 && char >= 8) {
-      result += (<string>data).slice(last, i);
+      result.write(<string>data, last, i);
       last = i + 1;
       switch (char) {
         case 8: {
-          result += "\\b";
+          result.write("\\b");
           break;
         }
         case 9: {
-          result += "\\t";
+          result.write("\\t");
           break;
         }
         case 10: {
-          result += "\\n";
+          result.write("\\n");
           break;
         }
         case 11: {
-          result += "\\x0B"; // \\u000b
+          result.write("\\x0B"); // \\u000b
           break;
         }
         case 12: {
-          result += "\\f";
+          result.write("\\f");
           break;
         }
         case 13: {
-          result += "\\r";
+          result.write("\\r");
           break;
         }
       }
     }
   }
   if (result.length === 1) return '"' + data + '"';
-  else result += (<string>data).slice(last);
-  return result + '"';
+  else result.write(<string>data, last);
+  result.write("\"");
+  return result.toString();
 }
 
 // @ts-ignore: Decorator
