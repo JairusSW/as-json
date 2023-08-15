@@ -21,6 +21,7 @@ import {
   uCode,
   emptyArrayWord,
   falseWord,
+  newLineCode,
 } from "./chars";
 import { snip_fast, unsafeCharCodeAt } from "./util";
 import { Virtual } from "as-virtual/assembly";
@@ -230,7 +231,6 @@ export namespace JSON {
       result.write(<string>data, last, i);
       result.writeCodePoint(backSlashCode);
       last = i;
-      //i++;
     } else if (char <= 13 && char >= 8) {
       result.write(<string>data, last, i);
       last = i + 1;
@@ -269,46 +269,46 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline function parseString(data: string): string {
-  let result = "";
+@inline export function parseString(data: string): string {
+  let result = new StringSink();
   let last = 1;
   for (let i = 1; i < data.length - 1; i++) {
     // \\"
     if (unsafeCharCodeAt(data, i) === backSlashCode) {
       const char = unsafeCharCodeAt(data, ++i);
-      result += data.slice(last, i - 1);
+      result.write(data, last, i - 1);
       if (char === 34) {
-        result += '"';
+        result.writeCodePoint(quoteCode);
         last = i + 1;
       } else if (char >= 92 && char <= 117) {
         switch (char) {
           case 92: {
-            result += "\\";
+            result.writeCodePoint(backSlashCode);
             last = i + 1;
             break;
           }
           case 98: {
-            result += "\b";
+            result.write("\b");
             last = i + 1;
             break;
           }
           case 102: {
-            result += "\f";
+            result.write("\f");
             last = i + 1;
             break;
           }
           case 110: {
-            result += "\n";
+            result.writeCodePoint(newLineCode);
             last = i + 1;
             break;
           }
           case 114: {
-            result += "\r";
+            result.write("\r");
             last = i + 1;
             break;
           }
           case 116: {
-            result += "\t";
+            result.write("\t");
             last = i + 1;
             break;
           }
@@ -318,7 +318,7 @@ export namespace JSON {
               load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
               27584753879220272
             ) {
-              result += "\u000b";
+              result.write("\u000b");
               i += 4;
               last = i + 1;
             }
@@ -328,8 +328,8 @@ export namespace JSON {
       }
     }
   }
-  result += data.slice(last, data.length - 1);
-  return result;
+  result.write(data, last, data.length - 1);
+  return result.toString();
 }
 
 // @ts-ignore: Decorator
