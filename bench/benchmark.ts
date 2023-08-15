@@ -1,4 +1,4 @@
-import { bench, blackbox } from "../../../WebAssembly/benchmark-wasm/assembly/bench";
+import { bench, blackbox } from "as-bench/assembly/bench";
 import { __atoi_fast } from "../assembly/src/util";
 import { JSON } from "../assembly";
 
