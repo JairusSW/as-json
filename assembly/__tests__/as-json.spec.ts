@@ -89,7 +89,7 @@ describe("Ser/de Array", () => {
   });
 
   it("should ser/de string arrays", () => {
-    canSerde<string[]>(['string \"with random spa\nces and \nnewlines\n\n\n']);
+    canSerde<string[]>(['string \"with random spa\nces and \nnewlines\n\n\n'], '["string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"]');
   });
 
   it("should ser/de nested integer arrays", () => {
