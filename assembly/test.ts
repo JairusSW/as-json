@@ -45,7 +45,7 @@ console.log("Implemented: " + JSON.stringify(JSON.parse<Vec3>('{"x":3.4,"y":1.2,
 console.log("Original: " + JSON.stringify(player));
 //console.log("Revised: " + vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize());
 console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}')));
-.*
+/*
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {
     blackbox<string>(vec.__JSON_Serialize());
