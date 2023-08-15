@@ -1,8 +1,5 @@
 # AS-JSON
 
-![AssemblyScript](https://img.shields.io/badge/AssemblyScript-blue)
-![WebAssembly](https://img.shields.io/badge/WebAssemby-purple)
-
 JSON for AssemblyScript focused on performance, low-overhead, and ease-of-use.
 
 ## Installation
@@ -21,6 +18,7 @@ Alternatively, add it to your `asconfig.json`
 
 ```
 {
+  // ...
   "options": {
     "transform": ["json-as/transform"]
   }
@@ -68,12 +66,12 @@ const stringified = JSON.stringify<Player>(player);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
+If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 ## Performance
 
-Here are some benchmarks I took with `tinybench` (JavaScript) and `astral` (AssemblyScript).
-I took the benchmarks using the stub runtime which doesn't call the Garbage Collector, so you may expect a 10% to 40% decrease from low to high throughput.
+Run or view the benchmarks [here](https://github.com/JairusSW/as-json/tree/master/bench)
 
-Tests are run on Ubuntu/WSL2 with a AMD Ryzen 9 CPU
+Below are benchmark results comparing JavaScript, WAVM (WebAssembly Virtual Machine), and Wasmtime environments.
 
 JavaScript Results
 
