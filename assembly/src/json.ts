@@ -407,26 +407,31 @@ export namespace JSON {
         }
       }
     } else if (char === quoteCode) {
+      let escaping = false;
       for (
         let stringValueIndex = ++outerLoopIndex;
         stringValueIndex < data.length - 1;
         stringValueIndex++
       ) {
         const char = unsafeCharCodeAt(data, stringValueIndex);
-        if (
-          char === quoteCode &&
-          unsafeCharCodeAt(data, stringValueIndex - 1) !== backSlashCode
-        ) {
-          if (isKey === false) {
-            key.reinst(data, outerLoopIndex, stringValueIndex);
-            isKey = true;
-          } else {
-            // @ts-ignore
-            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, stringValueIndex);
-            isKey = false;
+        if (char === backSlashCode && !escaping) {
+          escaping = true;
+        } else {
+          if (
+            char === quoteCode && !escaping
+          ) {
+            if (isKey === false) {
+              key.reinst(data, outerLoopIndex, stringValueIndex);
+              isKey = true;
+            } else {
+              // @ts-ignore
+              schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, stringValueIndex);
+              isKey = false;
+            }
+            outerLoopIndex = ++stringValueIndex;
+            break;
           }
-          outerLoopIndex = ++stringValueIndex;
-          break;
+          escaping = false;
         }
       }
     } else if (char == nCode) {
@@ -503,15 +508,22 @@ export namespace JSON {
   const result: string[] = [];
   let lastPos = 0;
   let instr = false;
+  let escaping = false;
   for (let i = 1; i < data.length - 1; i++) {
-    if (unsafeCharCodeAt(data, i) === quoteCode) {
-      if (instr === false) {
-        instr = true;
-        lastPos = i;
-      } else if (unsafeCharCodeAt(data, i - 1) !== backSlashCode) {
-        instr = false;
-        result.push(parseString(data.slice(lastPos, i)));
+    const char = unsafeCharCodeAt(data, i);
+    if (char === backSlashCode && !escaping) {
+      escaping = true;
+    } else {
+      if (char === quoteCode && !escaping) {
+        if (instr === false) {
+          instr = true;
+          lastPos = i;
+        } else {
+          instr = false;
+          result.push(parseString(data.slice(lastPos, i + 1)));
+        }
       }
+      escaping = false;
     }
   }
   return result;

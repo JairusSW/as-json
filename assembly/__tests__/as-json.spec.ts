@@ -5,6 +5,25 @@ function canSerde<T>(data: T, toBe: string = ""): void {
   expect(deserialized).toBe(toBe);
 }
 
+function canDeser<T>(data: string, toBe: T): void {
+  const deserialized = JSON.parse<T>(data);
+  expect(deserialized).toStrictEqual(toBe);
+}
+
+function canSer<T>(data: T, toBe: string): void {
+  const serialized = JSON.stringify<T>(data);
+  expect(serialized).toBe(toBe);
+}
+
+// @ts-ignore
+@json
+class Map4 {
+  a: string;
+  b: string;
+  c: string;
+  d: string;
+}
+
 // @ts-ignore
 @json
 class Vec3 {
@@ -151,4 +170,36 @@ describe("Ser/de Objects", () => {
       isVerified: true,
     }, '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}');
   });
+});
+
+describe("Ser externals", () => {
+  it("should serialize valid objects", () => {
+    canSer<Map4>({ a: '\\', b: '}', c: '][', d: '"' }, '{"a":"\\\\","b":"}","c":"][","d":"\\""}')
+    canSer<Vec3>({ x: 0.4, y: 1.4, z: 0 }, '{"x":0.4,"y":1.4,"z":0.0}')
+  })
+});
+
+// @ts-ignore
+@json
+class HttpResp {
+  statusCode: number;
+  headers: Array<Array<string>>;
+  body: string;
+}
+
+describe("Deser externals", () => {
+  it("should deserialize valid JSON strings", () => {
+    canDeser<Map4>('\n{"a":\r"\\\\",\n\r"b":"}","c":"][","d"\t:\t"\\""}', { a: '\\', b: '}', c: '][', d: '"' })
+    canDeser<Vec3>('{"x":0.4,"y":1.4,"z":0.0}', { x: 0.4, y: 1.4, z: 0 })
+    canDeser<HttpResp>('{"statusCode":200,"headers":[["Conn\\\\ection","close"],["Content-Length","375"],["ETag","W/\\"177-/Ihew5Z+fiI8NLbTM2Wyphl/PFY\\""]],\n"body":"{\\n  \\\"args\\\": {},\\n  \\\"headers\\\": {\\n    \\\"content-length\\\": \\\"0\\\",\\n    \\\"accept\\\": \\\"*/*\\\" \\n}}"}',
+      {
+        statusCode: 200,
+        headers: [
+          ['Conn\\ection', 'close'],
+          ['Content-Length', '375'],
+          ['ETag', 'W/\"177-/Ihew5Z+fiI8NLbTM2Wyphl/PFY\"']
+        ],
+        body: '{\n  "args": {},\n  "headers": {\n    "content-length": "0",\n    "accept": "*/*" \n}}'
+      })
+  })
 });
