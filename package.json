@@ -64,5 +64,8 @@
     "url": "https://github.com/JairusSW/as-json/issues"
   },
   "homepage": "https://github.com/JairusSW/as-json#readme",
-  "type": "module"
+  "type": "module",
+  "publishConfig": {
+    "@JairusSW:registry": "https://npm.pkg.github.com"
+  }
 }
