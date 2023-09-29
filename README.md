@@ -1,5 +1,6 @@
-<h1 align=center>JSON<h4 align=center>Implementation of JSON for modern AssemblyScript</h3></h1>
-
+<p align="center">
+    <img width="800" src="https://raw.githubusercontent.com/romdotdog/as-tral/main/as-tral.svg" alt="logo">
+</p>
 ## Installation
 
 ```bash
