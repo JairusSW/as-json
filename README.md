@@ -1,6 +1,4 @@
-# AS-JSON
-
-JSON for AssemblyScript focused on performance, low-overhead, and ease-of-use.
+<h1 align=center>JSON<h4 align=center>Implementation of JSON for modern AssemblyScript</h3></h1>
 
 ## Installation
 
