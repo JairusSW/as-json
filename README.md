@@ -1,7 +1,4 @@
-<p align="center">
-    <img width="800" src="https://raw.githubusercontent.com/JairusSW/as-json/master/assets/logo.svg" alt="logo">
-    <br>
-</p>
+<h1>JSON</h1>
 
 ## Installation
 
