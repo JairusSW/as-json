@@ -204,14 +204,14 @@ export namespace JSON {
       return parseNumber<T>(data);
     } else if (isArrayLike<T>()) {
       // @ts-ignore
-      return parseArray<T>(data);
+      return parseArray<T>(data.trimStart());
       // @ts-ignore
     } else if (isNullable<T>() && data == "null") {
       // @ts-ignore
       return null;
       // @ts-ignore
     } else if (isDefined(type.__JSON_Set_Key)) {
-      return parseObject<T>(data);
+      return parseObject<T>(data.trimStart());
     } else if (idof<nonnull<T>>() == idof<Date>()) {
       // @ts-ignore
       return Date.fromString(data);
