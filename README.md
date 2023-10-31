@@ -60,6 +60,7 @@ const player: Player = {
 };
 
 const stringified = JSON.stringify<Player>(player);
+// Alternative: use JSON.serializeTo(player, out);
 
 const parsed = JSON.parse<Player>(stringified);
 ```
