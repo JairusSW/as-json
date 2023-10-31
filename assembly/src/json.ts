@@ -102,6 +102,87 @@ export namespace JSON {
     }
   }
   /**
+   * Stringifies valid JSON data.
+   * ```js
+   * JSON.stringify<T>(data)
+   * ```
+   * @param data T
+   * @returns string
+   */
+  // @ts-ignore: Decorator
+  @inline export function stringifyTo<T>(data: T, out: string): void {
+    // String
+    if (isString<T>() && data != null) {
+      out = serializeString(data as string);
+      return;
+    } else if (isBoolean<T>()) {
+      out = data ? "true" : "false";
+      return;
+    } else if (isNullable<T>() && data == null) {
+      out = "null";
+      return;
+      // @ts-ignore
+    } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
+      // @ts-ignore
+      out = data.toString();
+      return;
+      // @ts-ignore: Hidden function
+    } else if (isDefined(data.__JSON_Serialize)) {
+      // @ts-ignore: Hidden function
+      out = data.__JSON_Serialize();
+      return;
+    } else if (data instanceof Date) {
+      out = data.toISOString();
+      return;
+    } else if (isArrayLike<T>()) {
+      // @ts-ignore
+      if (data.length == 0) {
+        out = emptyArrayWord;
+        return;
+        // @ts-ignore
+      } else if (isString<valueof<T>>()) {
+        out = "[";
+        // @ts-ignore
+        for (let i = 0; i < data.length - 1; i++) {
+          // @ts-ignore
+          out += serializeString(unchecked(data[i]));
+          out += commaWord;
+        }
+        // @ts-ignore
+        out += serializeString(unchecked(data[data.length - 1]));
+        out += rightBracketWord;
+        return;
+        // @ts-ignore
+      } else if (isBoolean<valueof<T>>()) {
+        // @ts-ignore
+        out = leftBracketWord + data.join(commaWord) + rightBracketWord;
+        return;
+        // @ts-ignore
+      } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
+        // @ts-ignore
+        out = leftBracketWord + data.join(commaWord) + rightBracketWord;
+        return;
+      } else {
+        let result = new StringSink(leftBracketWord);
+        // @ts-ignore
+        for (let i = 0; i < data.length - 1; i++) {
+          // @ts-ignore
+          result.write(JSON.stringify(unchecked(data[i])));
+          result.write(commaWord);
+        }
+        // @ts-ignore
+        result.write(JSON.stringify(unchecked(data[data.length - 1])));
+        result.write(rightBracketWord);
+        out = result.toString();
+        return;
+      }
+    } else {
+      throw new Error(
+        `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
+      );
+    }
+  }
+  /**
    * Parses valid JSON strings into their original format.
    * ```js
    * JSON.parse<T>(data)
@@ -123,14 +204,14 @@ export namespace JSON {
       return parseNumber<T>(data);
     } else if (isArrayLike<T>()) {
       // @ts-ignore
-      return parseArray<T>(data.trimStart());
+      return parseArray<T>(data);
       // @ts-ignore
     } else if (isNullable<T>() && data == "null") {
       // @ts-ignore
       return null;
       // @ts-ignore
     } else if (isDefined(type.__JSON_Set_Key)) {
-      return parseObject<T>(data.trimStart());
+      return parseObject<T>(data);
     } else if (idof<nonnull<T>>() == idof<Date>()) {
       // @ts-ignore
       return Date.fromString(data);

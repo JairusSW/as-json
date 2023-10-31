@@ -33,14 +33,14 @@
     "@as-tral/cli": "^2.0.1",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bench": "^0.0.0-alpha",
-    "assemblyscript": "^0.27.9",
+    "assemblyscript": "^0.27.14",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
     "kati": "^0.6.2",
     "microtime": "^3.1.1",
-    "prettier": "^3.0.2",
-    "tinybench": "^2.5.0",
-    "typescript": "^5.1.6",
+    "prettier": "^3.0.3",
+    "tinybench": "^2.5.1",
+    "typescript": "^5.2.2",
     "visitor-as": "^0.11.4"
   },
   "dependencies": {

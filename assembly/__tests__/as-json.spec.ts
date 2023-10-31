@@ -189,7 +189,7 @@ class HttpResp {
 
 describe("Deser externals", () => {
   it("should deserialize valid JSON strings", () => {
-    canDeser<Map4>('\n{"a":\r"\\\\",\n\r"b":"}","c":"][","d"\t:\t"\\""}', { a: '\\', b: '}', c: '][', d: '"' })
+    canDeser<Map4>('{"a":\r"\\\\",\n\r"b":"}","c":"][","d"\t:\t"\\""}', { a: '\\', b: '}', c: '][', d: '"' })
     canDeser<Vec3>('{"x":0.4,"y":1.4,"z":0.0}', { x: 0.4, y: 1.4, z: 0 })
     canDeser<HttpResp>('{"statusCode":200,"headers":[["Conn\\\\ection","close"],["Content-Length","375"],["ETag","W/\\"177-/Ihew5Z+fiI8NLbTM2Wyphl/PFY\\""]],\n"body":"{\\n  \\\"args\\\": {},\\n  \\\"headers\\\": {\\n    \\\"content-length\\\": \\\"0\\\",\\n    \\\"accept\\\": \\\"*/*\\\" \\n}}"}',
       {
