@@ -40,7 +40,7 @@ JSON.stringifyTo(vec, out);
 
 console.log("Original: " + out);
 //console.log("Revised: " + vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize());
-console.log("Implemented: " + JSON.stringify(JSON.parse<Vec3>('{}')));
+console.log("Implemented: " + JSON.stringify(JSON.parse<Vec3>('{}', true)));
 
 console.log("Original: " + JSON.stringify(player));
 //console.log("Revised: " + vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize());

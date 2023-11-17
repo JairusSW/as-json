@@ -59,7 +59,8 @@ const player: Player = {
   isVerified: true
 };
 
-const stringified = JSON.stringify<Player>(player);
+const stringified = JSON.stringify<Player>(player, true);
+// You can toggle on setting default values with the 2nd parameter
 // Alternative: use JSON.serializeTo(player, out);
 
 const parsed = JSON.parse<Player>(stringified);

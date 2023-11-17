@@ -193,7 +193,7 @@ export namespace JSON {
    */
 
   // @ts-ignore: Decorator
-  @inline export function parse<T>(data: string): T {
+  @inline export function parse<T>(data: string, initializeDefaultValues: boolean = false): T {
     let type: T;
     if (isString<T>()) {
       // @ts-ignore
@@ -212,7 +212,7 @@ export namespace JSON {
       return null;
       // @ts-ignore
     } else if (isDefined(type.__JSON_Set_Key)) {
-      return parseObject<T>(data.trimStart());
+      return parseObject<T>(data.trimStart(), initializeDefaultValues);
     } else if (idof<nonnull<T>>() == idof<Date>()) {
       // @ts-ignore
       return parseDate(data);
@@ -226,7 +226,7 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@global @inline function __parseObjectValue<T>(data: string): T {
+@global @inline function __parseObjectValue<T>(data: string, initializeDefaultValues: boolean): T {
   let type: T;
   if (isString<T>()) {
     // @ts-ignore
@@ -289,7 +289,7 @@ export namespace JSON {
     return null;
     // @ts-ignore
   } else if (isDefined(type.__JSON_Set_Key)) {
-    return parseObject<T>(data.trimStart());
+    return parseObject<T>(data.trimStart(), initializeDefaultValues);
   } else if (idof<nonnull<T>>() == idof<Date>()) {
     // @ts-ignore
     return parseDate(data);
@@ -436,10 +436,13 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline function parseObject<T>(data: string): T {
+@inline function parseObject<T>(data: string, initializeDefaultValues: boolean): T {
   let schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );
+  // @ts-ignore
+  if (initializeDefaultValues) schema.__JSON_Initialize();
+
   let key = Virtual.createEmpty<string>();
   let isKey = false;
   let depth = 0;
@@ -460,7 +463,7 @@ export namespace JSON {
           if (depth === 0) {
             ++arrayValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, arrayValueIndex);
+            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, arrayValueIndex, initializeDefaultValues);
             outerLoopIndex = arrayValueIndex;
             isKey = false;
             break;
@@ -481,7 +484,7 @@ export namespace JSON {
           if (depth === 0) {
             ++objectValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, objectValueIndex);
+            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, objectValueIndex, initializeDefaultValues);
             outerLoopIndex = objectValueIndex;
             isKey = false;
             break;
@@ -507,7 +510,7 @@ export namespace JSON {
               isKey = true;
             } else {
               // @ts-ignore
-              schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, stringValueIndex);
+              schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, stringValueIndex, initializeDefaultValues);
               isKey = false;
             }
             outerLoopIndex = ++stringValueIndex;
@@ -518,7 +521,7 @@ export namespace JSON {
       }
     } else if (char == nCode) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, nullWord, 0, 4);
+      schema.__JSON_Set_Key<Virtual<string>>(key, nullWord, 0, 4, initializeDefaultValues);
       isKey = false;
     } else if (
       char === tCode &&
@@ -527,7 +530,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, trueWord, 0, 4);
+      schema.__JSON_Set_Key<Virtual<string>>(key, trueWord, 0, 4, initializeDefaultValues);
       isKey = false;
     } else if (
       char === fCode &&
@@ -537,7 +540,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, falseWord, 0, 5);
+      schema.__JSON_Set_Key<Virtual<string>>(key, falseWord, 0, 5, initializeDefaultValues);
       isKey = false;
     } else if ((char >= 48 && char <= 57) || char === 45) {
       let numberValueIndex = ++outerLoopIndex;
@@ -545,7 +548,7 @@ export namespace JSON {
         const char = unsafeCharCodeAt(data, numberValueIndex);
         if (char === commaCode || char === rightBraceCode || isSpace(char)) {
           // @ts-ignore
-          schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex - 1, numberValueIndex);
+          schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex - 1, numberValueIndex, initializeDefaultValues);
           outerLoopIndex = numberValueIndex;
           isKey = false;
           break;

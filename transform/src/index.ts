@@ -17,6 +17,7 @@ class SchemaData {
   public node!: ClassDeclaration;
   public encodeStmts: string[] = [];
   public setDataStmts: string[] = [];
+  public initializeStmts: string[] = [];
 }
 
 class AsJSONTransform extends BaseVisitor {
@@ -54,6 +55,7 @@ class AsJSONTransform extends BaseVisitor {
       node: node,
       encodeStmts: [],
       setDataStmts: [],
+      initializeStmts: []
     };
 
     if (this.currentClass.parent.length > 0) {
@@ -119,6 +121,11 @@ class AsJSONTransform extends BaseVisitor {
       }
       `
           );
+          if (member.initializer) {
+            this.currentClass.initializeStmts.push(
+              `this.${name} = ${toString(member.initializer)}`
+            );
+          }
         } else // @ts-ignore
           if (
             [
@@ -132,11 +139,16 @@ class AsJSONTransform extends BaseVisitor {
             // @ts-ignore
             this.currentClass.setDataStmts.push(
               `if (key.equals("${name}")) {
-        this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end));
+        this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
         return;
       }
       `
             );
+            if (member.initializer) {
+              this.currentClass.initializeStmts.push(
+                `this.${name} = ${toString(member.initializer)}`
+              );
+            }
           } else {
             this.currentClass.encodeStmts.push(
               `"${name}":\${JSON.stringify<${type}>(this.${name})},`
@@ -144,11 +156,16 @@ class AsJSONTransform extends BaseVisitor {
             // @ts-ignore
             this.currentClass.setDataStmts.push(
               `if (key.equals("${name}")) {
-        this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data);
+        this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
         return;
       }
       `
             );
+            if (member.initializer) {
+              this.currentClass.initializeStmts.push(
+                `this.${name} = ${toString(member.initializer)}`
+              );
+            }
           }
       }
     }
@@ -178,7 +195,7 @@ class AsJSONTransform extends BaseVisitor {
     // Odd behavior here... When pairing this transform with asyncify, having @inline on __JSON_Set_Key<T> with a generic will cause it to freeze.
     // Binaryen cannot predict and add/mangle code when it is genericed.
     const setKeyFunc = `
-      __JSON_Set_Key<T>(key: T, data: string, val_start: i32, val_end: i32): void {
+      __JSON_Set_Key<T>(key: T, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
         ${
       // @ts-ignore
       this.currentClass.setDataStmts.join("")
@@ -186,11 +203,27 @@ class AsJSONTransform extends BaseVisitor {
       }
     `;
 
+    let initializeFunc = "";
+
+    if (this.currentClass.initializeStmts.length > 0) {
+      initializeFunc = `
+      @inline __JSON_Initialize(): void {
+      ${this.currentClass.initializeStmts.join(";\n")};
+      }
+      `;
+    } else {
+      initializeFunc = `
+      @inline __JSON_Initialize(): void {}
+      `;
+    }
     const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
     node.members.push(serializeMethod);
 
     const setDataMethod = SimpleParser.parseClassMember(setKeyFunc, node);
     node.members.push(setDataMethod);
+
+    const initializeMethod = SimpleParser.parseClassMember(initializeFunc, node);
+    node.members.push(initializeMethod);
 
     this.schemasList.push(this.currentClass);
     //console.log(toString(node));
