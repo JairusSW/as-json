@@ -57,7 +57,7 @@ export namespace JSON {
       // @ts-ignore: Hidden function
       return data.__JSON_Serialize();
     } else if (data instanceof Date) {
-      return data.toISOString();
+      return "\"" + data.toISOString() + "\"";
     } else if (isArrayLike<T>()) {
       // @ts-ignore
       if (data.length == 0) {
@@ -133,7 +133,7 @@ export namespace JSON {
       out = data.__JSON_Serialize();
       return;
     } else if (data instanceof Date) {
-      out = data.toISOString();
+      out = "\"" + data.toISOString() + "\"";
       return;
     } else if (isArrayLike<T>()) {
       // @ts-ignore
