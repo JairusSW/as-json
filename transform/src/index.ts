@@ -18,6 +18,7 @@ class SchemaData {
   public encodeStmts: string[] = [];
   public setDataStmts: string[] = [];
 }
+
 class AsJSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
   public currentClass!: SchemaData;
@@ -137,18 +138,18 @@ class AsJSONTransform extends BaseVisitor {
       `
             );
           } else {
-          this.currentClass.encodeStmts.push(
-            `"${name}":\${JSON.stringify<${type}>(this.${name})},`
-          );
-          // @ts-ignore
-          this.currentClass.setDataStmts.push(
-            `if (key.equals("${name}")) {
+            this.currentClass.encodeStmts.push(
+              `"${name}":\${JSON.stringify<${type}>(this.${name})},`
+            );
+            // @ts-ignore
+            this.currentClass.setDataStmts.push(
+              `if (key.equals("${name}")) {
         this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data);
         return;
       }
       `
-          );
-        }
+            );
+          }
       }
     }
 

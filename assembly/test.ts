@@ -1,4 +1,5 @@
 import { JSON } from "./src/json";
+
 // @ts-ignore
 @json
 class Vec3 {
@@ -12,7 +13,7 @@ class Vec3 {
 class Player {
     firstName: string;
     lastName: string;
-    lastActive: i32[];
+    lastActive: Date;
     age: i32;
     pos: Vec3 | null;
     isVerified: boolean;
@@ -23,7 +24,7 @@ const vec = new Vec3();
 const player: Player = {
     firstName: "Emmet",
     lastName: "West",
-    lastActive: [8, 27, 2022],
+    lastActive: new Date(0),
     age: 23,
     pos: {
         x: 3.4,
@@ -43,7 +44,7 @@ console.log("Implemented: " + JSON.stringify(JSON.parse<Vec3>('{}')));
 
 console.log("Original: " + JSON.stringify(player));
 //console.log("Revised: " + vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize());
-console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}')));
+console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":2023-11-16T04:06:35.108285303Z,"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}')));
 /*
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {
