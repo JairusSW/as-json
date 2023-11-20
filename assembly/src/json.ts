@@ -716,94 +716,12 @@ export namespace JSON {
   return result;
 }
 
-// @ts-ignore: decorator
-@inline const
-  MILLIS_PER_DAY = 1000 * 60 * 60 * 24,
-  MILLIS_PER_HOUR = 1000 * 60 * 60,
-  MILLIS_PER_MINUTE = 1000 * 60,
-  MILLIS_PER_SECOND = 1000,
+function parseDate(dateTimeString: string): Date { 
+  // Use AssemblyScript's date parser
+  const d = Date.fromString(dateTimeString);
 
-  YEARS_PER_EPOCH = 400,
-  DAYS_PER_EPOCH = 146097,
-  EPOCH_OFFSET = 719468, // Jan 1, 1970
-  MILLIS_LIMIT = 8640000000000000;
-
-function parseDate(dateTimeString: string): Date {
-  if (!dateTimeString.length) throw new RangeError(E_INVALIDDATE);
-  var
-    hour: i32 = 0,
-    min: i32 = 0,
-    sec: i32 = 0,
-    ms: i32 = 0;
-
-  let dateString = dateTimeString;
-  let posT = dateTimeString.indexOf("T");
-  if (~posT) {
-    // includes a time component
-    let timeString: string;
-    dateString = dateTimeString.substring(0, posT);
-    timeString = dateTimeString.substring(posT + 1);
-    // parse the HH-MM-SS component
-    let timeParts = timeString.split(":");
-    let len = timeParts.length;
-    if (len <= 1) throw new RangeError(E_INVALIDDATE);
-
-    hour = i32.parse(timeParts[0]);
-    min = i32.parse(timeParts[1]);
-    if (len >= 3) {
-      let secAndMs = timeParts[2];
-      let posDot = secAndMs.indexOf(".");
-      if (~posDot) {
-        // includes milliseconds
-        sec = i32.parse(secAndMs.substring(0, posDot));
-        ms = i32.parse(secAndMs.substring(posDot + 1));
-      } else {
-        sec = i32.parse(secAndMs);
-      }
-    }
-  }
-  // parse the YYYY-MM-DD component
-  let parts = dateString.split("-");
-  let year = i32.parse(parts[0]);
-  let month = 1, day = 1;
-  let len = parts.length;
-  if (len >= 2) {
-    month = i32.parse(parts[1]);
-    if (len >= 3) {
-      day = i32.parse(parts[2]);
-    }
-  }
-  return new Date(epochMillis(year, month, day, hour, min, sec, ms));
-}
-
-function epochMillis(
-  year: i32,
-  month: i32,
-  day: i32,
-  hour: i32,
-  minute: i32,
-  second: i32,
-  milliseconds: i32
-): i64 {
-  return (
-    daysSinceEpoch(year, month, day) * MILLIS_PER_DAY +
-    hour * MILLIS_PER_HOUR +
-    minute * MILLIS_PER_MINUTE +
-    second * MILLIS_PER_SECOND +
-    milliseconds
-  );
-}
-
-function daysSinceEpoch(y: i32, m: i32, d: i32): i64 {
-  y -= i32(m <= 2);
-  let era = <u32>floorDiv(y, YEARS_PER_EPOCH);
-  let yoe = <u32>y - era * YEARS_PER_EPOCH; // [0, 399]
-  let doy = <u32>(153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1; // [0, 365]
-  let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy; // [0, 146096]
-  return <i64><i32>(era * 146097 + doe - EPOCH_OFFSET);
-}
-
-// @ts-ignore: decorator
-@inline function floorDiv<T extends number>(a: T, b: T): T {
-  return (a - (a < 0 ? b - 1 : 0)) / b as T;
+  // Return a new object instead of the one that the parser returned.
+  // This may seem redundant, but addreses the issue when Date
+  // is globally aliased to wasi_Date (or some other superclass).
+  return new Date(d.getTime());
 }
