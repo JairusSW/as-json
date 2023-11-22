@@ -45,6 +45,29 @@ console.log("Implemented: " + JSON.stringify(JSON.parse<Vec3>('{}', true)));
 console.log("Original: " + JSON.stringify(player));
 //console.log("Revised: " + vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize());
 console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":"2023-11-16T04:06:35.108285303Z","age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}')));
+
+@serializable
+class Wrapper<T> {
+    data!: T;
+}
+
+@serializable
+class Foo {
+    foo!: string;
+}
+
+@serializable
+class Bar {
+    bar!: string;
+}
+
+const foo: Wrapper<Foo> = {
+    data: new Foo()
+}
+
+foo.data.foo = "ha";
+console.log(JSON.stringify(foo));
+console.log(JSON.stringify(JSON.parse<Wrapper<Foo>>("{\"data\":{\"foo\":\"ha\"}}")))
 /*
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {

@@ -195,7 +195,7 @@ class AsJSONTransform extends BaseVisitor {
     // Odd behavior here... When pairing this transform with asyncify, having @inline on __JSON_Set_Key<T> with a generic will cause it to freeze.
     // Binaryen cannot predict and add/mangle code when it is genericed.
     const setKeyFunc = `
-      __JSON_Set_Key<T>(key: T, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
+      __JSON_Set_Key<__JSON_Key_Type>(key: __JSON_Key_Type, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
         ${
       // @ts-ignore
       this.currentClass.setDataStmts.join("")
