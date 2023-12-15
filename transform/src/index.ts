@@ -255,5 +255,13 @@ export default class Transformer extends Transform {
         transformer.visit(source);
       }
     }
+    // Check that every parent and child class is hooked up correctly
+    const schemas = transformer.schemasList;
+    for (const schema of schemas) {
+      if (schema.parent) {
+        const parent = schemas.find((v) => v.name === schema.parent);
+        if (!parent) throw new Error(`Class ${schema.name} extends its parent class ${schema.parent}, but ${schema.parent} does not include a @json or @serializable decorator! Add the decorator and rebuild.`);
+      }
+    }
   }
 }

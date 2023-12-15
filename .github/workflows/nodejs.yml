@@ -22,4 +22,4 @@ jobs:
         run: yarn build:test
 
       - name: Perform tests
-        run: yarn run test:aspect
+        run: yarn run test

@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -14,7 +14,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "test:aspect": "asp",
+    "test": "asp",
     "bench:astral": "astral --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior never --runtime stub",
     "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always --runtime stub",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",

@@ -1,7 +1,7 @@
 import { JSON } from "./src/json";
 
 // @ts-ignore
-@json
+
 class Vec3 {
     x: f64 = 3.4;
     y: f64 = 1.2;
@@ -10,7 +10,7 @@ class Vec3 {
 
 // @ts-ignore
 @json
-class Player {
+class Player extends Vec3 {
     firstName: string;
     lastName: string;
     lastActive: Date;
@@ -32,6 +32,9 @@ const player: Player = {
         z: 8.3,
     },
     isVerified: true,
+    x: 1,
+    y: 3,
+    z: 3
 }
 
 let out = "";
@@ -44,7 +47,7 @@ console.log("Implemented: " + JSON.stringify(JSON.parse<Vec3>('{}', true)));
 
 console.log("Original: " + JSON.stringify(player));
 //console.log("Revised: " + vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize());
-console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":"2023-11-16T04:06:35.108285303Z","age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}')));
+console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":"2023-11-16T04:06:35.108285303Z","age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true,"x":5","y":4","z":3}')));
 
 @serializable
 class Wrapper<T> {
