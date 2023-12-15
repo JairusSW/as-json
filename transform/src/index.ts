@@ -65,12 +65,6 @@ class AsJSONTransform extends BaseVisitor {
       if (parentSchema?.encodeStmts) {
         parentSchema?.encodeStmts.push(parentSchema?.encodeStmts.pop() + ",");
         this.currentClass.encodeStmts.push(...parentSchema?.encodeStmts);
-      } else {
-        console.error(
-          "Class extends " +
-          this.currentClass.parent +
-          ", but parent class not found. Maybe add the @json decorator over parent class?"
-        );
       }
     }
 
