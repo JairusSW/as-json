@@ -88,6 +88,12 @@ class AsJSONTransform extends BaseVisitor {
         let type = toString(member.type);
 
         const name = member.name.text;
+        let aliasName = name;
+        if (member.decorators && member.decorators[0]?.name.text === "alias") {
+          if (member.decorators[0] && member.decorators[0].args![0]) {
+            aliasName = member.decorators[0].args![0].value;
+          }
+        }
         this.currentClass.keys.push(name);
         // @ts-ignore
         this.currentClass.types.push(type);
@@ -105,11 +111,11 @@ class AsJSONTransform extends BaseVisitor {
           ].includes(type.toLowerCase())
         ) {
           this.currentClass.encodeStmts.push(
-            `"${name}":\${this.${name}.toString()},`
+            `"${aliasName}":\${this.${name}.toString()},`
           );
           // @ts-ignore
           this.currentClass.setDataStmts.push(
-            `if (key.equals("${name}")) {
+            `if (key.equals("${aliasName}")) {
         this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
         return;
       }
@@ -128,11 +134,11 @@ class AsJSONTransform extends BaseVisitor {
             ].includes(type.toLowerCase())
           ) {
             this.currentClass.encodeStmts.push(
-              `"${name}":\${this.${name}.toString()},`
+              `"${aliasName}":\${this.${name}.toString()},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
-              `if (key.equals("${name}")) {
+              `if (key.equals("${aliasName}")) {
         this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
         return;
       }
@@ -145,11 +151,11 @@ class AsJSONTransform extends BaseVisitor {
             }
           } else {
             this.currentClass.encodeStmts.push(
-              `"${name}":\${JSON.stringify<${type}>(this.${name})},`
+              `"${aliasName}":\${JSON.stringify<${type}>(this.${name})},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
-              `if (key.equals("${name}")) {
+              `if (key.equals("${aliasName}")) {
         this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
         return;
       }
@@ -220,7 +226,7 @@ class AsJSONTransform extends BaseVisitor {
     node.members.push(initializeMethod);
 
     this.schemasList.push(this.currentClass);
-    //console.log(toString(node));
+    console.log(toString(node));
   }
   visitSource(node: Source): void {
     super.visitSource(node);

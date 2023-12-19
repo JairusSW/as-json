@@ -21,7 +21,7 @@ class AsJSONTransform extends BaseVisitor {
     }
     visitMethodDeclaration() { }
     visitClassDeclaration(node) {
-        var _c;
+        var _c, _d;
         const className = node.name.text;
         if (!((_c = node.decorators) === null || _c === void 0 ? void 0 : _c.length))
             return;
@@ -76,6 +76,12 @@ class AsJSONTransform extends BaseVisitor {
                 // @ts-ignore
                 let type = toString(member.type);
                 const name = member.name.text;
+                let aliasName = name;
+                if (member.decorators && ((_d = member.decorators[0]) === null || _d === void 0 ? void 0 : _d.name.text) === "alias") {
+                    if (member.decorators[0] && member.decorators[0].args[0]) {
+                        aliasName = member.decorators[0].args[0].value;
+                    }
+                }
                 this.currentClass.keys.push(name);
                 // @ts-ignore
                 this.currentClass.types.push(type);
@@ -90,9 +96,9 @@ class AsJSONTransform extends BaseVisitor {
                     "u64",
                     "i64",
                 ].includes(type.toLowerCase())) {
-                    this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
+                    this.currentClass.encodeStmts.push(`"${aliasName}":\${this.${name}.toString()},`);
                     // @ts-ignore
-                    this.currentClass.setDataStmts.push(`if (key.equals("${name}")) {
+                    this.currentClass.setDataStmts.push(`if (key.equals("${aliasName}")) {
         this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
         return;
       }
@@ -106,9 +112,9 @@ class AsJSONTransform extends BaseVisitor {
                     "f32",
                     "f64",
                 ].includes(type.toLowerCase())) {
-                    this.currentClass.encodeStmts.push(`"${name}":\${this.${name}.toString()},`);
+                    this.currentClass.encodeStmts.push(`"${aliasName}":\${this.${name}.toString()},`);
                     // @ts-ignore
-                    this.currentClass.setDataStmts.push(`if (key.equals("${name}")) {
+                    this.currentClass.setDataStmts.push(`if (key.equals("${aliasName}")) {
         this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
         return;
       }
@@ -118,9 +124,9 @@ class AsJSONTransform extends BaseVisitor {
                     }
                 }
                 else {
-                    this.currentClass.encodeStmts.push(`"${name}":\${JSON.stringify<${type}>(this.${name})},`);
+                    this.currentClass.encodeStmts.push(`"${aliasName}":\${JSON.stringify<${type}>(this.${name})},`);
                     // @ts-ignore
-                    this.currentClass.setDataStmts.push(`if (key.equals("${name}")) {
+                    this.currentClass.setDataStmts.push(`if (key.equals("${aliasName}")) {
         this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
         return;
       }
@@ -178,7 +184,7 @@ class AsJSONTransform extends BaseVisitor {
         const initializeMethod = SimpleParser.parseClassMember(initializeFunc, node);
         node.members.push(initializeMethod);
         this.schemasList.push(this.currentClass);
-        //console.log(toString(node));
+        console.log(toString(node));
     }
     visitSource(node) {
         super.visitSource(node);

@@ -1,7 +1,7 @@
 import { JSON } from "./src/json";
 
 // @ts-ignore
-
+@serializable
 class Vec3 {
     x: f64 = 3.4;
     y: f64 = 1.2;
@@ -9,8 +9,9 @@ class Vec3 {
 }
 
 // @ts-ignore
-@json
+@serializable
 class Player extends Vec3 {
+    @alias("first name")
     firstName: string;
     lastName: string;
     lastActive: Date;
@@ -47,7 +48,7 @@ console.log("Implemented: " + JSON.stringify(JSON.parse<Vec3>('{}', true)));
 
 console.log("Original: " + JSON.stringify(player));
 //console.log("Revised: " + vec.__JSON_Deserialize('{"x":3,"y":1,"z":8}').__JSON_Serialize());
-console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":"2023-11-16T04:06:35.108285303Z","age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true,"x":5","y":4","z":3}')));
+console.log("Implemented: " + JSON.stringify(JSON.parse<Player>('{"first name":"Emmet","lastName":"West","lastActive":"2023-11-16T04:06:35.108285303Z","age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true,"x":5","y":4","z":3}')));
 
 @serializable
 class Wrapper<T> {
@@ -56,6 +57,7 @@ class Wrapper<T> {
 
 @serializable
 class Foo {
+    @alias("ur mom")
     foo!: string;
 }
 
@@ -70,7 +72,7 @@ const foo: Wrapper<Foo> = {
 
 foo.data.foo = "ha";
 console.log(JSON.stringify(foo));
-console.log(JSON.stringify(JSON.parse<Wrapper<Foo>>("{\"data\":{\"foo\":\"ha\"}}")))
+console.log(JSON.stringify(JSON.parse<Wrapper<Foo>>("{\"data\":{\"ur mom\":\"ha\"}}")))
 /*
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {
