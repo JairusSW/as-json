@@ -226,7 +226,7 @@ class AsJSONTransform extends BaseVisitor {
     node.members.push(initializeMethod);
 
     this.schemasList.push(this.currentClass);
-    console.log(toString(node));
+    //console.log(toString(node));
   }
   visitSource(node: Source): void {
     super.visitSource(node);
