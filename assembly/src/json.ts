@@ -594,8 +594,11 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function parseMap<T extends Map>(data: string, initializeDefaultValues: boolean): T {
-  const map = instantiate<T>();
 
+  const map: nonnull<T> = changetype<nonnull<T>>(
+    __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
+  );
+  
   if (!isDefined(map.set)) {
     return unreachable();
   }
