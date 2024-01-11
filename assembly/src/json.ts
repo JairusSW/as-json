@@ -1,28 +1,39 @@
 import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
-import { E_INVALIDDATE } from "util/error";
 import {
-  backSlashCode,
-  commaCode,
-  commaWord,
+  aCode,
   eCode,
   fCode,
+  lCode,
+  nCode,
+  rCode,
+  sCode,
+  tCode,
+  uCode,
+
+  backSlashCode,
+  colonCode,
+  commaCode,
   leftBraceCode,
   leftBracketCode,
-  leftBracketWord,
-  nCode,
-  nullWord,
+  newLineCode,
   quoteCode,
-  rCode,
   rightBraceCode,
   rightBracketCode,
+
+  colonWord,
+  commaWord,
+  quoteWord,
+
+  leftBraceWord,
+  leftBracketWord,
+  rightBraceWord,
   rightBracketWord,
-  tCode,
-  trueWord,
-  uCode,
   emptyArrayWord,
+
+  trueWord,
   falseWord,
-  newLineCode,
+  nullWord,
 } from "./chars";
 import { snip_fast, unsafeCharCodeAt } from "./util";
 import { Virtual } from "as-virtual/assembly";
@@ -47,7 +58,7 @@ export namespace JSON {
     } else if (isBoolean<T>()) {
       return data ? "true" : "false";
     } else if (isNullable<T>() && data == null) {
-      return "null";
+      return nullWord;
       // @ts-ignore
     } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
       // @ts-ignore
@@ -64,7 +75,7 @@ export namespace JSON {
         return emptyArrayWord;
         // @ts-ignore
       } else if (isString<valueof<T>>()) {
-        let result = "[";
+        let result = leftBracketWord;
         // @ts-ignore
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
@@ -117,10 +128,10 @@ export namespace JSON {
       out = serializeString(data as string);
       return;
     } else if (isBoolean<T>()) {
-      out = data ? "true" : "false";
+      out = data ? trueWord : falseWord;
       return;
     } else if (isNullable<T>() && data == null) {
-      out = "null";
+      out = nullWord;
       return;
       // @ts-ignore
     } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
@@ -133,7 +144,7 @@ export namespace JSON {
       out = data.__JSON_Serialize();
       return;
     } else if (data instanceof Date) {
-      out = "\"" + data.toISOString() + "\"";
+      out = quoteWord + data.toISOString() + quoteWord;
       return;
     } else if (isArrayLike<T>()) {
       // @ts-ignore
@@ -142,7 +153,7 @@ export namespace JSON {
         return;
         // @ts-ignore
       } else if (isString<valueof<T>>()) {
-        out = "[";
+        out = leftBracketWord;
         // @ts-ignore
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
@@ -206,8 +217,7 @@ export namespace JSON {
     } else if (isArrayLike<T>()) {
       // @ts-ignore
       return parseArray<T>(data.trimStart());
-      // @ts-ignore
-    } else if (isNullable<T>() && data == "null") {
+    } else if (isNullable<T>() && data == nullWord) {
       // @ts-ignore
       return null;
       // @ts-ignore
@@ -217,7 +227,6 @@ export namespace JSON {
       // @ts-ignore
       return parseDate(data);
     } else {
-      // @ts-ignore
       throw new Error(
         `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
       );
@@ -229,7 +238,6 @@ export namespace JSON {
 @global @inline function __parseObjectValue<T>(data: string, initializeDefaultValues: boolean): T {
   let type: T;
   if (isString<T>()) {
-    // @ts-ignore
     let result = "";
     let last = 0;
     for (let i = 0; i < data.length; i++) {
@@ -283,8 +291,7 @@ export namespace JSON {
   } else if (isArrayLike<T>()) {
     // @ts-ignore
     return parseArray<T>(data);
-    // @ts-ignore
-  } else if (isNullable<T>() && data == "null") {
+  } else if (isNullable<T>() && data == nullWord) {
     // @ts-ignore
     return null;
     // @ts-ignore
@@ -294,7 +301,6 @@ export namespace JSON {
     // @ts-ignore
     return parseDate(data);
   } else {
-    // @ts-ignore
     throw new Error(
       `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
     );
@@ -306,7 +312,6 @@ export namespace JSON {
   let result = new StringSink('"');
 
   let last: i32 = 0;
-  // @ts-ignore
   for (let i = 0; i < data.length; i++) {
     const char = unsafeCharCodeAt(<string>data, i);
     if (char === 34 || char === 92) {
@@ -344,9 +349,11 @@ export namespace JSON {
       }
     }
   }
-  if (result.length === 1) return '"' + data + '"';
-  else result.write(<string>data, last);
-  result.write("\"");
+  if (result.length === 1) {
+    return quoteWord + data + quoteWord;
+  }
+  result.write(<string>data, last);
+  result.write(quoteWord);
   return result.toString();
 }
 
@@ -410,14 +417,16 @@ export namespace JSON {
       }
     }
   }
-  if ((data.length - 1) > last) result.write(data, last, data.length - 1);
+  if ((data.length - 1) > last) {
+    result.write(data, last, data.length - 1);
+  }
   return result.toString();
 }
 
 // @ts-ignore: Decorator
 @inline function parseBoolean<T extends boolean>(data: string): T {
-  if (data.length > 3 && data.startsWith("true")) return <T>true;
-  else if (data.length > 4 && data.startsWith("false")) return <T>false;
+  if (data.length > 3 && data.startsWith(trueWord)) return <T>true;
+  else if (data.length > 4 && data.startsWith(falseWord)) return <T>false;
   else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
 }
 
@@ -437,13 +446,14 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function parseObject<T>(data: string, initializeDefaultValues: boolean): T {
-  let schema: nonnull<T> = changetype<nonnull<T>>(
+  const schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );
+  
   // @ts-ignore
   if (initializeDefaultValues) schema.__JSON_Initialize();
 
-  let key = Virtual.createEmpty<string>();
+  const key = Virtual.createEmpty<string>();
   let isKey = false;
   let depth = 0;
   let outerLoopIndex = 1;
@@ -519,7 +529,12 @@ export namespace JSON {
           escaping = false;
         }
       }
-    } else if (char == nCode) {
+    } else if (
+      char == nCode &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === uCode &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === lCode &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === lCode
+    ) {
       // @ts-ignore
       schema.__JSON_Set_Key<Virtual<string>>(key, nullWord, 0, 4, initializeDefaultValues);
       isKey = false;
@@ -534,9 +549,9 @@ export namespace JSON {
       isKey = false;
     } else if (
       char === fCode &&
-      unsafeCharCodeAt(data, ++outerLoopIndex) === "a".charCodeAt(0) &&
-      unsafeCharCodeAt(data, ++outerLoopIndex) === "l".charCodeAt(0) &&
-      unsafeCharCodeAt(data, ++outerLoopIndex) === "s".charCodeAt(0) &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === aCode &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === lCode &&
+      unsafeCharCodeAt(data, ++outerLoopIndex) === sCode &&
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
@@ -572,7 +587,6 @@ export namespace JSON {
   } else if (isArrayLike<valueof<T>>()) {
     // @ts-ignore
     return parseArrayArray<T>(data);
-    // @ts-ignore
   } else if (isManaged<valueof<T>>() || isReference<valueof<T>>()) {
     // We instantiate the required memory for the class and fill it. This is extremely unsafe and uses "a bit of magic".
     const type = changetype<nonnull<valueof<T>>>(
@@ -580,11 +594,10 @@ export namespace JSON {
     );
     // @ts-ignore
     if (isDefined(type.__JSON_Set_Key)) {
-      // @ts-ignore
       return parseObjectArray<T>(data);
     }
-    return unreachable();
   }
+  
   return unreachable();
 }
 

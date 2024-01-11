@@ -43,13 +43,21 @@
 // @ts-ignore: Decorator is valid here
 @inline export const nullWord = "null";
 // @ts-ignore: Decorator is valid here
+@inline export const leftBraceWord = "{";
+// @ts-ignore: Decorator is valid here
 @inline export const leftBracketWord = "[";
 // @ts-ignore: Decorator is valid here
 @inline export const emptyArrayWord = "[]";
 // @ts-ignore: Decorator is valid here
+@inline export const colonWord = ":";
+// @ts-ignore: Decorator is valid here
 @inline export const commaWord = ",";
 // @ts-ignore: Decorator is valid here
+@inline export const rightBraceWord = "}";
+// @ts-ignore: Decorator is valid here
 @inline export const rightBracketWord = "]";
+// @ts-ignore: Decorator is valid here
+@inline export const quoteWord = "\"";
 // Escape Codes
 // @ts-ignore: Decorator is valid here
 @inline export const newLineCode = 10;
