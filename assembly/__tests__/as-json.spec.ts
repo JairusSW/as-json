@@ -203,3 +203,147 @@ describe("Deser externals", () => {
       })
   })
 });
+
+describe("Ser/de Maps", () => {
+  it("should serialize Map<string, string>", () => {
+    const m = new Map<string, string>();
+    m.set("a", "x");
+    m.set("b", "y");
+    m.set("c", "z");
+    canSer(m, '{"a":"x","b":"y","c":"z"}');
+  });
+  it("should serialize Map<string, string | null>", () => {
+    const m = new Map<string, string | null>();
+    m.set("a", "x");
+    m.set("b", "y");
+    m.set("c", null);
+    canSer(m, '{"a":"x","b":"y","c":null}');
+  });
+  it("should serialize Map<string, string[]]>", () => {
+    const m = new Map<string, string[]>();
+    m.set("a", ["a1", "a2", "a3"]);
+    m.set("b", ["b1", "b2", "b3"]);
+    m.set("c", ["c1", "c2", "c3"]);
+    canSer(m, '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1","c2","c3"]}');
+  });
+  it("should serialize Map<string, u32>", () => {
+    const m = new Map<string, u32>();
+    m.set("a", 1);
+    m.set("b", 2);
+    m.set("c", 3);
+    canSer(m, '{"a":1,"b":2,"c":3}');
+  });
+  it("should serialize Map<string, bool>", () => {
+    const m = new Map<string, bool>();
+    m.set("a", true);
+    m.set("b", false);
+    m.set("c", true);
+    canSer(m, '{"a":true,"b":false,"c":true}');
+  });
+  it("should serialize Map<string, Vec3>", () => {
+    const m = new Map<string, Vec3>();
+    m.set("foo", { x: 1, y: 2, z: 3 });
+    m.set("bar", { x: 11.5, y: 12.5, z: 13.5 });
+    canSer(m, '{"foo":{"x":1.0,"y":2.0,"z":3.0},"bar":{"x":11.5,"y":12.5,"z":13.5}}');
+  });
+
+  it("should deserialize Map<string, string>", () => {
+    const m = new Map<string, string>();
+    m.set("a", "x");
+    m.set("b", "y");
+    m.set("c", "z");
+    canDeser('{"a":"x","b":"y","c":"z"}', m);
+  });
+  it("should deserialize Map<string, string | null>", () => {
+    const m = new Map<string, string | null>();
+    m.set("a", "x");
+    m.set("b", "y");
+    m.set("c", null);
+    canDeser('{"a":"x","b":"y","c":null}', m);
+  });
+  it("should deserialize Map<string, string[]>", () => {
+    const m = new Map<string, string[]>();
+    m.set("a", ["a1", "a2", "a3"]);
+    m.set("b", ["b1", "b2", "b3"]);
+    m.set("c", ["c1", "c2", "c3"]);
+    canDeser('{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1","c2","c3"]}', m);
+  });
+  it("should deserialize Map<string, u32>", () => {
+    const m = new Map<string, u32>();
+    m.set("a", 1);
+    m.set("b", 2);
+    m.set("c", 3);
+    canDeser('{"a":1,"b":2,"c":3}', m);
+  });
+  it("should deserialize Map<string, bool>", () => {
+    const m = new Map<string, bool>();
+    m.set("a", true);
+    m.set("b", false);
+    m.set("c", true);
+    canDeser('{"a":true,"b":false,"c":true}', m);
+  });
+  it("should deserialize Map<string, Vec3>", () => {
+    const m = new Map<string, Vec3>();
+    m.set("foo", { x: 1, y: 2, z: 3 });
+    m.set("bar", { x: 11.5, y: 12.5, z: 13.5 });
+    canDeser('{"foo":{"x":1.0,"y":2.0,"z":3.0},"bar":{"x":11.5,"y":12.5,"z":13.5}}', m);
+  });
+
+  it("should serialize Map<u32, bool>", () => {
+    const m = new Map<u32, bool>();
+    m.set(1, true);
+    m.set(2, false);
+    m.set(3, true);
+    canSer(m, '{"1":true,"2":false,"3":true}'); 
+  });
+  it("should deserialize Map<u32, bool>", () => {
+    const m = new Map<u32, bool>();
+    m.set(1, true);
+    m.set(2, false);
+    m.set(3, true);
+    canDeser('{"1":true,"2":false,"3":true}', m); 
+  });
+
+  it("should serialize Map<bool, string>", () => {
+    const m = new Map<bool, string>();
+    m.set(true, "a");
+    m.set(false, "b");
+    canSer(m, '{"true":"a","false":"b"}'); 
+  });
+  it("should deserialize Map<bool, string>", () => {
+    const m = new Map<bool, string>();
+    m.set(true, "a");
+    m.set(false, "b");
+    canDeser('{"true":"a","false":"b"}', m); 
+  });
+
+  it("should serialize Map<string, string>[]", () => {
+    const m1 = new Map<string, string>();
+    m1.set("a", "u");
+    m1.set("b", "v");
+    m1.set("c", "w");
+    
+    const m2 = new Map<string, string>();
+    m2.set("d", "x");
+    m2.set("e", "y");
+    m2.set("f", "z");
+
+    const a = [m1, m2];
+    canSer(a, '[{"a":"u","b":"v","c":"w"},{"d":"x","e":"y","f":"z"}]');
+  });
+  it("should deserialize Map<string, string>[]", () => {
+    const m1 = new Map<string, string>();
+    m1.set("a", "u");
+    m1.set("b", "v");
+    m1.set("c", "w");
+    
+    const m2 = new Map<string, string>();
+    m2.set("d", "x");
+    m2.set("e", "y");
+    m2.set("f", "z");
+
+    const a = [m1, m2];
+    canDeser('[{"a":"u","b":"v","c":"w"},{"d":"x","e":"y","f":"z"}]', a);
+  });
+
+});
