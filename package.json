@@ -33,7 +33,7 @@
     "@as-tral/cli": "^2.0.1",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bench": "^0.0.0-alpha",
-    "assemblyscript": "^0.27.22",
+    "assemblyscript": "^0.27.18",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
     "kati": "^0.6.2",
