@@ -911,5 +911,6 @@ function parseDate(dateTimeString: string): Date {
 
 // @ts-ignore: Decorator
 @inline function isMap<T>(): bool {
-  return nameof<T>().startsWith("Map<");
+  let type = changetype<T>(0);
+  return type instanceof Map;
 }
