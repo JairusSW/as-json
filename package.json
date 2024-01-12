@@ -10,7 +10,8 @@
     "Derek Barrera",
     "Frankk Taylor",
     "lekiano",
-    "Florian Guitton"
+    "Florian Guitton",
+    "Matt Johnson-Pint"
   ],
   "license": "MIT",
   "scripts": {
@@ -28,24 +29,27 @@
     "prettier": "as-prettier -w ."
   },
   "devDependencies": {
-    "@as-pect/cli": "^8.0.1",
-    "@as-tral/cli": "^2.0.1",
+    "@as-pect/cli": "^8.1.0",
+    "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bench": "^0.0.0-alpha",
-    "assemblyscript": "^0.27.18",
+    "assemblyscript": "^0.27.22",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
     "kati": "^0.6.2",
     "microtime": "^3.1.1",
-    "prettier": "^3.1.0",
+    "prettier": "^3.1.1",
     "tinybench": "^2.5.1",
-    "typescript": "^5.2.2",
+    "typescript": "^5.3.3",
     "visitor-as": "^0.11.4"
   },
   "dependencies": {
     "as-string-sink": "^0.5.3",
     "as-variant": "^0.4.1",
     "as-virtual": "^0.1.9"
+  },
+  "overrides": {
+    "assemblyscript": "$assemblyscript"
   },
   "repository": {
     "type": "git",
