@@ -15,7 +15,6 @@ function canSer<T>(data: T, toBe: string): void {
   expect(serialized).toBe(toBe);
 }
 
-// @ts-ignore
 @json
 class Map4 {
   a: string;
@@ -24,7 +23,6 @@ class Map4 {
   d: string;
 }
 
-// @ts-ignore
 @json
 class Vec3 {
   x: f64;
@@ -32,7 +30,6 @@ class Vec3 {
   z: f64;
 }
 
-// @ts-ignore
 @json
 class Player {
   firstName: string;
@@ -179,7 +176,6 @@ describe("Ser externals", () => {
   })
 });
 
-// @ts-ignore
 @json
 class HttpResp {
   statusCode: number;

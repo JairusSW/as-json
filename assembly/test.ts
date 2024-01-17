@@ -1,6 +1,5 @@
 import { JSON } from "./src/json";
 
-// @ts-ignore
 @serializable
 class Vec3 {
     x: f64 = 3.4;
@@ -8,7 +7,6 @@ class Vec3 {
     z: f64 = 8.3;
 }
 
-// @ts-ignore
 @serializable
 class Player extends Vec3 {
     @alias("first name")
