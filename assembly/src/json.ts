@@ -544,12 +544,13 @@ export namespace JSON {
           escaping = true;
         } else {
           if (char === quoteCode && !escaping) {
+            const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
             if (isKey === false) {
-              key.reinst(data, outerLoopIndex, stringValueIndex);
+              key.reinst(value);
               isKey = true;
             } else {
               // @ts-ignore
-              schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, stringValueIndex, initializeDefaultValues);
+              schema.__JSON_Set_Key<Virtual<string>>(key, value, 0, value.length, initializeDefaultValues);
               isKey = false;
             }
             outerLoopIndex = ++stringValueIndex;

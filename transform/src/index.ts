@@ -114,11 +114,11 @@ class AsJSONTransform extends BaseVisitor {
           ].includes(type.toLowerCase())
         ) {
           this.currentClass.encodeStmts.push(
-            `"${aliasName}":\${this.${name}.toString()},`
+            `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}.toString()},`
           );
           // @ts-ignore
           this.currentClass.setDataStmts.push(
-            `if (key.equals("${aliasName}")) {
+            `if (key.equals("${aliasName.replace(/\\/g,'\\\\')}")) {
         this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
         return;
       }
