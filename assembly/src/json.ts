@@ -342,7 +342,7 @@ export namespace JSON {
       result.write(<string>data, last, i);
       result.writeCodePoint(backSlashCode);
       last = i;
-    } else if (char <= 13 && char >= 8) {
+    } else if (char < 16) {
       result.write(<string>data, last, i);
       last = i + 1;
       switch (char) {
@@ -358,10 +358,6 @@ export namespace JSON {
           result.write("\\n");
           break;
         }
-        case 11: {
-          result.write("\\x0B"); // \\u000b
-          break;
-        }
         case 12: {
           result.write("\\f");
           break;
@@ -370,7 +366,19 @@ export namespace JSON {
           result.write("\\r");
           break;
         }
+        default: {
+          // all chars 0-31 must be encoded as a four digit unicode escape sequence
+          // \u0000 to \u000f handled here
+          result.write("\\u000" + char.toString(16));
+          break;
+        }
       }
+    } else if (char < 32) {
+      result.write(<string>data, last, i);
+      last = i + 1;
+      // all chars 0-31 must be encoded as a four digit unicode escape sequence
+      // \u0010 to \u001f handled here
+      result.write("\\u00" + char.toString(16));
     }
   }
   result.write(<string>data, last);
