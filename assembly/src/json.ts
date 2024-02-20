@@ -329,6 +329,10 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function serializeString(data: string): string {
+  if (data.length === 0) {
+    return quoteWord + quoteWord;
+  }
+
   let result = new StringSink(quoteWord);
 
   let last: i32 = 0;
@@ -368,9 +372,6 @@ export namespace JSON {
         }
       }
     }
-  }
-  if (result.length === 1) {
-    return quoteWord + data + quoteWord;
   }
   result.write(<string>data, last);
   result.write(quoteWord);
