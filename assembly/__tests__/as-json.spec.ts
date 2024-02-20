@@ -472,6 +472,12 @@ describe("Ser/de escape sequences in strings", () => {
     canSer('\\\\\\', '"\\\\\\\\\\\\"');
   });
 
+  it("cannot parse invalid escape sequences", () => {
+    expect(() => {
+      JSON.parse<string>('"\\z"');
+    }).toThrow();
+  });
+
 });
 
 describe("Ser/de special strings in object", () => {
@@ -494,6 +500,17 @@ describe("Ser/de special strings in object", () => {
     const o: ObjWithString = { s: "\\\\\\" };
     const s = '{"s":"\\\\\\\\\\\\"}';
     canDeser(s, o);
+  });
+
+  it("should deserialize slashes in string in object", () => {
+    const o: ObjWithString = { s: "//" };
+    const s = '{"s":"/\\/"}';
+    canDeser(s, o);
+  });
+  it("should deserialize slashes in string in array", () => {
+    const a = ["/", "/"];
+    const s = '["/","\/"]';
+    canDeser(s, a);
   });
 
   it("should ser/de short escape sequences in strings in objects", () => {
