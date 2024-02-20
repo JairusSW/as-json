@@ -480,7 +480,7 @@ describe("Ser/de escape sequences in strings", () => {
 
 });
 
-describe("Ser/de special strings in object", () => {
+describe("Ser/de special strings in object values", () => {
   it("should serialize quotes in string in object", () => {
     const o: ObjWithString = { s: '"""' };
     const s = '{"s":"\\"\\"\\""}';
@@ -576,9 +576,25 @@ describe("Ser/de special strings in object", () => {
     canSerde(o, s);
   });
 
-  it("should ser/de escape sequences in key of object", () => {
-    const o: ObjWithStrangeKey = { n: 123 };
+});
+
+describe("Ser/de special strings in object keys", () => {
+
+  it("should ser/de escape sequences in key of object with int value", () => {
+    const o: ObjWithStrangeKey<i32> = { data: 123 };
     const s = '{"a\\\\\\t\\"\\u0002b":123}';
+    canSerde(o, s);
+  });
+
+  it("should ser/de escape sequences in key of object with float value", () => {
+    const o: ObjWithStrangeKey<f64> = { data: 123.4 };
+    const s = '{"a\\\\\\t\\"\\u0002b":123.4}';
+    canSerde(o, s);
+  });
+
+  it("should ser/de escape sequences in key of object with string value", () => {
+    const o: ObjWithStrangeKey<string> = { data: "abc" };
+    const s = '{"a\\\\\\t\\"\\u0002b":"abc"}';
     canSerde(o, s);
   });
 });
@@ -604,7 +620,7 @@ class ObjectWithFloatArray {
 }
 
 @json
-class ObjWithStrangeKey {
+class ObjWithStrangeKey<T> {
   @alias('a\\\t"\x02b')
-  n!: i32;
+  data!: T;
 }
