@@ -100,7 +100,7 @@ class AsJSONTransform extends BaseVisitor {
                 ].includes(type.toLowerCase())) {
                     this.currentClass.encodeStmts.push(`${JSON.stringify(aliasName).replace(/\\/g, '\\\\')}:\${this.${name}.toString()},`);
                     // @ts-ignore
-                    this.currentClass.setDataStmts.push(`if (key.equals("${aliasName.replace(/\\/g, '\\\\')}")) {
+                    this.currentClass.setDataStmts.push(`if (key.equals(${JSON.stringify(aliasName)})) {
         this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
         return;
       }
@@ -114,9 +114,9 @@ class AsJSONTransform extends BaseVisitor {
                     "f32",
                     "f64",
                 ].includes(type.toLowerCase())) {
-                    this.currentClass.encodeStmts.push(`"${aliasName}":\${this.${name}.toString()},`);
+                    this.currentClass.encodeStmts.push(`${JSON.stringify(aliasName).replace(/\\/g, '\\\\')}:\${this.${name}.toString()},`);
                     // @ts-ignore
-                    this.currentClass.setDataStmts.push(`if (key.equals("${aliasName}")) {
+                    this.currentClass.setDataStmts.push(`if (key.equals(${JSON.stringify(aliasName)})) {
         this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
         return;
       }
@@ -126,9 +126,9 @@ class AsJSONTransform extends BaseVisitor {
                     }
                 }
                 else {
-                    this.currentClass.encodeStmts.push(`"${aliasName}":\${JSON.stringify<${type}>(this.${name})},`);
+                    this.currentClass.encodeStmts.push(`${JSON.stringify(aliasName).replace(/\\/g, '\\\\')}:\${JSON.stringify<${type}>(this.${name})},`);
                     // @ts-ignore
-                    this.currentClass.setDataStmts.push(`if (key.equals("${aliasName}")) {
+                    this.currentClass.setDataStmts.push(`if (key.equals(${JSON.stringify(aliasName)})) {
         this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
         return;
       }

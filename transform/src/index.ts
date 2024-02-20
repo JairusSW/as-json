@@ -118,7 +118,7 @@ class AsJSONTransform extends BaseVisitor {
           );
           // @ts-ignore
           this.currentClass.setDataStmts.push(
-            `if (key.equals("${aliasName.replace(/\\/g,'\\\\')}")) {
+            `if (key.equals(${JSON.stringify(aliasName)})) {
         this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
         return;
       }
@@ -137,11 +137,11 @@ class AsJSONTransform extends BaseVisitor {
             ].includes(type.toLowerCase())
           ) {
             this.currentClass.encodeStmts.push(
-              `"${aliasName}":\${this.${name}.toString()},`
+              `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}.toString()},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
-              `if (key.equals("${aliasName}")) {
+              `if (key.equals(${JSON.stringify(aliasName)})) {
         this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
         return;
       }
@@ -154,11 +154,11 @@ class AsJSONTransform extends BaseVisitor {
             }
           } else {
             this.currentClass.encodeStmts.push(
-              `"${aliasName}":\${JSON.stringify<${type}>(this.${name})},`
+              `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${JSON.stringify<${type}>(this.${name})},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
-              `if (key.equals("${aliasName}")) {
+              `if (key.equals(${JSON.stringify(aliasName)})) {
         this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
         return;
       }
