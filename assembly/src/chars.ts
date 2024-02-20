@@ -35,6 +35,8 @@
 @inline export const sCode = 115;
 // @ts-ignore = Decorator is valid here
 @inline export const nCode = 110;
+// @ts-ignore = Decorator is valid here
+@inline export const bCode = 98;
 // Strings
 // @ts-ignore: Decorator is valid here
 @inline export const trueWord = "true";

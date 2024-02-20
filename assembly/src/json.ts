@@ -2,6 +2,7 @@ import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
 import {
   aCode,
+  bCode,
   eCode,
   fCode,
   lCode,
@@ -14,6 +15,7 @@ import {
   backSlashCode,
   colonCode,
   commaCode,
+  forwardSlashCode,
   leftBraceCode,
   leftBracketCode,
   newLineCode,
@@ -327,12 +329,12 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function serializeString(data: string): string {
-  let result = new StringSink('"');
+  let result = new StringSink(quoteWord);
 
   let last: i32 = 0;
   for (let i = 0; i < data.length; i++) {
     const char = unsafeCharCodeAt(<string>data, i);
-    if (char === 34 || char === 92) {
+    if (char === quoteCode || char === backSlashCode) {
       result.write(<string>data, last, i);
       result.writeCodePoint(backSlashCode);
       last = i;
@@ -380,7 +382,6 @@ export namespace JSON {
   let result = new StringSink();
   let last = 1;
   for (let i = 1; i < data.length - 1; i++) {
-    // \\"
     if (unsafeCharCodeAt(data, i) === backSlashCode) {
       const char = unsafeCharCodeAt(data, ++i);
       result.write(data, last, i - 1);
@@ -389,32 +390,32 @@ export namespace JSON {
         last = i + 1;
       } else if (char >= 92 && char <= 117) {
         switch (char) {
-          case 92: {
+          case backSlashCode: {
             result.writeCodePoint(backSlashCode);
             last = i + 1;
             break;
           }
-          case 98: {
+          case bCode: {
             result.write("\b");
             last = i + 1;
             break;
           }
-          case 102: {
+          case fCode: {
             result.write("\f");
             last = i + 1;
             break;
           }
-          case 110: {
+          case nCode: {
             result.writeCodePoint(newLineCode);
             last = i + 1;
             break;
           }
-          case 114: {
+          case rCode: {
             result.write("\r");
             last = i + 1;
             break;
           }
-          case 116: {
+          case tCode: {
             result.write("\t");
             last = i + 1;
             break;
@@ -530,9 +531,7 @@ export namespace JSON {
         if (char === backSlashCode && !escaping) {
           escaping = true;
         } else {
-          if (
-            char === quoteCode && !escaping
-          ) {
+          if (char === quoteCode && !escaping) {
             if (isKey === false) {
               key.reinst(data, outerLoopIndex, stringValueIndex);
               isKey = true;
