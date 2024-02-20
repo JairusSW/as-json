@@ -397,7 +397,7 @@ export namespace JSON {
       if (char === 34) {
         result.writeCodePoint(quoteCode);
         last = i + 1;
-      } else if (char >= 92 && char <= 117) {
+      } else {
         switch (char) {
           case backSlashCode: {
             result.writeCodePoint(backSlashCode);
@@ -429,17 +429,15 @@ export namespace JSON {
             last = i + 1;
             break;
           }
-          default: {
-            if (
-              char === 117 &&
-              load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
-              27584753879220272
-            ) {
-              result.write("\u000b");
-              i += 4;
-              last = i + 1;
-            }
+          case uCode: {
+            const code = u16.parse(data.slice(i + 1, i + 5), 16);
+            result.writeCodePoint(code);
+            i += 4;
+            last = i + 1;
             break;
+          }
+          default: {
+            throw new Error(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
           }
         }
       }
