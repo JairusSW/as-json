@@ -89,8 +89,11 @@ class AsJSONTransform extends BaseVisitor {
 
         const name = member.name.text;
         let aliasName = name;
+
+        // @ts-ignore
         if (member.decorators && member.decorators[0]?.name.text === "alias") {
           if (member.decorators[0] && member.decorators[0].args![0]) {
+            // @ts-ignore
             aliasName = member.decorators[0].args![0].value;
           }
         }
