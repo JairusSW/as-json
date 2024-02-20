@@ -575,6 +575,12 @@ describe("Ser/de special strings in object", () => {
     const s = `{"sa":["${y.join('","')}"]}`;
     canSerde(o, s);
   });
+
+  it("should ser/de escape sequences in key of object", () => {
+    const o: ObjWithStrangeKey = { n: 123 };
+    const s = '{"a\\\\\\t\\"\\u0002b":123}';
+    canSerde(o, s);
+  });
 });
 
 @json
@@ -595,4 +601,10 @@ class ObjectWithFloat {
 @json
 class ObjectWithFloatArray {
   fa!: f64[];
+}
+
+@json
+class ObjWithStrangeKey {
+  @alias('a\\\t"\x02b')
+  n!: i32;
 }
