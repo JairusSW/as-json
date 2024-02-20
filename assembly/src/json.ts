@@ -404,6 +404,11 @@ export namespace JSON {
             last = i + 1;
             break;
           }
+          case forwardSlashCode: {
+            result.writeCodePoint(forwardSlashCode);
+            last = i + 1;
+            break;
+          }
           case bCode: {
             result.write("\b");
             last = i + 1;
