@@ -830,7 +830,7 @@ export namespace JSON {
   let i = 1;
   for (; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if ((lastPos === 0 && char >= 48 && char <= 57) || char === 45) {
+    if (lastPos === 0 && ((char >= 48 && char <= 57) || char === 45)) {
       lastPos = i;
     } else if ((isSpace(char) || char == commaCode) && lastPos > 0) {
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i)));
