@@ -632,12 +632,13 @@ export namespace JSON {
           if (
             char === quoteCode && !escaping
           ) {
+            const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
             if (isKey === false) {
-              key.reinst(data, outerLoopIndex, stringValueIndex);
+              key.reinst(value);
               isKey = true;
             } else {              
               if (isString<valueof<T>>()) {
-                map.set(parseMapKey<indexof<T>>(key), data.slice(outerLoopIndex, stringValueIndex));
+                map.set(parseMapKey<indexof<T>>(key), value);
               }
               isKey = false;
             }

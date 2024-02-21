@@ -595,6 +595,19 @@ describe("Ser/de special strings in object keys", () => {
     const s = '{"a\\\\\\t\\"\\u0002b":"abc"}';
     canSerde(o, s);
   });
+
+  it("should ser/de escape sequences in map key", () => {
+    const m = new Map<string, string>();
+    m.set('a\\\t"\x02b', 'abc');
+    const s = '{"a\\\\\\t\\"\\u0002b":"abc"}';
+    canSerde(m, s);
+  });
+  it("should ser/de escape sequences in map value", () => {
+    const m = new Map<string, string>();
+    m.set('abc', 'a\\\t"\x02b');
+    const s = '{"abc":"a\\\\\\t\\"\\u0002b"}';
+    canSerde(m, s);
+  });
 });
 
 @json
