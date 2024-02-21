@@ -347,10 +347,11 @@ export namespace JSON {
 }
 
 // @ts-ignore: Decorator
-@inline function parseString(data: string): string {
-  let result = StringSink.withCapacity(data.length);
-  let last = 1;
-  for (let i = 1; i < data.length - 1; i++) {
+@inline function parseString(data: string, start: i32 = 0, end: i32 = 0): string {
+  end = end || data.length - 1; 
+  let result = StringSink.withCapacity(end - start - 1);
+  let last = start + 1;
+  for (let i = last; i < end; i++) {
     if (unsafeCharCodeAt(data, i) !== backSlashCode) {
       continue;
     }
@@ -409,10 +410,10 @@ export namespace JSON {
       }
     }
   }
-  if ((data.length - 1) > last) {
-    result.write(data, last, data.length - 1);
+  if (end > last) {
+    result.write(data, last, end);
   }
-  return result.toString();
+  return result.toString()
 }
 
 // @ts-ignore: Decorator
@@ -508,14 +509,13 @@ export namespace JSON {
             if (isKey === false) {
               // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
               if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
-                const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
-                key.reinst(value);
+                key.reinst(parseString(data, outerLoopIndex - 1, stringValueIndex));
               } else {
                 key.reinst(data, outerLoopIndex, stringValueIndex);
               }
               isKey = true;
             } else {
-              const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
+              const value = parseString(data, outerLoopIndex - 1, stringValueIndex);
               // @ts-ignore
               schema.__JSON_Set_Key<Virtual<string>>(key, value, 0, value.length, initializeDefaultValues);
               isKey = false;
@@ -645,15 +645,14 @@ export namespace JSON {
             if (isKey === false) {
               // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
               if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
-                const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
-                key.reinst(value);
+                key.reinst(parseString(data, outerLoopIndex - 1, stringValueIndex));
               } else {
                 key.reinst(data, outerLoopIndex, stringValueIndex);
               }
               isKey = true;
             } else {              
               if (isString<valueof<T>>()) {
-                const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
+                const value = parseString(data, outerLoopIndex - 1, stringValueIndex);
                 map.set(parseMapKey<indexof<T>>(key), value);
               }
               isKey = false;
@@ -774,7 +773,7 @@ export namespace JSON {
           lastPos = i;
         } else {
           instr = false;
-          result.push(parseString(data.slice(lastPos, i + 1)));
+          result.push(parseString(data, lastPos, i));
         }
       }
       escaping = false;
