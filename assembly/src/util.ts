@@ -348,3 +348,11 @@ import { backSlashCode, quoteCode } from "./chars";
   }
   return memory.compare(changetype<usize>(p1_data) + p1_start, changetype<usize>(p2_data) + p2_start, p1_len) === 0;
 }
+
+// @ts-ignore
+@inline export function containsCodePoint(str: string, code: u32, start: i32, end: i32): bool {
+  for (let i = start; i <= end; i++) {
+    if (unsafeCharCodeAt(str, i) == code) return true;
+  }
+  return false;
+}
