@@ -348,7 +348,7 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function parseString(data: string): string {
-  let result = new StringSink();
+  let result = StringSink.withCapacity(data.length);
   let last = 1;
   for (let i = 1; i < data.length - 1; i++) {
     if (unsafeCharCodeAt(data, i) !== backSlashCode) {
