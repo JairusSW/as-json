@@ -74,9 +74,7 @@ describe("Ser/de Numbers", () => {
 
     canSerde<f64>(123456e-5, "1.23456");
     canSerde<f64>(0.0, "0.0");
-
-    canSerde<f64>(0.0, "0.0");
-    canSerde<f64>(7.23, "7.23");
+    canSerde<f64>(-7.23, "-7.23");
 
     canSerde<f64>(1e-6, "0.000001");
     canSerde<f64>(1e-7, "1e-7");
