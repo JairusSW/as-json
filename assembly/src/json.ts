@@ -641,12 +641,18 @@ export namespace JSON {
           if (
             char === quoteCode && !escaping
           ) {
-            const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
             if (isKey === false) {
-              key.reinst(value);
+              // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
+              if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
+                const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
+                key.reinst(value);
+              } else {
+                key.reinst(data, outerLoopIndex, stringValueIndex);
+              }
               isKey = true;
             } else {              
               if (isString<valueof<T>>()) {
+                const value = parseString(data.slice(outerLoopIndex-1, stringValueIndex+1));
                 map.set(parseMapKey<indexof<T>>(key), value);
               }
               isKey = false;
