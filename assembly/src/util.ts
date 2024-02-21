@@ -12,11 +12,11 @@ import { backSlashCode, quoteCode } from "./chars";
   const result = new StringSink();
   let instr = false;
   for (let i = 0; i < data.length; i++) {
-    const char = data.charCodeAt(i);
+    const char = unsafeCharCodeAt(data, i);
     if (instr === false && char === quoteCode) instr = true;
     else if (
       instr === true && char === quoteCode
-      && data.charCodeAt(i - 1) !== backSlashCode
+      && unsafeCharCodeAt(data, i - 1) !== backSlashCode
     ) instr = false;
 
     if (instr === false) {

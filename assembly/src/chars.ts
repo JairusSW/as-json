@@ -60,6 +60,15 @@
 @inline export const rightBracketWord = "]";
 // @ts-ignore: Decorator is valid here
 @inline export const quoteWord = "\"";
+
 // Escape Codes
 // @ts-ignore: Decorator is valid here
-@inline export const newLineCode = 10;
+@inline export const backspaceCode = 8; // \b
+// @ts-ignore: Decorator is valid here
+@inline export const tabCode = 9; // \t
+// @ts-ignore: Decorator is valid here
+@inline export const newLineCode = 10; // \n
+// @ts-ignore: Decorator is valid here
+@inline export const formFeedCode = 12; // \f
+// @ts-ignore: Decorator is valid here
+@inline export const carriageReturnCode = 13; // \r

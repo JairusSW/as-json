@@ -18,18 +18,21 @@ import {
   forwardSlashCode,
   leftBraceCode,
   leftBracketCode,
-  newLineCode,
   quoteCode,
   rightBraceCode,
   rightBracketCode,
 
-  colonWord,
+  backspaceCode,
+  carriageReturnCode,
+  tabCode,
+  formFeedCode,
+  newLineCode,
+  
   commaWord,
   quoteWord,
 
   leftBraceWord,
   leftBracketWord,
-  rightBraceWord,
   rightBracketWord,
   emptyArrayWord,
 
@@ -102,11 +105,11 @@ export namespace JSON {
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
           result.write(JSON.stringify(unchecked(data[i])));
-          result.write(commaWord);
+          result.writeCodePoint(commaCode);
         }
         // @ts-ignore
         result.write(JSON.stringify(unchecked(data[data.length - 1])));
-        result.write(rightBracketWord);
+        result.writeCodePoint(rightBracketCode);
         return result.toString();
       }
     } else if (data instanceof Map) {
@@ -115,13 +118,13 @@ export namespace JSON {
       let values = data.values();
       for (let i = 0; i < data.size; i++) {
         result.write(serializeString(keys[i].toString()));
-        result.write(colonWord);
+        result.writeCodePoint(colonCode);
         result.write(JSON.stringify(values[i]));
         if (i < data.size - 1) {
-          result.write(commaWord);
+          result.writeCodePoint(commaCode);
         }
       }
-      result.write(rightBraceWord);
+      result.writeCodePoint(rightBraceCode);
       return result.toString();
     } else {
       throw new Error(
@@ -196,11 +199,11 @@ export namespace JSON {
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
           result.write(JSON.stringify(unchecked(data[i])));
-          result.write(commaWord);
+          result.writeCodePoint(commaCode);
         }
         // @ts-ignore
         result.write(JSON.stringify(unchecked(data[data.length - 1])));
-        result.write(rightBracketWord);
+        result.writeCodePoint(rightBracketCode);
         out = result.toString();
         return;
       }
@@ -303,23 +306,23 @@ export namespace JSON {
       result.write(<string>data, last, i);
       last = i + 1;
       switch (char) {
-        case 8: {
+        case backspaceCode: {
           result.write("\\b");
           break;
         }
-        case 9: {
+        case tabCode: {
           result.write("\\t");
           break;
         }
-        case 10: {
+        case newLineCode: {
           result.write("\\n");
           break;
         }
-        case 12: {
+        case formFeedCode: {
           result.write("\\f");
           break;
         }
-        case 13: {
+        case carriageReturnCode: {
           result.write("\\r");
           break;
         }
@@ -339,7 +342,7 @@ export namespace JSON {
     }
   }
   result.write(<string>data, last);
-  result.write(quoteWord);
+  result.writeCodePoint(quoteCode);
   return result.toString();
 }
 
@@ -351,56 +354,56 @@ export namespace JSON {
     if (unsafeCharCodeAt(data, i) === backSlashCode) {
       const char = unsafeCharCodeAt(data, ++i);
       result.write(data, last, i - 1);
-      if (char === 34) {
-        result.writeCodePoint(quoteCode);
-        last = i + 1;
-      } else {
-        switch (char) {
-          case backSlashCode: {
-            result.writeCodePoint(backSlashCode);
-            last = i + 1;
-            break;
-          }
-          case forwardSlashCode: {
-            result.writeCodePoint(forwardSlashCode);
-            last = i + 1;
-            break;
-          }
-          case bCode: {
-            result.write("\b");
-            last = i + 1;
-            break;
-          }
-          case fCode: {
-            result.write("\f");
-            last = i + 1;
-            break;
-          }
-          case nCode: {
-            result.writeCodePoint(newLineCode);
-            last = i + 1;
-            break;
-          }
-          case rCode: {
-            result.write("\r");
-            last = i + 1;
-            break;
-          }
-          case tCode: {
-            result.write("\t");
-            last = i + 1;
-            break;
-          }
-          case uCode: {
-            const code = u16.parse(data.slice(i + 1, i + 5), 16);
-            result.writeCodePoint(code);
-            i += 4;
-            last = i + 1;
-            break;
-          }
-          default: {
-            throw new Error(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
-          }
+      switch (char) {
+        case quoteCode: {
+          result.writeCodePoint(quoteCode);
+          last = i + 1;
+          break;
+        }
+        case backSlashCode: {
+          result.writeCodePoint(backSlashCode);
+          last = i + 1;
+          break;
+        }
+        case forwardSlashCode: {
+          result.writeCodePoint(forwardSlashCode);
+          last = i + 1;
+          break;
+        }
+        case bCode: {
+          result.writeCodePoint(backspaceCode);
+          last = i + 1;
+          break;
+        }
+        case fCode: {
+          result.writeCodePoint(formFeedCode);
+          last = i + 1;
+          break;
+        }
+        case nCode: {
+          result.writeCodePoint(newLineCode);
+          last = i + 1;
+          break;
+        }
+        case rCode: {
+          result.writeCodePoint(carriageReturnCode);
+          last = i + 1;
+          break;
+        }
+        case tCode: {
+          result.writeCodePoint(tabCode);
+          last = i + 1;
+          break;
+        }
+        case uCode: {
+          const code = u16.parse(data.slice(i + 1, i + 5), 16);
+          result.writeCodePoint(code);
+          i += 4;
+          last = i + 1;
+          break;
+        }
+        default: {
+          throw new Error(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
         }
       }
     }
@@ -773,16 +776,6 @@ export namespace JSON {
   let lastPos = 1;
   for (let i = 1; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    /*// if char == "t" && i+3 == "e"
-                if (char === tCode && data.charCodeAt(i + 3) === eCode) {
-                  //i += 3;
-                  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+2)));
-                  //i++;
-                } else if (char === fCode && data.charCodeAt(i + 4) === eCode) {
-                  //i += 4;
-                  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+3)));
-                  //i++;
-                }*/
     if (char === tCode || char === fCode) {
       lastPos = i;
     } else if (char === eCode) {
