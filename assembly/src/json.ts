@@ -73,7 +73,7 @@ export namespace JSON {
       // @ts-ignore: Hidden function
       return data.__JSON_Serialize();
     } else if (data instanceof Date) {
-      return "\"" + data.toISOString() + "\"";
+      return `"${data.toISOString()}"`;
     } else if (isArrayLike<T>()) {
       // @ts-ignore
       if (data.length == 0) {
@@ -329,7 +329,8 @@ export namespace JSON {
         default: {
           // all chars 0-31 must be encoded as a four digit unicode escape sequence
           // \u0000 to \u000f handled here
-          result.write("\\u000" + char.toString(16));
+          result.write("\\u000");
+          result.write(char.toString(16));
           break;
         }
       }
@@ -338,7 +339,8 @@ export namespace JSON {
       last = i + 1;
       // all chars 0-31 must be encoded as a four digit unicode escape sequence
       // \u0010 to \u001f handled here
-      result.write("\\u00" + char.toString(16));
+      result.write("\\u00");
+      result.write(char.toString(16));
     }
   }
   result.write(<string>data, last);
