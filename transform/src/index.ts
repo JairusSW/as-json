@@ -114,7 +114,7 @@ class AsJSONTransform extends BaseVisitor {
           ].includes(type.toLowerCase())
         ) {
           this.currentClass.encodeStmts.push(
-            `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}.toString()},`
+            `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}},`
           );
           // @ts-ignore
           this.currentClass.setDataStmts.push(
@@ -137,7 +137,7 @@ class AsJSONTransform extends BaseVisitor {
             ].includes(type.toLowerCase())
           ) {
             this.currentClass.encodeStmts.push(
-              `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}.toString()},`
+              `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
