@@ -580,19 +580,19 @@ describe("Ser/de special strings in object keys", () => {
 
   it("should ser/de escape sequences in key of object with int value", () => {
     const o: ObjWithStrangeKey<i32> = { data: 123 };
-    const s = '{"a\\\\\\t\\"\\u0002b":123}';
+    const s = '{"a\\\\\\t\\"\\u0002b`c":123}';
     canSerde(o, s);
   });
 
   it("should ser/de escape sequences in key of object with float value", () => {
     const o: ObjWithStrangeKey<f64> = { data: 123.4 };
-    const s = '{"a\\\\\\t\\"\\u0002b":123.4}';
+    const s = '{"a\\\\\\t\\"\\u0002b`c":123.4}';
     canSerde(o, s);
   });
 
   it("should ser/de escape sequences in key of object with string value", () => {
     const o: ObjWithStrangeKey<string> = { data: "abc" };
-    const s = '{"a\\\\\\t\\"\\u0002b":"abc"}';
+    const s = '{"a\\\\\\t\\"\\u0002b`c":"abc"}';
     canSerde(o, s);
   });
 
@@ -636,6 +636,6 @@ class ObjectWithFloatArray {
 
 @json
 class ObjWithStrangeKey<T> {
-  @alias('a\\\t"\x02b')
+  @alias('a\\\t"\x02b`c')
   data!: T;
 }

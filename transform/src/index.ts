@@ -117,7 +117,7 @@ class AsJSONTransform extends BaseVisitor {
           ].includes(type.toLowerCase())
         ) {
           this.currentClass.encodeStmts.push(
-            `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}},`
+            `${encodeKey(aliasName)}:\${this.${name}},`
           );
           // @ts-ignore
           this.currentClass.setDataStmts.push(
@@ -139,7 +139,7 @@ class AsJSONTransform extends BaseVisitor {
             ].includes(type.toLowerCase())
           ) {
             this.currentClass.encodeStmts.push(
-              `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${this.${name}},`
+              `${encodeKey(aliasName)}:\${this.${name}},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
@@ -155,7 +155,7 @@ class AsJSONTransform extends BaseVisitor {
             }
           } else {
             this.currentClass.encodeStmts.push(
-              `${JSON.stringify(aliasName).replace(/\\/g,'\\\\')}:\${JSON.stringify<${type}>(this.${name})},`
+              `${encodeKey(aliasName)}:\${JSON.stringify<${type}>(this.${name})},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
@@ -253,6 +253,12 @@ class AsJSONTransform extends BaseVisitor {
     // Add the import statement to the top of the source.
     node.statements.unshift(stmt);
   }
+}
+
+function encodeKey(aliasName: string): string {
+  return JSON.stringify(aliasName)
+    .replace(/\\/g, "\\\\")
+    .replace(/\`/g, '\\`');
 }
 
 export default class Transformer extends Transform {

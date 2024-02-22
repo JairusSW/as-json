@@ -99,7 +99,7 @@ class AsJSONTransform extends BaseVisitor {
                     "u64",
                     "i64",
                 ].includes(type.toLowerCase())) {
-                    this.currentClass.encodeStmts.push(`${JSON.stringify(aliasName).replace(/\\/g, '\\\\')}:\${this.${name}},`);
+                    this.currentClass.encodeStmts.push(`${encodeKey(aliasName)}:\${this.${name}},`);
                     // @ts-ignore
                     this.currentClass.setDataStmts.push(`if (key.equals(${JSON.stringify(aliasName)})) {
           this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
@@ -114,7 +114,7 @@ class AsJSONTransform extends BaseVisitor {
                     "f32",
                     "f64",
                 ].includes(type.toLowerCase())) {
-                    this.currentClass.encodeStmts.push(`${JSON.stringify(aliasName).replace(/\\/g, '\\\\')}:\${this.${name}},`);
+                    this.currentClass.encodeStmts.push(`${encodeKey(aliasName)}:\${this.${name}},`);
                     // @ts-ignore
                     this.currentClass.setDataStmts.push(`if (key.equals(${JSON.stringify(aliasName)})) {
             this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
@@ -125,7 +125,7 @@ class AsJSONTransform extends BaseVisitor {
                     }
                 }
                 else {
-                    this.currentClass.encodeStmts.push(`${JSON.stringify(aliasName).replace(/\\/g, '\\\\')}:\${JSON.stringify<${type}>(this.${name})},`);
+                    this.currentClass.encodeStmts.push(`${encodeKey(aliasName)}:\${JSON.stringify<${type}>(this.${name})},`);
                     // @ts-ignore
                     this.currentClass.setDataStmts.push(`if (key.equals(${JSON.stringify(aliasName)})) {
             this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
@@ -203,6 +203,11 @@ class AsJSONTransform extends BaseVisitor {
         // Add the import statement to the top of the source.
         node.statements.unshift(stmt);
     }
+}
+function encodeKey(aliasName) {
+    return JSON.stringify(aliasName)
+        .replace(/\\/g, "\\\\")
+        .replace(/\`/g, '\\`');
 }
 export default class Transformer extends Transform {
     // Trigger the transform after parse.
