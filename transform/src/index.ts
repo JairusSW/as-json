@@ -119,10 +119,9 @@ class AsJSONTransform extends BaseVisitor {
           // @ts-ignore
           this.currentClass.setDataStmts.push(
             `if (key.equals(${JSON.stringify(aliasName)})) {
-        this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
-        return;
-      }
-      `
+          this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
+          return;
+        }`
           );
           if (member.initializer) {
             this.currentClass.initializeStmts.push(
@@ -142,10 +141,9 @@ class AsJSONTransform extends BaseVisitor {
             // @ts-ignore
             this.currentClass.setDataStmts.push(
               `if (key.equals(${JSON.stringify(aliasName)})) {
-        this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
-        return;
-      }
-      `
+            this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
+            return;
+          }`
             );
             if (member.initializer) {
               this.currentClass.initializeStmts.push(
@@ -159,10 +157,9 @@ class AsJSONTransform extends BaseVisitor {
             // @ts-ignore
             this.currentClass.setDataStmts.push(
               `if (key.equals(${JSON.stringify(aliasName)})) {
-        this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
-        return;
-      }
-      `
+            this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
+            return;
+          }`
             );
             if (member.initializer) {
               this.currentClass.initializeStmts.push(
@@ -185,24 +182,19 @@ class AsJSONTransform extends BaseVisitor {
       serializeFunc = `
       @inline __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
-      }
-      `;
+      }`;
     } else {
       serializeFunc = `
       @inline __JSON_Serialize(): string {
         return "{}";
-      }
-      `;
+      }`;
     }
 
     // Odd behavior here... When pairing this transform with asyncify, having @inline on __JSON_Set_Key<T> with a generic will cause it to freeze.
     // Binaryen cannot predict and add/mangle code when it is genericed.
     const setKeyFunc = `
       __JSON_Set_Key<__JSON_Key_Type>(key: __JSON_Key_Type, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
-        ${
-      // @ts-ignore
-      this.currentClass.setDataStmts.join("")
-      }
+        ${this.currentClass.setDataStmts.join("\n        ")}
       }
     `;
 
