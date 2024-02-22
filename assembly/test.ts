@@ -55,7 +55,7 @@ class Wrapper<T> {
 
 @serializable
 class Foo {
-    @alias("ur mom")
+    @alias("hello")
     foo!: string;
 }
 
@@ -70,7 +70,7 @@ const foo: Wrapper<Foo> = {
 
 foo.data.foo = "ha";
 console.log(JSON.stringify(foo));
-console.log(JSON.stringify(JSON.parse<Wrapper<Foo>>("{\"data\":{\"ur mom\":\"ha\"}}")))
+console.log(JSON.stringify(JSON.parse<Wrapper<Foo>>("{\"data\":{\"hello\":\"ha\"}}")))
 /*
 // 9,325,755
 bench("Stringify Object (Vec3)", () => {

@@ -143,32 +143,32 @@ class AsJSONTransform extends BaseVisitor {
             this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
                 stmt.slice(0, stmt.length - 1);
             serializeFunc = `
-      @inline __JSON_Serialize(): string {
+      __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
       }`;
         }
         else {
             serializeFunc = `
-      @inline __JSON_Serialize(): string {
+      __JSON_Serialize(): string {
         return "{}";
       }`;
         }
         const setKeyFunc = `
-      @inline __JSON_Set_Key(key: __Virtual<string>, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
+      __JSON_Set_Key(key: __Virtual<string>, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
         ${this.currentClass.setDataStmts.join("\n        ")}
       }
     `;
         let initializeFunc = "";
         if (this.currentClass.initializeStmts.length > 0) {
             initializeFunc = `
-      @inline __JSON_Initialize(): void {
+      __JSON_Initialize(): void {
       ${this.currentClass.initializeStmts.join(";\n")};
       }
       `;
         }
         else {
             initializeFunc = `
-      @inline __JSON_Initialize(): void {}
+      __JSON_Initialize(): void {}
       `;
         }
         const serializeMethod = SimpleParser.parseClassMember(serializeFunc, node);
