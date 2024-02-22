@@ -117,9 +117,9 @@ export namespace JSON {
       let keys = data.keys();
       let values = data.values();
       for (let i = 0; i < data.size; i++) {
-        result.write(serializeString(keys[i].toString()));
+        result.write(serializeString(unchecked(keys[i]).toString()));
         result.writeCodePoint(colonCode);
-        result.write(JSON.stringify(values[i]));
+        result.write(JSON.stringify(unchecked(values[i])));
         if (i < data.size - 1) {
           result.writeCodePoint(commaCode);
         }
