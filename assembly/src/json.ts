@@ -2,6 +2,7 @@ import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
 import {
   aCode,
+  bCode,
   eCode,
   fCode,
   lCode,
@@ -14,20 +15,24 @@ import {
   backSlashCode,
   colonCode,
   commaCode,
+  forwardSlashCode,
   leftBraceCode,
   leftBracketCode,
-  newLineCode,
   quoteCode,
   rightBraceCode,
   rightBracketCode,
 
-  colonWord,
+  backspaceCode,
+  carriageReturnCode,
+  tabCode,
+  formFeedCode,
+  newLineCode,
+  
   commaWord,
   quoteWord,
 
   leftBraceWord,
   leftBracketWord,
-  rightBraceWord,
   rightBracketWord,
   emptyArrayWord,
 
@@ -35,7 +40,7 @@ import {
   falseWord,
   nullWord,
 } from "./chars";
-import { snip_fast, unsafeCharCodeAt } from "./util";
+import { snip_fast, unsafeCharCodeAt, containsCodePoint } from "./util";
 import { Virtual } from "as-virtual/assembly";
 
 /**
@@ -68,7 +73,7 @@ export namespace JSON {
       // @ts-ignore: Hidden function
       return data.__JSON_Serialize();
     } else if (data instanceof Date) {
-      return "\"" + data.toISOString() + "\"";
+      return `"${data.toISOString()}"`;
     } else if (isArrayLike<T>()) {
       // @ts-ignore
       if (data.length == 0) {
@@ -100,11 +105,11 @@ export namespace JSON {
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
           result.write(JSON.stringify(unchecked(data[i])));
-          result.write(commaWord);
+          result.writeCodePoint(commaCode);
         }
         // @ts-ignore
         result.write(JSON.stringify(unchecked(data[data.length - 1])));
-        result.write(rightBracketWord);
+        result.writeCodePoint(rightBracketCode);
         return result.toString();
       }
     } else if (data instanceof Map) {
@@ -112,14 +117,14 @@ export namespace JSON {
       let keys = data.keys();
       let values = data.values();
       for (let i = 0; i < data.size; i++) {
-        result.write(serializeString(keys[i].toString()));
-        result.write(colonWord);
-        result.write(JSON.stringify(values[i]));
+        result.write(serializeString(unchecked(keys[i]).toString()));
+        result.writeCodePoint(colonCode);
+        result.write(JSON.stringify(unchecked(values[i])));
         if (i < data.size - 1) {
-          result.write(commaWord);
+          result.writeCodePoint(commaCode);
         }
       }
-      result.write(rightBraceWord);
+      result.writeCodePoint(rightBraceCode);
       return result.toString();
     } else {
       throw new Error(
@@ -194,11 +199,11 @@ export namespace JSON {
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
           result.write(JSON.stringify(unchecked(data[i])));
-          result.write(commaWord);
+          result.writeCodePoint(commaCode);
         }
         // @ts-ignore
         result.write(JSON.stringify(unchecked(data[data.length - 1])));
-        result.write(rightBracketWord);
+        result.writeCodePoint(rightBracketCode);
         out = result.toString();
         return;
       }
@@ -254,51 +259,8 @@ export namespace JSON {
 @global @inline function __parseObjectValue<T>(data: string, initializeDefaultValues: boolean): T {
   let type: T;
   if (isString<T>()) {
-    let result = "";
-    let last = 0;
-    for (let i = 0; i < data.length; i++) {
-      // \\"
-      if (unsafeCharCodeAt(data, i) === backSlashCode) {
-        const char = unsafeCharCodeAt(data, ++i);
-        result += data.slice(last, i - 1);
-        if (char === 34) {
-          result += '"';
-          last = ++i;
-        } else if (char === 110) {
-          result += "\n";
-          last = ++i;
-          // 92 98 114 116 102 117
-        } else if (char >= 92 && char <= 117) {
-          if (char === 92) {
-            result += "\\";
-            last = ++i;
-          } else if (char === 98) {
-            result += "\b";
-            last = ++i;
-          } else if (char === 102) {
-            result += "\f";
-            last = ++i;
-          } else if (char === 114) {
-            result += "\r";
-            last = ++i;
-          } else if (char === 116) {
-            result += "\t";
-            last = ++i;
-          } else if (
-            char === 117 &&
-            load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
-            27584753879220272
-          ) {
-            result += "\u000b";
-            i += 4;
-            last = ++i;
-          }
-        }
-      }
-    }
-    result += data.slice(last);
     // @ts-ignore
-    return result;
+    return data;
   } else if (isBoolean<T>()) {
     // @ts-ignore
     return parseBoolean<T>(data);
@@ -327,118 +289,133 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function serializeString(data: string): string {
-  let result = new StringSink('"');
+  if (data.length === 0) {
+    return quoteWord + quoteWord;
+  }
+
+  let result = new StringSink(quoteWord);
 
   let last: i32 = 0;
   for (let i = 0; i < data.length; i++) {
     const char = unsafeCharCodeAt(<string>data, i);
-    if (char === 34 || char === 92) {
+    if (char === quoteCode || char === backSlashCode) {
       result.write(<string>data, last, i);
       result.writeCodePoint(backSlashCode);
       last = i;
-    } else if (char <= 13 && char >= 8) {
+    } else if (char < 16) {
       result.write(<string>data, last, i);
       last = i + 1;
       switch (char) {
-        case 8: {
+        case backspaceCode: {
           result.write("\\b");
           break;
         }
-        case 9: {
+        case tabCode: {
           result.write("\\t");
           break;
         }
-        case 10: {
+        case newLineCode: {
           result.write("\\n");
           break;
         }
-        case 11: {
-          result.write("\\x0B"); // \\u000b
-          break;
-        }
-        case 12: {
+        case formFeedCode: {
           result.write("\\f");
           break;
         }
-        case 13: {
+        case carriageReturnCode: {
           result.write("\\r");
           break;
         }
+        default: {
+          // all chars 0-31 must be encoded as a four digit unicode escape sequence
+          // \u0000 to \u000f handled here
+          result.write("\\u000");
+          result.write(char.toString(16));
+          break;
+        }
       }
+    } else if (char < 32) {
+      result.write(<string>data, last, i);
+      last = i + 1;
+      // all chars 0-31 must be encoded as a four digit unicode escape sequence
+      // \u0010 to \u001f handled here
+      result.write("\\u00");
+      result.write(char.toString(16));
     }
   }
-  if (result.length === 1) {
-    return quoteWord + data + quoteWord;
-  }
   result.write(<string>data, last);
-  result.write(quoteWord);
+  result.writeCodePoint(quoteCode);
   return result.toString();
 }
 
 // @ts-ignore: Decorator
-@inline function parseString(data: string): string {
-  let result = new StringSink();
-  let last = 1;
-  for (let i = 1; i < data.length - 1; i++) {
-    // \\"
-    if (unsafeCharCodeAt(data, i) === backSlashCode) {
-      const char = unsafeCharCodeAt(data, ++i);
-      result.write(data, last, i - 1);
-      if (char === 34) {
+@inline function parseString(data: string, start: i32 = 0, end: i32 = 0): string {
+  end = end || data.length - 1; 
+  let result = StringSink.withCapacity(end - start - 1);
+  let last = start + 1;
+  for (let i = last; i < end; i++) {
+    if (unsafeCharCodeAt(data, i) !== backSlashCode) {
+      continue;
+    }
+    const char = unsafeCharCodeAt(data, ++i);
+    result.write(data, last, i - 1);
+    switch (char) {
+      case quoteCode: {
         result.writeCodePoint(quoteCode);
         last = i + 1;
-      } else if (char >= 92 && char <= 117) {
-        switch (char) {
-          case 92: {
-            result.writeCodePoint(backSlashCode);
-            last = i + 1;
-            break;
-          }
-          case 98: {
-            result.write("\b");
-            last = i + 1;
-            break;
-          }
-          case 102: {
-            result.write("\f");
-            last = i + 1;
-            break;
-          }
-          case 110: {
-            result.writeCodePoint(newLineCode);
-            last = i + 1;
-            break;
-          }
-          case 114: {
-            result.write("\r");
-            last = i + 1;
-            break;
-          }
-          case 116: {
-            result.write("\t");
-            last = i + 1;
-            break;
-          }
-          default: {
-            if (
-              char === 117 &&
-              load<u64>(changetype<usize>(data) + <usize>((i + 1) << 1)) ===
-              27584753879220272
-            ) {
-              result.write("\u000b");
-              i += 4;
-              last = i + 1;
-            }
-            break;
-          }
-        }
+        break;
+      }
+      case backSlashCode: {
+        result.writeCodePoint(backSlashCode);
+        last = i + 1;
+        break;
+      }
+      case forwardSlashCode: {
+        result.writeCodePoint(forwardSlashCode);
+        last = i + 1;
+        break;
+      }
+      case bCode: {
+        result.writeCodePoint(backspaceCode);
+        last = i + 1;
+        break;
+      }
+      case fCode: {
+        result.writeCodePoint(formFeedCode);
+        last = i + 1;
+        break;
+      }
+      case nCode: {
+        result.writeCodePoint(newLineCode);
+        last = i + 1;
+        break;
+      }
+      case rCode: {
+        result.writeCodePoint(carriageReturnCode);
+        last = i + 1;
+        break;
+      }
+      case tCode: {
+        result.writeCodePoint(tabCode);
+        last = i + 1;
+        break;
+      }
+      case uCode: {
+        const code = u16.parse(data.slice(i + 1, i + 5), 16);
+        result.writeCodePoint(code);
+        i += 4;
+        last = i + 1;
+        break;
+      }
+      default: {
+        throw new Error(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
       }
     }
   }
-  if ((data.length - 1) > last) {
-    result.write(data, last, data.length - 1);
+  if (end > last) {
+    result.write(data, last, end);
   }
-  return result.toString();
+  return result.toString()
 }
 
 // @ts-ignore: Decorator
@@ -491,7 +468,7 @@ export namespace JSON {
           if (depth === 0) {
             ++arrayValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, arrayValueIndex, initializeDefaultValues);
+            schema.__JSON_Set_Key(key, data, outerLoopIndex, arrayValueIndex, initializeDefaultValues);
             outerLoopIndex = arrayValueIndex;
             isKey = false;
             break;
@@ -512,7 +489,7 @@ export namespace JSON {
           if (depth === 0) {
             ++objectValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, objectValueIndex, initializeDefaultValues);
+            schema.__JSON_Set_Key(key, data, outerLoopIndex, objectValueIndex, initializeDefaultValues);
             outerLoopIndex = objectValueIndex;
             isKey = false;
             break;
@@ -530,15 +507,19 @@ export namespace JSON {
         if (char === backSlashCode && !escaping) {
           escaping = true;
         } else {
-          if (
-            char === quoteCode && !escaping
-          ) {
+          if (char === quoteCode && !escaping) {
             if (isKey === false) {
-              key.reinst(data, outerLoopIndex, stringValueIndex);
+              // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
+              if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
+                key.reinst(parseString(data, outerLoopIndex - 1, stringValueIndex));
+              } else {
+                key.reinst(data, outerLoopIndex, stringValueIndex);
+              }
               isKey = true;
             } else {
+              const value = parseString(data, outerLoopIndex - 1, stringValueIndex);
               // @ts-ignore
-              schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, stringValueIndex, initializeDefaultValues);
+              schema.__JSON_Set_Key(key, value, 0, value.length, initializeDefaultValues);
               isKey = false;
             }
             outerLoopIndex = ++stringValueIndex;
@@ -554,7 +535,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === lCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, nullWord, 0, 4, initializeDefaultValues);
+      schema.__JSON_Set_Key(key, nullWord, 0, 4, initializeDefaultValues);
       isKey = false;
     } else if (
       char === tCode &&
@@ -563,7 +544,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, trueWord, 0, 4, initializeDefaultValues);
+      schema.__JSON_Set_Key(key, trueWord, 0, 4, initializeDefaultValues);
       isKey = false;
     } else if (
       char === fCode &&
@@ -573,7 +554,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, falseWord, 0, 5, initializeDefaultValues);
+      schema.__JSON_Set_Key(key, falseWord, 0, 5, initializeDefaultValues);
       isKey = false;
     } else if ((char >= 48 && char <= 57) || char === 45) {
       let numberValueIndex = ++outerLoopIndex;
@@ -581,7 +562,7 @@ export namespace JSON {
         const char = unsafeCharCodeAt(data, numberValueIndex);
         if (char === commaCode || char === rightBraceCode || isSpace(char)) {
           // @ts-ignore
-          schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex - 1, numberValueIndex, initializeDefaultValues);
+          schema.__JSON_Set_Key(key, data, outerLoopIndex - 1, numberValueIndex, initializeDefaultValues);
           outerLoopIndex = numberValueIndex;
           isKey = false;
           break;
@@ -664,11 +645,17 @@ export namespace JSON {
             char === quoteCode && !escaping
           ) {
             if (isKey === false) {
-              key.reinst(data, outerLoopIndex, stringValueIndex);
+              // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
+              if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
+                key.reinst(parseString(data, outerLoopIndex - 1, stringValueIndex));
+              } else {
+                key.reinst(data, outerLoopIndex, stringValueIndex);
+              }
               isKey = true;
             } else {              
               if (isString<valueof<T>>()) {
-                map.set(parseMapKey<indexof<T>>(key), data.slice(outerLoopIndex, stringValueIndex));
+                const value = parseString(data, outerLoopIndex - 1, stringValueIndex);
+                map.set(parseMapKey<indexof<T>>(key), value);
               }
               isKey = false;
             }
@@ -788,7 +775,7 @@ export namespace JSON {
           lastPos = i;
         } else {
           instr = false;
-          result.push(parseString(data.slice(lastPos, i + 1)));
+          result.push(parseString(data, lastPos, i));
         }
       }
       escaping = false;
@@ -803,16 +790,6 @@ export namespace JSON {
   let lastPos = 1;
   for (let i = 1; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    /*// if char == "t" && i+3 == "e"
-                if (char === tCode && data.charCodeAt(i + 3) === eCode) {
-                  //i += 3;
-                  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+2)));
-                  //i++;
-                } else if (char === fCode && data.charCodeAt(i + 4) === eCode) {
-                  //i += 4;
-                  result.push(parseBoolean<valueof<T>>(data.slice(lastPos, i+3)));
-                  //i++;
-                }*/
     if (char === tCode || char === fCode) {
       lastPos = i;
     } else if (char === eCode) {
@@ -830,7 +807,7 @@ export namespace JSON {
   let i = 1;
   for (; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if ((lastPos === 0 && char >= 48 && char <= 57) || char === 45) {
+    if (lastPos === 0 && ((char >= 48 && char <= 57) || char === 45)) {
       lastPos = i;
     } else if ((isSpace(char) || char == commaCode) && lastPos > 0) {
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i)));

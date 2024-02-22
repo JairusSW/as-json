@@ -1,9 +1,12 @@
 import {
   ClassDeclaration,
   FieldDeclaration,
-  Source,
   Parser,
-} from "assemblyscript/dist/assemblyscript";
+  Source,
+  SourceKind,
+  Tokenizer,
+} from "assemblyscript/dist/assemblyscript.js";
+
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
@@ -23,7 +26,7 @@ class SchemaData {
 class AsJSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
   public currentClass!: SchemaData;
-  public sources: Source[] = [];
+  public sources = new Set<Source>();
 
   visitMethodDeclaration(): void { }
   visitClassDeclaration(node: ClassDeclaration): void {
@@ -89,8 +92,11 @@ class AsJSONTransform extends BaseVisitor {
 
         const name = member.name.text;
         let aliasName = name;
+
+        // @ts-ignore
         if (member.decorators && member.decorators[0]?.name.text === "alias") {
           if (member.decorators[0] && member.decorators[0].args![0]) {
+            // @ts-ignore
             aliasName = member.decorators[0].args![0].value;
           }
         }
@@ -111,15 +117,14 @@ class AsJSONTransform extends BaseVisitor {
           ].includes(type.toLowerCase())
         ) {
           this.currentClass.encodeStmts.push(
-            `"${aliasName}":\${this.${name}.toString()},`
+            `${encodeKey(aliasName)}:\${this.${name}},`
           );
           // @ts-ignore
           this.currentClass.setDataStmts.push(
-            `if (key.equals("${aliasName}")) {
-        this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
-        return;
-      }
-      `
+            `if (key.equals(${JSON.stringify(aliasName)})) {
+          this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
+          return;
+        }`
           );
           if (member.initializer) {
             this.currentClass.initializeStmts.push(
@@ -134,15 +139,14 @@ class AsJSONTransform extends BaseVisitor {
             ].includes(type.toLowerCase())
           ) {
             this.currentClass.encodeStmts.push(
-              `"${aliasName}":\${this.${name}.toString()},`
+              `${encodeKey(aliasName)}:\${this.${name}},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
-              `if (key.equals("${aliasName}")) {
-        this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
-        return;
-      }
-      `
+              `if (key.equals(${JSON.stringify(aliasName)})) {
+            this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
+            return;
+          }`
             );
             if (member.initializer) {
               this.currentClass.initializeStmts.push(
@@ -151,15 +155,14 @@ class AsJSONTransform extends BaseVisitor {
             }
           } else {
             this.currentClass.encodeStmts.push(
-              `"${aliasName}":\${JSON.stringify<${type}>(this.${name})},`
+              `${encodeKey(aliasName)}:\${JSON.stringify<${type}>(this.${name})},`
             );
             // @ts-ignore
             this.currentClass.setDataStmts.push(
-              `if (key.equals("${aliasName}")) {
-        this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
-        return;
-      }
-      `
+              `if (key.equals(${JSON.stringify(aliasName)})) {
+            this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
+            return;
+          }`
             );
             if (member.initializer) {
               this.currentClass.initializeStmts.push(
@@ -182,24 +185,17 @@ class AsJSONTransform extends BaseVisitor {
       serializeFunc = `
       @inline __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
-      }
-      `;
+      }`;
     } else {
       serializeFunc = `
       @inline __JSON_Serialize(): string {
         return "{}";
-      }
-      `;
+      }`;
     }
 
-    // Odd behavior here... When pairing this transform with asyncify, having @inline on __JSON_Set_Key<T> with a generic will cause it to freeze.
-    // Binaryen cannot predict and add/mangle code when it is genericed.
     const setKeyFunc = `
-      __JSON_Set_Key<__JSON_Key_Type>(key: __JSON_Key_Type, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
-        ${
-      // @ts-ignore
-      this.currentClass.setDataStmts.join("")
-      }
+      @inline __JSON_Set_Key(key: __Virtual<string>, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
+        ${this.currentClass.setDataStmts.join("\n        ")}
       }
     `;
 
@@ -226,11 +222,43 @@ class AsJSONTransform extends BaseVisitor {
     node.members.push(initializeMethod);
 
     this.schemasList.push(this.currentClass);
-    //console.log(toString(node));
+    this.sources.add(node.name.range.source);
+
+    // Uncomment to see the generated code for debugging.
+    // console.log(serializeFunc);
+    // console.log(setKeyFunc);
+    // console.log(initializeFunc);
   }
+
   visitSource(node: Source): void {
     super.visitSource(node);
+
+    // Only add the import statement to sources that have JSON decorated classes.
+    if (!this.sources.has(node)) {
+      return;
+    }
+
+    // Note, the following one liner would be easier, but it fails with an assertion error
+    // because as-virtual's SimpleParser doesn't set the parser.currentSource correctly.
+    //
+    // const stmt = SimpleParser.parseTopLevelStatement('import { Virtual as __Virtual } from "as-virtual/assembly";');
+
+    // ... So we have to do it the long way:
+    const s = 'import { Virtual as __Virtual } from "as-virtual/assembly";'
+    const t = new Tokenizer(new Source(SourceKind.User, "index.ts", s));
+    const p = new Parser();
+    p.currentSource = t.source;
+    const stmt = p.parseTopLevelStatement(t)!;
+
+    // Add the import statement to the top of the source.
+    node.statements.unshift(stmt);
   }
+}
+
+function encodeKey(aliasName: string): string {
+  return JSON.stringify(aliasName)
+    .replace(/\\/g, "\\\\")
+    .replace(/\`/g, '\\`');
 }
 
 export default class Transformer extends Transform {

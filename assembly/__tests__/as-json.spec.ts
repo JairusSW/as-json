@@ -73,9 +73,18 @@ describe("Ser/de Numbers", () => {
     canSerde<f64>(10e2, "1000.0");
 
     canSerde<f64>(123456e-5, "1.23456");
-
     canSerde<f64>(0.0, "0.0");
-    canSerde<f64>(7.23, "7.23");
+    canSerde<f64>(-7.23, "-7.23");
+
+    canSerde<f64>(1e-6, "0.000001");
+    canSerde<f64>(1e-7, "1e-7");
+    canDeser<f64>("1E-7", 1e-7);
+
+    canSerde<f64>(1e20, "100000000000000000000.0");
+    canSerde<f64>(1e21, "1e+21");
+    canDeser<f64>("1E+21", 1e21);
+    canDeser<f64>("1e21", 1e21);
+    canDeser<f64>("1E21", 1e21);
   });
 
   it("should ser/de booleans", () => {
@@ -97,6 +106,11 @@ describe("Ser/de Array", () => {
 
   it("should ser/de float arrays", () => {
     canSerde<f64[]>([7.23, 10e2, 10e2, 123456e-5, 123456e-5, 0.0, 7.23]);
+
+    canSerde<f64[]>([1e21,1e22,1e-7,1e-8,1e-9], "[1e+21,1e+22,1e-7,1e-8,1e-9]");
+    canDeser<f64[]>("[1E+21,1E+22,1E-7,1E-8,1E-9]", [1e21,1e22,1e-7,1e-8,1e-9]);
+    canDeser<f64[]>("[1e21,1e22,1e-7,1e-8,1e-9]", [1e21,1e22,1e-7,1e-8,1e-9]);
+    canDeser<f64[]>("[1E21,1E22,1E-7,1E-8,1E-9]", [1e21,1e22,1e-7,1e-8,1e-9]);
   });
 
   it("should ser/de boolean arrays", () => {
@@ -166,6 +180,38 @@ describe("Ser/de Objects", () => {
       },
       isVerified: true,
     }, '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}');
+  });
+
+  it("should ser/de object with floats", () => {
+    canSerde<ObjectWithFloat>({ f: 7.23 }, '{"f":7.23}');
+    canSerde<ObjectWithFloat>({ f: 0.000001 }, '{"f":0.000001}');
+
+    canSerde<ObjectWithFloat>({ f: 1e-7 }, '{"f":1e-7}');
+    canDeser<ObjectWithFloat>('{"f":1E-7}', { f: 1e-7 });
+
+    canSerde<ObjectWithFloat>({ f: 1e20 }, '{"f":100000000000000000000.0}');
+    canSerde<ObjectWithFloat>({ f: 1e21 }, '{"f":1e+21}');
+    canDeser<ObjectWithFloat>('{"f":1E+21}', { f: 1e21 });
+    canDeser<ObjectWithFloat>('{"f":1e21}', { f: 1e21 });
+  });
+
+  it("should ser/de object with float arrays", () => {
+    canSerde<ObjectWithFloatArray>(
+      { fa: [1e21,1e22,1e-7,1e-8,1e-9] },
+      '{"fa":[1e+21,1e+22,1e-7,1e-8,1e-9]}');
+
+    canDeser<ObjectWithFloatArray>(
+      '{"fa":[1E+21,1E+22,1E-7,1E-8,1E-9]}',
+      { fa: [1e21,1e22,1e-7,1e-8,1e-9] });
+
+    canDeser<ObjectWithFloatArray>(
+      '{"fa":[1e21,1e22,1e-7,1e-8,1e-9]}',
+      { fa: [1e21,1e22,1e-7,1e-8,1e-9] });
+
+    canDeser<ObjectWithFloatArray>(
+      '{"fa":[1E21,1E22,1E-7,1E-8,1E-9]}',
+      { fa: [1e21,1e22,1e-7,1e-8,1e-9] });
+
   });
 });
 
@@ -343,3 +389,253 @@ describe("Ser/de Maps", () => {
   });
 
 });
+
+describe("Ser/de escape sequences in strings", () => {
+  it("should encode short escape sequences", () => {
+    canSer("\\", '"\\\\"');
+    canSer('"', '"\\""');
+    canSer("\n", '"\\n"');
+    canSer("\r", '"\\r"');
+    canSer("\t", '"\\t"');
+    canSer("\b", '"\\b"');
+    canSer("\f", '"\\f"');
+  });
+
+  it("should decode short escape sequences", () => {
+    canDeser('"\\\\"', "\\");
+    canDeser('"\\""', '"');
+    canDeser('"\\n"', "\n");
+    canDeser('"\\r"', "\r");
+    canDeser('"\\t"', "\t");
+    canDeser('"\\b"', "\b");
+    canDeser('"\\f"', "\f");
+  });
+
+  it("should decode escaped forward slash but not encode", () => {
+    canSer("/", '"/"');
+    canDeser('"/"', "/");
+    canDeser('"\\/"', "/"); // allowed
+  });
+
+  // 0x00 - 0x1f, excluding characters that have short escape sequences
+  it("should encode long escape sequences", () => {
+    const singles = ["\n", "\r", "\t", "\b", "\f"];
+    for (let i = 0; i < 0x1F; i++) {
+      const c = String.fromCharCode(i);
+      if (singles.includes(c)) continue;
+      const actual = JSON.stringify(c);
+      const expected = `"\\u${i.toString(16).padStart(4, "0")}"`;
+      expect(actual).toBe(expected, `Failed to encode '\\x${i.toString(16).padStart(2, "0")}'`);
+    }
+  });
+
+  // \u0000 - \u001f
+  it("should decode long escape sequences (lower cased)", () => {
+    for (let i = 0; i <= 0x1f; i++) {
+      const s = `"\\u${i.toString(16).padStart(4, "0").toLowerCase()}"`;      
+      const actual = JSON.parse<string>(s);
+      const expected = String.fromCharCode(i);
+      expect(actual).toBe(expected, `Failed to decode ${s}`);
+    }
+  });
+
+  // \u0000 - \u001F
+  it("should decode long escape sequences (upper cased)", () => {
+    for (let i = 0; i <= 0x1f; i++) {
+      const s = `"\\u${i.toString(16).padStart(4, "0").toUpperCase()}"`;      
+      const actual = JSON.parse<string>(s);
+      const expected = String.fromCharCode(i);
+      expect(actual).toBe(expected, `Failed to decode ${s}`);
+    }
+  });
+
+  // See https://datatracker.ietf.org/doc/html/rfc8259#section-7
+  it("should decode UTF-16 surrogate pairs", () => {
+    const s = '"\\uD834\\uDD1E"';
+    const actual = JSON.parse<string>(s);
+    const expected = "𝄞";
+    expect(actual).toBe(expected);
+  });
+
+  // Just because we can decode UTF-16 surrogate pairs, doesn't mean we should encode them.
+  it("should not encode UTF-16 surrogate pairs", () => {
+    const s = "𝄞";
+    const actual = JSON.stringify(s);
+    const expected = '"𝄞"';
+    expect(actual).toBe(expected);
+  });
+
+  it("should encode multiple escape sequences", () => {
+    canSer('"""', '"\\"\\"\\""');
+    canSer('\\\\\\', '"\\\\\\\\\\\\"');
+  });
+
+  it("cannot parse invalid escape sequences", () => {
+    expect(() => {
+      JSON.parse<string>('"\\z"');
+    }).toThrow();
+  });
+
+});
+
+describe("Ser/de special strings in object values", () => {
+  it("should serialize quotes in string in object", () => {
+    const o: ObjWithString = { s: '"""' };
+    const s = '{"s":"\\"\\"\\""}';
+    canSer(o, s);
+  });
+  it("should deserialize quotes in string in object", () => {
+    const o: ObjWithString = { s: '"""' };
+    const s = '{"s":"\\"\\"\\""}';
+    canDeser(s, o);
+  });
+  it("should serialize backslashes in string in object", () => {
+    const o: ObjWithString = { s: "\\\\\\" };
+    const s = '{"s":"\\\\\\\\\\\\"}';
+    canSer(o, s);
+  });
+  it("should deserialize backslashes in string in object", () => {
+    const o: ObjWithString = { s: "\\\\\\" };
+    const s = '{"s":"\\\\\\\\\\\\"}';
+    canDeser(s, o);
+  });
+
+  it("should deserialize slashes in string in object", () => {
+    const o: ObjWithString = { s: "//" };
+    const s = '{"s":"/\\/"}';
+    canDeser(s, o);
+  });
+  it("should deserialize slashes in string in array", () => {
+    const a = ["/", "/"];
+    const s = '["/","\/"]';
+    canDeser(s, a);
+  });
+
+  it("should ser/de short escape sequences in strings in objects", () => {
+    const o: ObjWithString = { s: "\n\r\t\b\f" };
+    const s = '{"s":"\\n\\r\\t\\b\\f"}';
+    canSerde(o, s);
+  });
+
+  it("should ser/de short escape sequences in string arrays", () => {
+    const a = ["\n", "\r", "\t", "\b", "\f"];
+    const s = '["\\n","\\r","\\t","\\b","\\f"]';
+    canSerde(a, s);
+  });
+
+  it("should ser/de short escape sequences in string arrays in objects", () => {
+    const o: ObjectWithStringArray = { sa: ["\n", "\r", "\t", "\b", "\f"] };
+    const s = '{"sa":["\\n","\\r","\\t","\\b","\\f"]}';
+    canSerde(o, s);
+  });
+
+  it("should ser/de long escape sequences in strings in objects", () => {
+    const singles = ["\n", "\r", "\t", "\b", "\f"];
+    let x = "";
+    let y = "";
+    for (let i = 0; i < 0x1F; i++) {
+      const c = String.fromCharCode(i);
+      if (singles.includes(c)) continue;
+      x += c;
+      y += `\\u${i.toString(16).padStart(4, "0")}`;
+    }
+    const o: ObjWithString = { s: x };
+    const s = `{"s":"${y}"}`;
+    canSerde(o, s);
+  });
+
+  it("should ser/de long escape sequences in strings in arrays", () => {
+    const singles = ["\n", "\r", "\t", "\b", "\f"];
+    let x: string[] = [];
+    let y: string[] = [];
+    for (let i = 0; i < 0x1F; i++) {
+      const c = String.fromCharCode(i);
+      if (singles.includes(c)) continue;
+      x.push(c);
+      y.push(`\\u${i.toString(16).padStart(4, "0")}`);
+    }
+    const a = x;
+    const s = `["${y.join('","')}"]`;
+    canSerde(a, s);
+  });
+
+  it("should ser/de long escape sequences in string arrays in objects", () => {
+    const singles = ["\n", "\r", "\t", "\b", "\f"];
+    let x: string[] = [];
+    let y: string[] = [];
+    for (let i = 0; i < 0x1F; i++) {
+      const c = String.fromCharCode(i);
+      if (singles.includes(c)) continue;
+      x.push(c);
+      y.push(`\\u${i.toString(16).padStart(4, "0")}`);
+    }
+    const o: ObjectWithStringArray = { sa: x };
+    const s = `{"sa":["${y.join('","')}"]}`;
+    canSerde(o, s);
+  });
+
+});
+
+describe("Ser/de special strings in object keys", () => {
+
+  it("should ser/de escape sequences in key of object with int value", () => {
+    const o: ObjWithStrangeKey<i32> = { data: 123 };
+    const s = '{"a\\\\\\t\\"\\u0002b`c":123}';
+    canSerde(o, s);
+  });
+
+  it("should ser/de escape sequences in key of object with float value", () => {
+    const o: ObjWithStrangeKey<f64> = { data: 123.4 };
+    const s = '{"a\\\\\\t\\"\\u0002b`c":123.4}';
+    canSerde(o, s);
+  });
+
+  it("should ser/de escape sequences in key of object with string value", () => {
+    const o: ObjWithStrangeKey<string> = { data: "abc" };
+    const s = '{"a\\\\\\t\\"\\u0002b`c":"abc"}';
+    canSerde(o, s);
+  });
+
+  // Something buggy in as-pect needs a dummy value reflected here
+  // or the subsequent test fails.  It's not used in any test.
+  Reflect.toReflectedValue(0);
+
+  it("should ser/de escape sequences in map key", () => {
+    const m = new Map<string, string>();
+    m.set('a\\\t"\x02b', 'abc');
+    const s = '{"a\\\\\\t\\"\\u0002b":"abc"}';
+    canSerde(m, s);
+  });
+  it("should ser/de escape sequences in map value", () => {
+    const m = new Map<string, string>();
+    m.set('abc', 'a\\\t"\x02b');
+    const s = '{"abc":"a\\\\\\t\\"\\u0002b"}';
+    canSerde(m, s);
+  });
+});
+
+@json
+class ObjWithString {
+  s!: string;
+}
+
+@json
+class ObjectWithStringArray {
+  sa!: string[];
+}
+
+@json
+class ObjectWithFloat {
+  f!: f64;
+}
+
+@json
+class ObjectWithFloatArray {
+  fa!: f64[];
+}
+
+@json
+class ObjWithStrangeKey<T> {
+  @alias('a\\\t"\x02b`c')
+  data!: T;
+}

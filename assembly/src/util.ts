@@ -12,11 +12,11 @@ import { backSlashCode, quoteCode } from "./chars";
   const result = new StringSink();
   let instr = false;
   for (let i = 0; i < data.length; i++) {
-    const char = data.charCodeAt(i);
+    const char = unsafeCharCodeAt(data, i);
     if (instr === false && char === quoteCode) instr = true;
     else if (
       instr === true && char === quoteCode
-      && data.charCodeAt(i - 1) !== backSlashCode
+      && unsafeCharCodeAt(data, i - 1) !== backSlashCode
     ) instr = false;
 
     if (instr === false) {
@@ -347,4 +347,12 @@ import { backSlashCode, quoteCode } from "./chars";
     return load<u16>(changetype<usize>(p1_data) + p1_start) == load<u16>(changetype<usize>(p2_data) + p2_start)
   }
   return memory.compare(changetype<usize>(p1_data) + p1_start, changetype<usize>(p2_data) + p2_start, p1_len) === 0;
+}
+
+// @ts-ignore
+@inline export function containsCodePoint(str: string, code: u32, start: i32, end: i32): bool {
+  for (let i = start; i <= end; i++) {
+    if (unsafeCharCodeAt(str, i) == code) return true;
+  }
+  return false;
 }
