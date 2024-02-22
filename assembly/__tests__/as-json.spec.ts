@@ -596,6 +596,10 @@ describe("Ser/de special strings in object keys", () => {
     canSerde(o, s);
   });
 
+  // Something buggy in as-pect needs a dummy value reflected here
+  // or the subsequent test fails.  It's not used in any test.
+  Reflect.toReflectedValue(0);
+
   it("should ser/de escape sequences in map key", () => {
     const m = new Map<string, string>();
     m.set('a\\\t"\x02b', 'abc');
