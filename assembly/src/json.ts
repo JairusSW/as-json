@@ -466,7 +466,7 @@ export namespace JSON {
           if (depth === 0) {
             ++arrayValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, arrayValueIndex, initializeDefaultValues);
+            schema.__JSON_Set_Key(key, data, outerLoopIndex, arrayValueIndex, initializeDefaultValues);
             outerLoopIndex = arrayValueIndex;
             isKey = false;
             break;
@@ -487,7 +487,7 @@ export namespace JSON {
           if (depth === 0) {
             ++objectValueIndex;
             // @ts-ignore
-            schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex, objectValueIndex, initializeDefaultValues);
+            schema.__JSON_Set_Key(key, data, outerLoopIndex, objectValueIndex, initializeDefaultValues);
             outerLoopIndex = objectValueIndex;
             isKey = false;
             break;
@@ -517,7 +517,7 @@ export namespace JSON {
             } else {
               const value = parseString(data, outerLoopIndex - 1, stringValueIndex);
               // @ts-ignore
-              schema.__JSON_Set_Key<Virtual<string>>(key, value, 0, value.length, initializeDefaultValues);
+              schema.__JSON_Set_Key(key, value, 0, value.length, initializeDefaultValues);
               isKey = false;
             }
             outerLoopIndex = ++stringValueIndex;
@@ -533,7 +533,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === lCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, nullWord, 0, 4, initializeDefaultValues);
+      schema.__JSON_Set_Key(key, nullWord, 0, 4, initializeDefaultValues);
       isKey = false;
     } else if (
       char === tCode &&
@@ -542,7 +542,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, trueWord, 0, 4, initializeDefaultValues);
+      schema.__JSON_Set_Key(key, trueWord, 0, 4, initializeDefaultValues);
       isKey = false;
     } else if (
       char === fCode &&
@@ -552,7 +552,7 @@ export namespace JSON {
       unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
     ) {
       // @ts-ignore
-      schema.__JSON_Set_Key<Virtual<string>>(key, falseWord, 0, 5, initializeDefaultValues);
+      schema.__JSON_Set_Key(key, falseWord, 0, 5, initializeDefaultValues);
       isKey = false;
     } else if ((char >= 48 && char <= 57) || char === 45) {
       let numberValueIndex = ++outerLoopIndex;
@@ -560,7 +560,7 @@ export namespace JSON {
         const char = unsafeCharCodeAt(data, numberValueIndex);
         if (char === commaCode || char === rightBraceCode || isSpace(char)) {
           // @ts-ignore
-          schema.__JSON_Set_Key<Virtual<string>>(key, data, outerLoopIndex - 1, numberValueIndex, initializeDefaultValues);
+          schema.__JSON_Set_Key(key, data, outerLoopIndex - 1, numberValueIndex, initializeDefaultValues);
           outerLoopIndex = numberValueIndex;
           isKey = false;
           break;

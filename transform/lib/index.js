@@ -1,3 +1,4 @@
+import { Parser, Source, Tokenizer, } from "assemblyscript/dist/assemblyscript.js";
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
@@ -17,7 +18,7 @@ class AsJSONTransform extends BaseVisitor {
     constructor() {
         super(...arguments);
         this.schemasList = [];
-        this.sources = [];
+        this.sources = new Set();
     }
     visitMethodDeclaration() { }
     visitClassDeclaration(node) {
@@ -152,10 +153,8 @@ class AsJSONTransform extends BaseVisitor {
         return "{}";
       }`;
         }
-        // Odd behavior here... When pairing this transform with asyncify, having @inline on __JSON_Set_Key<T> with a generic will cause it to freeze.
-        // Binaryen cannot predict and add/mangle code when it is genericed.
         const setKeyFunc = `
-      __JSON_Set_Key<__JSON_Key_Type>(key: __JSON_Key_Type, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
+      @inline __JSON_Set_Key(key: __Virtual<string>, data: string, val_start: i32, val_end: i32, initializeDefaultValues: boolean): void {
         ${this.currentClass.setDataStmts.join("\n        ")}
       }
     `;
@@ -179,6 +178,7 @@ class AsJSONTransform extends BaseVisitor {
         const initializeMethod = SimpleParser.parseClassMember(initializeFunc, node);
         node.members.push(initializeMethod);
         this.schemasList.push(this.currentClass);
+        this.sources.add(node.name.range.source);
         // Uncomment to see the generated code for debugging.
         // console.log(serializeFunc);
         // console.log(setKeyFunc);
@@ -186,6 +186,22 @@ class AsJSONTransform extends BaseVisitor {
     }
     visitSource(node) {
         super.visitSource(node);
+        // Only add the import statement to sources that have JSON decorated classes.
+        if (!this.sources.has(node)) {
+            return;
+        }
+        // Note, the following one liner would be easier, but it fails with an assertion error
+        // because as-virtual's SimpleParser doesn't set the parser.currentSource correctly.
+        //
+        // const stmt = SimpleParser.parseTopLevelStatement('import { Virtual as __Virtual } from "as-virtual/assembly";');
+        // ... So we have to do it the long way:
+        const s = 'import { Virtual as __Virtual } from "as-virtual/assembly";';
+        const t = new Tokenizer(new Source(0 /* SourceKind.User */, "index.ts", s));
+        const p = new Parser();
+        p.currentSource = t.source;
+        const stmt = p.parseTopLevelStatement(t);
+        // Add the import statement to the top of the source.
+        node.statements.unshift(stmt);
     }
 }
 export default class Transformer extends Transform {
