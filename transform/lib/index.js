@@ -179,7 +179,10 @@ class AsJSONTransform extends BaseVisitor {
         const initializeMethod = SimpleParser.parseClassMember(initializeFunc, node);
         node.members.push(initializeMethod);
         this.schemasList.push(this.currentClass);
-        //console.log(toString(node));
+        // Uncomment to see the generated code for debugging.
+        // console.log(serializeFunc);
+        // console.log(setKeyFunc);
+        // console.log(initializeFunc);
     }
     visitSource(node) {
         super.visitSource(node);
