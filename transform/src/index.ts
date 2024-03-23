@@ -83,59 +83,38 @@ class AsJSONTransform extends BaseVisitor {
       // @ts-ignore
       if (mem.type && mem.type.name && mem.type.name.identifier.text) {
         const member = mem as FieldDeclaration;
-        if (toString(member).startsWith("static")) return;
         const lineText = toString(member);
-        if (lineText.startsWith("private")) return;
+        console.log("Member: " + lineText)
 
-        // @ts-ignore
-        let type = toString(member.type);
+        if (!lineText.startsWith("private") && !lineText.startsWith("static")) {
 
-        const name = member.name.text;
-        let aliasName = name;
-
-        // @ts-ignore
-        if (member.decorators && member.decorators[0]?.name.text === "alias") {
-          if (member.decorators[0] && member.decorators[0].args![0]) {
-            // @ts-ignore
-            aliasName = member.decorators[0].args![0].value;
-          }
-        }
-        this.currentClass.keys.push(name);
-        // @ts-ignore
-        this.currentClass.types.push(type);
-        // @ts-ignore
-        if (
-          [
-            "u8",
-            "i8",
-            "u16",
-            "i16",
-            "u32",
-            "i32",
-            "u64",
-            "i64",
-          ].includes(type.toLowerCase())
-        ) {
-          this.currentClass.encodeStmts.push(
-            `${encodeKey(aliasName)}:\${this.${name}},`
-          );
           // @ts-ignore
-          this.currentClass.setDataStmts.push(
-            `if (key.equals(${JSON.stringify(aliasName)})) {
-          this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
-          return;
-        }`
-          );
-          if (member.initializer) {
-            this.currentClass.initializeStmts.push(
-              `this.${name} = ${toString(member.initializer)}`
-            );
+          let type = toString(member.type);
+
+          const name = member.name.text;
+          let aliasName = name;
+
+          // @ts-ignore
+          if (member.decorators && member.decorators[0]?.name.text === "alias") {
+            if (member.decorators[0] && member.decorators[0].args![0]) {
+              // @ts-ignore
+              aliasName = member.decorators[0].args![0].value;
+            }
           }
-        } else // @ts-ignore
+          this.currentClass.keys.push(name);
+          // @ts-ignore
+          this.currentClass.types.push(type);
+          // @ts-ignore
           if (
             [
-              "f32",
-              "f64",
+              "u8",
+              "i8",
+              "u16",
+              "i16",
+              "u32",
+              "i32",
+              "u64",
+              "i64",
             ].includes(type.toLowerCase())
           ) {
             this.currentClass.encodeStmts.push(
@@ -144,32 +123,55 @@ class AsJSONTransform extends BaseVisitor {
             // @ts-ignore
             this.currentClass.setDataStmts.push(
               `if (key.equals(${JSON.stringify(aliasName)})) {
+          this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
+          return;
+        }`
+            );
+            if (member.initializer) {
+              this.currentClass.initializeStmts.push(
+                `this.${name} = ${toString(member.initializer)}`
+              );
+            }
+          } else // @ts-ignore
+            if (
+              [
+                "f32",
+                "f64",
+              ].includes(type.toLowerCase())
+            ) {
+              this.currentClass.encodeStmts.push(
+                `${encodeKey(aliasName)}:\${this.${name}},`
+              );
+              // @ts-ignore
+              this.currentClass.setDataStmts.push(
+                `if (key.equals(${JSON.stringify(aliasName)})) {
             this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
             return;
           }`
-            );
-            if (member.initializer) {
-              this.currentClass.initializeStmts.push(
-                `this.${name} = ${toString(member.initializer)}`
               );
-            }
-          } else {
-            this.currentClass.encodeStmts.push(
-              `${encodeKey(aliasName)}:\${JSON.stringify<${type}>(this.${name})},`
-            );
-            // @ts-ignore
-            this.currentClass.setDataStmts.push(
-              `if (key.equals(${JSON.stringify(aliasName)})) {
+              if (member.initializer) {
+                this.currentClass.initializeStmts.push(
+                  `this.${name} = ${toString(member.initializer)}`
+                );
+              }
+            } else {
+              this.currentClass.encodeStmts.push(
+                `${encodeKey(aliasName)}:\${JSON.stringify<${type}>(this.${name})},`
+              );
+              // @ts-ignore
+              this.currentClass.setDataStmts.push(
+                `if (key.equals(${JSON.stringify(aliasName)})) {
             this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
             return;
           }`
-            );
-            if (member.initializer) {
-              this.currentClass.initializeStmts.push(
-                `this.${name} = ${toString(member.initializer)}`
               );
+              if (member.initializer) {
+                this.currentClass.initializeStmts.push(
+                  `this.${name} = ${toString(member.initializer)}`
+                );
+              }
             }
-          }
+        }
       }
     }
 
@@ -225,9 +227,9 @@ class AsJSONTransform extends BaseVisitor {
     this.sources.add(node.name.range.source);
 
     // Uncomment to see the generated code for debugging.
-    // console.log(serializeFunc);
-    // console.log(setKeyFunc);
-    // console.log(initializeFunc);
+    //console.log(serializeFunc);
+    //console.log(setKeyFunc);
+    //console.log(initializeFunc);
   }
 
   visitSource(node: Source): void {
