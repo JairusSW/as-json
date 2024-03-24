@@ -84,7 +84,7 @@ class AsJSONTransform extends BaseVisitor {
       if (mem.type && mem.type.name && mem.type.name.identifier.text) {
         const member = mem as FieldDeclaration;
         const lineText = toString(member);
-        console.log("Member: " + lineText)
+        //console.log("Member: " + lineText)
 
         if (!lineText.startsWith("private") && !lineText.startsWith("static")) {
 
