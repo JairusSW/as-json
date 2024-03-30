@@ -1,21 +1,7 @@
-import { JSON } from "./src/json";
-@json
-class Person {
-  private prng: i32 = 23;
-  public country: string = '';
+import { JSON } from ".";
 
-  constructor(id: u32) {
-    this.prng = 321;
-    const seed = id.toString();
-    this.country = this.getCountry();
-  }
-
-  // temp method, returns hard-coded string for now
-  private getCountry(): string {
-    return "USA";
-  }
-}
-
-const person = new Person(1);
-let result = JSON.stringify<Person>(person);
-console.log(result);
+const v = JSON.Value.from("hello world");
+console.log(v.get<string>())
+console.log(JSON.serialize(v));
+console.log(JSON.serialize("hello world"))
+console.log(JSON.parse<JSON.Value>(JSON.serialize(v)).get<string>());
