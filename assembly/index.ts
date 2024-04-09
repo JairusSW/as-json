@@ -10,6 +10,7 @@ import { Variant } from "as-variant/assembly";
 import { deserializeString } from "./deserialize/string";
 import { deserializeUnknown } from "./deserialize/unknown";
 import { deserializeBoolean } from "./deserialize/boolean";
+import { falseWord, trueWord } from "./src/chars";
 
 // @ts-ignore: Decorator valid here
 @inline const STORAGE = offsetof<JSON.Value>("storage");
@@ -23,6 +24,7 @@ export namespace JSON {
         U16,
         U32,
         U64,
+        Boolean,
         String,
         Array
     }
@@ -53,7 +55,10 @@ export namespace JSON {
          * @param value - The value to be set.
          */
         @inline set<T>(value: T): void {
-            if (value instanceof u8) {
+            if (isBoolean<T>()) {
+                this.type = JSON.Types.Boolean;
+                store<T>(changetype<usize>(this), value, STORAGE);
+            } else if (value instanceof u8) {
                 this.type = JSON.Types.U8;
                 store<T>(changetype<usize>(this), value, STORAGE);
             } else if (value instanceof u16) {
@@ -98,6 +103,7 @@ export namespace JSON {
                 case JSON.Types.U32: return this.get<u32>().toString();
                 case JSON.Types.U64: return this.get<u64>().toString();
                 case JSON.Types.String: return "\"" + this.get<string>() + "\"";
+                case JSON.Types.Boolean: return this.get<boolean>() ? trueWord : falseWord;
                 default: {
                     const arr = this.get<JSON.Value[]>();
                     if (!arr.length) return "[]";
@@ -155,7 +161,7 @@ export namespace JSON {
             return __atoi_fast<T>(data);
         } else if (idof<T>() === idof<JSON.Value>()) {
             // @ts-ignore: Returns T
-            return deserializeUnknown(data);
+            return deserializeUnknown(data).unwrap();
         }
         throw new Error(`Could not deserialize data of type ${nameof<T>()}`);
     }
