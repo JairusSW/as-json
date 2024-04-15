@@ -356,3 +356,28 @@ import { backSlashCode, quoteCode } from "./chars";
   }
   return false;
 }
+
+
+@inline export function createStringSink<T>(data: T, sink: StringSink | null= null): StringSink {
+  if (sink) {
+    store<ArrayBuffer>(
+      changetype<usize>(sink),
+      changetype<ArrayBuffer>(data),
+      offsetof<StringSink>("buffer")
+    );
+    store<u32>(
+      changetype<usize>(sink),
+      0,
+      offsetof<StringSink>("offset")
+    );
+    return sink;
+  } else {
+    const s = changetype<StringSink>(__new(sizeof<StringSink>(), idof<StringSink>()));
+    store<ArrayBuffer>(
+      changetype<usize>(s),
+      changetype<ArrayBuffer>(data),
+      offsetof<StringSink>("buffer")
+    );
+    return s;
+  }
+}
