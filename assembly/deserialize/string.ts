@@ -1,11 +1,17 @@
 import { StringSink } from "as-string-sink/assembly";
 import { unsafeCharCodeAt } from "../src/util";
 import { bCode, backSlashCode, backspaceCode, carriageReturnCode, fCode, formFeedCode, forwardSlashCode, nCode, newLineCode, quoteCode, rCode, tCode, tabCode, uCode } from "../src/chars";
+import { Result } from "as-container/assembly/reference";
 
 // @ts-ignore: Decorator
-@inline export function deserializeString(data: string, start: i32 = 0, end: i32 = 0): string {
+@inline export function deserializeString(data: string, start: i32 = 0, end: i32 = 0): Result<string, string> {
     end = end || data.length - 1; 
     let result = StringSink.withCapacity(end - start - 1);
+    const firstChar = unsafeCharCodeAt(data, start);
+    const lastChar = unsafeCharCodeAt(data, end);
+    if (firstChar !== quoteCode || lastChar !== quoteCode) {
+      return Result.Err<string, string>("Expected string to start and end with \", but got " + data + "!");
+    }
     let last = start + 1;
     for (let i = last; i < end; i++) {
       if (unsafeCharCodeAt(data, i) !== backSlashCode) {
@@ -62,12 +68,12 @@ import { bCode, backSlashCode, backspaceCode, carriageReturnCode, fCode, formFee
           break;
         }
         default: {
-          throw new Error(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
+          return Result.Err<string, string>(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
         }
       }
     }
     if (end > last) {
       result.write(data, last, end);
     }
-    return result.toString()
+    return Result.Ok<string, string>(result.toString());
   }

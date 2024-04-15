@@ -11,6 +11,7 @@ import { deserializeString } from "./deserialize/string";
 import { deserializeUnknown } from "./deserialize/unknown";
 import { deserializeBoolean } from "./deserialize/boolean";
 import { falseWord, trueWord } from "./src/chars";
+import { Result } from "as-container";
 
 // @ts-ignore: Decorator valid here
 @inline const STORAGE = offsetof<JSON.Value>("storage");
@@ -149,7 +150,7 @@ export namespace JSON {
      * @throws Error if deserialization fails.
      */
     // @ts-ignore: Decorator valid here
-    @inline export function parse<T>(data: string): T {
+    @inline export function parse<T>(data: string): Result<T, string> {
         if (isString<T>()) {
             // @ts-ignore: Returns T
             return deserializeString(data);

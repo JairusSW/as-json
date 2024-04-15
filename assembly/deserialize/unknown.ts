@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { Result } from "as-container";
+import { Result } from "as-container/assembly/reference";
 import { fCode, quoteCode, tCode } from "../src/chars";
 import { unsafeCharCodeAt } from "../src/util";
 import { deserializeNumber } from "./number";
@@ -15,7 +15,7 @@ import { deserializeString } from "./string";
     const firstChar = unsafeCharCodeAt(data, 0);
     const lastChar = unsafeCharCodeAt(data, data.length - 1);
     if (firstChar === quoteCode && lastChar === quoteCode) {
-        return Result.Ok<JSON.Value, string>(JSON.Value.from<string>(deserializeString(data)));
+        return Result.Ok<JSON.Value, string>(JSON.Value.from<string>(deserializeString(data).unwrap()));
     } else if (firstChar === 45 || (firstChar < 58 && firstChar > 47)) {
         return Result.Ok<JSON.Value, string>(JSON.Value.from<i64>(deserializeNumber<i64>(data)));
     } else if (
