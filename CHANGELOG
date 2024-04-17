@@ -1,0 +1,1 @@
+v0.8.2 - Properties starting with `static` or `private` would be ignored

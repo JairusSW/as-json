@@ -1,11 +1,11 @@
 import { JSON } from "./src/json";
 @json
 class Person {
-  private prng: i32 = 23;
+  staticprng: i32 = 23;
   public country: string = '';
 
   constructor(id: u32) {
-    this.prng = 321;
+    this.staticprng = 321;
     const seed = id.toString();
     this.country = this.getCountry();
   }
@@ -17,5 +17,7 @@ class Person {
 }
 
 const person = new Person(1);
+person.staticprng = 32
 let result = JSON.stringify<Person>(person);
+console.log(JSON.stringify(JSON.parse<Person>(result)));
 console.log(result);

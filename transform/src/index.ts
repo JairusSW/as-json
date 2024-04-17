@@ -86,7 +86,7 @@ class AsJSONTransform extends BaseVisitor {
         const lineText = toString(member);
         //console.log("Member: " + lineText)
 
-        if (!lineText.startsWith("private") && !lineText.startsWith("static")) {
+        if (!lineText.startsWith("private ") && !lineText.startsWith("static ")) {
 
           // @ts-ignore
           let type = toString(member.type);
