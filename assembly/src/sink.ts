@@ -36,7 +36,7 @@ export class Sink {
                 changetype<usize>(initial),
                 size
             );
-            sink.offset = size;
+            sink.offset += size;
         }
         return sink;
     }
@@ -54,7 +54,7 @@ export class Sink {
                 changetype<usize>(initial),
                 size
             );
-            sink.offset = size;
+            sink.offset += size;
         }
         return sink;
     }

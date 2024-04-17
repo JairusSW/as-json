@@ -1,5 +1,8 @@
 import { JSON } from "..";
+import { Sink } from "../src/sink";
 import { __atoi_fast } from "../src/util";
+import { serializeFloat } from "./float";
+import { serializeInteger } from "./integer";
 import { serializeString } from "./string";
 
 /**
@@ -8,23 +11,29 @@ import { serializeString } from "./string";
  * @param data - The JSON.Value to be serialized.
  * @returns The serialized result.
  */
-export function serializeUnknown(data: JSON.Value): string {
+export function serializeUnknown(data: JSON.Value, out: Sink | null = null): Sink {
     const type = data.type;
     switch (type) {
         case JSON.Types.String: {
-            return serializeString(data.get<string>());
+            return serializeString(data.get<string>(), out);
         }
         case JSON.Types.U8: {
-            return data.get<u8>().toString();
+            return serializeInteger(data.get<u8>(), out);
         }
         case JSON.Types.U16: {
-            return data.get<u16>().toString();
+            return serializeInteger(data.get<u16>(), out);
         }
         case JSON.Types.U32: {
-            return data.get<u32>().toString();
+            return serializeInteger(data.get<u32>(), out);
         }
         case JSON.Types.U64: {
-            return data.get<u64>().toString();
+            return serializeInteger(data.get<u64>(), out);
+        }
+        case JSON.Types.F32: {
+            return serializeFloat(data.get<f32>(), out);
+        }
+        case JSON.Types.F64: {
+            return serializeFloat(data.get<f64>(), out);
         }
     }
     // handle fail. skip, dump, crash

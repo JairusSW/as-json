@@ -12,6 +12,15 @@ import { deserializeUnknown } from "./deserialize/unknown";
 import { deserializeBoolean } from "./deserialize/boolean";
 import { falseWord, trueWord } from "./src/chars";
 import { Result } from "as-container";
+import { Sink } from "./src/sink";
+import { serializeBool } from "./serialize/bool";
+import { serializeInteger } from "./serialize/integer";
+import { serializeFloat } from "./serialize/float";
+import { serializeStringArray } from "./serialize/array/string";
+import { serializeIntegerArray } from "./serialize/array/integer";
+import { serializeFloatArray } from "./serialize/array/float";
+import { serializeUnknownArray } from "./serialize/array/unknown";
+import { serializeBoolArray } from "./serialize/array/bool";
 
 // @ts-ignore: Decorator valid here
 @inline const STORAGE = offsetof<JSON.Value>("storage");
@@ -25,6 +34,8 @@ export namespace JSON {
         U16,
         U32,
         U64,
+        F32,
+        F64,
         Boolean,
         String,
         Array
@@ -59,17 +70,23 @@ export namespace JSON {
             if (isBoolean<T>()) {
                 this.type = JSON.Types.Boolean;
                 store<T>(changetype<usize>(this), value, STORAGE);
-            } else if (value instanceof u8) {
+            } else if (value instanceof u8 || value instanceof i8) {
                 this.type = JSON.Types.U8;
                 store<T>(changetype<usize>(this), value, STORAGE);
-            } else if (value instanceof u16) {
+            } else if (value instanceof u16 || value instanceof i16) {
                 this.type = JSON.Types.U16;
                 store<T>(changetype<usize>(this), value, STORAGE);
-            } else if (value instanceof u32) {
+            } else if (value instanceof u32 || value instanceof i32) {
                 this.type = JSON.Types.U32;
                 store<T>(changetype<usize>(this), value, STORAGE);
-            } else if (value instanceof u64) {
+            } else if (value instanceof u64 || value instanceof i64) {
                 this.type = JSON.Types.U64;
+                store<T>(changetype<usize>(this), value, STORAGE);
+            }else if (value instanceof f32) {
+                this.type = JSON.Types.F64;
+                store<T>(changetype<usize>(this), value, STORAGE);
+            }else if (value instanceof f64) {
+                this.type = JSON.Types.F64;
                 store<T>(changetype<usize>(this), value, STORAGE);
             } else if (isString<T>()) {
                 this.type = JSON.Types.String;
@@ -130,17 +147,31 @@ export namespace JSON {
      * @returns The JSON-encoded String.
      */
     // @ts-ignore: Decorator valid here
-    @inline export function serialize<T>(data: T): string {
+    @inline export function serialize<T>(data: T, out: Sink | null = null): Sink {
         if (isString<T>()) {
-            return serializeString(data as string);
+            return serializeString(data as string, out);
         } else if (isBoolean<T>()) {
-            // @ts-ignore
-            return data.toString();
+            return serializeBool(data as boolean, out)
         } else if (isInteger<T>()) {
-            // @ts-ignore
-            return data.toString();
+            return serializeInteger<T>(data, out);
+        } else if (isFloat<T>()) {
+            return serializeFloat<T>(data, out);
+        } else if (isArray<T>()) {
+            if (isString<valueof<T>>()) {
+                return serializeStringArray(data as string[], out);
+            } else if (isBoolean<valueof<T>>()) {
+                return serializeBoolArray(data as bool[], out);
+            } else if (isInteger<valueof<T>>()) {
+                return serializeIntegerArray(data, out);
+            } else if (isFloat<valueof<T>>()) {
+                return serializeFloatArray(data, out);
+            } else if (isArray<valueof<T>>()) {
+                throw new Error("Not implemented yet")
+            } else if (idof<valueof<T>>() === idof<JSON.Value>()) {
+                return serializeUnknownArray(data as JSON.Value[], out);
+            }
         } else if (data instanceof JSON.Value) {
-            return serializeUnknown(data as JSON.Value);
+            return serializeUnknown(data as JSON.Value, out);
         }
     }
     /**

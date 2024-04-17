@@ -1,7 +1,7 @@
 import { bench, blackbox } from "as-bench/assembly/bench";
 import { __atoi_fast } from "../assembly/src/util";
 import { JSON } from "../assembly";
-
+import { JSON as J } from "../assembly/src/json"
 @json
 class Vec3 {
     x: i32;
@@ -14,6 +14,14 @@ const vec: Vec3 = {
     y: 1,
     z: 8,
 }
+
+bench("Serialize Sink", () => {
+    blackbox<string>(JSON.serialize("hello world").toString());
+});
+
+bench("Serialize Old", () => {
+    blackbox<string>(J.stringify("hello world"))
+})
 /*
 bench("Parse Number SNIP", () => {
     blackbox<i32>(snip_fast<i32>("12345"));
@@ -26,7 +34,7 @@ bench("Parse Number ATOI", () => {
 bench("Parse Number STDLIB", () => {
     blackbox<i32>(i32.parse("12345"));
 });
-*/
+
 bench("Stringify Object (Vec3)", () => {
     blackbox<string>(JSON.stringify(vec));
 });
