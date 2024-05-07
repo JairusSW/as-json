@@ -1,6 +1,7 @@
 import { JSON } from "..";
 import { Sink } from "../src/sink";
 import { __atoi_fast } from "../src/util";
+import { serializeUnknownArray } from "./array/unknown";
 import { serializeFloat } from "./float";
 import { serializeInteger } from "./integer";
 import { serializeString } from "./string";
@@ -36,6 +37,5 @@ export function serializeUnknown(data: JSON.Value, out: Sink | null = null): Sin
             return serializeFloat(data.get<f64>(), out);
         }
     }
-    // handle fail. skip, dump, crash
-    return unreachable();
+    return serializeUnknownArray(data.get<JSON.Value[]>(), out);
 }

@@ -1,5 +1,5 @@
 import { JSON } from "../..";
-import { commaCode, rightBracketCode } from "../../src/chars";
+import { commaCode, leftBracketCode, rightBracketCode } from "../../src/chars";
 import { Sink } from "../../src/sink";
 import { serializeUnknown } from "../unknown";
 
@@ -10,6 +10,12 @@ import { serializeUnknown } from "../unknown";
             return Sink.fromStringLiteral("[]");
         } else {
             out = Sink.fromString("[");
+        }
+    } else {
+        out.writeCodePoint(leftBracketCode);
+        if (!data.length) {
+            out.writeCodePoint(rightBracketCode);
+            return out;
         }
     }
 

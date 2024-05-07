@@ -38,6 +38,7 @@ export namespace JSON {
         F64,
         Boolean,
         String,
+        Obj,
         Array
     }
     export class Value {
@@ -56,6 +57,8 @@ export namespace JSON {
         @inline static from<T>(value: T): JSON.Value {
             if (value instanceof Variant) {
                 // Handle
+            } else if (value instanceof JSON.Value) {
+                return value;
             }
             const out = changetype<JSON.Value>(__new(offsetof<JSON.Value>(), idof<JSON.Value>()));
             out.set<T>(value);
@@ -82,15 +85,21 @@ export namespace JSON {
             } else if (value instanceof u64 || value instanceof i64) {
                 this.type = JSON.Types.U64;
                 store<T>(changetype<usize>(this), value, STORAGE);
-            }else if (value instanceof f32) {
+            } else if (value instanceof f32) {
                 this.type = JSON.Types.F64;
                 store<T>(changetype<usize>(this), value, STORAGE);
-            }else if (value instanceof f64) {
+            } else if (value instanceof f64) {
                 this.type = JSON.Types.F64;
                 store<T>(changetype<usize>(this), value, STORAGE);
             } else if (isString<T>()) {
                 this.type = JSON.Types.String;
                 this.length = String.UTF8.byteLength(value as string);
+                store<T>(changetype<usize>(this), value, STORAGE);
+            } else if (value instanceof Map) {
+                if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
+                    throw new Error("Maps must be of type Map<string, JSON.Value>!");
+                }
+                this.type = JSON.Types.Obj;
                 store<T>(changetype<usize>(this), value, STORAGE);
             } else if (isArray<T>()) {
                 // @ts-ignore: T satisfies constraints of any[]
@@ -172,6 +181,10 @@ export namespace JSON {
             }
         } else if (data instanceof JSON.Value) {
             return serializeUnknown(data as JSON.Value, out);
+            // @ts-ignore
+        } else if (isDefined(data.__JSON_Serialize)) {
+            // @ts-ignore
+            return data.__JSON_Serialize(out);
         }
     }
     /**
