@@ -1,1 +1,2 @@
 v0.8.2 - Properties starting with `static` or `private` would be ignored
+v0.8.3 - Dirty fix to issue #68. Add __JSON_Stringify callable to global scope.

@@ -27,7 +27,7 @@ import {
   tabCode,
   formFeedCode,
   newLineCode,
-  
+
   commaWord,
   quoteWord,
 
@@ -50,7 +50,7 @@ export namespace JSON {
   /**
    * Stringifies valid JSON data.
    * ```js
-   * JSON.stringify<T>(data)
+   * __JSON_Stringify<T>(data)
    * ```
    * @param data T
    * @returns string
@@ -104,11 +104,11 @@ export namespace JSON {
         // @ts-ignore
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
-          result.write(JSON.stringify(unchecked(data[i])));
+          result.write(__JSON_Stringify(unchecked(data[i])));
           result.writeCodePoint(commaCode);
         }
         // @ts-ignore
-        result.write(JSON.stringify(unchecked(data[data.length - 1])));
+        result.write(__JSON_Stringify(unchecked(data[data.length - 1])));
         result.writeCodePoint(rightBracketCode);
         return result.toString();
       }
@@ -116,14 +116,17 @@ export namespace JSON {
       let result = new StringSink(leftBraceWord);
       let keys = data.keys();
       let values = data.values();
-      for (let i = 0; i < data.size; i++) {
+      const end = data.size - 1;
+      for (let i = 0; i < end; i++) {
         result.write(serializeString(unchecked(keys[i]).toString()));
         result.writeCodePoint(colonCode);
-        result.write(JSON.stringify(unchecked(values[i])));
-        if (i < data.size - 1) {
-          result.writeCodePoint(commaCode);
-        }
+        result.write(__JSON_Stringify(unchecked(values[i])));
+        result.writeCodePoint(commaCode);
       }
+      result.write(serializeString(unchecked(keys[end]).toString()));
+      result.writeCodePoint(colonCode);
+      result.write(__JSON_Stringify(unchecked(values[end])));
+      
       result.writeCodePoint(rightBraceCode);
       return result.toString();
     } else {
@@ -135,7 +138,7 @@ export namespace JSON {
   /**
    * Stringifies valid JSON data.
    * ```js
-   * JSON.stringify<T>(data)
+   * __JSON_Stringify<T>(data)
    * ```
    * @param data T
    * @returns string
@@ -198,11 +201,11 @@ export namespace JSON {
         // @ts-ignore
         for (let i = 0; i < data.length - 1; i++) {
           // @ts-ignore
-          result.write(JSON.stringify(unchecked(data[i])));
+          result.write(__JSON_Stringify(unchecked(data[i])));
           result.writeCodePoint(commaCode);
         }
         // @ts-ignore
-        result.write(JSON.stringify(unchecked(data[data.length - 1])));
+        result.write(__JSON_Stringify(unchecked(data[data.length - 1])));
         result.writeCodePoint(rightBracketCode);
         out = result.toString();
         return;
@@ -350,7 +353,7 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @inline function parseString(data: string, start: i32 = 0, end: i32 = 0): string {
-  end = end || data.length - 1; 
+  end = end || data.length - 1;
   let result = StringSink.withCapacity(end - start - 1);
   let last = start + 1;
   for (let i = last; i < end; i++) {
@@ -444,7 +447,7 @@ export namespace JSON {
   const schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );
-  
+
   // @ts-ignore
   if (initializeDefaultValues) schema.__JSON_Initialize();
 
@@ -579,7 +582,7 @@ export namespace JSON {
   const map: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );
-  
+
   if (!isDefined(map.set)) {
     return unreachable();
   }
@@ -652,7 +655,7 @@ export namespace JSON {
                 key.reinst(data, outerLoopIndex, stringValueIndex);
               }
               isKey = true;
-            } else {              
+            } else {
               if (isString<valueof<T>>()) {
                 const value = parseString(data, outerLoopIndex - 1, stringValueIndex);
                 map.set(parseMapKey<indexof<T>>(key), value);
@@ -702,7 +705,7 @@ export namespace JSON {
         if (char === colonCode || char === commaCode || char === rightBraceCode || isSpace(char)) {
           if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
             map.set(parseMapKey<indexof<T>>(key), parseNumber<valueof<T>>(data.slice(outerLoopIndex - 1, numberValueIndex)));
-          }          
+          }
           outerLoopIndex = numberValueIndex;
           isKey = false;
           break;
@@ -754,7 +757,7 @@ export namespace JSON {
       return parseObjectArray<T>(data);
     }
   }
-  
+
   return unreachable();
 }
 
@@ -876,7 +879,7 @@ export namespace JSON {
   return result;
 }
 
-function parseDate(dateTimeString: string): Date { 
+function parseDate(dateTimeString: string): Date {
   // Use AssemblyScript's date parser
   const d = Date.fromString(dateTimeString);
 
@@ -890,4 +893,86 @@ function parseDate(dateTimeString: string): Date {
 @inline function isMap<T>(): bool {
   let type = changetype<T>(0);
   return type instanceof Map;
+}
+
+// Dirty fix
+ // @ts-ignore: Decorator
+@global @inline function __JSON_Stringify<T>(data: T): string {
+  // String
+  if (isString<T>() && data != null) {
+    return serializeString(data as string);
+  } else if (isBoolean<T>()) {
+    return data ? "true" : "false";
+  } else if (isNullable<T>() && data == null) {
+    return nullWord;
+    // @ts-ignore
+  } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
+    // @ts-ignore
+    return data.toString();
+    // @ts-ignore: Hidden function
+  } else if (isDefined(data.__JSON_Serialize)) {
+    // @ts-ignore: Hidden function
+    return data.__JSON_Serialize();
+  } else if (data instanceof Date) {
+    return `"${data.toISOString()}"`;
+  } else if (isArrayLike<T>()) {
+    // @ts-ignore
+    if (data.length == 0) {
+      return emptyArrayWord;
+      // @ts-ignore
+    } else if (isString<valueof<T>>()) {
+      let result = leftBracketWord;
+      // @ts-ignore
+      for (let i = 0; i < data.length - 1; i++) {
+        // @ts-ignore
+        result += serializeString(unchecked(data[i]));
+        result += commaWord;
+      }
+      // @ts-ignore
+      result += serializeString(unchecked(data[data.length - 1]));
+      result += rightBracketWord;
+      return result;
+      // @ts-ignore
+    } else if (isBoolean<valueof<T>>()) {
+      // @ts-ignore
+      return leftBracketWord + data.join(commaWord) + rightBracketWord;
+      // @ts-ignore
+    } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
+      // @ts-ignore
+      return leftBracketWord + data.join(commaWord) + rightBracketWord;
+    } else {
+      let result = new StringSink(leftBracketWord);
+      // @ts-ignore
+      for (let i = 0; i < data.length - 1; i++) {
+        // @ts-ignore
+        result.write(__JSON_Stringify(unchecked(data[i])));
+        result.writeCodePoint(commaCode);
+      }
+      // @ts-ignore
+      result.write(__JSON_Stringify(unchecked(data[data.length - 1])));
+      result.writeCodePoint(rightBracketCode);
+      return result.toString();
+    }
+  } else if (data instanceof Map) {
+    let result = new StringSink(leftBraceWord);
+    let keys = data.keys();
+    let values = data.values();
+    const end = data.size - 1;
+    for (let i = 0; i < end; i++) {
+      result.write(serializeString(unchecked(keys[i]).toString()));
+      result.writeCodePoint(colonCode);
+      result.write(__JSON_Stringify(unchecked(values[i])));
+      result.writeCodePoint(commaCode);
+    }
+    result.write(serializeString(unchecked(keys[end]).toString()));
+    result.writeCodePoint(colonCode);
+    result.write(__JSON_Stringify(unchecked(values[end])));
+    
+    result.writeCodePoint(rightBraceCode);
+    return result.toString();
+  } else {
+    throw new Error(
+      `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
+    );
+  }
 }

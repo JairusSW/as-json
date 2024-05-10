@@ -123,7 +123,7 @@ class AsJSONTransform extends BaseVisitor {
                         }
                     }
                     else {
-                        this.currentClass.encodeStmts.push(`${encodeKey(aliasName)}:\${JSON.stringify<${type}>(this.${name})},`);
+                        this.currentClass.encodeStmts.push(`${encodeKey(aliasName)}:\${__JSON_Stringify<${type}>(this.${name})},`);
                         // @ts-ignore
                         this.currentClass.setDataStmts.push(`if (key.equals(${JSON.stringify(aliasName)})) {
             this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
@@ -194,11 +194,11 @@ class AsJSONTransform extends BaseVisitor {
         //
         // const stmt = SimpleParser.parseTopLevelStatement('import { Virtual as __Virtual } from "as-virtual/assembly";');
         // ... So we have to do it the long way:
-        const s = 'import { Virtual as __Virtual } from "as-virtual/assembly";';
-        const t = new Tokenizer(new Source(0 /* SourceKind.User */, "index.ts", s));
-        const p = new Parser();
-        p.currentSource = t.source;
-        const stmt = p.parseTopLevelStatement(t);
+        const txt = 'import { Virtual as __Virtual } from "as-virtual/assembly";';
+        const tokenizer = new Tokenizer(new Source(0 /* SourceKind.User */, node.normalizedPath, txt));
+        const parser = new Parser();
+        parser.currentSource = tokenizer.source;
+        const stmt = parser.parseTopLevelStatement(tokenizer);
         // Add the import statement to the top of the source.
         node.statements.unshift(stmt);
     }
