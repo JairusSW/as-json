@@ -21,6 +21,7 @@ import { serializeIntegerArray } from "./serialize/array/integer";
 import { serializeFloatArray } from "./serialize/array/float";
 import { serializeUnknownArray } from "./serialize/array/unknown";
 import { serializeBoolArray } from "./serialize/array/bool";
+import { serializeMap } from "./serialize/map";
 
 // @ts-ignore: Decorator valid here
 @inline const STORAGE = offsetof<JSON.Value>("storage");
@@ -41,6 +42,7 @@ export namespace JSON {
         Obj,
         Array
     }
+    //export type Key = string | number;
     export class Value {
         public type: i32;
         public length: i32 = 0;
@@ -182,6 +184,8 @@ export namespace JSON {
         } else if (data instanceof JSON.Value) {
             return serializeUnknown(data as JSON.Value, out);
             // @ts-ignore
+        } else if (data instanceof Map) {
+            return serializeMap(data, out);
         } else if (isDefined(data.__JSON_Serialize)) {
             // @ts-ignore
             return data.__JSON_Serialize(out);

@@ -79,15 +79,15 @@ export class Sink {
 
     constructor() { }
 
-    get length(): i32 {
+    @inline get length(): i32 {
         return this.offset >> 1;
     }
 
-    get capacity(): i32 {
+    @inline get capacity(): i32 {
         return this.buffer.byteLength >>> 1;
     }
 
-    write(src: string, start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink | null {
+    @inline write(src: string, start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink | null {
         let len = src.length as u32;
 
         if (start != 0 || end != i32.MAX_VALUE) {
@@ -114,7 +114,7 @@ export class Sink {
         return this;
     }
 
-    writeLn(src: string = "", start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink {
+    @inline writeLn(src: string = "", start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink {
         let len = src.length as u32;
         if (start != 0 || end != i32.MAX_VALUE) {
             let from: i32;
@@ -135,7 +135,7 @@ export class Sink {
         return this;
     }
 
-    writeCodePoint(code: i32): Sink {
+    @inline writeCodePoint(code: i32): Sink {
         let hasSur = <u32>code > 0xFFFF;
         this.ensureCapacity(2 << i32(hasSur));
 
@@ -156,7 +156,21 @@ export class Sink {
         return this;
     }
 
-    writeNumber<T extends number>(value: T): Sink {
+    @inline writeCodePointUnsafe(code: i32): Sink {
+        this.ensureCapacity(2);
+
+        let offset = this.offset;
+        let dest = changetype<usize>(this.buffer) + offset;
+
+        code -= 0x10000;
+        let hi = (code & 0x03FF) | 0xDC00;
+        let lo = code >>> 10 | 0xD800;
+        store<u32>(dest, lo | hi << 16);
+        this.offset = offset + 4;
+        return this;
+    }
+
+    @inline writeNumber<T extends number>(value: T): Sink {
         let offset = this.offset;
         if (isInteger<T>()) {
             let maxCapacity = 0;
@@ -186,7 +200,7 @@ export class Sink {
         return this;
     }
 
-    reserve(capacity: i32, clear: bool = false): void {
+    @inline reserve(capacity: i32, clear: bool = false): void {
         if (clear) this.offset = 0;
         this.buffer = changetype<ArrayBuffer>(__renew(
             changetype<usize>(this.buffer),
@@ -194,18 +208,18 @@ export class Sink {
         ));
     }
 
-    shrink(): void {
+    @inline shrink(): void {
         this.buffer = changetype<ArrayBuffer>(__renew(
             changetype<usize>(this.buffer),
             max<u32>(this.offset, MIN_BUFFER_SIZE)
         ));
     }
 
-    clear(): void {
+    @inline clear(): void {
         this.reserve(0, true);
     }
 
-    toString(): string {
+    @inline toString(): string {
         let size = this.offset;
         if (!size) return "";
         let out = changetype<string>(__new(size, idof<string>()));
@@ -213,7 +227,7 @@ export class Sink {
         return out;
     }
 
-    @inline protected ensureCapacity(deltaBytes: u32): void {
+    @inline ensureCapacity(deltaBytes: u32): void {
         let buffer = this.buffer;
         let newSize = this.offset + deltaBytes;
         if (newSize > <u32>buffer.byteLength) {

@@ -50,7 +50,7 @@ class Vec3 {
         }
 
         out.write(this.__JSON_Serialize_Unsafe());
-        
+
         return out;
     }
     @inline __JSON_Serialize_Unsafe(): string {
@@ -64,4 +64,10 @@ const vec: Vec3 = {
     z: -5.6
 }
 
-console.log(JSON.serialize(vec).toString())
+const map = new Map<string, JSON.Value>();
+map.set("x", JSON.Value.from<f64>(3.4));
+map.set("y", JSON.Value.from<f64>(1.2));
+map.set("z", JSON.Value.from<f64>(-5.6));
+
+console.log(JSON.serialize(vec).toString());
+console.log(JSON.serialize(map).toString());
