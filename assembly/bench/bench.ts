@@ -1,4 +1,6 @@
 import { JSON } from "..";
+import { _deserializeString, deserializeString } from "../deserialize/string";
+import { ProductValue } from "../product";
 import { serializeUnknown } from "../serialize/unknown";
 import { Sink } from "../src/sink";
 
@@ -50,7 +52,22 @@ map.set("z", JSON.Value.from<f64>(-5.6));
 bench("Serialize Set Theoretical Representation", () => {
   blackbox<Sink>(serializeUnknown(set));
 });
-*/
+*//*
 bench("Serialize Vector 3 Struct", () => {
   blackbox<string>(vec.__JSON_Serialize_Unsafe());
+});
+bench("Serialize String (Sink)", () => {
+  blackbox<Sink>(JSON.serialize<string>("hello world"));
+});
+bench("Serialize String (No Sink)", () => {
+  blackbox<string>(JSON.serialize<string>("hello world").toString());
+});*/
+bench("Parse String (Raw)", () => {
+  blackbox<string>(_deserializeString("\"hello world\""));
+});
+bench("Parse String (Product)", () => {
+  blackbox<ProductValue>(JSON.parse<string>("\"hello world\""));
+});
+bench("Parse String (Unwrap)", () => {
+  blackbox<string>(JSON.parse<string>("\"hello world\"").unwrap<string>());
 });

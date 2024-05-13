@@ -1,5 +1,6 @@
 import { snip_fast } from "../src/util";
 
+/*
 // @ts-ignore: Decorator
 @inline export function deserializeNumber<T>(data: string, start: i32 = 0, end: i32 = 0): T {
   end = end || data.length - 1; 
@@ -13,5 +14,5 @@ import { snip_fast } from "../src/util";
     if (type instanceof f64) return f64.parse(data);
     // @ts-ignore
     else if (type instanceof f32) return f32.parse(data);
-  }
+  }*/
   

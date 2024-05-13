@@ -11,6 +11,7 @@ import { deserializeString } from "./string";
  * @param data - The string containing the unknown data.
  * @returns The parsed JSON.Value.
  */
+/*
 @inline export function deserializeUnknown(data: string): Result<JSON.Value, string> {
     const firstChar = unsafeCharCodeAt(data, 0);
     const lastChar = unsafeCharCodeAt(data, data.length - 1);
@@ -30,4 +31,4 @@ import { deserializeString } from "./string";
         return Result.Ok<JSON.Value, string>(JSON.Value.from<boolean>(false));
     }
     return Result.Err<JSON.Value, string>("Could not deserialize " + (data.length > 150 ? data.slice(0, 150) + "..." : data) + " as a valid JSON value!");
-}
+}*/

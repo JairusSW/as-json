@@ -1,14 +1,10 @@
-/**
- * Offset of the 'storage' property in the JSON.Value class.
- */
-
 import { StringSink } from "as-string-sink/assembly";
 import { __atoi_fast, getArrayDepth } from "./src/util";
 import { serializeString } from "./serialize/string";
 import { serializeUnknown } from "./serialize/unknown";
 import { Variant } from "as-variant/assembly";
 import { deserializeString } from "./deserialize/string";
-import { deserializeUnknown } from "./deserialize/unknown";
+//import { deserializeUnknown } from "./deserialize/unknown";
 import { deserializeBoolean } from "./deserialize/boolean";
 import { falseWord, trueWord } from "./src/chars";
 import { Result } from "as-container";
@@ -22,7 +18,11 @@ import { serializeFloatArray } from "./serialize/array/float";
 import { serializeUnknownArray } from "./serialize/array/unknown";
 import { serializeBoolArray } from "./serialize/array/bool";
 import { serializeMap } from "./serialize/map";
+import { Product, ProductValue } from "./product";
 
+/**
+ * Offset of the 'storage' property in the JSON.Value class.
+ */
 // @ts-ignore: Decorator valid here
 @inline const STORAGE = offsetof<JSON.Value>("storage");
 
@@ -198,20 +198,19 @@ export namespace JSON {
      * @throws Error if deserialization fails.
      */
     // @ts-ignore: Decorator valid here
-    @inline export function parse<T>(data: string): Result<T, string> {
+    @inline export function parse<T>(data: string): ProductValue {
         if (isString<T>()) {
-            // @ts-ignore: Returns T
             return deserializeString(data);
         } else if (isBoolean<T>()) {
-            // @ts-ignore: Returns T
             return deserializeBoolean(data);
-        } else if (isInteger<T>()) {
+        } /*else if (isInteger<T>()) {
             // @ts-ignore: Returns T
             return __atoi_fast<T>(data);
         } else if (idof<T>() === idof<JSON.Value>()) {
             // @ts-ignore: Returns T
             return deserializeUnknown(data);
         }
-        throw new Error(`Could not deserialize data of type ${nameof<T>()}`);
+        throw new Error(`Could not deserialize data of type ${nameof<T>()}`);*/
+        return Product.Err(`Could not deserialize data of type ${nameof<T>()}`);
     }
 }
