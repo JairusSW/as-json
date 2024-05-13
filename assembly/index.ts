@@ -210,7 +210,7 @@ export namespace JSON {
             return __atoi_fast<T>(data);
         } else if (idof<T>() === idof<JSON.Value>()) {
             // @ts-ignore: Returns T
-            return deserializeUnknown(data).unwrap();
+            return deserializeUnknown(data);
         }
         throw new Error(`Could not deserialize data of type ${nameof<T>()}`);
     }

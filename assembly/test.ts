@@ -71,3 +71,5 @@ map.set("z", JSON.Value.from<f64>(-5.6));
 
 console.log(JSON.serialize(vec).toString());
 console.log(JSON.serialize(map).toString());
+
+console.log(JSON.parse<string>("\"hello world\"").unwrap());
