@@ -808,20 +808,16 @@ export namespace JSON {
   const result = instantiate<T>();
   let lastPos = 0;
   let i = 1;
-  for (; i < data.length - 1; i++) {
+  let awaitingParse = false;
+  for (; i < data.length; i++) {
     const char = unsafeCharCodeAt(data, i);
     if (lastPos === 0 && ((char >= 48 && char <= 57) || char === 45)) {
+      awaitingParse = true;
       lastPos = i;
-    } else if ((isSpace(char) || char == commaCode) && lastPos > 0) {
+    } else if (awaitingParse && (isSpace(char) || char == commaCode || char == rightBracketCode) && lastPos > 0) {
+      awaitingParse = false;
       result.push(parseNumber<valueof<T>>(data.slice(lastPos, i)));
       lastPos = 0;
-    }
-  }
-  for (; i > lastPos - 1; i--) {
-    const char = unsafeCharCodeAt(data, i);
-    if (char !== rightBracketCode) {
-      result.push(parseNumber<valueof<T>>(data.slice(lastPos, i + 1)));
-      break;
     }
   }
   return result;

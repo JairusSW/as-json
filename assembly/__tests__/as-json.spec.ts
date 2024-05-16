@@ -102,6 +102,11 @@ describe("Ser/de Array", () => {
 
     canSerde<i32[]>([0, 100, 101, -100, -101]);
     canSerde<i64[]>([0, 100, 101, -100, -101]);
+    canDeser<i32[]>(`[
+      1,
+      2,
+      3
+    ]`, [1,2,3]);
   });
 
   it("should ser/de float arrays", () => {
