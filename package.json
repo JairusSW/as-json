@@ -16,9 +16,9 @@
   "license": "MIT",
   "scripts": {
     "test": "asp",
-    "bench:astral": "astral --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior never --runtime stub",
-    "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always --runtime stub",
-    "build:bench": "asc assembly/bench/bench.ts -o build/bench.wasm --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --converge --shrinkLevel 0 --noAssert --exportRuntime --runtime stub",
+    "bench:astral": "astral --optimizeLevel 3 --shrinkLevel 0 --converge --uncheckedBehavior never --runtime stub",
+    "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json",
+    "build:bench": "asc assembly/bench/bench.ts -o build/bench.wasm --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --converge --exportRuntime --runtime stub",
     "bench:wasmtime": "wasmtime ./build/bench.wasm",
     "bench:wavm": "wavm run ./build/bench.wasm",
     "build:transform": "tsc -p ./transform",

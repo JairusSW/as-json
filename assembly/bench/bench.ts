@@ -5,6 +5,7 @@ import { serializeUnknown } from "../serialize/unknown";
 import { Sink } from "../src/sink";
 
 import { bench, blackbox } from "as-bench/assembly/bench";
+import { __atoi_fast, __atoi_fast_safe } from "../src/util";
 
 const set = JSON.Value.from([
   JSON.Value.from([]),
@@ -61,7 +62,7 @@ bench("Serialize String (Sink)", () => {
 });
 bench("Serialize String (No Sink)", () => {
   blackbox<string>(JSON.serialize<string>("hello world").toString());
-});*/
+});
 bench("Parse String (Raw)", () => {
   blackbox<string>(_deserializeString("\"hello world\""));
 });
@@ -70,4 +71,12 @@ bench("Parse String (Product)", () => {
 });
 bench("Parse String (Unwrap)", () => {
   blackbox<string>(JSON.parse<string>("\"hello world\"").unwrap<string>());
+});*/
+
+bench("ATOI (Unsafe)", () => {
+  blackbox<u32>(__atoi_fast<u32>("1234567890"));
+});
+
+bench("ATOI (Safe)", () => {
+  blackbox<u32>(__atoi_fast_safe<u32>("1234567890"));
 });

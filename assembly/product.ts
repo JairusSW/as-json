@@ -1,22 +1,36 @@
 import { Variant } from "as-variant/assembly";
 
-@global let __PRODUCT_INSTANCE = changetype<ProductValue>(__new(offsetof<ProductValue>(), idof<ProductValue>()));
+@global let __PRODUCT_INSTANCE = changetype<Product>(__new(offsetof<Product>(), idof<Product>()));
+@global let __PRODUCT_SAFE: boolean = false;
+@global let __PRODUCT_ERR: string = "";
+@global let __PRODUCT_OK: u64 = 0;
 
-export namespace Product {
+@unmanaged export class Product {
+    constructor() { unreachable(); }
     // @ts-ignore: Decorator
-    @inline export function Ok<O>(ok: O): ProductValue {
-        __PRODUCT_INSTANCE.ok(ok);
+    @inline static Ok<O>(ok: O): Product {
+        __PRODUCT_SAFE = true;
         return __PRODUCT_INSTANCE;
     }
     // @ts-ignore: Decorator
-    @inline export function Err(err: string): ProductValue {
-        __PRODUCT_INSTANCE.err(err);
+    @inline static Err(err: string): Product {
+        __PRODUCT_SAFE = false;
+        __PRODUCT_ERR = err;
         return __PRODUCT_INSTANCE;
     }
     // @ts-ignore: Decorator
-    @inline export function Init(): ProductValue {
+    @inline static Init(): Product {
         return __PRODUCT_INSTANCE;
     }
+    // @ts-ignore: Decorator
+    @inline static Wrap<T>(x: T) {
+
+    }
+    // @ts-ignore: Decorator
+    @inline static catch(catchFn: ((err: string) => {})) {
+        // nop
+    }
+    
 }
 
 export class ProductValue {
@@ -43,6 +57,7 @@ export class ProductValue {
     }
     @inline expect<O>(message: string): O {
         if (this.safe) return this._ok.get<O>();
-        throw new Error(message + ": " + this._err!);
+        else assert(false, message + ": " + this._err!);
+        return this._ok.get<O>();
     }
 }
