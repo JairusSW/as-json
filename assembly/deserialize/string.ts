@@ -86,7 +86,7 @@ import { Product, ProductValue } from "../product";
   const firstChar = unsafeCharCodeAt(data, start);
   const lastChar = unsafeCharCodeAt(data, end);
   if (firstChar !== quoteCode || lastChar !== quoteCode) {
-    throw new Error(`Expected string to start and end with ", but got ${data.slice(0, 100)} instead!`);
+    abort(`Expected string to start and end with ", but got ${data.slice(0, 100)} instead!`);
   }
   let last = start + 1;
   for (let i = last; i < end; i++) {
@@ -144,7 +144,7 @@ import { Product, ProductValue } from "../product";
         break;
       }
       default: {
-        throw new Error(`Cannot parse "${data.slice(0, 100)}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
+        abort(`Cannot parse "${data.slice(0, 100)}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
       }
     }
   }

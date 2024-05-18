@@ -6,7 +6,7 @@ import { serializeInteger } from "../integer";
 @inline export function serializeIntegerArray<T extends number[]>(data: T, out: Sink | null = null): Sink {
     if (!out) {
         if (!data.length) {
-            return Sink.fromStringLiteral("[]");
+            return Sink.fromString("[]");
         } else {
             out = Sink.fromString("[");
         }
@@ -16,14 +16,14 @@ import { serializeInteger } from "../integer";
 
     for (let i = 0; i < end; i++) {
         serializeInteger<valueof<T>>(
-            unchecked(data[i]),
+            data[i],
             out
         );
         out.writeCodePoint(commaCode);
     }
 
     serializeInteger<valueof<T>>(
-        unchecked(data[end]),
+        data[end],
         out
     );
     out.writeCodePoint(rightBracketCode);

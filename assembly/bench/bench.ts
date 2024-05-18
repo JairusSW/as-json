@@ -1,11 +1,10 @@
 import { JSON } from "..";
 import { _deserializeString, deserializeString } from "../deserialize/string";
-import { ProductValue } from "../product";
-import { serializeUnknown } from "../serialize/unknown";
 import { Sink } from "../src/sink";
 
 import { bench, blackbox } from "as-bench/assembly/bench";
 import { __atoi_fast, __atoi_fast_safe } from "../src/util";
+import { serializeUnknown } from "../serialize/unknown";
 
 const set = JSON.Value.from([
   JSON.Value.from([]),
@@ -53,7 +52,7 @@ map.set("z", JSON.Value.from<f64>(-5.6));
 bench("Serialize Set Theoretical Representation", () => {
   blackbox<Sink>(serializeUnknown(set));
 });
-*//*
+
 bench("Serialize Vector 3 Struct", () => {
   blackbox<string>(vec.__JSON_Serialize_Unsafe());
 });
@@ -73,10 +72,11 @@ bench("Parse String (Unwrap)", () => {
   blackbox<string>(JSON.parse<string>("\"hello world\"").unwrap<string>());
 });*/
 
-bench("ATOI (Unsafe)", () => {
+bench("ATOI (Unsafe): " + __atoi_fast<u32>("1234567890").toString(), () => {
   blackbox<u32>(__atoi_fast<u32>("1234567890"));
 });
 
-bench("ATOI (Safe)", () => {
+bench("ATOI (Safe): " + __atoi_fast_safe<u32>("1234567890").toString(), () => {
   blackbox<u32>(__atoi_fast_safe<u32>("1234567890"));
 });
+bench("empty", () => {})

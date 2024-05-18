@@ -290,10 +290,10 @@ import { Product } from "../product";
   if (!end) end = start + u32(str.length << 1);
   if (isSigned<T>()) {
     // Negative path
-    if (load<u16>(changetype<usize>(str) + <usize>start) === 45) {
+    if (load<u8>(changetype<usize>(str) + <usize>start) === 45) {
       start += 2;
-      for (; start < end; start += 2) {
-        const v = load<u16>(changetype<usize>(str) + <usize>start) - 48;
+      for (; end > start; start += 2) {
+        const v = load<u8>(changetype<usize>(str) + <usize>start) - 48;
         // v > 9 is 1/3 slower than 9 < v
         if (<u16>9 < v) {
           Product.Err("Can only parse character 0-9, but found \\" + (v).toString() + " instead!");
@@ -303,8 +303,8 @@ import { Product } from "../product";
       }
       return -val as T;
     } else {
-      for (; start < end; start += 2) {
-        const v = load<u16>(changetype<usize>(str) + <usize>start) - 48;
+      for (; end > start; start += 2) {
+        const v = load<u8>(changetype<usize>(str) + <usize>start) - 48;
         if (<u16>9 < v) {
           Product.Err("Can only parse character 0-9, but found \\" + (v).toString() + " instead!");
           break;

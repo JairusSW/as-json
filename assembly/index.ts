@@ -99,7 +99,7 @@ export namespace JSON {
                 store<T>(changetype<usize>(this), value, STORAGE);
             } else if (value instanceof Map) {
                 if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
-                    throw new Error("Maps must be of type Map<string, JSON.Value>!");
+                    abort("Maps must be of type Map<string, JSON.Value>!");
                 }
                 this.type = JSON.Types.Obj;
                 store<T>(changetype<usize>(this), value, STORAGE);
@@ -177,7 +177,7 @@ export namespace JSON {
             } else if (isFloat<valueof<T>>()) {
                 return serializeFloatArray(data, out);
             } else if (isArray<valueof<T>>()) {
-                throw new Error("Not implemented yet")
+                abort("Not implemented yet")
             } else if (idof<valueof<T>>() === idof<JSON.Value>()) {
                 return serializeUnknownArray(data as JSON.Value[], out);
             }
@@ -210,7 +210,7 @@ export namespace JSON {
             // @ts-ignore: Returns T
             return deserializeUnknown(data);
         }
-        throw new Error(`Could not deserialize data of type ${nameof<T>()}`);*/
+        abort(`Could not deserialize data of type ${nameof<T>()}`);*/
         return Product.Err(`Could not deserialize data of type ${nameof<T>()}`);
     }
 }

@@ -6,7 +6,7 @@ import { serializeString } from "../string";
 @inline export function serializeStringArray<T extends string[]>(data: T, out: Sink | null = null): Sink {
     if (!out) {
         if (!data.length) {
-            return Sink.fromStringLiteral("[]");
+            return Sink.fromString("[]");
         } else {
             out = Sink.fromString("[");
         }
@@ -16,14 +16,14 @@ import { serializeString } from "../string";
 
     for (let i = 0; i < end; i++) {
         serializeString(
-            unchecked(data[i]),
+            data[i],
             out
         );
         out.writeCodePoint(commaCode);
     }
 
     serializeString(
-        unchecked(data[end]),
+        data[end],
         out
     );
     out.writeCodePoint(rightBracketCode);

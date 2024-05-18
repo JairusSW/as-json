@@ -6,7 +6,7 @@ import { serializeBool } from "../bool";
 @inline export function serializeBoolArray<T extends bool[]>(data: T, out: Sink | null = null): Sink {
     if (!out) {
         if (!data.length) {
-            return Sink.fromStringLiteral("[]");
+            return Sink.fromString("[]");
         } else {
             out = Sink.fromString("[");
         }
@@ -16,14 +16,14 @@ import { serializeBool } from "../bool";
 
     for (let i = 0; i < end; i++) {
         serializeBool(
-            unchecked(data[i]),
+            data[i],
             out
         );
         out.writeCodePoint(commaCode);
     }
 
     serializeBool(
-        unchecked(data[end]),
+        data[end],
         out
     );
     out.writeCodePoint(rightBracketCode);

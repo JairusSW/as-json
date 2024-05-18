@@ -6,7 +6,7 @@ import { serializeFloat } from "../float";
 @inline export function serializeFloatArray<T extends number[]>(data: T, out: Sink | null = null): Sink {
     if (!out) {
         if (!data.length) {
-            return Sink.fromStringLiteral("[]");
+            return Sink.fromString("[]");
         } else {
             out = Sink.fromString("[");
         }
@@ -16,14 +16,14 @@ import { serializeFloat } from "../float";
 
     for (let i = 0; i < end; i++) {
         serializeFloat(
-            unchecked(data[i]),
+            data[i],
             out
         );
         out.writeCodePoint(commaCode);
     }
 
     serializeFloat(
-        unchecked(data[end]),
+        data[end],
         out
     );
     out.writeCodePoint(rightBracketCode);

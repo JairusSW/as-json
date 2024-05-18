@@ -7,7 +7,7 @@ import { serializeUnknown } from "../unknown";
 @inline export function serializeUnknownArray<T extends JSON.Value[]>(data: T, out: Sink | null = null): Sink {
     if (!out) {
         if (!data.length) {
-            return Sink.fromStringLiteral("[]");
+            return Sink.fromString("[]");
         } else {
             out = Sink.fromString("[");
         }

@@ -127,7 +127,7 @@ export namespace JSON {
       result.writeCodePoint(rightBraceCode);
       return result.toString();
     } else {
-      throw new Error(
+      abort(
         `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
       );
     }
@@ -208,7 +208,7 @@ export namespace JSON {
         return;
       }
     } else {
-      throw new Error(
+      abort(
         `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
       );
     }
@@ -248,7 +248,7 @@ export namespace JSON {
       // @ts-ignore
       return parseDate(data);
     } else {
-      throw new Error(
+      abort(
         `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
       );
     }
@@ -281,7 +281,7 @@ export namespace JSON {
     // @ts-ignore
     return parseDate(data);
   } else {
-    throw new Error(
+    abort(
       `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
     );
   }
@@ -408,7 +408,7 @@ export namespace JSON {
         break;
       }
       default: {
-        throw new Error(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
+        abort(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
       }
     }
   }
@@ -422,7 +422,7 @@ export namespace JSON {
 @inline function parseBoolean<T extends boolean>(data: string): T {
   if (data.length > 3 && data.startsWith(trueWord)) return <T>true;
   else if (data.length > 4 && data.startsWith(falseWord)) return <T>false;
-  else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
+  else abort(`JSON: Cannot parse "${data}" as boolean`);
 }
 
 // @ts-ignore: Decorator
@@ -726,7 +726,7 @@ export namespace JSON {
     return parseNumber<T>(k);
   }
 
-  throw new Error(`JSON: Cannot parse JSON object to a Map with a key of type ${nameof<T>()}`);
+  abort(`JSON: Cannot parse JSON object to a Map with a key of type ${nameof<T>()}`);
 }
 
 // @ts-ignore: Decorator
