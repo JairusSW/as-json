@@ -20,7 +20,7 @@
     "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json",
     "build:bench": "asc assembly/bench/bench.ts -o build/bench.wasm --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --converge --exportRuntime --runtime stub",
     "bench:wasmtime": "wasmtime ./build/bench.wasm",
-    "bench:wavm": "wavm run ./build/bench.wasm",
+    "bench:wasmer": "wasmer run ./build/bench.wasm --llvm",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:wavm": "wavm run ./build/test.wasm",
@@ -32,6 +32,7 @@
     "@as-pect/cli": "^8.1.0",
     "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
+    "@types/benchmark": "^2.1.5",
     "as-bench": "^0.0.0-alpha",
     "as-test": "JairusSW/as-test#03e96e7",
     "assemblyscript": "^0.27.22",
@@ -40,14 +41,13 @@
     "kati": "^0.6.2",
     "microtime": "^3.1.1",
     "prettier": "^3.1.1",
-    "tinybench": "^2.5.1",
+    "tinybench": "^2.8.0",
     "typescript": "^5.3.3",
     "visitor-as": "^0.11.4"
   },
   "dependencies": {
     "as-container": "^0.8.0",
     "as-string-sink": "^0.5.3",
-    "as-test": "JairusSW/as-test",
     "as-variant": "^0.4.1",
     "as-virtual": "^0.1.9"
   },

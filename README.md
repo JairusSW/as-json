@@ -84,53 +84,49 @@ If you use this project in your codebase, consider dropping a [star](https://git
 
 Run or view the benchmarks [here](https://github.com/JairusSW/as-json/tree/master/bench)
 
-Below are benchmark results comparing JavaScript, WAVM (WebAssembly Virtual Machine), and Wasmtime environments.
+Below are benchmark results comparing JavaScript's built-in JSON implementation and `JSON-AS`
 
-JavaScript Results
+My library beats JSON (written in C++) on all counts *and*, I see many places where I can pull at least a 60% uplift in performance if I implement it.
 
-NodeJS v20.5.1 - TinyBench v2.5.0 (V8)
-```
-┌───────────────────────────┬───────────────┐
-│         Task Name         │   ops / sec   │
-├───────────────────────────┼───────────────┤
-│ 'Stringify Object (Vec3)' │  '1,191,221'  │
-│   'Parse Object (Vec3)'   │  '897,759'    │
-│ 'Stringify Number Array'  │  '1,552,255'  │
-│   'Parse Number Array'    │  '1,225,325'  │
-│    'Stringify String'     │  '1,761,011'  │
-│      'Parse String'       │  '80,845'     │
-└───────────────────────────┴───────────────┘
-```
+**Serialize String**
 
-AssemblyScript Results
+- Value: "hello world"
 
-WAVM v0.0.0-prerelease - as-bench v0.0.0-alpha (LLVM)
-```
-┌───────────────────────────┬───────────────┐
-│         Task Name         │   ops / sec   │
-├───────────────────────────┼───────────────┤
-│ 'Stringify Object (Vec3)' │  '6,270,322'  │
-│   'Parse Object (Vec3)'   │  '8,000,195'  |
-│ 'Stringify Number Array'  │  '6,664,937'  │
-│   'Parse Number Array'    │  '6,557,357'  │
-│    'Stringify String'     │  '6,946,947'  │
-│      'Parse String'       │  '10,952,502' │
-└───────────────────────────┴───────────────┘
-```
+JavaScript: 28,629,598 ops/s
 
-Wasmtime v11.0.1 - as-bench v0.0.0-alpha (Cranelift)
-```
-┌───────────────────────────┬───────────────┐
-│         Task Name         │   ops / sec   │
-├───────────────────────────┼───────────────┤
-│ 'Stringify Object (Vec3)' │  '2,038,684'  │
-│   'Parse Object (Vec3)'   │  '4,623,337'  |
-│ 'Stringify Number Array'  │  '2,500,947'  │
-│   'Parse Number Array'    │  '2,959,180'  │
-│    'Stringify String'     │  '3,236,896'  │
-│      'Parse String'       │  '5,634,594'  │
-└───────────────────────────┴───────────────┘
-```
+AssemblyScript: 64,210,666 ops/s
+
+**Serialize Integer**
+
+- Value 12345
+
+JavaScript: 31,562,431 ops/s
+
+AssemblyScript: 48,035,001 ops/s
+
+**Serialize Float**
+
+- Value 1.2345
+
+JavaScript: 15,977,278 ops/s
+
+AssemblyScript: 20,322,939 ops/s
+
+**Serialize Set Theoretical Representation**
+
+- Value [[],[[]],[[],[[]]]]
+
+JavaScript: 8,998,624 ops/s
+
+AssemblyScript: 34,453,102 ops/s
+
+**Parse Integer**
+
+- Value: "12345"
+
+JavaScript: 34,647,886 ops/s
+
+AssemblyScript: 254,640,930 ops/s
 
 ## Issues
 
