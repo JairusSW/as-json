@@ -79,7 +79,8 @@ const stringified = JSON.stringify<Player>(player, true);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
-If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
+If you use this project in your codebase, please dropping a [star](https://github.com/JairusSW/as-json). I would *really* appreciate it!
+
 ## Performance
 
 Run or view the benchmarks [here](https://github.com/JairusSW/as-json/tree/master/bench)
@@ -88,45 +89,34 @@ Below are benchmark results comparing JavaScript's built-in JSON implementation 
 
 My library beats JSON (written in C++) on all counts *and*, I see many places where I can pull at least a 60% uplift in performance if I implement it.
 
-**Serialize String**
+```
+Serialization Benchmarks:
 
-- Value: "hello world"
+| Value                      | JavaScript (ops/s) | AssemblyScript (ops/s) | % Diff |
+|----------------------------|--------------------|------------------------|--------|
+| "hello world"              | 28,629,598         | 64,210,666             | + 124% |
+| 12345                      | 31,562,431         | 48,035,001             | + 52%  |
+| 1.2345                     | 15,977,278         | 20,322,939             | + 27%  |
+| [[],[[]],[[],[[]]]]        | 8,998,624          | 34,453,102             | + 283% |
+```
 
-JavaScript: 28,629,598 ops/s
+```
+Deserialization Benchmarks: (WIP)
 
-AssemblyScript: 64,210,666 ops/s
+| Value                      | JavaScript (ops/s) | AssemblyScript (ops/s) | % Diff |
+|----------------------------|--------------------|------------------------|--------|
+| "12345"                    | 34,647,886         | 254,640,930            | + 635% |
+```
 
-**Serialize Integer**
+And my PC specs:
 
-- Value 12345
-
-JavaScript: 31,562,431 ops/s
-
-AssemblyScript: 48,035,001 ops/s
-
-**Serialize Float**
-
-- Value 1.2345
-
-JavaScript: 15,977,278 ops/s
-
-AssemblyScript: 20,322,939 ops/s
-
-**Serialize Set Theoretical Representation**
-
-- Value [[],[[]],[[],[[]]]]
-
-JavaScript: 8,998,624 ops/s
-
-AssemblyScript: 34,453,102 ops/s
-
-**Parse Integer**
-
-- Value: "12345"
-
-JavaScript: 34,647,886 ops/s
-
-AssemblyScript: 254,640,930 ops/s
+| Component       | Specification                        |
+|-----------------|--------------------------------------|
+| Wasmer Version  | v4.3.0                               |
+| CPU             | AMD Ryzen 7 7800x3D @ 6.00 GHz       |
+| Memory          | T-Force DDR5 6000 MHz                |
+| OS              | Ubuntu WSL2                          |
+| Graphics        | AMD Radeon RX 6750XT                 |
 
 ## Issues
 
