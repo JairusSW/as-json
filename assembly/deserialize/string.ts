@@ -4,13 +4,13 @@ import { bCode, backSlashCode, backspaceCode, carriageReturnCode, fCode, formFee
 import { Product, ProductValue } from "../product";
 
 // @ts-ignore: Decorator
-@inline export function deserializeString(data: string, start: i32 = 0, end: i32 = 0): ProductValue {
+@inline export function deserializeString(data: string, start: i32 = 0, end: i32 = 0): string {
   end = end || data.length - 1;
   let result = StringSink.withCapacity(end - start - 1);
   const firstChar = unsafeCharCodeAt(data, start);
   const lastChar = unsafeCharCodeAt(data, end);
   if (firstChar !== quoteCode || lastChar !== quoteCode) {
-    return Product.Err(`Expected string to start and end with ", but got ${data.slice(0, 100)} instead!`);
+    return abort(`Expected string to start and end with ", but got ${data.slice(0, 100)} instead!`);
   }
   let last = start + 1;
   for (let i = last; i < end; i++) {
@@ -68,14 +68,14 @@ import { Product, ProductValue } from "../product";
         break;
       }
       default: {
-        return Product.Err(`Cannot parse "${data.slice(0, 100)}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
+        return abort(`Cannot parse "${data.slice(0, 100)}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
       }
     }
   }
   if (end > last) {
     result.write(data, last, end);
   }
-  return Product.Ok<string>(result.toString());
+  return result.toString();
 }
 
 

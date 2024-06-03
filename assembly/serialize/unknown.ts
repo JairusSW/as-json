@@ -2,6 +2,7 @@ import { JSON } from "..";
 import { Sink } from "../src/sink";
 import { __atoi_fast } from "../src/util";
 import { serializeUnknownArray } from "./array/unknown";
+import { serializeBool } from "./bool";
 import { serializeFloat } from "./float";
 import { serializeInteger } from "./integer";
 import { serializeString } from "./string";
@@ -17,6 +18,9 @@ export function serializeUnknown(data: JSON.Value, out: Sink | null = null): Sin
     switch (type) {
         case JSON.Types.String: {
             return serializeString(data.get<string>(), out);
+        }
+        case JSON.Types.Boolean: {
+            return serializeBool(data.get<bool>(), out);
         }
         case JSON.Types.U8: {
             return serializeInteger(data.get<u8>(), out);

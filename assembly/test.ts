@@ -1,28 +1,58 @@
 import { JSON } from ".";
 import { Sink } from "./src/sink";
+import { describe, expect } from "as-test/assembly";
 
-console.log(JSON.serialize("hello world!").toString());
+describe("Serialize String", () => {
+    expect(JSON.serialize("hello world").toString()).toBe("\"hello world\"");
+});
 
-console.log(JSON.serialize(314).toString());
+describe("Serialize Integer", () => {
+    expect(JSON.serialize(65536).toString()).toBe("65536");
+});
+describe("Serialize Float", () => {
+    expect(JSON.serialize(3.1415).toString()).toBe("3.1415");
+});
 
-console.log(JSON.serialize(3.14).toString());
+describe("Serialize Boolean", () => {
+    expect(JSON.serialize(true).toString()).toBe("true");
+    expect(JSON.serialize(false).toString()).toBe("false");
+});
 
-console.log(JSON.serialize(true).toString());
+describe("Serialize String Value", () => {
+    expect(
+        JSON.serialize(
+            JSON.Value.from("hello world")
+        ).toString()
+    ).toBe("\"hello world\"");
+});
+describe("Serialize Integer Value", () => {
+    expect(
+        JSON.serialize(
+            JSON.Value.from(65536)
+        ).toString()
+    ).toBe("65536");
+});
 
-console.log(JSON.serialize(false).toString());
+describe("Serialize Float Value", () => {
+    expect(
+        JSON.serialize(
+            JSON.Value.from(3.1415)
+        ).toString()
+    ).toBe("3.1415");
+});
+describe("Serialize Boolean Value", () => {
+    expect(
+        JSON.serialize(
+            JSON.Value.from(true)
+        ).toString()
+    ).toBe("true");
 
-console.log(JSON.serialize(JSON.Value.from("hello world!")).toString());
-
-console.log(JSON.serialize([
-    JSON.Value.from("hello"),
-    JSON.Value.from("world"),
-    JSON.Value.from(123),
-    JSON.Value.from("456"),
-    JSON.Value.from([
-        JSON.Value.from(7.89),
-        JSON.Value.from([])
-    ])
-]).toString());
+    expect(
+        JSON.serialize(
+            JSON.Value.from(false)
+        ).toString()
+    ).toBe("false");
+});
 
 const set = JSON.Value.from([
     JSON.Value.from([]),
@@ -37,7 +67,22 @@ const set = JSON.Value.from([
     ]),
 ]);
 
-console.log(JSON.serialize(set).toString());
+describe("Serialize Set Theoretical Representation", () => {
+    expect(JSON.serialize(set).toString()).toBe("[[],[[]],[[],[[]]]]")
+});
+
+describe("Serialize Complex Array Types", () => {
+    expect(JSON.serialize([
+        JSON.Value.from("hello"),
+        JSON.Value.from("world"),
+        JSON.Value.from(123),
+        JSON.Value.from("456"),
+        JSON.Value.from([
+            JSON.Value.from(7.89),
+            JSON.Value.from([])
+        ])
+    ]).toString()).toBe("[\"hello\",\"world\",123,\"456\",[7.89,[]]]");
+});
 
 @unmanaged
 class Vec3 {
@@ -64,14 +109,15 @@ const vec: Vec3 = {
     z: -5.6
 }
 
+describe("Serialize Structs", () => {
+    expect(JSON.serialize(vec).toString()).toBe("{\"x\":3.4,\"y\":1.2,\"z\":-5.6}");
+});
+
 const map = new Map<string, JSON.Value>();
 map.set("x", JSON.Value.from<f64>(3.4));
 map.set("y", JSON.Value.from<f64>(1.2));
 map.set("z", JSON.Value.from<f64>(-5.6));
 
-console.log(JSON.serialize(vec).toString());
-console.log(JSON.serialize(map).toString());
-
-//console.log(JSON.parse<string>("\"hello world\"").unwrap<string>());
-console.log(JSON.parse<boolean>("true").unwrap<boolean>().toString());
-console.log(JSON.parse<boolean>("false").unwrap<boolean>().toString());
+describe("Serialize Maps", () => {
+    expect(JSON.serialize(map).toString()).toBe("{\"x\":3.4,\"y\":1.2,\"z\":-5.6}");
+});

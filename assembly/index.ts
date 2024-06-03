@@ -4,10 +4,8 @@ import { serializeString } from "./serialize/string";
 import { serializeUnknown } from "./serialize/unknown";
 import { Variant } from "as-variant/assembly";
 import { deserializeString } from "./deserialize/string";
-//import { deserializeUnknown } from "./deserialize/unknown";
 import { deserializeBoolean } from "./deserialize/boolean";
 import { falseWord, trueWord } from "./src/chars";
-import { Result } from "as-container";
 import { Sink } from "./src/sink";
 import { serializeBool } from "./serialize/bool";
 import { serializeInteger } from "./serialize/integer";
@@ -198,7 +196,7 @@ export namespace JSON {
      * @throws Error if deserialization fails.
      */
     // @ts-ignore: Decorator valid here
-    @inline export function parse<T>(data: string): ProductValue {
+    @inline export function parse<T>(data: string): T {
         if (isString<T>()) {
             return deserializeString(data);
         } else if (isBoolean<T>()) {
@@ -209,8 +207,8 @@ export namespace JSON {
         } else if (idof<T>() === idof<JSON.Value>()) {
             // @ts-ignore: Returns T
             return deserializeUnknown(data);
-        }
-        abort(`Could not deserialize data of type ${nameof<T>()}`);*/
-        return Product.Err(`Could not deserialize data of type ${nameof<T>()}`);
+        }*/
+        
+        abort(`Could not deserialize data of type ${nameof<T>()}`);
     }
 }

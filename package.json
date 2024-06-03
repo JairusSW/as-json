@@ -33,6 +33,7 @@
     "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bench": "^0.0.0-alpha",
+    "as-test": "JairusSW/as-test#03e96e7",
     "assemblyscript": "^0.27.22",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
@@ -46,6 +47,7 @@
   "dependencies": {
     "as-container": "^0.8.0",
     "as-string-sink": "^0.5.3",
+    "as-test": "JairusSW/as-test",
     "as-variant": "^0.4.1",
     "as-virtual": "^0.1.9"
   },
