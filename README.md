@@ -89,7 +89,7 @@ Below are benchmark results comparing JavaScript's built-in JSON implementation 
 
 My library beats JSON (written in C++) on all counts *and*, I see many places where I can pull at least a 60% uplift in performance if I implement it.
 
-```
+
 Serialization Benchmarks:
 
 | Value                      | JavaScript (ops/s) | AssemblyScript (ops/s) | % Diff |
@@ -98,15 +98,15 @@ Serialization Benchmarks:
 | 12345                      | 31,562,431         | 48,035,001             | + 52%  |
 | 1.2345                     | 15,977,278         | 20,322,939             | + 27%  |
 | [[],[[]],[[],[[]]]]        | 8,998,624          | 34,453,102             | + 283% |
-```
 
-```
+
+
 Deserialization Benchmarks: (WIP)
 
 | Value                      | JavaScript (ops/s) | AssemblyScript (ops/s) | % Diff |
 |----------------------------|--------------------|------------------------|--------|
 | "12345"                    | 34,647,886         | 254,640,930            | + 635% |
-```
+
 
 And my PC specs:
 
