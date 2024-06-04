@@ -86,7 +86,9 @@ export class Sink {
     @inline get capacity(): i32 {
         return this.buffer.byteLength >>> 1;
     }
-
+    @inline reset(): void {
+        this.offset = 0;
+    }
     @inline write(src: string, start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink | null {
         let len = src.length as u32;
 
@@ -191,6 +193,38 @@ export class Sink {
             ) << 1;
         } else {
             this.ensureCapacity(32 << 1);
+            offset += dtoa_buffered(
+                changetype<usize>(this.buffer) + offset,
+                value
+            ) << 1;
+        }
+        this.offset = offset;
+        return this;
+    }
+    @inline writeNumberUnsafe<T extends number>(value: T): Sink {
+        let offset = this.offset;
+        if (isInteger<T>()) {
+            offset += itoa_buffered(
+                changetype<usize>(this.buffer) + offset,
+                value
+            ) << 1;
+        } else {
+            offset += dtoa_buffered(
+                changetype<usize>(this.buffer) + offset,
+                value
+            ) << 1;
+        }
+        this.offset = offset;
+        return this;
+    }
+    @inline writeIntegerUnsafe<T extends number>(value: T): Sink {
+        let offset = this.offset;
+        if (isInteger<T>()) {
+            offset += itoa_buffered(
+                changetype<usize>(this.buffer) + offset,
+                value
+            ) << 1;
+        } else {
             offset += dtoa_buffered(
                 changetype<usize>(this.buffer) + offset,
                 value

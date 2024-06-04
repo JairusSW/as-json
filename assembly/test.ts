@@ -1,4 +1,5 @@
 import { JSON } from ".";
+import { utoa16 } from "./serialize/integer";
 import { Sink } from "./src/sink";
 import { describe, expect } from "as-test/assembly";
 
@@ -8,6 +9,8 @@ describe("Serialize String", () => {
 
 describe("Serialize Integer", () => {
     expect(JSON.serialize(65536).toString()).toBe("65536");
+    expect(utoa16(65536)).toBe("65536");
+    console.log(utoa16(6553))
 });
 describe("Serialize Float", () => {
     expect(JSON.serialize(3.1415).toString()).toBe("3.1415");
