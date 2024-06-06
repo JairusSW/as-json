@@ -158,6 +158,18 @@ export class Sink {
         return this;
     }
 
+    @inline writeCodePoint16(code: i32): Sink {
+        this.ensureCapacity(2);
+
+        let offset = this.offset;
+        let dest = changetype<usize>(this.buffer) + offset;
+
+        store<u16>(dest, <u16>code);
+        this.offset = offset + 2;
+
+        return this;
+    }
+
     @inline writeCodePointUnsafe(code: i32): Sink {
         this.ensureCapacity(2);
 
