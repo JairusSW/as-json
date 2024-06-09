@@ -25,7 +25,7 @@ import { Sink } from "../src/sink";
   const firstChar = unsafeCharCodeAt(data, start);
   const lastChar = unsafeCharCodeAt(data, end);
   if (firstChar !== quoteCode || lastChar !== quoteCode) {
-    return abort(`Expected string to start and end with ", but got ${data.slice(0, 100)} instead!`);
+    throw new Error(`Expected string to start and end with ", but got ${data.slice(0, 100)} instead!`);
   }
   let last = start + 1;
   for (let i = last; i < end; i++) {
@@ -83,7 +83,7 @@ import { Sink } from "../src/sink";
         break;
       }
       default: {
-        return abort(`Cannot parse "${data.slice(0, 100)}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
+        throw new Error(`Cannot parse "${data.slice(0, 100)}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
       }
     }
   }

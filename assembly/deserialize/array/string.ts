@@ -7,7 +7,7 @@ import { deserializeString } from "../string";
     const result: string[] = [];
     let lastPos = 0;
     let instr = false;
-    let escaping = false;v 
+    let escaping = false;
     for (let i = 1; i < data.length - 1; i++) {
         const char = unsafeCharCodeAt(data, i);
         if (char === backSlashCode && !escaping) {
