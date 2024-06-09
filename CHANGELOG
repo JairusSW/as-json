@@ -1,2 +1,3 @@
 v0.8.2 - Properties starting with `static` or `private` would be ignored
 v0.8.3 - Dirty fix to issue #68. Add __JSON_Stringify callable to global scope.
+v0.8.4 - Fix #71. Classes with the extending class overriding a property cause the property to be serialized twice.
