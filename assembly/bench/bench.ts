@@ -2,7 +2,7 @@ import { bench, blackbox } from "as-bench/assembly/bench";
 import { Sink } from "../src/sink";
 import { JSON } from "..";
 import { serializeString } from "../serialize/string";
-
+/*
 const set = JSON.Value.from([
   JSON.Value.from([]),
   JSON.Value.from([
@@ -15,14 +15,15 @@ const set = JSON.Value.from([
     ]),
   ]),
 ]);
-
+*/
 const page = Sink.withCapacity(65536);
-/*
+
+let i = 1000000;
 bench("Serialize Integer", () => {
   blackbox<Sink>(JSON.serialize(12345, page));
+  //if (--i == 0) { page.reset(); i = 1000000; }
 });
-
-
+/*
 bench("Serialize Set Theoretical Representation", () => {
   blackbox<Sink>(JSON.serialize(set,page));
   page.reset();
@@ -35,7 +36,7 @@ bench("Serialize Float", () => {
 bench("Serialize Float32", () => {
   blackbox<Sink>(JSON.serialize<f32>(1.2345, page));
   page.reset();
-});*/
+});
 bench("Serialize String", () => {
   blackbox<Sink>(serializeString("hello world", page));
 });

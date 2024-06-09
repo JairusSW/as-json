@@ -1,4 +1,4 @@
-import { StringSink } from "as-string-sink/assembly";
+ import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
 import {
   aCode,
