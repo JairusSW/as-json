@@ -14,7 +14,32 @@ function canSer<T>(data: T, toBe: string): void {
   const serialized = JSON.stringify<T>(data);
   expect(serialized).toBe(toBe);
 }
+@json
+class BaseObject {
+  a: string;
 
+  constructor(a: string) {
+    this.a = a;
+  }
+}
+
+@json
+class DerivedObject extends BaseObject {
+  b: string;
+
+  constructor(a: string, b: string) {
+    super(a);
+    this.b = b;
+  }
+}
+
+describe("Ser/de object hierarchies", () => {
+  it("should ser/de objects derived from base objects", () => {
+    const o = new DerivedObject("1", "2");
+    const s = '{"a":"1","b":"2"}';
+    canSerde(o, s);
+  });
+});
 @json
 class Map4 {
   a: string;

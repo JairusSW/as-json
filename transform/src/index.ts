@@ -61,23 +61,32 @@ class AsJSONTransform extends BaseVisitor {
       initializeStmts: []
     };
 
-    if (this.currentClass.parent.length > 0) {
+    if (this.currentClass.parent.length) {
       const parentSchema = this.schemasList.find(
         (v) => v.name == this.currentClass.parent
       );
       if (parentSchema?.encodeStmts) {
         parentSchema?.encodeStmts.push(parentSchema?.encodeStmts.pop() + ",");
-        this.currentClass.encodeStmts.push(...parentSchema?.encodeStmts);
+        for (let i = 0; i < parentSchema.keys.length; i++) {
+          const key = parentSchema.keys[i];
+          if (node.members.filter(v => v.name.text == key) == undefined) this.currentClass.encodeStmts.unshift(parentSchema.encodeStmts[i]!);
+        }
       }
     }
 
     const parentSchema = this.schemasList.find(
       (v) => v.name == this.currentClass.parent
     );
+
     const members = [
-      ...node.members,
-      ...(parentSchema ? parentSchema.node.members : []),
+      ...node.members
     ];
+
+    if (parentSchema) {
+      for (const mem of parentSchema.node.members) {
+        if (members.find(v => v.name === mem.name) == undefined) members.unshift(mem);
+      }
+    }
 
     for (const mem of members) {
       // @ts-ignore

@@ -53,18 +53,27 @@ class AsJSONTransform extends BaseVisitor {
             setDataStmts: [],
             initializeStmts: []
         };
-        if (this.currentClass.parent.length > 0) {
+        if (this.currentClass.parent.length) {
             const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
             if (parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts) {
                 parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts.push((parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts.pop()) + ",");
-                this.currentClass.encodeStmts.push(...parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts);
+                for (let i = 0; i < parentSchema.keys.length; i++) {
+                    const key = parentSchema.keys[i];
+                    if (node.members.filter(v => v.name.text == key) == undefined)
+                        this.currentClass.encodeStmts.unshift(parentSchema.encodeStmts[i]);
+                }
             }
         }
         const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
         const members = [
-            ...node.members,
-            ...(parentSchema ? parentSchema.node.members : []),
+            ...node.members
         ];
+        if (parentSchema) {
+            for (const mem of parentSchema.node.members) {
+                if (members.find(v => v.name === mem.name) == undefined)
+                    members.unshift(mem);
+            }
+        }
         for (const mem of members) {
             // @ts-ignore
             if (mem.type && mem.type.name && mem.type.name.identifier.text) {
