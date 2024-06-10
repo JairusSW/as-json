@@ -3,10 +3,9 @@ import { snip_fast } from "../src/util";
 
 // @ts-ignore: Decorator
 @inline export function deserializeNumber<T>(data: string, start: i32 = 0, end: i32 = 0): T {
-  end = end || data.length - 1;
   if (isInteger<T>()) {
     // @ts-ignore
-    return snip_fast<T>(data.slice(start, end));
+    return snip_fast<T>(data, start, end || data.length << 1);
   }
   // @ts-ignore
   const type: T = 0;

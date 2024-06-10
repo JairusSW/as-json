@@ -26,7 +26,7 @@ import { deserializeString } from "./string";
         return Result.Ok<JSON.Value, string>(JSON.Value.from<boolean>(true));
     } else if (
         firstChar === fCode
-        && load<u64>(changetype<usize>(data), 2) === 28429466576093281 // "alse"
+        && load<u64>(changetype<usize>(data), 2) === 28429466576093281 // "false"
     ) {
         return Result.Ok<JSON.Value, string>(JSON.Value.from<boolean>(false));
     }

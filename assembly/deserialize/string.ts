@@ -24,14 +24,15 @@ import { Sink } from "../src/sink";
   let result = Sink.withCapacity(end - start - 1);
   const firstChar = unsafeCharCodeAt(data, start);
   const lastChar = unsafeCharCodeAt(data, end);
+
   if (firstChar !== quoteCode || lastChar !== quoteCode) {
     throw new Error(`Expected string to start and end with ", but got ${data.slice(0, 100)} instead!`);
   }
+
   let last = start + 1;
   for (let i = last; i < end; i++) {
-    if (unsafeCharCodeAt(data, i) !== backSlashCode) {
-      continue;
-    }
+    if (unsafeCharCodeAt(data, i) !== backSlashCode) continue;
+
     const char = unsafeCharCodeAt(data, ++i);
     result.write(data, last, i - 1);
     switch (char) {
@@ -87,8 +88,10 @@ import { Sink } from "../src/sink";
       }
     }
   }
+
   if (end > last) {
     result.write(data, last, end);
   }
+  
   return result.toString();
 }

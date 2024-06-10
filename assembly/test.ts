@@ -3,10 +3,12 @@ import { deserializeArray } from "./deserialize/array/array";
 import { deserializeBooleanArray } from "./deserialize/array/boolean";
 import { deserializeNumberArray } from "./deserialize/array/number";
 import { deserializeStringArray } from "./deserialize/array/string";
+import { deserializeNumber } from "./deserialize/number";
 import { utoa32 } from "./serialize/integer";
 import { Sink } from "./src/sink";
 import { describe, expect } from "as-test/assembly";
-/*
+import { __atoi_fast } from "./src/util";
+
 describe("Serialize String", () => {
     expect(JSON.serialize("hello world").toString()).toBe("\"hello world\"");
 });
@@ -128,7 +130,11 @@ map.set("z", JSON.Value.from<f64>(-5.6));
 describe("Serialize Maps", () => {
     expect(JSON.serialize(map).toString()).toBe("{\"x\":3.4,\"y\":1.2,\"z\":-5.6}");
 });
-*/
+
+describe("Deserialize Number", () => {
+    expect(JSON.serialize(deserializeNumber<i32>("1234e3")).toString()).toBe("1234000");
+})
+/*
 
 describe("Deserialize String[]", () => {
     expect(JSON.serialize(deserializeStringArray("[\"hello\",\"world\"]")).toString()).toBe("[\"hello\",\"world\"]");
@@ -144,4 +150,4 @@ describe("Deserialize Boolean[]", () => {
 
 describe("Deserialize [][]", () => {
     deserializeArray<JSON.Value[]>("[[[]],[[[]]]]")
-});
+});*/

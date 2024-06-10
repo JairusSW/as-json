@@ -88,15 +88,15 @@ import { Product } from "../product";
  * @param str - Any number. Can include scientific notation.
 */
 // @ts-ignore: Decorator
-@inline export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u32 = 0): T {
+@inline export function snip_fast<T extends number>(str: string, start: u32 = 0, end: u32 = str.length << 1): T {
+  let val: T = 0 as T;
+  const len: u32 = end - start;
   if (isSigned<T>()) {
     const firstChar: u32 = load<u16>(changetype<usize>(str));
     if (firstChar === 48) return 0 as T;
     const isNegative = firstChar === 45; // Check if the number is negative
-    let val: T = 0 as T;
-    if (len == 0) len = u32(str.length << 1);
     if (isNegative) {
-      offset += 2;
+      let offset: u32 = 2;
       if (len >= 4) {
         // 32-bit route
         for (; offset < (len - 3); offset += 4) {
@@ -146,6 +146,7 @@ import { Product } from "../product";
       }
       return -val as T;
     } else {
+      let offset: u32 = 0;
       if (len >= 4) {
         // Duplet 16 bit lane load
         for (; offset < (len - 3); offset += 4) {
@@ -198,7 +199,7 @@ import { Product } from "../product";
     const firstChar: u32 = load<u16>(changetype<usize>(str));
     if (firstChar === 48) return 0 as T;
     let val: T = 0 as T;
-    if (len == 0) len = u32(str.length << 1);
+    let offset: u32 = 0;
     if (len >= 4) {
       // Duplet 16 bit lane load
       for (; offset < (len - 3); offset += 4) {
