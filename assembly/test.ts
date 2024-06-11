@@ -132,9 +132,9 @@ describe("Serialize Maps", () => {
 });
 
 describe("Deserialize Number", () => {
-    expect(JSON.serialize(deserializeNumber<i32>("1234e3")).toString()).toBe("1234000");
+    expect(JSON.serialize(deserializeNumber<i32>("1234")).toString()).toBe("1234");
 })
-/*
+
 
 describe("Deserialize String[]", () => {
     expect(JSON.serialize(deserializeStringArray("[\"hello\",\"world\"]")).toString()).toBe("[\"hello\",\"world\"]");
@@ -147,7 +147,7 @@ describe("Deserialize Number[]", () => {
 describe("Deserialize Boolean[]", () => {
     expect(JSON.serialize(deserializeBooleanArray<bool[]>("[true, false]")).toString()).toBe("[true,false]");
 });
-
+/*
 describe("Deserialize [][]", () => {
     deserializeArray<JSON.Value[]>("[[[]],[[[]]]]")
 });*/

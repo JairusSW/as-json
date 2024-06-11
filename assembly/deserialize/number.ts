@@ -1,11 +1,15 @@
-import { snip_fast } from "../src/util";
+import { __atoi_fast, snip_fast } from "../src/util";
 
 
 // @ts-ignore: Decorator
 @inline export function deserializeNumber<T>(data: string, start: i32 = 0, end: i32 = 0): T {
   if (isInteger<T>()) {
     // @ts-ignore
-    return snip_fast<T>(data, start, end || data.length << 1);
+    return __atoi_fast<T>(
+      data,
+      start << 1,
+      end << 1 || data.length << 1
+    );
   }
   // @ts-ignore
   const type: T = 0;

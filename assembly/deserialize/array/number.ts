@@ -13,6 +13,7 @@ import { deserializeNumber } from "../number";
         if (lastPos === 0 && ((char >= 48 && char <= 57) || char === 45)) {
             lastPos = i;
         } else if ((isSpace(char) || char == commaCode) && lastPos > 0) {
+            console.log("result: " + data.slice(lastPos, i));
             result.push(deserializeNumber<valueof<T>>(data, lastPos, i));
             lastPos = 0;
         }
@@ -21,6 +22,7 @@ import { deserializeNumber } from "../number";
         const char = unsafeCharCodeAt(data, i);
         if (char !== rightBracketCode) {
             result.push(deserializeNumber<valueof<T>>(data, lastPos, i + 1));
+            console.log("result: " + data.slice(lastPos, i + 1));
             break;
         }
     }
