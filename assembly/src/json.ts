@@ -42,6 +42,7 @@ import {
 } from "./chars";
 import { snip_fast, unsafeCharCodeAt, containsCodePoint } from "./util";
 import { Virtual } from "as-virtual/assembly";
+import { Box } from "as-container/assembly";
 
 /**
  * JSON Encoder/Decoder for AssemblyScript
@@ -62,7 +63,12 @@ export namespace JSON {
       return serializeString(data as string);
     } else if (isBoolean<T>()) {
       return data ? "true" : "false";
-    } else if (isNullable<T>() && data == null) {
+    } else if (data instanceof Box) {
+      if (isNullable<T>() && changetype<usize>(data._val) == <usize>0) {
+        return nullWord;
+      }
+      return JSON.stringify(data.unwrap());
+    } else if (isNullable<T>() && changetype<usize>(data) == <usize>0) {
       return nullWord;
       // @ts-ignore
     } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
@@ -135,86 +141,10 @@ export namespace JSON {
       );
     }
   }
-  /**
-   * Stringifies valid JSON data.
-   * ```js
-   * __JSON_Stringify<T>(data)
-   * ```
-   * @param data T
-   * @returns string
-   */
   // @ts-ignore: Decorator
+  @unsafe
   @inline export function stringifyTo<T>(data: T, out: string): void {
-    // String
-    if (isString<T>() && data != null) {
-      out = serializeString(data as string);
-      return;
-    } else if (isBoolean<T>()) {
-      out = data ? trueWord : falseWord;
-      return;
-    } else if (isNullable<T>() && data == null) {
-      out = nullWord;
-      return;
-      // @ts-ignore
-    } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
-      // @ts-ignore
-      out = data.toString();
-      return;
-      // @ts-ignore: Hidden function
-    } else if (isDefined(data.__JSON_Serialize)) {
-      // @ts-ignore: Hidden function
-      out = data.__JSON_Serialize();
-      return;
-    } else if (data instanceof Date) {
-      out = quoteWord + data.toISOString() + quoteWord;
-      return;
-    } else if (isArrayLike<T>()) {
-      // @ts-ignore
-      if (data.length == 0) {
-        out = emptyArrayWord;
-        return;
-        // @ts-ignore
-      } else if (isString<valueof<T>>()) {
-        out = leftBracketWord;
-        // @ts-ignore
-        for (let i = 0; i < data.length - 1; i++) {
-          // @ts-ignore
-          out += serializeString(unchecked(data[i]));
-          out += commaWord;
-        }
-        // @ts-ignore
-        out += serializeString(unchecked(data[data.length - 1]));
-        out += rightBracketWord;
-        return;
-        // @ts-ignore
-      } else if (isBoolean<valueof<T>>()) {
-        // @ts-ignore
-        out = leftBracketWord + data.join(commaWord) + rightBracketWord;
-        return;
-        // @ts-ignore
-      } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
-        // @ts-ignore
-        out = leftBracketWord + data.join(commaWord) + rightBracketWord;
-        return;
-      } else {
-        let result = new StringSink(leftBracketWord);
-        // @ts-ignore
-        for (let i = 0; i < data.length - 1; i++) {
-          // @ts-ignore
-          result.write(__JSON_Stringify(unchecked(data[i])));
-          result.writeCodePoint(commaCode);
-        }
-        // @ts-ignore
-        result.write(__JSON_Stringify(unchecked(data[data.length - 1])));
-        result.writeCodePoint(rightBracketCode);
-        out = result.toString();
-        return;
-      }
-    } else {
-      throw abort(
-        `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
-    }
+    throw new Error("Method is deprecated");
   }
   /**
    * Parses valid JSON strings into their original format.
@@ -227,7 +157,6 @@ export namespace JSON {
 
   // @ts-ignore: Decorator
   @inline export function parse<T>(data: string, initializeDefaultValues: boolean = false): T {
-    let type: T;
     if (isString<T>()) {
       // @ts-ignore
       return parseString(data);
@@ -239,6 +168,15 @@ export namespace JSON {
     } else if (isArrayLike<T>()) {
       // @ts-ignore
       return parseArray<T>(data.trimStart());
+      // @ts-ignore
+    }
+    let type: nonnull<T> = changetype<nonnull<T>>(0);
+    if (type instanceof Box) {
+      const instance = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()))// as Box<usize>;
+      const val = instance._val;
+      instance._val = parseDirectInference(val, data);
+      // @ts-ignore
+      return changetype<T>(instance);
     } else if (isNullable<T>() && data == nullWord) {
       // @ts-ignore
       return null;
@@ -260,7 +198,6 @@ export namespace JSON {
 
 // @ts-ignore: Decorator
 @global @inline function __parseObjectValue<T>(data: string, initializeDefaultValues: boolean): T {
-  let type: T;
   if (isString<T>()) {
     // @ts-ignore
     return data;
@@ -272,6 +209,15 @@ export namespace JSON {
   } else if (isArrayLike<T>()) {
     // @ts-ignore
     return parseArray<T>(data);
+    // @ts-ignore
+  }
+  let type: nonnull<T> = changetype<nonnull<T>>(0);
+  if (type instanceof Box) {
+    const instance = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()))// as Box<usize>;
+    const val = instance._val;
+    instance._val = parseDirectInference(val, data);
+    // @ts-ignore
+    return changetype<T>(instance);
   } else if (isNullable<T>() && data == nullWord) {
     // @ts-ignore
     return null;
@@ -284,7 +230,7 @@ export namespace JSON {
     // @ts-ignore
     return parseDate(data);
   } else {
-    throw abort(
+    throw new Error(
       `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
     );
   }
@@ -436,6 +382,18 @@ export namespace JSON {
   }
   // @ts-ignore
   const type: T = 0;
+  // @ts-ignore
+  if (type instanceof f64) return f64.parse(data);
+  // @ts-ignore
+  else if (type instanceof f32) return f32.parse(data);
+}
+
+// @ts-ignore: Decorator
+@inline function parseNumberDirectInference<T>(type: T, data: string): T {
+  if (isInteger(type)) {
+    // @ts-ignore
+    return snip_fast<T>(data);
+  }
   // @ts-ignore
   if (type instanceof f64) return f64.parse(data);
   // @ts-ignore
@@ -899,7 +857,7 @@ function parseDate(dateTimeString: string): Date {
     return serializeString(data as string);
   } else if (isBoolean<T>()) {
     return data ? "true" : "false";
-  } else if (isNullable<T>() && data == null) {
+  } else if (isNullable<T>() && changetype<usize>(data) == <usize>0) {
     return nullWord;
     // @ts-ignore
   } else if ((isInteger<T>() || isFloat<T>()) && isFinite(data)) {
@@ -911,6 +869,11 @@ function parseDate(dateTimeString: string): Date {
     return data.__JSON_Serialize();
   } else if (data instanceof Date) {
     return `"${data.toISOString()}"`;
+  } else if (data instanceof Box) {
+    if (isNullable<T>() && changetype<usize>(data) == <usize>0) {
+      return nullWord;
+    }
+    return JSON.stringify(data.unwrap());
   } else if (isArrayLike<T>()) {
     // @ts-ignore
     if (data.length == 0) {
@@ -971,4 +934,8 @@ function parseDate(dateTimeString: string): Date {
       `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
     );
   }
+}
+
+@inline function parseDirectInference<T>(type: T, data: string, initializeDefaultValues: boolean = false): T {
+  return JSON.parse<T>(data, initializeDefaultValues)
 }

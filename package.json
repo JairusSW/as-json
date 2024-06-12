@@ -44,9 +44,10 @@
     "visitor-as": "^0.11.4"
   },
   "dependencies": {
+    "as-container": "^0.8.0",
     "as-string-sink": "^0.5.3",
     "as-variant": "^0.4.1",
-    "as-virtual": "^0.1.9"
+    "as-virtual": "^0.2.0"
   },
   "overrides": {
     "assemblyscript": "$assemblyscript"
