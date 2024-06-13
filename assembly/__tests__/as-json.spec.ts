@@ -53,6 +53,8 @@ class Vec3 {
   x: f64;
   y: f64;
   z: f64;
+
+  static shouldIgnore: string = "should not be serialized";
 }
 
 @json

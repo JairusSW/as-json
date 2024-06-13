@@ -95,116 +95,91 @@ class AsJSONTransform extends BaseVisitor {
         const lineText = toString(member);
         //console.log("Member: " + lineText)
 
-        if (lineText.startsWith("private ") && lineText.startsWith("static ")) continue;
+        if (!lineText.startsWith("private ") && !lineText.startsWith("static ")) {
 
-        const omitnull = member.decorators?.find(v => v.name.text == "omitnull");
-        console.log(member.decorators?.find(v => v.name.text === "omitif"))
-        const omitif = member.decorators?.find(v => v.name.text === "omitif")?.args?.[0]?.value ?? null;
-
-        // @ts-ignore
-        let type = toString(member.type);
-
-        const name = member.name.text;
-        let aliasName = name;
-
-        // @ts-ignore
-        if (member.decorators && member.decorators[0]?.name.text === "alias") {
-          if (member.decorators[0] && member.decorators[0].args![0]) {
-            // @ts-ignore
-            aliasName = member.decorators[0].args![0].value;
-          }
-        }
-        this.currentClass.keys.push(name);
-        // @ts-ignore
-        this.currentClass.types.push(type);
-        // @ts-ignore
-        if (
-          [
-            "u8",
-            "i8",
-            "u16",
-            "i16",
-            "u32",
-            "i32",
-            "u64",
-            "i64",
-          ].includes(type.toLowerCase())
-        ) {
-          if (omitif) {
-            this.currentClass.encodeStmts.push(
-              `\${${omitif} ? "" : \`,${encodeKey(aliasName)}:\${this.${name}}\`}`
-            );
-          } else {
-            this.currentClass.encodeStmts.push(
-              `,${encodeKey(aliasName)}:\${this.${name}}`
-            );
-          }
           // @ts-ignore
-          this.currentClass.setDataStmts.push(
-            `if (key.equals(${JSON.stringify(aliasName)})) {
+          let type = toString(member.type);
+
+          const name = member.name.text;
+          let aliasName = name;
+
+          // @ts-ignore
+          if (member.decorators && member.decorators[0]?.name.text === "alias") {
+            if (member.decorators[0] && member.decorators[0].args![0]) {
+              // @ts-ignore
+              aliasName = member.decorators[0].args![0].value;
+            }
+          }
+          this.currentClass.keys.push(name);
+          // @ts-ignore
+          this.currentClass.types.push(type);
+          // @ts-ignore
+          if (
+            [
+              "u8",
+              "i8",
+              "u16",
+              "i16",
+              "u32",
+              "i32",
+              "u64",
+              "i64",
+            ].includes(type.toLowerCase())
+          ) {
+            this.currentClass.encodeStmts.push(
+              `${encodeKey(aliasName)}:\${this.${name}},`
+            );
+            // @ts-ignore
+            this.currentClass.setDataStmts.push(
+              `if (key.equals(${JSON.stringify(aliasName)})) {
           this.${name} = __atoi_fast<${type}>(data, val_start << 1, val_end << 1);
           return;
         }`
-          );
-          if (member.initializer) {
-            this.currentClass.initializeStmts.push(
-              `this.${name} = ${toString(member.initializer)}`
             );
-          }
-        } else if (
-          [
-            "f32",
-            "f64",
-          ].includes(type.toLowerCase())
-        ) {
-          if (omitif) {
-            this.currentClass.encodeStmts.push(
-              `\${${omitif} ? "" : \`,${encodeKey(aliasName)}:\${this.${name}}\`}`
-            );
-          } else {
-            this.currentClass.encodeStmts.push(
-              `,${encodeKey(aliasName)}:\${this.${name}}`
-            );
-          }
-          // @ts-ignore
-          this.currentClass.setDataStmts.push(
-            `if (key.equals(${JSON.stringify(aliasName)})) {
+            if (member.initializer) {
+              this.currentClass.initializeStmts.push(
+                `this.${name} = ${toString(member.initializer)}`
+              );
+            }
+          } else // @ts-ignore
+            if (
+              [
+                "f32",
+                "f64",
+              ].includes(type.toLowerCase())
+            ) {
+              this.currentClass.encodeStmts.push(
+                `${encodeKey(aliasName)}:\${this.${name}},`
+              );
+              // @ts-ignore
+              this.currentClass.setDataStmts.push(
+                `if (key.equals(${JSON.stringify(aliasName)})) {
             this.${name} = __parseObjectValue<${type}>(data.slice(val_start, val_end), initializeDefaultValues);
             return;
           }`
-          );
-          if (member.initializer) {
-            this.currentClass.initializeStmts.push(
-              `this.${name} = ${toString(member.initializer)}`
-            );
-          }
-        } else {
-          if (omitnull) {
-            this.currentClass.encodeStmts.push(
-              `${comma}\${changetype<usize>(this.${name}) !== <usize>0 ? "" : \`${encodeKey(aliasName)}:\${__JSON_Stringify<${type}>(this.${name})}\`}`
-            );
-            console.log(`\${changetype<usize>(this.${name}) != <usize>0 ? \`${encodeKey(aliasName)}:,\${__JSON_Stringify<${type}>(this.${name})}\` : ""}`)
-          } else if (omitif) {
-            this.currentClass.encodeStmts.push(
-              `\${${omitif} ? "" : \`${encodeKey(aliasName)}:,\${__JSON_Stringify<${type}>(this.${name})}\`}`
-            );
-          } else {
-            this.currentClass.encodeStmts.push(
-              `,${encodeKey(aliasName)}:\${__JSON_Stringify<${type}>(this.${name})}`
-            );
-          }
-          // @ts-ignore
-          this.currentClass.setDataStmts.push(
-            `if (key.equals(${JSON.stringify(aliasName)})) {
+              );
+              if (member.initializer) {
+                this.currentClass.initializeStmts.push(
+                  `this.${name} = ${toString(member.initializer)}`
+                );
+              }
+            } else {
+              this.currentClass.encodeStmts.push(
+                `${encodeKey(aliasName)}:\${__JSON_Stringify<${type}>(this.${name})},`
+              );
+              // @ts-ignore
+              this.currentClass.setDataStmts.push(
+                `if (key.equals(${JSON.stringify(aliasName)})) {
             this.${name} = __parseObjectValue<${type}>(val_start ? data.slice(val_start, val_end) : data, initializeDefaultValues);
             return;
           }`
-          );
-          if (member.initializer) {
-            this.currentClass.initializeStmts.push(
-              `this.${name} = ${toString(member.initializer)}`
-            );
-          }
+              );
+              if (member.initializer) {
+                this.currentClass.initializeStmts.push(
+                  `this.${name} = ${toString(member.initializer)}`
+                );
+              }
+            }
         }
       }
     }
@@ -213,8 +188,11 @@ class AsJSONTransform extends BaseVisitor {
 
     if (this.currentClass.encodeStmts.length > 0) {
       const stmt =
-        this.currentClass.encodeStmts[0]!;
-      this.currentClass.encodeStmts[0] = stmt!.slice(1);
+        this.currentClass.encodeStmts[
+        this.currentClass.encodeStmts.length - 1
+        ]!;
+      this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
+        stmt!.slice(0, stmt.length - 1);
       serializeFunc = `
       __JSON_Serialize(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
@@ -258,7 +236,7 @@ class AsJSONTransform extends BaseVisitor {
     this.sources.add(node.name.range.source);
 
     // Uncomment to see the generated code for debugging.
-    console.log(serializeFunc);
+    //console.log(serializeFunc);
     //console.log(setKeyFunc);
     //console.log(initializeFunc);
   }
