@@ -12,3 +12,13 @@ declare function serializable(target: any): void;
  * Property decorator that provides an alias name for JSON serialization.
  */
 declare function alias(name: string): Function;
+
+/**
+ * Property decorator that allows a field to be omitted when equal to an Expression.
+ */
+declare function omitwhen(condition: string): Function;
+
+/**
+ * Property decorator that allows a field to be omitted when a property is null.
+ */
+declare function omitnull(): Function;

@@ -7,7 +7,7 @@
 ██║  ██║███████║      ╚█████╔╝███████║╚██████╔╝██║ ╚████║
 ╚═╝  ╚═╝╚══════╝       ╚════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝
 
-v0.8.3
+v0.8.5
 </pre>
 </h3>
 
@@ -79,6 +79,43 @@ const parsed = JSON.parse<Player>(stringified);
 ```
 
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
+
+## Performance
+
+Run or view the benchmarks [here](https://github.com/JairusSW/as-json/tree/master/bench)
+
+Below are benchmark results comparing JavaScript's built-in JSON implementation and `JSON-AS`
+
+My library beats JSON (written in C++) on all counts *and*, I see many places where I can pull at least a 60% uplift in performance if I implement it.
+
+
+Serialization Benchmarks:
+
+| Value                      | JavaScript (ops/s) | JSON-as (ops/s) | JSON-AS with Pages |
+|----------------------------|--------------------|-----------------|--------------------|
+| "hello world"              | 28,629,598         | 64,210,666      | + 124%             |
+| 12345                      | 31,562,431         | 56,329,066      | 321,783,941 ops/s  |
+| 1.2345                     | 15,977,278         | 20,322,939      | 30,307,616 ops/s  |
+| [[],[[]],[[],[[]]]]        | 8,998,624          | 34,453,102      | + 283% |
+
+
+
+Deserialization Benchmarks: (WIP)
+
+| Value                      | JavaScript (ops/s) | JSON-AS (ops/s) | % Diff |
+|----------------------------|--------------------|-----------------|--------|
+| "12345"                    | 34,647,886         | 254,640,930     | + 635% |
+
+
+And my PC specs:
+
+| Component       | Specification                        |
+|-----------------|--------------------------------------|
+| Wasmer Version  | v4.3.0                               |
+| CPU             | AMD Ryzen 7 7800x3D @ 6.00 GHz       |
+| Memory          | T-Force DDR5 6000 MHz                |
+| OS              | Ubuntu WSL2                          |
+| Graphics        | AMD Radeon RX 6750XT                 |
 
 ## Issues
 

@@ -64,7 +64,7 @@ export namespace JSON {
     } else if (isBoolean<T>()) {
       return data ? "true" : "false";
     } else if (data instanceof Box) {
-      if (isNullable<T>() && changetype<usize>(data._val) == <usize>0) {
+      if (isNullable<T>() && (changetype<usize>(data._val) == <usize>0 || changetype<usize>(data) == <usize>0)) {
         return nullWord;
       }
       return JSON.stringify(data.unwrap());
@@ -136,7 +136,7 @@ export namespace JSON {
       result.writeCodePoint(rightBraceCode);
       return result.toString();
     } else {
-      throw abort(
+      throw new Error(
         `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
       );
     }
@@ -189,7 +189,7 @@ export namespace JSON {
       // @ts-ignore
       return parseDate(data);
     } else {
-      throw abort(
+      throw new Error(
         `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
       );
     }
@@ -357,7 +357,7 @@ export namespace JSON {
         break;
       }
       default: {
-        throw abort(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
+        throw new Error(`JSON: Cannot parse "${data}" as string. Invalid escape sequence: \\${data.charAt(i)}`);
       }
     }
   }
@@ -371,7 +371,7 @@ export namespace JSON {
 @inline function parseBoolean<T extends boolean>(data: string): T {
   if (data.length > 3 && data.startsWith(trueWord)) return <T>true;
   else if (data.length > 4 && data.startsWith(falseWord)) return <T>false;
-  else throw abort(`JSON: Cannot parse "${data}" as boolean`);
+  else throw new Error(`JSON: Cannot parse "${data}" as boolean`);
 }
 
 // @ts-ignore: Decorator
@@ -542,7 +542,7 @@ export namespace JSON {
   );
 
   if (!isDefined(map.set)) {
-    throw abort("Tried to parse a map, but the types did not match!")
+    throw new Error("Tried to parse a map, but the types did not match!")
   }
 
   const key = Virtual.createEmpty<string>();
@@ -687,7 +687,7 @@ export namespace JSON {
     return parseNumber<T>(k);
   }
 
-  throw abort(`JSON: Cannot parse JSON object to a Map with a key of type ${nameof<T>()}`);
+  throw new Error(`JSON: Cannot parse JSON object to a Map with a key of type ${nameof<T>()}`);
 }
 
 // @ts-ignore: Decorator
@@ -716,7 +716,7 @@ export namespace JSON {
     }
   }
 
-  throw abort("Tried to parse array, but failed!")
+  throw new Error("Tried to parse array, but failed!")
 }
 
 // @ts-ignore: Decorator
@@ -930,7 +930,7 @@ function parseDate(dateTimeString: string): Date {
     result.writeCodePoint(rightBraceCode);
     return result.toString();
   } else {
-    throw abort(
+    throw new Error(
       `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
     );
   }

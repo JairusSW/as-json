@@ -1,6 +1,6 @@
 {
   "name": "@json-as/transform",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "JSON encoder/decoder for AssemblyScript",
   "main": "./lib/index.js",
   "author": "Jairus Tanaka",
@@ -25,6 +25,8 @@
     "json",
     "serialize",
     "deserialize",
+    "stringify",
+    "data",
     "serde"
   ],
   "bugs": {
