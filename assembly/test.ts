@@ -9,11 +9,18 @@ class Foo {
   tristateValue: Box<bool> | null = null;
 }
 
+@json
+class TestBody {
+  a!: string;
+  b!: u8;
+}
+
 const foo: Foo = {
   optionalNumber: null,
   tristateValue: Box.from(true)
 }
-
+console.log(JSON.stringify(JSON.parse<TestBody[]>('[{"a":"hi","b":5},{"a":"bye","b":6}]')))
+console.log(JSON.stringify([foo, foo]))
 console.log(JSON.stringify(foo));
 
 const p1 = JSON.parse<Box<i32> | null>("null");

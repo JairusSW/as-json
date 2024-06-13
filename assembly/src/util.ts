@@ -3,6 +3,12 @@ import { isSpace } from "util/string";
 import { backSlashCode, quoteCode } from "./chars";
 
 // @ts-ignore: Decorator
+@inline export function isMap<T>(): bool {
+  let type = changetype<T>(0);
+  return type instanceof Map;
+}
+
+// @ts-ignore: Decorator
 @inline export function unsafeCharCodeAt(data: string, pos: i32): i32 {
   return load<u16>(changetype<usize>(data) + ((<usize>pos) << 1));
 }

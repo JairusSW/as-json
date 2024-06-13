@@ -46,7 +46,7 @@ class AsJSONTransform extends BaseVisitor {
 
     // Prevent from being triggered twice.
     for (const member of node.members) {
-      if (member.name.text == "__JSON_Serialize") return;
+      if (member.name.text == "__SERIALIZE") return;
     }
 
     this.currentClass = {
@@ -194,12 +194,12 @@ class AsJSONTransform extends BaseVisitor {
       this.currentClass.encodeStmts[this.currentClass.encodeStmts.length - 1] =
         stmt!.slice(0, stmt.length - 1);
       serializeFunc = `
-      __JSON_Serialize(): string {
+      __SERIALIZE(): string {
         return \`{${this.currentClass.encodeStmts.join("")}}\`;
       }`;
     } else {
       serializeFunc = `
-      __JSON_Serialize(): string {
+      __SERIALIZE(): string {
         return "{}";
       }`;
     }

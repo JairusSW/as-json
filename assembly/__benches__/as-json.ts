@@ -30,7 +30,7 @@ bench("Parse Number OLD", () => {
 });
 
 bench("Stringify Object (Vec3)", () => {
-  blackbox<string>(vec.__JSON_Serialize());
+  blackbox<string>(vec.__SERIALIZE());
 });*/
 
 // TODO: Make this allocate without crashing
