@@ -34,7 +34,18 @@ const vec = {
 let data;
 
 const bench = new Bench({ time: 1000 })
-
+    /*.add("stringify float", () => {
+        data = JSON.stringify(1.2345)
+    })
+    .add("parse float", () => {
+        data = JSON.parse("1.2345")
+    })
+    .add("stringify iny", () => {
+        data = JSON.stringify(12345)
+    })
+    .add("parse int", () => {
+        data = JSON.parse("12345")
+    })
     .add("Stringify Object (Vec3)", () => {
         data = JSON.stringify(vec);
     })
@@ -54,9 +65,9 @@ const bench = new Bench({ time: 1000 })
     .add("Stringify String", () => {
         data = JSON.stringify('Hello "World!');
     })
-
+*/
     .add("Parse String", () => {
-        data = JSON.parse('"Hello "World!"');
+        data = JSON.parse('[[],[[]],[[],[[]]]]');
     })
     .todo("unimplemented .add");
 

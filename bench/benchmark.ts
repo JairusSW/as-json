@@ -26,14 +26,14 @@ bench("Parse Number ATOI", () => {
 bench("Parse Number STDLIB", () => {
     blackbox<i32>(i32.parse("12345"));
 });
-*/
+
 bench("Stringify Object (Vec3)", () => {
     blackbox<string>(JSON.stringify(vec));
-});
+});*/
 
 bench("Parse Object (Vec3)", () => {
     blackbox<Vec3>(JSON.parse<Vec3>('{"x":0,"y":0,"z":0}'));
-});
+});/*
 
 bench("Stringify Number Array", () => {
     blackbox<string>(JSON.stringify<i32[]>([1, 2, 3]));
@@ -46,6 +46,10 @@ bench("Parse Number Array", () => {
 bench("Stringify String", () => {
     blackbox<string>(JSON.stringify(blackbox('Hello "World!')));
 });
+
+bench("Parse Number ATOI", () => {
+    blackbox<i32>(__atoi_fast<i32>("12345"));
+})
 
 bench("Parse String", () => {
     blackbox<string>(JSON.parse<string>(blackbox('"Hello "World!"')));

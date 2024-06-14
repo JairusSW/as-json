@@ -22,9 +22,8 @@ class AsJSONTransform extends BaseVisitor {
     }
     visitMethodDeclaration() { }
     visitClassDeclaration(node) {
-        var _c, _d;
         const className = node.name.text;
-        if (!((_c = node.decorators) === null || _c === void 0 ? void 0 : _c.length))
+        if (!node.decorators?.length)
             return;
         let foundDecorator = false;
         for (const decorator of node.decorators) {
@@ -55,8 +54,8 @@ class AsJSONTransform extends BaseVisitor {
         };
         if (this.currentClass.parent.length) {
             const parentSchema = this.schemasList.find((v) => v.name == this.currentClass.parent);
-            if (parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts) {
-                parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts.push((parentSchema === null || parentSchema === void 0 ? void 0 : parentSchema.encodeStmts.pop()) + ",");
+            if (parentSchema?.encodeStmts) {
+                parentSchema?.encodeStmts.push(parentSchema?.encodeStmts.pop() + ",");
                 for (let i = 0; i < parentSchema.keys.length; i++) {
                     const key = parentSchema.keys[i];
                     if (node.members.filter(v => v.name.text == key) == undefined)
@@ -86,7 +85,7 @@ class AsJSONTransform extends BaseVisitor {
                     const name = member.name.text;
                     let aliasName = name;
                     // @ts-ignore
-                    if (member.decorators && ((_d = member.decorators[0]) === null || _d === void 0 ? void 0 : _d.name.text) === "alias") {
+                    if (member.decorators && member.decorators[0]?.name.text === "alias") {
                         if (member.decorators[0] && member.decorators[0].args[0]) {
                             // @ts-ignore
                             aliasName = member.decorators[0].args[0].value;

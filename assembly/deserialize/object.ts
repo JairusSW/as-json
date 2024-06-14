@@ -77,11 +77,11 @@ import { isSpace } from "util/string";
               if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
                 key_start = outerLoopIndex - 1;
                 key_end = stringValueIndex;
-                console.log(`[KEY-00]: ${data.slice(outerLoopIndex - 1, stringValueIndex)}`)
+                //console.log(`[KEY-00]: ${data.slice(outerLoopIndex - 1, stringValueIndex)}`)
               } else {
                 key_start = outerLoopIndex;
                 key_end = stringValueIndex;
-                console.log(`[KEY-01]: ${data.slice(outerLoopIndex, stringValueIndex)}`)
+                //console.log(`[KEY-01]: ${data.slice(outerLoopIndex, stringValueIndex)}`)
               }
               isKey = true;
             } else {

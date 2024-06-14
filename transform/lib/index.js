@@ -10,10 +10,9 @@ class JSONTransform extends BaseVisitor {
     }
     visitMethodDeclaration() { }
     visitClassDeclaration(node) {
-        var _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
-        if (!((_c = node.decorators) === null || _c === void 0 ? void 0 : _c.length))
+        if (!node.decorators?.length)
             return;
-        if (!((_d = node.members) === null || _d === void 0 ? void 0 : _d.length))
+        if (!node.members?.length)
             return;
         let found = false;
         for (const decorator of node.decorators) {
@@ -28,7 +27,20 @@ class JSONTransform extends BaseVisitor {
         const schema = new SchemaData();
         schema.node = node;
         schema.name = node.name.text;
-        for (const member of node.members) {
+        const members = [
+            ...node.members
+        ];
+        if (node.extendsType) {
+            schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text);
+            if (schema.parent?.members) {
+                for (let i = 0; i < schema.parent.members.length; i++) {
+                    const replace = schema.members.find((v) => v.name == schema.parent?.members[i]?.name);
+                    if (!replace)
+                        schema.members.unshift(schema.parent.members[i]);
+                }
+            }
+        }
+        for (const member of members) {
             if (!(member instanceof FieldDeclaration))
                 continue;
             const name = member.name;
@@ -47,9 +59,10 @@ class JSONTransform extends BaseVisitor {
             mem.name = name.text;
             mem.type = type;
             mem.value = value;
+            mem.node = member;
             for (const decorator of member.decorators || []) {
                 if (decorator.name.text == "alias") {
-                    if (!((_e = decorator.args) === null || _e === void 0 ? void 0 : _e.length))
+                    if (!decorator.args?.length)
                         throw new Error("Expected 1 argument but got zero at @alias in " + node.range.source.normalizedPath);
                     mem.flag = PropertyFlags.Alias;
                     mem.alias = decorator.args[0].value;
@@ -61,9 +74,9 @@ class JSONTransform extends BaseVisitor {
                     mem.flag = PropertyFlags.OmitNull;
                 }
                 else if (decorator.name.text == "omitif") {
-                    if (!((_f = decorator.args) === null || _f === void 0 ? void 0 : _f.length))
+                    if (!decorator.args?.length)
                         throw new Error("Expected 1 argument but got zero at @omitif in " + node.range.source.normalizedPath);
-                    (_g = mem.args) === null || _g === void 0 ? void 0 : _g.push(decorator.args[0].value);
+                    mem.args?.push(decorator.args[0].value);
                     mem.flag = PropertyFlags.OmitIf;
                 }
             }
@@ -71,35 +84,25 @@ class JSONTransform extends BaseVisitor {
                 mem.name = mem.alias;
             }
             else if (mem.flag === PropertyFlags.None) {
-                mem.serialize = encodeKey(name.text) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+                mem.serialize = encodeKey(mem.name) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
             }
             if (mem.flag == PropertyFlags.OmitNull) {
-                mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + encodeKey(name.text) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
+                mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + encodeKey(mem.name) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
             }
             else if (mem.flag == PropertyFlags.OmitIf) {
-                mem.serialize = "${" + mem.args[0] + " ? \"\" : '" + encodeKey(name.text) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ")}";
+                mem.serialize = "${" + mem.args[0] + " ? \"\" : '" + encodeKey(mem.name) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ")}";
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
             }
             else if (mem.flag == PropertyFlags.Alias) {
-                mem.serialize = encodeKey(name.text) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+                mem.serialize = encodeKey(mem.name) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
                 mem.name = name.text;
             }
             if (mem.value)
                 mem.initialize = "this." + name.text + " = " + mem.value;
             schema.members.push(mem);
-        }
-        if (node.extendsType) {
-            schema.parent = this.schemasList.find((v) => { var _c; return v.name == ((_c = node.extendsType) === null || _c === void 0 ? void 0 : _c.name.identifier.text); });
-            if ((_h = schema.parent) === null || _h === void 0 ? void 0 : _h.members) {
-                for (let i = 0; i < schema.parent.members.length; i++) {
-                    const replace = schema.members.find((v) => { var _c, _d; return v.name == ((_d = (_c = schema.parent) === null || _c === void 0 ? void 0 : _c.members[i]) === null || _d === void 0 ? void 0 : _d.name); });
-                    if (!replace)
-                        schema.members.unshift(schema.parent.members[i]);
-                }
-            }
         }
         let SERIALIZE_RAW = "@inline __SERIALIZE(): string {\n  let out = `{";
         let SERIALIZE_PRETTY = "@inline __SERIALIZE_PRETTY(): string {\n  let out = `{";
@@ -109,18 +112,18 @@ class JSONTransform extends BaseVisitor {
         if (!schema.members.length)
             return;
         found = false;
-        if (((_j = schema.members[0]) === null || _j === void 0 ? void 0 : _j.flag) === PropertyFlags.OmitNull
-            || ((_k = schema.members[0]) === null || _k === void 0 ? void 0 : _k.flag) === PropertyFlags.OmitIf) {
-            SERIALIZE_RAW += (_l = schema.members[0]) === null || _l === void 0 ? void 0 : _l.serialize;
-            SERIALIZE_PRETTY += "\\n" + ((_m = schema.members[0]) === null || _m === void 0 ? void 0 : _m.serialize);
+        if (schema.members[0]?.flag === PropertyFlags.OmitNull
+            || schema.members[0]?.flag === PropertyFlags.OmitIf) {
+            SERIALIZE_RAW += schema.members[0]?.serialize;
+            SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize;
         }
         else {
-            SERIALIZE_RAW += ((_o = schema.members[0]) === null || _o === void 0 ? void 0 : _o.serialize) + ",";
-            SERIALIZE_PRETTY += "\\n" + ((_p = schema.members[0]) === null || _p === void 0 ? void 0 : _p.serialize) + ",\\n";
+            SERIALIZE_RAW += schema.members[0]?.serialize + ",";
+            SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize + ",\\n";
             found = true;
         }
-        if ((_q = schema.members[0]) === null || _q === void 0 ? void 0 : _q.initialize)
-            INITIALIZE += "  " + ((_r = schema.members[0]) === null || _r === void 0 ? void 0 : _r.initialize) + ";\n";
+        if (schema.members[0]?.initialize)
+            INITIALIZE += "  " + schema.members[0]?.initialize + ";\n";
         for (let i = 1; i < schema.members.length; i++) {
             const member = schema.members[i];
             if (member.initialize)
@@ -150,7 +153,7 @@ class JSONTransform extends BaseVisitor {
         let len = 0;
         let offset = 0;
         sortedMembers.push([_sorted[0]]);
-        len = (_s = _sorted[0]) === null || _s === void 0 ? void 0 : _s.name.length;
+        len = _sorted[0]?.name.length;
         for (let i = 1; i < _sorted.length; i++) {
             const member = _sorted[i];
             if (len < member.name.length) {
@@ -163,7 +166,13 @@ class JSONTransform extends BaseVisitor {
         }
         let first = true;
         for (const memberSet of sortedMembers) {
-            if (memberSet[0].name.length === 1) {
+            const firstMember = memberSet[0];
+            if (firstMember.flag == PropertyFlags.Alias) {
+                let alias = firstMember.alias;
+                firstMember.alias = firstMember.name;
+                firstMember.name = alias;
+            }
+            if (firstMember.name.length === 1) {
                 if (first) {
                     DESERIALIZE += "  if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
                     first = false;
@@ -172,7 +181,7 @@ class JSONTransform extends BaseVisitor {
                     DESERIALIZE += "else if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
                 }
             }
-            else if (memberSet[0].name.length === 2) {
+            else if (firstMember.name.length === 2) {
                 if (first) {
                     DESERIALIZE += "  if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
                     first = false;
@@ -181,7 +190,7 @@ class JSONTransform extends BaseVisitor {
                     DESERIALIZE += "else if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
                 }
             }
-            else if (memberSet[0].name.length === 4) {
+            else if (firstMember.name.length === 4) {
                 if (first) {
                     DESERIALIZE += "  if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
                     first = false;
@@ -192,15 +201,25 @@ class JSONTransform extends BaseVisitor {
             }
             else {
                 if (first) {
-                    DESERIALIZE += "  if (" + memberSet[0].name.length + " === len) {\n";
+                    DESERIALIZE += "  if (" + firstMember.name.length + " === len) {\n";
                     first = false;
                 }
                 else {
-                    DESERIALIZE += "else if (" + memberSet[0].name.length + " === len) {\n";
+                    DESERIALIZE += "else if (" + firstMember.name.length + " === len) {\n";
                 }
+            }
+            if (firstMember.flag == PropertyFlags.Alias) {
+                let name = firstMember.alias;
+                firstMember.alias = firstMember.name;
+                firstMember.name = name;
             }
             for (let i = 0; i < memberSet.length; i++) {
                 const member = memberSet[i];
+                if (member.flag == PropertyFlags.Alias) {
+                    let alias = member.alias;
+                    member.alias = member.name;
+                    member.name = alias;
+                }
                 if (member.name.length === 1) {
                     DESERIALIZE += `      case ${member.name.charCodeAt(0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
                 }
@@ -211,8 +230,18 @@ class JSONTransform extends BaseVisitor {
                     DESERIALIZE += `    if (${charCodeAt64(member.name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
                 }
                 else {
-                    DESERIALIZE += `    if (memory.compare(changetype<usize>(data) + (key_start << 1), changetype<usize>("${member.name}"), ${member.name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+                    DESERIALIZE += `    if (memory.compare(changetype<usize>("${escapeQuotes(member.name)}"), changetype<usize>(data) + (key_start << 1), ${member.name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
                 }
+                if (member.flag == PropertyFlags.Alias) {
+                    let name = member.alias;
+                    member.alias = member.name;
+                    member.name = name;
+                }
+            }
+            if (firstMember.flag == PropertyFlags.Alias) {
+                let alias = firstMember.alias;
+                firstMember.alias = firstMember.name;
+                firstMember.name = alias;
             }
             if (memberSet[0].name.length < 3) {
                 DESERIALIZE += `      default: {\n        return false;\n      }\n    }\n`;
@@ -224,18 +253,24 @@ class JSONTransform extends BaseVisitor {
                 DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`;
             }
             DESERIALIZE += "  } ";
+            if (firstMember.flag == PropertyFlags.Alias) {
+                let name = firstMember.alias;
+                firstMember.alias = firstMember.name;
+                firstMember.name = name;
+            }
         }
         DESERIALIZE += "\n  return false;\n}";
-        console.log(sortedMembers);
-        console.log(SERIALIZE_RAW);
-        console.log(SERIALIZE_PRETTY);
-        console.log(INITIALIZE);
+        //console.log(sortedMembers);
+        //console.log(SERIALIZE_RAW);
+        //console.log(SERIALIZE_PRETTY);
+        //console.log(INITIALIZE);
         console.log(DESERIALIZE);
         const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
         //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
         const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
         const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
         node.members.push(SERIALIZE_RAW_METHOD, INITIALIZE_METHOD, DESERIALIZE_METHOD);
+        this.schemasList.push(schema);
     }
     visitSource(node) {
         super.visitSource(node);
@@ -294,7 +329,7 @@ export default class Transformer extends Transform {
         const schemas = transformer.schemasList;
         for (const schema of schemas) {
             if (schema.parent) {
-                const parent = schemas.find((v) => { var _c; return v.name === ((_c = schema.parent) === null || _c === void 0 ? void 0 : _c.name); });
+                const parent = schemas.find((v) => v.name === schema.parent?.name);
                 if (!parent)
                     throw new Error(`Class ${schema.name} extends its parent class ${schema.parent}, but ${schema.parent} does not include a @json or @serializable decorator! Add the decorator and rebuild.`);
             }
@@ -342,4 +377,7 @@ function charCodeAt64(data, offset) {
     const fourthCharCode = BigInt(data.charCodeAt(offset + 3));
     const u64Value = (fourthCharCode << 48n) | (thirdCharCode << 32n) | (secondCharCode << 16n) | firstCharCode;
     return u64Value;
+}
+function escapeQuotes(data) {
+    return data.replace(/"/g, '\\"');
 }

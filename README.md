@@ -54,6 +54,7 @@ class Player {
   lastName!: string;
   lastActive!: i32[];
   age!: i32;
+  @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
 }
@@ -71,9 +72,7 @@ const player: Player = {
   isVerified: true
 };
 
-const stringified = JSON.stringify<Player>(player, true);
-// You can toggle on setting default values with the 2nd parameter
-// Alternative: use JSON.serializeTo(player, out);
+const stringified = JSON.stringify<Player>(player);
 
 const parsed = JSON.parse<Player>(stringified);
 ```
@@ -91,21 +90,25 @@ My library beats JSON (written in C++) on all counts *and*, I see many places wh
 
 Serialization Benchmarks:
 
-| Value                      | JavaScript (ops/s) | JSON-as (ops/s) | JSON-AS with Pages |
-|----------------------------|--------------------|-----------------|--------------------|
-| "hello world"              | 28,629,598         | 64,210,666      | + 124%             |
-| 12345                      | 31,562,431         | 56,329,066      | 321,783,941 ops/s  |
-| 1.2345                     | 15,977,278         | 20,322,939      | 30,307,616 ops/s  |
-| [[],[[]],[[],[[]]]]        | 8,998,624          | 34,453,102      | + 283% |
+| Value                      | JavaScript (ops/s) | JSON-as (ops/s) | Difference |
+|----------------------------|--------------------|-----------------|------------|
+| "hello world"              | 28,629,598         | 64,210,666      | + 124%     |
+| 12345                      | 31,562,431         | 56,329,066      | + 78%      |
+| 1.2345                     | 15,977,278         | 20,322,939      | + 27%      |
+| [[],[[]],[[],[[]]]]        | 8,998,624          | 34,453,102      | + 283%     |
+| { x: f64, y: f64, z: f64 } | 15,583,686         | 17,604,821      | + 12%      |
 
 
 
-Deserialization Benchmarks: (WIP)
+Deserialization Benchmarks:
 
-| Value                      | JavaScript (ops/s) | JSON-AS (ops/s) | % Diff |
-|----------------------------|--------------------|-----------------|--------|
-| "12345"                    | 34,647,886         | 254,640,930     | + 635% |
-
+| Value                      | JavaScript (ops/s) | JSON-AS (ops/s) | Difference|
+|----------------------------|--------------------|-----------------|-----------|
+| "hello world"              | 12,210,131         | 24,274,496      | + 98%     |
+| "12345"                    | 21,376,873         | 254,640,930     | + 1,191%  |
+| 1.2345                     | 23,193,902         | 221,869,840     | + 987%    |
+| [[],[[]],[[],[[]]]]        | 4,777,227          | 74,921,123      | + 1,568%  |
+| { x: f64, y: f64, z: f64 } | 10,973,723         | 25,214,019      | + 230%    |
 
 And my PC specs:
 
@@ -115,7 +118,6 @@ And my PC specs:
 | CPU             | AMD Ryzen 7 7800x3D @ 6.00 GHz       |
 | Memory          | T-Force DDR5 6000 MHz                |
 | OS              | Ubuntu WSL2                          |
-| Graphics        | AMD Radeon RX 6750XT                 |
 
 ## Issues
 
