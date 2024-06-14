@@ -184,17 +184,31 @@ class JSONTransform extends BaseVisitor {
     for (const memberSet of sortedMembers) {
       if (memberSet[0]!.name.length === 1) {
         if (first) {
-          DESERIALIZE += "  if (len === 1) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE += "  if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
           first = false;
         } else {
-          DESERIALIZE += "  if (len === 1) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE += "else if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
         }
       } else if (memberSet[0]!.name.length === 2) {
         if (first) {
-          DESERIALIZE += "  if (len === 2) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE += "  if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
           first = false;
         } else {
-          DESERIALIZE += "  if (len === 2) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE += "else if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
+        }
+      } else if (memberSet[0]!.name.length === 4) {
+        if (first) {
+          DESERIALIZE += "  if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
+          first = false;
+        } else {
+          DESERIALIZE += "else if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
+        }
+      } else {
+        if (first) {
+          DESERIALIZE += "  if (" + memberSet[0]!.name.length + " === len) {\n";
+          first = false;
+        } else {
+          DESERIALIZE += "else if (" + memberSet[0]!.name.length + " === len) {\n";
         }
       }
       for (let i = 0; i < memberSet.length; i++) {
@@ -203,19 +217,23 @@ class JSONTransform extends BaseVisitor {
           DESERIALIZE += `      case ${member.name.charCodeAt(0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
         } else if (member.name.length === 2) {
           DESERIALIZE += `      case ${charCodeAt32(member.name, 0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
+        } else if (member.name.length === 4) {
+          DESERIALIZE += `    if (${charCodeAt64(member.name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
         } else {
-          DESERIALIZE += `    if (memory.compare(changetype<usize>(data) + (key_start << 1), changetype<usize>("${member.name}"), ${member.name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`
+          DESERIALIZE += `    if (changetype<usize>("${member.name}"), memory.compare(changetype<usize>(data) + (key_start << 1), ${member.name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`
         }
       }
       if (memberSet[0]!.name.length < 3) {
-        DESERIALIZE += `      default: {\n        return false;\n      }\n`
+        DESERIALIZE += `      default: {\n        return false;\n      }\n    }\n`
+      } else if (memberSet[0]!.name.length == 4) {
+        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`
       } else {
-        DESERIALIZE += ` else {\n        return false;\n      }\n`
+        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`
       }
-      DESERIALIZE += "    } ";
+      DESERIALIZE += "  } ";
     }
 
-    DESERIALIZE += "\n  }\n  return false;\n}"
+    DESERIALIZE += "\n  return false;\n}"
 
     console.log(sortedMembers);
 
@@ -335,4 +353,19 @@ class SchemaData {
 
 function charCodeAt32(data: string, offset: number): number {
   return (data.charCodeAt(offset + 1) << 16) | data.charCodeAt(offset);
+}
+
+function charCodeAt64(data: string, offset: number): bigint {
+  if (offset + 3 >= data.length) {
+    throw new Error("The string must have at least 4 characters from the specified offset.");
+  }
+
+  const firstCharCode = BigInt(data.charCodeAt(offset));
+  const secondCharCode = BigInt(data.charCodeAt(offset + 1));
+  const thirdCharCode = BigInt(data.charCodeAt(offset + 2));
+  const fourthCharCode = BigInt(data.charCodeAt(offset + 3));
+
+  const u64Value = (fourthCharCode << 48n) | (thirdCharCode << 32n) | (secondCharCode << 16n) | firstCharCode;
+
+  return u64Value;
 }
