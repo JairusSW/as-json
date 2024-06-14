@@ -1,30 +1,22 @@
 import { Box } from "as-container";
-import { JSON } from "./src/json";
-
+import { JSON } from ".";
+import { deserializeObject } from "./deserialize/object";
 @json
-class Foo {
-  @omitnull
-  optionalNumber: Box<i32> | null = null;
-  @omitif("this.tristateValue!.unwrap() == false")
-  tristateValue: Box<bool> | null = null;
+class Vec3 {
+  @omitnull()
+  xx: Box<f64> | null = Box.from<f64>(0.0);
+  yy: Box<f64> | null = Box.from<f64>(0.0);
+  zz: Box<f64> | null = Box.from<f64>(0.0);
 }
 
-@json
-class TestBody {
-  a!: string;
-  b!: u8;
+const vec: Vec3 = {
+  xx: null,
+  yy: Box.from(2.0),
+  zz: null//Box.from(3.0)
 }
 
-const foo: Foo = {
-  optionalNumber: null,
-  tristateValue: Box.from(true)
-}
-console.log(JSON.stringify(JSON.parse<TestBody[]>('[{"a":"hi","b":5},{"a":"bye","b":6}]')))
-console.log(JSON.stringify([foo, foo]))
-console.log(JSON.stringify(foo));
+console.log(JSON.stringify(vec));
 
-const p1 = JSON.parse<Box<i32> | null>("null");
-console.log(JSON.stringify<Box<i32> | null>(p1));
-console.log(changetype<usize>(p1).toString())
-const p2 = JSON.parse<Foo>("{\"optionalNumber\":null,\"tristateValue\":false}");
-console.log(JSON.stringify(p2));
+console.log(JSON.stringify(deserializeObject<Vec3>("{\"xx\":1.0,\"yy\":2.0,\"zz\":3.0}", true)));
+
+console.log(load<u32>(changetype<usize>("xx")).toString())

@@ -1,5 +1,5 @@
 import { colonCode, commaCode, leftBraceWord, rightBraceCode } from "../src/chars";
-import { JSON } from "../src/json";
+import { JSON } from "..";
 import { Sink } from "../src/sink";
 import { serializeString } from "./string";
 

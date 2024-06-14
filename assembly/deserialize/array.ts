@@ -28,7 +28,7 @@ import { deserializeStringArray } from "./array/string";
     } else if (isManaged<valueof<T>>() || isReference<valueof<T>>()) {
         const type = changetype<nonnull<valueof<T>>>(0);
         // @ts-ignore
-        if (isDefined(type.__JSON_Set_Key)) {
+        if (isDefined(type.__DESERIALIZE)) {
             return deserializeObjectArray<T>(data);
         }
     }

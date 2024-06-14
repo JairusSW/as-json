@@ -1,5 +1,5 @@
 import { leftBraceCode, rightBraceCode } from "../../src/chars";
-import { JSON } from "../../src/json";
+import { JSON } from "../..";
 import { unsafeCharCodeAt } from "../../src/util";
 
 // @ts-ignore: Decorator

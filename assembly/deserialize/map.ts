@@ -20,7 +20,7 @@ import {
     uCode
 } from "../src/chars";
 import { deserializeBoolean } from "./bool";
-import { JSON } from "../src/json";
+import { JSON } from "..";
 import { deserializeString } from "./string";
 import { isSpace } from "util/string";
 import { deserializeInteger } from "./integer";

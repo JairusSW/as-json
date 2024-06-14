@@ -1,3 +1,4 @@
+import { JSON } from "..";
 import {
     commaCode,
     commaWord,
@@ -40,11 +41,11 @@ import { serializeString } from "./string";
         // @ts-ignore
         for (let i = 0; i < data.length - 1; i++) {
             // @ts-ignore
-            result.write(__JSON_Stringify(unchecked(data[i])));
+            result.write(JSON.stringify(unchecked(data[i])));
             result.writeCodePoint(commaCode);
         }
         // @ts-ignore
-        result.write(__JSON_Stringify(unchecked(data[data.length - 1])));
+        result.write(JSON.stringify(unchecked(data[data.length - 1])));
         result.writeCodePoint(rightBracketCode);
         return result.toString();
     }

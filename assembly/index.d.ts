@@ -14,9 +14,15 @@ declare function serializable(target: any): void;
 declare function alias(name: string): Function;
 
 /**
+ * Property decorator that allows omits a field, making it be ignored.
+ */
+declare function omit(): Function;
+
+
+/**
  * Property decorator that allows a field to be omitted when equal to an Expression.
  */
-declare function omitwhen(condition: string): Function;
+declare function omitif(condition: string): Function;
 
 /**
  * Property decorator that allows a field to be omitted when a property is null.

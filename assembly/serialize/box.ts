@@ -1,5 +1,5 @@
 import { nullWord } from "../src/chars";
-import { JSON } from "../src/json";
+import { JSON } from "..";
 
 // @ts-ignore
 @inline export function serializeBox<T extends Box<any>>(data: T): string {
