@@ -1,23 +1,12 @@
 import { JSON } from "..";
-function canSerde<T>(data: T, toBe: string = ""): void {
-  if (!toBe) toBe = JSON.stringify<T>(data);
-  const deserialized = JSON.stringify<T>(JSON.parse<T>(JSON.stringify(data)));
-  expect(deserialized).toBe(toBe);
-}
+import {
+  describe,
+  expect
+} from "as-test/assembly";
 
-function canDeser<T>(data: string, toBe: T): void {
-  const deserialized = JSON.parse<T>(data);
-  expect(deserialized).toStrictEqual(toBe);
-}
-
-function canSer<T>(data: T, toBe: string): void {
-  const serialized = JSON.stringify<T>(data);
-  expect(serialized).toBe(toBe);
-}
 @json
 class BaseObject {
   a: string;
-
   constructor(a: string) {
     this.a = a;
   }
@@ -26,20 +15,12 @@ class BaseObject {
 @json
 class DerivedObject extends BaseObject {
   b: string;
-
   constructor(a: string, b: string) {
     super(a);
     this.b = b;
   }
 }
 
-describe("Ser/de object hierarchies", () => {
-  it("should ser/de objects derived from base objects", () => {
-    const o = new DerivedObject("1", "2");
-    const s = '{"a":"1","b":"2"}';
-    canSerde(o, s);
-  });
-});
 @json
 class Map4 {
   a: string;
@@ -70,56 +51,96 @@ class Player {
 class Nullable { }
 type Null = Nullable | null;
 
+describe("Should serialize class inheritance", () => {
+
+  const obj: DerivedObject = {
+    a: "1",
+    b: "2"
+  }
+
+  expect(
+    JSON.stringify(obj)
+  ).toBe("{\"a\":\"1\",\"b\":\"2\"}");
+
+});
+
 describe("Ser/de Nulls", () => {
-  canSerde<Null>(null);
+
+  expect(
+    JSON.stringify<Null>(null)
+  ).toBe("null");
+
 });
 
 describe("Ser/de Strings", () => {
-  it("should ser/de strings", () => {
-    canSerde<string>("abcdefg");
-    canSerde<string>('st"ring" w""ith quotes"');
-    canSerde<string>('string \"with random spa\nces and \nnewlines\n\n\n');
-    canSerde<string>(
-      'string with colon : comma , brace [ ] bracket { } and quote " and other quote \\"'
-    );
-  });
+
+  expect(
+    JSON.stringify("abcdefg")
+  ).toBe("\"abcdefg\"");
+
+  expect(
+    JSON.stringify('st"ring" w""ith quotes"')
+  ).toBe('"st\\"ring\\" w\\"\\"ith quotes\\""');
+
+  expect(
+    JSON.stringify('string \"with random spa\nces and \nnewlines\n\n\n')
+  ).toBe('"string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"');
+
+  expect(
+    JSON.stringify('string with colon : comma , brace [ ] bracket { } and quote " and other quote \\"')
+  ).toBe('"string with colon : comma , brace [ ] bracket { } and quote \\" and other quote \\\\\\""')
+
 });
 
-describe("Ser/de Numbers", () => {
-  it("should ser/de integers", () => {
-    canSerde<i32>(0);
+describe("Ser/de Integers", () => {
 
-    canSerde<u32>(100, "100");
-    canSerde<u64>(101, "101");
-    canSerde<i32>(-100, "-100");
-    canSerde<i64>(-101, "-101");
-  });
+  expect(
+    JSON.stringify(0)
+  ).toBe("0");
 
-  it("should ser/de floats", () => {
-    canSerde<f64>(7.23, "7.23");
-    canSerde<f64>(10e2, "1000.0");
+  expect(
+    JSON.stringify<u32>(100)
+  ).toBe("100");
 
-    canSerde<f64>(123456e-5, "1.23456");
-    canSerde<f64>(0.0, "0.0");
-    canSerde<f64>(-7.23, "-7.23");
+  expect(
+    JSON.stringify<u64>(101)
+  ).toBe("101");
 
-    canSerde<f64>(1e-6, "0.000001");
-    canSerde<f64>(1e-7, "1e-7");
-    canDeser<f64>("1E-7", 1e-7);
+  expect(
+    JSON.stringify<i32>(-100)
+  ).toBe("-100");
 
-    canSerde<f64>(1e20, "100000000000000000000.0");
-    canSerde<f64>(1e21, "1e+21");
-    canDeser<f64>("1E+21", 1e21);
-    canDeser<f64>("1e21", 1e21);
-    canDeser<f64>("1E21", 1e21);
-  });
+  expect(
+    JSON.stringify<i64>(-101)
+  ).toBe("-101");
 
-  it("should ser/de booleans", () => {
-    canSerde<bool>(true);
-    canSerde<bool>(false);
-    canSerde<boolean>(true);
-    canSerde<boolean>(false);
-  });
+});
+
+describe("Should serialize floats", () => {
+  canSerde<f64>(7.23, "7.23");
+  canSerde<f64>(10e2, "1000.0");
+
+  canSerde<f64>(123456e-5, "1.23456");
+  canSerde<f64>(0.0, "0.0");
+  canSerde<f64>(-7.23, "-7.23");
+
+  canSerde<f64>(1e-6, "0.000001");
+  canSerde<f64>(1e-7, "1e-7");
+  canDeser<f64>("1E-7", 1e-7);
+
+  canSerde<f64>(1e20, "100000000000000000000.0");
+  canSerde<f64>(1e21, "1e+21");
+  canDeser<f64>("1E+21", 1e21);
+  canDeser<f64>("1e21", 1e21);
+  canDeser<f64>("1E21", 1e21);
+});
+
+it("should ser/de booleans", () => {
+  canSerde<bool>(true);
+  canSerde<bool>(false);
+  canSerde<boolean>(true);
+  canSerde<boolean>(false);
+});
 });
 
 describe("Ser/de Array", () => {
@@ -133,16 +154,16 @@ describe("Ser/de Array", () => {
       1,
       2,
       3
-    ]`, [1,2,3]);
+    ]`, [1, 2, 3]);
   });
 
   it("should ser/de float arrays", () => {
     canSerde<f64[]>([7.23, 10e2, 10e2, 123456e-5, 123456e-5, 0.0, 7.23]);
 
-    canSerde<f64[]>([1e21,1e22,1e-7,1e-8,1e-9], "[1e+21,1e+22,1e-7,1e-8,1e-9]");
-    canDeser<f64[]>("[1E+21,1E+22,1E-7,1E-8,1E-9]", [1e21,1e22,1e-7,1e-8,1e-9]);
-    canDeser<f64[]>("[1e21,1e22,1e-7,1e-8,1e-9]", [1e21,1e22,1e-7,1e-8,1e-9]);
-    canDeser<f64[]>("[1E21,1E22,1E-7,1E-8,1E-9]", [1e21,1e22,1e-7,1e-8,1e-9]);
+    canSerde<f64[]>([1e21, 1e22, 1e-7, 1e-8, 1e-9], "[1e+21,1e+22,1e-7,1e-8,1e-9]");
+    canDeser<f64[]>("[1E+21,1E+22,1E-7,1E-8,1E-9]", [1e21, 1e22, 1e-7, 1e-8, 1e-9]);
+    canDeser<f64[]>("[1e21,1e22,1e-7,1e-8,1e-9]", [1e21, 1e22, 1e-7, 1e-8, 1e-9]);
+    canDeser<f64[]>("[1E21,1E22,1E-7,1E-8,1E-9]", [1e21, 1e22, 1e-7, 1e-8, 1e-9]);
   });
 
   it("should ser/de boolean arrays", () => {
@@ -229,20 +250,20 @@ describe("Ser/de Objects", () => {
 
   it("should ser/de object with float arrays", () => {
     canSerde<ObjectWithFloatArray>(
-      { fa: [1e21,1e22,1e-7,1e-8,1e-9] },
+      { fa: [1e21, 1e22, 1e-7, 1e-8, 1e-9] },
       '{"fa":[1e+21,1e+22,1e-7,1e-8,1e-9]}');
 
     canDeser<ObjectWithFloatArray>(
       '{"fa":[1E+21,1E+22,1E-7,1E-8,1E-9]}',
-      { fa: [1e21,1e22,1e-7,1e-8,1e-9] });
+      { fa: [1e21, 1e22, 1e-7, 1e-8, 1e-9] });
 
     canDeser<ObjectWithFloatArray>(
       '{"fa":[1e21,1e22,1e-7,1e-8,1e-9]}',
-      { fa: [1e21,1e22,1e-7,1e-8,1e-9] });
+      { fa: [1e21, 1e22, 1e-7, 1e-8, 1e-9] });
 
     canDeser<ObjectWithFloatArray>(
       '{"fa":[1E21,1E22,1E-7,1E-8,1E-9]}',
-      { fa: [1e21,1e22,1e-7,1e-8,1e-9] });
+      { fa: [1e21, 1e22, 1e-7, 1e-8, 1e-9] });
 
   });
 });
@@ -368,27 +389,27 @@ describe("Ser/de Maps", () => {
     m.set(1, true);
     m.set(2, false);
     m.set(3, true);
-    canSer(m, '{"1":true,"2":false,"3":true}'); 
+    canSer(m, '{"1":true,"2":false,"3":true}');
   });
   it("should deserialize Map<u32, bool>", () => {
     const m = new Map<u32, bool>();
     m.set(1, true);
     m.set(2, false);
     m.set(3, true);
-    canDeser('{"1":true,"2":false,"3":true}', m); 
+    canDeser('{"1":true,"2":false,"3":true}', m);
   });
 
   it("should serialize Map<bool, string>", () => {
     const m = new Map<bool, string>();
     m.set(true, "a");
     m.set(false, "b");
-    canSer(m, '{"true":"a","false":"b"}'); 
+    canSer(m, '{"true":"a","false":"b"}');
   });
   it("should deserialize Map<bool, string>", () => {
     const m = new Map<bool, string>();
     m.set(true, "a");
     m.set(false, "b");
-    canDeser('{"true":"a","false":"b"}', m); 
+    canDeser('{"true":"a","false":"b"}', m);
   });
 
   it("should serialize Map<string, string>[]", () => {
@@ -396,7 +417,7 @@ describe("Ser/de Maps", () => {
     m1.set("a", "u");
     m1.set("b", "v");
     m1.set("c", "w");
-    
+
     const m2 = new Map<string, string>();
     m2.set("d", "x");
     m2.set("e", "y");
@@ -410,7 +431,7 @@ describe("Ser/de Maps", () => {
     m1.set("a", "u");
     m1.set("b", "v");
     m1.set("c", "w");
-    
+
     const m2 = new Map<string, string>();
     m2.set("d", "x");
     m2.set("e", "y");
@@ -464,7 +485,7 @@ describe("Ser/de escape sequences in strings", () => {
   // \u0000 - \u001f
   it("should decode long escape sequences (lower cased)", () => {
     for (let i = 0; i <= 0x1f; i++) {
-      const s = `"\\u${i.toString(16).padStart(4, "0").toLowerCase()}"`;      
+      const s = `"\\u${i.toString(16).padStart(4, "0").toLowerCase()}"`;
       const actual = JSON.parse<string>(s);
       const expected = String.fromCharCode(i);
       expect(actual).toBe(expected, `Failed to decode ${s}`);
@@ -474,7 +495,7 @@ describe("Ser/de escape sequences in strings", () => {
   // \u0000 - \u001F
   it("should decode long escape sequences (upper cased)", () => {
     for (let i = 0; i <= 0x1f; i++) {
-      const s = `"\\u${i.toString(16).padStart(4, "0").toUpperCase()}"`;      
+      const s = `"\\u${i.toString(16).padStart(4, "0").toUpperCase()}"`;
       const actual = JSON.parse<string>(s);
       const expected = String.fromCharCode(i);
       expect(actual).toBe(expected, `Failed to decode ${s}`);
