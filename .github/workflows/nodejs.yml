@@ -19,7 +19,7 @@ jobs:
         run: yarn
       
       - name: Build tests
-        run: yarn run test:build
-        
+        run: yarn run tests:build
+
       - name: Perform tests
         run: yarn run test
