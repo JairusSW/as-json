@@ -1,6 +1,6 @@
 import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
-import { backSlashCode, quoteCode } from "./chars";
+import { BACK_SLASH, QUOTE } from "./chars";
 
 // @ts-ignore: Decorator
 @inline export function isMap<T>(): bool {
@@ -19,10 +19,10 @@ import { backSlashCode, quoteCode } from "./chars";
   let instr = false;
   for (let i = 0; i < data.length; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if (instr === false && char === quoteCode) instr = true;
+    if (instr === false && char === QUOTE) instr = true;
     else if (
-      instr === true && char === quoteCode
-      && unsafeCharCodeAt(data, i - 1) !== backSlashCode
+      instr === true && char === QUOTE
+      && unsafeCharCodeAt(data, i - 1) !== BACK_SLASH
     ) instr = false;
 
     if (instr === false) {

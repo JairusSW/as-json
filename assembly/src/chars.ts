@@ -1,74 +1,76 @@
 // Characters
 // @ts-ignore = Decorator is valid here
-@inline export const commaCode = 44;
+@inline export const COMMA = 44;
 // @ts-ignore = Decorator is valid here
-@inline export const quoteCode = 34;
+@inline export const QUOTE = 34;
 // @ts-ignore = Decorator is valid here
-@inline export const backSlashCode = 92;
+@inline export const BACK_SLASH = 92;
 // @ts-ignore: Decorator is valid here
-@inline export const forwardSlashCode = 47;
+@inline export const FWD_SLASH = 47;
 // @ts-ignore: Decorator is valid here
-@inline export const leftBraceCode = 123;
+@inline export const BRACE_LEFT = 123;
 // @ts-ignore: Decorator is valid here
-@inline export const rightBraceCode = 125;
+@inline export const BRACE_RIGHT = 125;
 // @ts-ignore: Decorator is valid here
-@inline export const leftBracketCode = 91;
+@inline export const BRACKET_LEFT = 91;
 // @ts-ignore: Decorator is valid here
-@inline export const rightBracketCode = 93;
+@inline export const BRACKET_RIGHT = 93;
 // @ts-ignore: Decorator is valid here
-@inline export const colonCode = 58;
+@inline export const COLON = 58;
 // @ts-ignore: Decorator is valid here
-@inline export const tCode = 116;
+@inline export const CHAR_T = 116;
 // @ts-ignore: Decorator is valid here
-@inline export const rCode = 114;
+@inline export const CHAR_R = 114;
 // @ts-ignore: Decorator is valid here
-@inline export const uCode = 117;
+@inline export const CHAR_U = 117;
 // @ts-ignore: Decorator is valid here
-@inline export const eCode = 101;
+@inline export const CHAR_E = 101;
 // @ts-ignore: Decorator is valid here
-@inline export const fCode = 102;
+@inline export const CHAR_F = 102;
 // @ts-ignore: Decorator is valid here
-@inline export const aCode = 97;
+@inline export const CHAR_A = 97;
 // @ts-ignore: Decorator is valid here
-@inline export const lCode = 108;
+@inline export const CHAR_L = 108;
 // @ts-ignore: Decorator is valid here
-@inline export const sCode = 115;
+@inline export const CHAR_S = 115;
 // @ts-ignore = Decorator is valid here
-@inline export const nCode = 110;
+@inline export const CHAR_N = 110;
 // @ts-ignore = Decorator is valid here
-@inline export const bCode = 98;
+@inline export const CHAR_B = 98;
 // Strings
 // @ts-ignore: Decorator is valid here
-@inline export const trueWord = "true";
+@inline export const TRUE_WORD = "true";
 // @ts-ignore: Decorator is valid here
-@inline export const falseWord = "false";
+@inline export const FALSE_WORD = "false";
 // @ts-ignore: Decorator is valid here
-@inline export const nullWord = "null";
+@inline export const NULL_WORD = "null";
 // @ts-ignore: Decorator is valid here
-@inline export const leftBraceWord = "{";
+@inline export const BRACE_LEFT_WORD = "{";
 // @ts-ignore: Decorator is valid here
-@inline export const leftBracketWord = "[";
+@inline export const BRACKET_LEFT_WORD = "[";
 // @ts-ignore: Decorator is valid here
-@inline export const emptyArrayWord = "[]";
+@inline export const EMPTY_BRACKET_WORD = "[]";
 // @ts-ignore: Decorator is valid here
-@inline export const colonWord = ":";
+@inline export const COLON_WORD = ":";
 // @ts-ignore: Decorator is valid here
-@inline export const commaWord = ",";
+@inline export const COMMA_WORD = ",";
 // @ts-ignore: Decorator is valid here
-@inline export const rightBraceWord = "}";
+@inline export const BRACE_RIGHT_WORD = "}";
 // @ts-ignore: Decorator is valid here
-@inline export const rightBracketWord = "]";
+@inline export const BRACKET_RIGHT_WORD = "]";
 // @ts-ignore: Decorator is valid here
-@inline export const quoteWord = "\"";
+@inline export const QUOTE_WORD = "\"";
+// @ts-ignore: Decorator is valid here
+@inline export const EMPTY_QUOTE_WORD = "\"\"";
 
 // Escape Codes
 // @ts-ignore: Decorator is valid here
-@inline export const backspaceCode = 8; // \b
+@inline export const BACKSPACE = 8; // \b
 // @ts-ignore: Decorator is valid here
-@inline export const tabCode = 9; // \t
+@inline export const TAB = 9; // \t
 // @ts-ignore: Decorator is valid here
-@inline export const newLineCode = 10; // \n
+@inline export const NEW_LINE = 10; // \n
 // @ts-ignore: Decorator is valid here
-@inline export const formFeedCode = 12; // \f
+@inline export const FORM_FEED = 12; // \f
 // @ts-ignore: Decorator is valid here
-@inline export const carriageReturnCode = 13; // \r
+@inline export const CARRIAGE_RETURN = 13; // \r

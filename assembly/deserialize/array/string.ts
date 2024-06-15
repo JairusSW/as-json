@@ -1,4 +1,4 @@
-import { backSlashCode, quoteCode } from "../../src/chars";
+import { BACK_SLASH, QUOTE } from "../../src/chars";
 import { unsafeCharCodeAt } from "../../src/util";
 import { deserializeString } from "../string";
 
@@ -10,10 +10,10 @@ import { deserializeString } from "../string";
   let escaping = false;
   for (let i = 1; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if (char === backSlashCode && !escaping) {
+    if (char === BACK_SLASH && !escaping) {
       escaping = true;
     } else {
-      if (char === quoteCode && !escaping) {
+      if (char === QUOTE && !escaping) {
         if (instr === false) {
           instr = true;
           lastPos = i;

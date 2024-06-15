@@ -1,4 +1,4 @@
-import { leftBracketCode, rightBracketCode } from "../../src/chars";
+import { BRACKET_LEFT, BRACKET_RIGHT } from "../../src/chars";
 import { JSON } from "../..";
 import { unsafeCharCodeAt } from "../../src/util";
 
@@ -13,13 +13,13 @@ import { unsafeCharCodeAt } from "../../src/util";
     //i++;
     for (; i < data.length - 1; i++) {
         const char = unsafeCharCodeAt(data, i);
-        if (char === leftBracketCode) {
+        if (char === BRACKET_LEFT) {
             if (depth === 0) {
                 lastPos = i;
             }
             // Shifting is 6% faster than incrementing
             depth++;
-        } else if (char === rightBracketCode) {
+        } else if (char === BRACKET_RIGHT) {
             depth--;
             if (depth === 0) {
                 i++;

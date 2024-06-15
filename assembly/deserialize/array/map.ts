@@ -1,4 +1,4 @@
-import { leftBraceCode, rightBraceCode } from "../../src/chars";
+import { BRACE_LEFT, BRACE_RIGHT } from "../../src/chars";
 import { JSON } from "../..";
 import { unsafeCharCodeAt } from "../../src/util";
 
@@ -9,12 +9,12 @@ import { unsafeCharCodeAt } from "../../src/util";
     let depth: u32 = 0;
     for (let pos: u32 = 0; pos < <u32>data.length; pos++) {
         const char = unsafeCharCodeAt(data, pos);
-        if (char === leftBraceCode) {
+        if (char === BRACE_LEFT) {
             if (depth === 0) {
                 lastPos = pos;
             }
             depth++;
-        } else if (char === rightBraceCode) {
+        } else if (char === BRACE_RIGHT) {
             depth--;
             if (depth === 0) {
                 pos++;

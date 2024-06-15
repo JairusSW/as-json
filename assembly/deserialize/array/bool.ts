@@ -1,4 +1,4 @@
-import { eCode, fCode, tCode } from "../../src/chars";
+import { CHAR_E, CHAR_F, CHAR_T } from "../../src/chars";
 import { unsafeCharCodeAt } from "../../src/util";
 import { deserializeBoolean } from "../bool";
 
@@ -8,9 +8,9 @@ import { deserializeBoolean } from "../bool";
   let lastPos = 1;
   for (let i = 1; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if (char === tCode || char === fCode) {
+    if (char === CHAR_T || char === CHAR_F) {
       lastPos = i;
-    } else if (char === eCode) {
+    } else if (char === CHAR_E) {
       i++;
       result.push(deserializeBoolean(data.slice(lastPos, i)));
     }

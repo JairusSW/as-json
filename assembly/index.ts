@@ -18,7 +18,7 @@ import { deserializeBox } from "./deserialize/box";
 import { deserializeObject } from "./deserialize/object";
 import { deserializeMap } from "./deserialize/map";
 import { deserializeDate } from "./deserialize/date";
-import { falseWord, nullWord, trueWord } from "./src/chars";
+import { FALSE_WORD, NULL_WORD, TRUE_WORD } from "./src/chars";
 import { deserializeInteger } from "./deserialize/integer";
 import { deserializeString } from "./deserialize/string";
 import { Sink } from "./src/sink";
@@ -44,9 +44,9 @@ export namespace JSON {
     U64,
     F32,
     F64,
-    Boolean,
+    Bool,
     String,
-    Obj,
+    Struct,
     Array
   }
   export class Value {
@@ -80,7 +80,7 @@ export namespace JSON {
      */
     @inline set<T>(value: T): void {
       if (isBoolean<T>()) {
-        this.type = JSON.Types.Boolean;
+        this.type = JSON.Types.Bool;
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (value instanceof u8 || value instanceof i8) {
         this.type = JSON.Types.U8;
@@ -106,9 +106,13 @@ export namespace JSON {
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (value instanceof Map) {
         if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
-          abort("Maps must be of type Map<string, JSON.Value>!");
+          throw new Error("Maps must be of type Map<string, JSON.Value>!");
         }
-        this.type = JSON.Types.Obj;
+        this.type = JSON.Types.Struct;
+        store<T>(changetype<usize>(this), value, STORAGE);
+        // @ts-ignore: __SERIALIZE is implemented by the transform
+      } else if (isDefined(value.__SERIALIZE)) {
+        this.type = JSON.Types.Struct;
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (isArray<T>()) {
         // @ts-ignore: T satisfies constraints of any[]
@@ -123,7 +127,51 @@ export namespace JSON {
      * Gets the value of the JSON.Value instance.
      * @returns The encapsulated value.
      */
+    @inline unwrap<T>(): T {
+      if (isManaged<T>()) {
+        if (this.type !== JSON.Types.Struct) throw new Error("Type mismatch");
+        if (idof<T>() !== load<u32>(changetype<usize>(this.storage), -8)) throw new Error("Type mismatch");
+      }
+      return load<T>(changetype<usize>(this), STORAGE);
+    }
+
+    /**
+     * Gets the value of the JSON.Value instance.
+     * @returns The encapsulated value.
+     */
+    @inline unwrapUnsafe<T>(): T {
+      return load<T>(changetype<usize>(this), STORAGE);
+    }
+
+    /**
+     * Gets the value of the JSON.Value instance.
+     * @returns The encapsulated value.
+     */
     @inline get<T>(): T {
+      return load<T>(changetype<usize>(this), STORAGE);
+    }
+
+    /**
+     * Gets the value of the JSON.Value instance.
+     * @returns The encapsulated value.
+     */
+    @inline getUnsafe<T>(): T {
+      return load<T>(changetype<usize>(this), STORAGE);
+    }
+
+    /**
+     * Gets the value of the JSON.Value instance.
+     * @returns The encapsulated value.
+     */
+    @inline is<T>(): T {
+      return load<T>(changetype<usize>(this), STORAGE);
+    }
+
+    /**
+     * Gets the value of the JSON.Value instance.
+     * @returns The encapsulated value.
+     */
+    @inline clone<T>(): T {
       return load<T>(changetype<usize>(this), STORAGE);
     }
 
@@ -139,7 +187,7 @@ export namespace JSON {
         case JSON.Types.U32: return this.get<u32>().toString();
         case JSON.Types.U64: return this.get<u64>().toString();
         case JSON.Types.String: return "\"" + this.get<string>() + "\"";
-        case JSON.Types.Boolean: return this.get<boolean>() ? trueWord : falseWord;
+        case JSON.Types.Bool: return this.get<boolean>() ? TRUE_WORD : FALSE_WORD;
         default: {
           const arr = this.get<JSON.Value[]>();
           if (!arr.length) return "[]";
@@ -170,7 +218,7 @@ export namespace JSON {
   // @ts-ignore: Decorator
   @inline export function stringify<T>(data: T): string {
     if (isNullable<T>() && changetype<usize>(data) == <usize>0) {
-      return nullWord;
+      return NULL_WORD;
       // @ts-ignore
     } else if (isString<T>()) {
       return serializeString(data as string);
@@ -227,7 +275,7 @@ export namespace JSON {
     let type: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
     if (type instanceof Box) {
       return deserializeBox<T>(data);
-    } else if (isNullable<T>() && data == nullWord) {
+    } else if (isNullable<T>() && data == NULL_WORD) {
       // @ts-ignore
       return null;
       // @ts-ignore

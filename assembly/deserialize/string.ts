@@ -1,18 +1,18 @@
 import {
-    bCode,
-    backSlashCode,
-    backspaceCode,
-    carriageReturnCode,
-    fCode,
-    formFeedCode,
-    forwardSlashCode,
-    nCode,
-    newLineCode,
-    quoteCode,
-    rCode,
-    tCode,
-    tabCode,
-    uCode
+    CHAR_B,
+    BACK_SLASH,
+    BACKSPACE,
+    CARRIAGE_RETURN,
+    CHAR_F,
+    FORM_FEED,
+    FWD_SLASH,
+    CHAR_N,
+    NEW_LINE,
+    QUOTE,
+    CHAR_R,
+    CHAR_T,
+    TAB,
+    CHAR_U
 } from "../src/chars";
 import { Sink } from "../src/sink";
 import { unsafeCharCodeAt } from "../src/util";
@@ -23,53 +23,53 @@ import { unsafeCharCodeAt } from "../src/util";
     let result = Sink.withCapacity(end - start - 1);
     let last = start + 1;
     for (let i = last; i < end; i++) {
-        if (unsafeCharCodeAt(data, i) !== backSlashCode) {
+        if (unsafeCharCodeAt(data, i) !== BACK_SLASH) {
             continue;
         }
         const char = unsafeCharCodeAt(data, ++i);
         result.write(data, last, i - 1);
         switch (char) {
-            case quoteCode: {
-                result.writeCodePoint(quoteCode);
+            case QUOTE: {
+                result.writeCodePoint(QUOTE);
                 last = i + 1;
                 break;
             }
-            case backSlashCode: {
-                result.writeCodePoint(backSlashCode);
+            case BACK_SLASH: {
+                result.writeCodePoint(BACK_SLASH);
                 last = i + 1;
                 break;
             }
-            case forwardSlashCode: {
-                result.writeCodePoint(forwardSlashCode);
+            case FWD_SLASH: {
+                result.writeCodePoint(FWD_SLASH);
                 last = i + 1;
                 break;
             }
-            case bCode: {
-                result.writeCodePoint(backspaceCode);
+            case CHAR_B: {
+                result.writeCodePoint(BACKSPACE);
                 last = i + 1;
                 break;
             }
-            case fCode: {
-                result.writeCodePoint(formFeedCode);
+            case CHAR_F: {
+                result.writeCodePoint(FORM_FEED);
                 last = i + 1;
                 break;
             }
-            case nCode: {
-                result.writeCodePoint(newLineCode);
+            case CHAR_N: {
+                result.writeCodePoint(NEW_LINE);
                 last = i + 1;
                 break;
             }
-            case rCode: {
-                result.writeCodePoint(carriageReturnCode);
+            case CHAR_R: {
+                result.writeCodePoint(CARRIAGE_RETURN);
                 last = i + 1;
                 break;
             }
-            case tCode: {
-                result.writeCodePoint(tabCode);
+            case CHAR_T: {
+                result.writeCodePoint(TAB);
                 last = i + 1;
                 break;
             }
-            case uCode: {
+            case CHAR_U: {
                 const code = u16.parse(data.slice(i + 1, i + 5), 16);
                 result.writeCodePoint(code);
                 i += 4;

@@ -1,5 +1,5 @@
 import { containsCodePoint, unsafeCharCodeAt } from "../src/util";
-import { aCode, backSlashCode, commaCode, eCode, fCode, lCode, leftBraceCode, leftBracketCode, nCode, quoteCode, rCode, rightBraceCode, rightBracketCode, sCode, tCode, uCode } from "../src/chars";
+import { CHAR_A, BACK_SLASH, COMMA, CHAR_E, CHAR_F, CHAR_L, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, CHAR_R, BRACE_RIGHT, BRACKET_RIGHT, CHAR_S, CHAR_T, CHAR_U } from "../src/chars";
 import { isSpace } from "util/string";
 
 // @ts-ignore: Decorator
@@ -18,16 +18,16 @@ import { isSpace } from "util/string";
   let outerLoopIndex = 1;
   for (; outerLoopIndex < data.length - 1; outerLoopIndex++) {
     const char = unsafeCharCodeAt(data, outerLoopIndex);
-    if (char === leftBracketCode) {
+    if (char === BRACKET_LEFT) {
       for (
         let arrayValueIndex = outerLoopIndex;
         arrayValueIndex < data.length - 1;
         arrayValueIndex++
       ) {
         const char = unsafeCharCodeAt(data, arrayValueIndex);
-        if (char === leftBracketCode) {
+        if (char === BRACKET_LEFT) {
           depth++;
-        } else if (char === rightBracketCode) {
+        } else if (char === BRACKET_RIGHT) {
           depth--;
           if (depth === 0) {
             ++arrayValueIndex;
@@ -39,16 +39,16 @@ import { isSpace } from "util/string";
           }
         }
       }
-    } else if (char === leftBraceCode) {
+    } else if (char === BRACE_LEFT) {
       for (
         let objectValueIndex = outerLoopIndex;
         objectValueIndex < data.length - 1;
         objectValueIndex++
       ) {
         const char = unsafeCharCodeAt(data, objectValueIndex);
-        if (char === leftBraceCode) {
+        if (char === BRACE_LEFT) {
           depth++;
-        } else if (char === rightBraceCode) {
+        } else if (char === BRACE_RIGHT) {
           depth--;
           if (depth === 0) {
             ++objectValueIndex;
@@ -60,7 +60,7 @@ import { isSpace } from "util/string";
           }
         }
       }
-    } else if (char === quoteCode) {
+    } else if (char === QUOTE) {
       let escaping = false;
       for (
         let stringValueIndex = ++outerLoopIndex;
@@ -68,10 +68,10 @@ import { isSpace } from "util/string";
         stringValueIndex++
       ) {
         const char = unsafeCharCodeAt(data, stringValueIndex);
-        if (char === backSlashCode && !escaping) {
+        if (char === BACK_SLASH && !escaping) {
           escaping = true;
         } else {
-          if (char === quoteCode && !escaping) {
+          if (char === QUOTE && !escaping) {
             if (isKey === false) {
               key_start = outerLoopIndex;
               key_end = stringValueIndex;
@@ -88,31 +88,31 @@ import { isSpace } from "util/string";
         }
       }
     } else if (
-      char == nCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 1) === uCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 2) === lCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 3) === lCode
+      char == CHAR_N &&
+      unsafeCharCodeAt(data, outerLoopIndex + 1) === CHAR_U &&
+      unsafeCharCodeAt(data, outerLoopIndex + 2) === CHAR_L &&
+      unsafeCharCodeAt(data, outerLoopIndex + 3) === CHAR_L
     ) {
       // @ts-ignore
       schema.__DESERIALIZE(data, key_start, key_end, outerLoopIndex, outerLoopIndex + 4);
       outerLoopIndex += 3;
       isKey = false;
     } else if (
-      char === tCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 1) === rCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 2) === uCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 3) === eCode
+      char === CHAR_T &&
+      unsafeCharCodeAt(data, outerLoopIndex + 1) === CHAR_R &&
+      unsafeCharCodeAt(data, outerLoopIndex + 2) === CHAR_U &&
+      unsafeCharCodeAt(data, outerLoopIndex + 3) === CHAR_E
     ) {
       // @ts-ignore
       schema.__DESERIALIZE(data, key_start, key_end, outerLoopIndex, outerLoopIndex + 4);
       outerLoopIndex += 3;
       isKey = false;
     } else if (
-      char === fCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 1) === aCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 2) === lCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 3) === sCode &&
-      unsafeCharCodeAt(data, outerLoopIndex + 4) === eCode
+      char === CHAR_F &&
+      unsafeCharCodeAt(data, outerLoopIndex + 1) === CHAR_A &&
+      unsafeCharCodeAt(data, outerLoopIndex + 2) === CHAR_L &&
+      unsafeCharCodeAt(data, outerLoopIndex + 3) === CHAR_S &&
+      unsafeCharCodeAt(data, outerLoopIndex + 4) === CHAR_E
     ) {
       // @ts-ignore
       schema.__DESERIALIZE(data, key_start, key_end, outerLoopIndex, outerLoopIndex + 5);
@@ -122,7 +122,7 @@ import { isSpace } from "util/string";
       let numberValueIndex = ++outerLoopIndex;
       for (; numberValueIndex < data.length; numberValueIndex++) {
         const char = unsafeCharCodeAt(data, numberValueIndex);
-        if (char === commaCode || char === rightBraceCode || isSpace(char)) {
+        if (char === COMMA || char === BRACE_RIGHT || isSpace(char)) {
           // @ts-ignore
           schema.__DESERIALIZE(data, key_start, key_end, outerLoopIndex - 1, numberValueIndex);
           outerLoopIndex = numberValueIndex;

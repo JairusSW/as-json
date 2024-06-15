@@ -1,11 +1,11 @@
 import { JSON } from "..";
 import {
-    commaCode,
-    commaWord,
-    emptyArrayWord,
-    leftBracketWord,
-    rightBracketCode,
-    rightBracketWord
+    COMMA,
+    COMMA_WORD,
+    EMPTY_BRACKET_WORD,
+    BRACKET_LEFT_WORD,
+    BRACKET_RIGHT,
+    BRACKET_RIGHT_WORD
 } from "../src/chars";
 import { Sink } from "../src/sink";
 import { serializeString } from "./string";
@@ -14,39 +14,39 @@ import { serializeString } from "./string";
 @inline export function serializeArray<T extends any[]>(data: T): string {
     // @ts-ignore
     if (data.length == 0) {
-        return emptyArrayWord;
+        return EMPTY_BRACKET_WORD;
         // @ts-ignore
     } else if (isString<valueof<T>>()) {
-        let result = leftBracketWord;
+        let result = BRACKET_LEFT_WORD;
         // @ts-ignore
         for (let i = 0; i < data.length - 1; i++) {
             // @ts-ignore
             result += serializeString(unchecked(data[i]));
-            result += commaWord;
+            result += COMMA_WORD;
         }
         // @ts-ignore
         result += serializeString(unchecked(data[data.length - 1]));
-        result += rightBracketWord;
+        result += BRACKET_RIGHT_WORD;
         return result;
         // @ts-ignore
     } else if (isBoolean<valueof<T>>()) {
         // @ts-ignore
-        return leftBracketWord + data.join(commaWord) + rightBracketWord;
+        return BRACKET_LEFT_WORD + data.join(COMMA_WORD) + BRACKET_RIGHT_WORD;
         // @ts-ignore
     } else if (isFloat<valueof<T>>() || isInteger<valueof<T>>()) {
         // @ts-ignore
-        return leftBracketWord + data.join(commaWord) + rightBracketWord;
+        return BRACKET_LEFT_WORD + data.join(COMMA_WORD) + BRACKET_RIGHT_WORD;
     } else {
-        let result = Sink.fromString(leftBracketWord);
+        let result = Sink.fromString(BRACKET_LEFT_WORD);
         // @ts-ignore
         for (let i = 0; i < data.length - 1; i++) {
             // @ts-ignore
             result.write(JSON.stringify(unchecked(data[i])));
-            result.writeCodePoint(commaCode);
+            result.writeCodePoint(COMMA);
         }
         // @ts-ignore
         result.write(JSON.stringify(unchecked(data[data.length - 1])));
-        result.writeCodePoint(rightBracketCode);
+        result.writeCodePoint(BRACKET_RIGHT);
         return result.toString();
     }
 }

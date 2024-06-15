@@ -1,23 +1,23 @@
 import { Virtual } from "as-virtual/assembly";
 import { containsCodePoint, unsafeCharCodeAt } from "../src/util";
 import {
-    aCode,
-    backSlashCode,
-    colonCode,
-    commaCode,
-    eCode,
-    fCode,
-    lCode,
-    leftBraceCode,
-    leftBracketCode,
-    nCode,
-    quoteCode,
-    rCode,
-    rightBraceCode,
-    rightBracketCode,
-    sCode,
-    tCode,
-    uCode
+    CHAR_A,
+    BACK_SLASH,
+    COLON,
+    COMMA,
+    CHAR_E,
+    CHAR_F,
+    CHAR_L,
+    BRACE_LEFT,
+    BRACKET_LEFT,
+    CHAR_N,
+    QUOTE,
+    CHAR_R,
+    BRACE_RIGHT,
+    BRACKET_RIGHT,
+    CHAR_S,
+    CHAR_T,
+    CHAR_U
 } from "../src/chars";
 import { deserializeBoolean } from "./bool";
 import { JSON } from "..";
@@ -39,16 +39,16 @@ import { deserializeFloat } from "./float";
     let outerLoopIndex = 1;
     for (; outerLoopIndex < data.length - 1; outerLoopIndex++) {
         const char = unsafeCharCodeAt(data, outerLoopIndex);
-        if (char === leftBracketCode) {
+        if (char === BRACKET_LEFT) {
             for (
                 let arrayValueIndex = outerLoopIndex;
                 arrayValueIndex < data.length - 1;
                 arrayValueIndex++
             ) {
                 const char = unsafeCharCodeAt(data, arrayValueIndex);
-                if (char === leftBracketCode) {
+                if (char === BRACKET_LEFT) {
                     depth++;
-                } else if (char === rightBracketCode) {
+                } else if (char === BRACKET_RIGHT) {
                     depth--;
                     if (depth === 0) {
                         ++arrayValueIndex;
@@ -59,16 +59,16 @@ import { deserializeFloat } from "./float";
                     }
                 }
             }
-        } else if (char === leftBraceCode) {
+        } else if (char === BRACE_LEFT) {
             for (
                 let objectValueIndex = outerLoopIndex;
                 objectValueIndex < data.length - 1;
                 objectValueIndex++
             ) {
                 const char = unsafeCharCodeAt(data, objectValueIndex);
-                if (char === leftBraceCode) {
+                if (char === BRACE_LEFT) {
                     depth++;
-                } else if (char === rightBraceCode) {
+                } else if (char === BRACE_RIGHT) {
                     depth--;
                     if (depth === 0) {
                         ++objectValueIndex;
@@ -79,7 +79,7 @@ import { deserializeFloat } from "./float";
                     }
                 }
             }
-        } else if (char === quoteCode) {
+        } else if (char === QUOTE) {
             let escaping = false;
             for (
                 let stringValueIndex = ++outerLoopIndex;
@@ -87,15 +87,15 @@ import { deserializeFloat } from "./float";
                 stringValueIndex++
             ) {
                 const char = unsafeCharCodeAt(data, stringValueIndex);
-                if (char === backSlashCode && !escaping) {
+                if (char === BACK_SLASH && !escaping) {
                     escaping = true;
                 } else {
                     if (
-                        char === quoteCode && !escaping
+                        char === QUOTE && !escaping
                     ) {
                         if (isKey === false) {
                             // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
-                            if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
+                            if (containsCodePoint(data, BACK_SLASH, outerLoopIndex, stringValueIndex)) {
                                 key.reinst(deserializeString(data, outerLoopIndex - 1, stringValueIndex));
                             } else {
                                 key.reinst(data, outerLoopIndex, stringValueIndex);
@@ -115,30 +115,30 @@ import { deserializeFloat } from "./float";
                 }
             }
         } else if (
-            char == nCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === uCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === lCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === lCode) {
+            char == CHAR_N &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_U &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_L &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_L) {
             if (isNullable<valueof<T>>()) {
                 map.set(deserializeMapKey<indexof<T>>(key), null);
             }
             isKey = false;
         } else if (
-            char === tCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === rCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === uCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
+            char === CHAR_T &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_R &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_U &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_E
         ) {
             if (isBoolean<valueof<T>>()) {
                 map.set(deserializeMapKey<indexof<T>>(key), true);
             }
             isKey = false;
         } else if (
-            char === fCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === aCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === lCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === sCode &&
-            unsafeCharCodeAt(data, ++outerLoopIndex) === eCode
+            char === CHAR_F &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_A &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_L &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_S &&
+            unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_E
         ) {
             if (isBoolean<valueof<T>>()) {
                 map.set(deserializeMapKey<indexof<T>>(key), false);
@@ -148,7 +148,7 @@ import { deserializeFloat } from "./float";
             let numberValueIndex = ++outerLoopIndex;
             for (; numberValueIndex < data.length; numberValueIndex++) {
                 const char = unsafeCharCodeAt(data, numberValueIndex);
-                if (char === colonCode || char === commaCode || char === rightBraceCode || isSpace(char)) {
+                if (char === COLON || char === COMMA || char === BRACE_RIGHT || isSpace(char)) {
                     if (isInteger<valueof<T>>()) {
                         map.set(deserializeMapKey<indexof<T>>(key), deserializeInteger<valueof<T>>(data.slice(outerLoopIndex - 1, numberValueIndex)));
                     } else if (isFloat<valueof<T>>()) {

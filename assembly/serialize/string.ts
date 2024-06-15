@@ -1,23 +1,32 @@
-import { backSlashCode, backspaceCode as BACKSPACE, carriageReturnCode as CARRIAGE_RETURN, formFeedCode as FORM_FEED, newLineCode as NEWLINE, quoteCode, quoteWord, tabCode as TAB } from "../src/chars";
+import {
+    BACK_SLASH,
+    BACKSPACE,
+    CARRIAGE_RETURN,
+    FORM_FEED,
+    NEW_LINE,
+    QUOTE,
+    QUOTE_WORD,
+    TAB
+} from "../src/chars";
 import { Sink } from "../src/sink";
 import { unsafeCharCodeAt } from "../src/util";
 
 // @ts-ignore: Decorator
 @inline export function serializeString(data: string): string {
     if (data.length === 0) {
-        return quoteWord + quoteWord;
+        return QUOTE_WORD + QUOTE_WORD;
     }
 
-    let result = Sink.fromString(quoteWord, data.length);
+    let result = Sink.fromString(QUOTE_WORD, data.length);
 
     let last: i32 = 0;
     for (let i = 0; i < data.length; i++) {
         const char = unsafeCharCodeAt(<string>data, i);
-        if (char === quoteCode || char === backSlashCode) {
+        if (char === QUOTE || char === BACK_SLASH) {
             result.write(<string>data, last, i);
-            result.writeCodePoint(backSlashCode);
+            result.writeCodePoint(BACK_SLASH);
             last = i;
-        } else if (char < 16) {
+        } else if (16 > char) {
             result.write(<string>data, last, i);
             last = i + 1;
             switch (char) {
@@ -29,7 +38,7 @@ import { unsafeCharCodeAt } from "../src/util";
                     result.write("\\t");
                     break;
                 }
-                case NEWLINE: {
+                case NEW_LINE: {
                     result.write("\\n");
                     break;
                 }
@@ -49,7 +58,7 @@ import { unsafeCharCodeAt } from "../src/util";
                     break;
                 }
             }
-        } else if (char < 32) {
+        } else if (32 > char) {
             result.write(<string>data, last, i);
             last = i + 1;
             // all chars 0-31 must be encoded as a four digit unicode escape sequence
@@ -59,6 +68,6 @@ import { unsafeCharCodeAt } from "../src/util";
         }
     }
     result.write(<string>data, last);
-    result.writeCodePoint(quoteCode);
+    result.writeCodePoint(QUOTE);
     return result.toString();
 }
