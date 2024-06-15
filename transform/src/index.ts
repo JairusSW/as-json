@@ -23,7 +23,6 @@ class JSONTransform extends BaseVisitor {
   visitMethodDeclaration(): void { }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
-    if (!node.members?.length) return;
 
     let found = false;
     for (const decorator of node.decorators) {
@@ -40,7 +39,7 @@ class JSONTransform extends BaseVisitor {
     schema.name = node.name.text;
 
     const members = [
-      ...node.members
+      ...node.members.filter(v => v instanceof FieldDeclaration)
     ];
 
     if (node.extendsType) {
@@ -56,6 +55,33 @@ class JSONTransform extends BaseVisitor {
           if (!replace) schema.members.unshift(schema.parent.members[i]!);
         }
       }
+    }
+
+    if (!members.length) {
+      let SERIALIZE_RAW_EMPTY = "@inline __SERIALIZE(): string {\n  return \"{}\";\n}";
+      let SERIALIZE_PRETTY_EMPTY = "@inline __SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
+
+      let INITIALIZE_EMPTY = "@inline __INITIALIZE(): this {\n  return this;\n}";
+
+      let DESERIALIZE_EMPTY = "@inline __DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
+
+      if (process.env["JSON_DEBUG"]) {
+        console.log(SERIALIZE_RAW_EMPTY);
+        //console.log(SERIALIZE_PRETTY_EMPTY);
+        console.log(INITIALIZE_EMPTY);
+        console.log(DESERIALIZE_EMPTY);
+      }
+
+      const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
+      //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
+      const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
+      const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
+
+      if (!node.members.find(v => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
+      if (!node.members.find(v => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD_EMPTY);
+      if (!node.members.find(v => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD_EMPTY);
+
+      this.schemasList.push(schema);
     }
 
     for (const member of members) {

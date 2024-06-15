@@ -1,41 +1,27 @@
 import { JSON } from ".";
+import { deserializeObjectArray } from "./deserialize/array/object";
+import { serializeArray } from "./serialize/array";
 
 @json
-class Vec3 {
+class Base {}
+
+@json
+class Vec1 extends Base {
   x: f32 = 0.0;
+}
+@json
+class Vec2 extends Vec1 {
   y: f32 = 0.0;
+}
+@json
+class Vec3 extends Vec2 {
   z: f32 = 0.0;
 }
 
-@json
-class Player {
-  @alias("first name")
-  firstName!: string;
-  lastName!: string;
-  lastActive!: i32[];
-  @omitif("this.age < 18")
-  age!: i32;
-  @omitnull()
-  pos!: Vec3 | null;
-  isVerified!: boolean;
-}
+const arr: Base[] = [
+  new Vec1(),
+  new Vec2(),
+  new Vec3()
+];
 
-const player: Player = {
-  firstName: "Emmet",
-  lastName: "West",
-  lastActive: [8, 27, 2022],
-  age: 13,
-  pos: {
-    x: 3.4,
-    y: 1.2,
-    z: 8.3
-  },
-  isVerified: true
-};
-
-const stringified = JSON.stringify<Player>(player);
-
-const parsed = JSON.parse<Player>(stringified);
-
-console.log("Stringified: " + stringified);
-console.log("Parsed: " + JSON.stringify(parsed));
+console.log(JSON.stringify(arr));
