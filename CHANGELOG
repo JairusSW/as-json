@@ -5,4 +5,5 @@ v0.8.5 - Fix #73. Support for nullable primatives with Box<T> from as-container
 v0.8.6 - Fix. Forgot to stash before publishing. Stash and push what should have been v0.8.5
 
 v0.9.0 - Large update. Refactor all the code, nullable primitives, rewrite the transform, allow extensibility with @omit keywords, and fix a plethora of bugs
-[UNRELEASED] v0.9.1 - Port JSON.Value from the `develop` branch to allow for union types, parsing of arbitrary data, and whatever the hell you want.
+v0.9.1 - Fix #71
+[UNRELEASED] v0.9.x - Port JSON.Value from the `develop` branch to allow for union types, parsing of arbitrary data, and whatever the hell you want.

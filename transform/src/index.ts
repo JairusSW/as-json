@@ -5,9 +5,7 @@ import {
   NamedTypeNode,
   StringLiteralExpression,
   Parser,
-  Source,
-  SourceKind,
-  Tokenizer,
+  Source
 } from "assemblyscript/dist/assemblyscript.js";
 
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
@@ -59,7 +57,7 @@ class JSONTransform extends BaseVisitor {
 
     if (!members.length) {
       let SERIALIZE_RAW_EMPTY = "@inline __SERIALIZE(): string {\n  return \"{}\";\n}";
-      let SERIALIZE_PRETTY_EMPTY = "@inline __SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
+      //let SERIALIZE_PRETTY_EMPTY = "@inline __SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
 
       let INITIALIZE_EMPTY = "@inline __INITIALIZE(): this {\n  return this;\n}";
 

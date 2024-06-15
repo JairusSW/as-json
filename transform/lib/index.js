@@ -1,4 +1,4 @@
-import { FieldDeclaration, } from "assemblyscript/dist/assemblyscript.js";
+import { FieldDeclaration } from "assemblyscript/dist/assemblyscript.js";
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
@@ -38,10 +38,9 @@ class JSONTransform extends BaseVisitor {
                 }
             }
         }
-        console.log("MEMBERS_LENGTH: " + members.length);
         if (!members.length) {
             let SERIALIZE_RAW_EMPTY = "@inline __SERIALIZE(): string {\n  return \"{}\";\n}";
-            let SERIALIZE_PRETTY_EMPTY = "@inline __SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
+            //let SERIALIZE_PRETTY_EMPTY = "@inline __SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
             let INITIALIZE_EMPTY = "@inline __INITIALIZE(): this {\n  return this;\n}";
             let DESERIALIZE_EMPTY = "@inline __DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
             if (process.env["JSON_DEBUG"]) {

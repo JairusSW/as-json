@@ -81,11 +81,49 @@ const stringified = JSON.stringify<Player>(player);
 const parsed = JSON.parse<Player>(stringified);
 ```
 
+Classes can even have inheritance. Here's a nasty example
+
+```js
+@json
+class Base {}
+
+@json
+class Vec1 extends Base {
+  x: f32 = 1.0;
+}
+@json
+class Vec2 extends Vec1 {
+  y: f32 = 2.0;
+}
+@json
+class Vec3 extends Vec2 {
+  z: f32 = 3.0;
+}
+
+const arr: Base[] = [
+  new Vec1(),
+  new Vec2(),
+  new Vec3()
+];
+
+const serialized = JSON.stringify(arr);
+// [{"x":1.0},{"x":1.0,"y":2.0},{"y":2.0,"x":1.0,"z":3.0}]
+const parsed = JSON.parse<Base[]>(serialized);
+```
+
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
 ## Notes
 
 If you want a feature, drop an issue (and again, maybe a star). I'll likely add it in less than 7 days.
+
+## Contact
+
+Contact me at:
+
+Email: `me@jairus.dev`
+GitHub: `JairusSW`
+Discord: `jairussw`
 
 ## Performance
 
