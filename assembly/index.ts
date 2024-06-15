@@ -77,7 +77,7 @@ export namespace JSON {
    */
 
   // @ts-ignore: Decorator
-  @inline export function parse<T>(data: string, initializeDefaultValues: boolean = false): T {
+  @inline export function parse<T>(data: string): T {
     if (isString<T>()) {
       // @ts-ignore
       return deserializeString(data);
@@ -91,7 +91,7 @@ export namespace JSON {
       // @ts-ignore
       return deserializeArray<T>(data);
     }
-    let type: nonnull<T> = changetype<nonnull<T>>(0);
+    let type: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
     if (type instanceof Box) {
       return deserializeBox<T>(data);
     } else if (isNullable<T>() && data == nullWord) {
@@ -99,7 +99,7 @@ export namespace JSON {
       return null;
       // @ts-ignore
     } else if (isDefined(type.__DESERIALIZE)) {
-      return deserializeObject<T>(data.trimStart(), initializeDefaultValues);
+      return deserializeObject<T>(data.trimStart());
     } else if (type instanceof Map) {
       return deserializeMap<T>(data.trimStart());
     } else if (type instanceof Date) {

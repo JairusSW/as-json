@@ -3,13 +3,13 @@ import { aCode, backSlashCode, commaCode, eCode, fCode, lCode, leftBraceCode, le
 import { isSpace } from "util/string";
 
 // @ts-ignore: Decorator
-@inline export function deserializeObject<T>(data: string, initializeDefaultValues: boolean): T {
+@inline export function deserializeObject<T>(data: string): T {
   const schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );
 
   // @ts-ignore
-  if (initializeDefaultValues) schema.__INITIALIZE();
+  schema.__INITIALIZE();
 
   let key_start: i32 = 0;
   let key_end: i32 = 0;
@@ -73,20 +73,12 @@ import { isSpace } from "util/string";
         } else {
           if (char === quoteCode && !escaping) {
             if (isKey === false) {
-              // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
-              if (containsCodePoint(data, backSlashCode, outerLoopIndex, stringValueIndex)) {
-                key_start = outerLoopIndex - 1;
-                key_end = stringValueIndex;
-                //console.log(`[KEY-00]: ${data.slice(outerLoopIndex - 1, stringValueIndex)}`)
-              } else {
-                key_start = outerLoopIndex;
-                key_end = stringValueIndex;
-                //console.log(`[KEY-01]: ${data.slice(outerLoopIndex, stringValueIndex)}`)
-              }
+              key_start = outerLoopIndex;
+              key_end = stringValueIndex;
               isKey = true;
             } else {
               // @ts-ignore
-              schema.__DESERIALIZE(data, key_start, key_end, outerLoopIndex - 1, stringValueIndex);
+              schema.__DESERIALIZE(data, key_start, key_end, outerLoopIndex - 1, stringValueIndex + 1);
               isKey = false;
             }
             outerLoopIndex = ++stringValueIndex;

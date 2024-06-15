@@ -2,6 +2,8 @@ import {
   ClassDeclaration,
   FieldDeclaration,
   IdentifierExpression,
+  NamedTypeNode,
+  StringLiteralExpression,
   Parser,
   Source,
   SourceKind,
@@ -12,7 +14,6 @@ import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { CommonFlags } from "types:assemblyscript/src/common";
-import { StringLiteralExpression } from "types:assemblyscript/src/ast";
 
 class JSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
@@ -95,23 +96,28 @@ class JSONTransform extends BaseVisitor {
       if (mem.flag === PropertyFlags.Alias) {
         mem.name = mem.alias!;
       } else if (mem.flag === PropertyFlags.None) {
-        mem.serialize = encodeKey(mem.name) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+        mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
       }
 
       if (mem.flag == PropertyFlags.OmitNull) {
-        mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + encodeKey(mem.name) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
+        mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + escapeString(JSON.stringify(mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
       } else if (mem.flag == PropertyFlags.OmitIf) {
-        mem.serialize = "${" + mem.args![0]! + " ? \"\" : '" + encodeKey(mem.name) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ")}";
+        mem.serialize = "${" + mem.args![0]! + " ? \"\" : '" + escapeString(JSON.stringify(mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ")}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
       } else if (mem.flag == PropertyFlags.Alias) {
-        mem.serialize = encodeKey(mem.name) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+        mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
         mem.name = name.text;
       }
 
-      if (mem.value) mem.initialize = "this." + name.text + " = " + mem.value;
+      const t = (mem.node.type as NamedTypeNode).name.identifier.text;
+      if (this.schemasList.find(v => v.name == t)) {
+        mem.initialize = "this." + name.text + " = changetype<nonnull<" + t + ">>(__new(offsetof<nonnull<" + t + ">>(), idof<nonnull<" + t + ">>()));\n  changetype<nonnull<" + t + ">>(this." + name.text + ").__INITIALIZE()"
+      } else if (mem.value) {
+        mem.initialize = "this." + name.text + " = " + mem.value;
+      }
 
       schema.members.push(mem);
     }
@@ -176,38 +182,34 @@ class JSONTransform extends BaseVisitor {
     len = _sorted[0]?.name.length!;
     for (let i = 1; i < _sorted.length; i++) {
       const member = _sorted[i]!;
-      if (len < member.name.length) {
+      if (member.alias?.length || member.name.length > len) {
         sortedMembers.push([member]);
+        len = member.alias?.length || member.name.length
         offset++;
       } else {
-        sortedMembers[offset]!.push(member)
+        sortedMembers[offset]!.push(member);
       }
     }
 
     let first = true;
-
     for (const memberSet of sortedMembers) {
       const firstMember = memberSet[0]!;
-      if (firstMember.flag == PropertyFlags.Alias) {
-        let alias = firstMember.alias!
-        firstMember.alias = firstMember.name;
-        firstMember.name = alias;
-      }
-      if (firstMember.name.length === 1) {
+      const name = encodeKey(firstMember.alias || firstMember.name);
+      if (name.length === 1) {
         if (first) {
           DESERIALIZE += "  if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
           first = false;
         } else {
           DESERIALIZE += "else if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
         }
-      } else if (firstMember.name.length === 2) {
+      } else if (name.length === 2) {
         if (first) {
           DESERIALIZE += "  if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
           first = false;
         } else {
           DESERIALIZE += "else if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
         }
-      } else if (firstMember.name.length === 4) {
+      } else if (name.length === 4) {
         if (first) {
           DESERIALIZE += "  if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
           first = false;
@@ -216,78 +218,65 @@ class JSONTransform extends BaseVisitor {
         }
       } else {
         if (first) {
-          DESERIALIZE += "  if (" + firstMember.name.length + " === len) {\n";
+          DESERIALIZE += "  if (" + name.length + " === len) {\n";
           first = false;
         } else {
-          DESERIALIZE += "else if (" + firstMember.name.length + " === len) {\n";
+          DESERIALIZE += "else if (" + name.length + " === len) {\n";
         }
       }
-      if (firstMember.flag == PropertyFlags.Alias) {
-        let name = firstMember.alias!
-        firstMember.alias = firstMember.name;
-        firstMember.name = name;
-      }
+      let f = true;
       for (let i = 0; i < memberSet.length; i++) {
         const member = memberSet[i]!;
-        if (member.flag == PropertyFlags.Alias) {
-          let alias = member.alias!
-          member.alias = member.name;
-          member.name = alias;
-        }
-        if (member.name.length === 1) {
-          DESERIALIZE += `      case ${member.name.charCodeAt(0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
-        } else if (member.name.length === 2) {
-          DESERIALIZE += `      case ${charCodeAt32(member.name, 0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
-        } else if (member.name.length === 4) {
-          DESERIALIZE += `    if (${charCodeAt64(member.name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+        const name = encodeKey(member.alias || member.name);
+        if (name.length === 1) {
+          DESERIALIZE += `      case ${name.charCodeAt(0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
+        } else if (name.length === 2) {
+          DESERIALIZE += `      case ${charCodeAt32(name, 0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
+        } else if (name.length === 4) {
+          if (f) {
+            f = false;
+            DESERIALIZE += `    if (${charCodeAt64(name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+          } else {
+            DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + `else if (${charCodeAt64(name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+          }
         } else {
-          DESERIALIZE += `    if (memory.compare(changetype<usize>("${escapeQuotes(member.name)}"), changetype<usize>(data) + (key_start << 1), ${member.name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`
-        }
-        if (member.flag == PropertyFlags.Alias) {
-          let name = member.alias!
-          member.alias = member.name;
-          member.name = name;
+          if (f) {
+            f = false;
+            DESERIALIZE += `    if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`
+          } else {
+            DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`
+          }
         }
       }
-      if (firstMember.flag == PropertyFlags.Alias) {
-        let alias = firstMember.alias!
-        firstMember.alias = firstMember.name;
-        firstMember.name = alias;
-      }
-      if (memberSet[0]!.name.length < 3) {
+      if (name.length < 3) {
         DESERIALIZE += `      default: {\n        return false;\n      }\n    }\n`
-      } else if (memberSet[0]!.name.length == 4) {
+      } else if (name.length == 4) {
         DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`
       } else {
         DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`
       }
       DESERIALIZE += "  } ";
-      if (firstMember.flag == PropertyFlags.Alias) {
-        let name = firstMember.alias!
-        firstMember.alias = firstMember.name;
-        firstMember.name = name;
-      }
     }
 
     DESERIALIZE += "\n  return false;\n}"
 
     //console.log(sortedMembers);
 
-    //console.log(SERIALIZE_RAW);
-    //console.log(SERIALIZE_PRETTY);
-    //console.log(INITIALIZE);
-    //console.log(DESERIALIZE)
+    if (process.env["JSON_DEBUG"]) {
+      console.log(SERIALIZE_RAW);
+      //console.log(SERIALIZE_PRETTY);
+      console.log(INITIALIZE);
+      console.log(DESERIALIZE);
+    }
 
     const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
     //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
     const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
 
-    node.members.push(
-      SERIALIZE_RAW_METHOD,
-      INITIALIZE_METHOD,
-      DESERIALIZE_METHOD
-    );
+    if (!node.members.find(v => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD);
+    if (!node.members.find(v => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
+    if (!node.members.find(v => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
 
     this.schemasList.push(schema);
   }
@@ -298,28 +287,7 @@ class JSONTransform extends BaseVisitor {
     if (!this.sources.has(node)) {
       return;
     }
-
-    // Note, the following one liner would be easier, but it fails with an assertion error
-    // because as-virtual's SimpleParser doesn't set the parser.currentSource correctly.
-    //
-    // const stmt = SimpleParser.parseTopLevelStatement('import { Virtual as __Virtual } from "as-virtual/assembly";');
-
-    // ... So we have to do it the long way:
-    const txt = 'import { Virtual as __Virtual } from "as-virtual/assembly";'
-    const tokenizer = new Tokenizer(new Source(SourceKind.User, node.normalizedPath, txt));
-    const parser = new Parser();
-    parser.currentSource = tokenizer.source;
-    const stmt = parser.parseTopLevelStatement(tokenizer)!;
-
-    // Add the import statement to the top of the source.
-    node.statements.unshift(stmt);
   }
-}
-
-function encodeKey(aliasName: string): string {
-  return JSON.stringify(aliasName)
-    .replace(/\\/g, "\\\\")
-    .replace(/\`/g, '\\`');
 }
 
 export default class Transformer extends Transform {
@@ -410,6 +378,21 @@ function charCodeAt64(data: string, offset: number): bigint {
   return u64Value;
 }
 
-function escapeQuotes(data: string): string {
-  return data.replace(/"/g, '\\"');
+function encodeKey(key: string): string {
+  const data = JSON.stringify(key);
+  return data.slice(1, data.length - 1);
+}
+
+function escapeString(data: string): string {
+  return data.replace(/\\/g, "\\\\")
+    .replace(/\`/g, '\\`');
+}
+
+function escapeSlash(data: string): string {
+  return data.replace(/\\/g, "\\\\")
+    .replace(/\`/g, '\\`');
+}
+
+function escapeQuote(data: string): string {
+  return data.replace(/\"/g, "\\\"");
 }

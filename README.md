@@ -7,7 +7,7 @@
 ██║  ██║███████║      ╚█████╔╝███████║╚██████╔╝██║ ╚████║
 ╚═╝  ╚═╝╚══════╝       ╚════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝
 
-v0.8.6
+v0.9.0
 </pre>
 </h3>
 
@@ -34,6 +34,8 @@ Alternatively, add it to your `asconfig.json`
 }
 ```
 
+If you'd like to see the code that the transform generates, run with `JSON_DEBUG=true`
+
 ## Usage
 
 ```js
@@ -53,6 +55,8 @@ class Player {
   firstName!: string;
   lastName!: string;
   lastActive!: i32[];
+  // Drop in a code block, function, or expression that evaluates to a boolean
+  @omitif("this.age < 18")
   age!: i32;
   @omitnull()
   pos!: Vec3 | null;
@@ -78,6 +82,10 @@ const parsed = JSON.parse<Player>(stringified);
 ```
 
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
+
+## Notes
+
+If you want a feature, drop an issue (and again, maybe a star). I'll likely add it in less than 7 days.
 
 ## Performance
 
