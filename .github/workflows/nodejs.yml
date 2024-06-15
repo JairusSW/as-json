@@ -1,7 +1,15 @@
 name: Node.js CI
 
 on: [push, pull_request]
-
+on: push
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jcbhmr/setup-wasmtime@v2
+      - run: cargo build --target wasm32-wasi
+      - run: wasmtime target/wasm32-wasi/debug/*.wasm
 jobs:
   build:
 
@@ -9,7 +17,10 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      
+      - name: Install Wasmtime
+        uses: jcbhmr/setup-wasmtime@v2
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
