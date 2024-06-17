@@ -55,7 +55,7 @@ class OmitIf {
   y: i32 = -1;
   z: i32 = 1;
   @omitnull()
-  foo: string | null = null;
+  foo: string | null = null
 }
 
 class Nullable { }
