@@ -4,10 +4,11 @@ import { JSON } from ".";
 class Base {}
 @json
 class Vec1 extends Base {
-  x: f32 = 1.0;
+  x: f64 = 1.0;
 }
 @json
 class Vec2 extends Vec1 {
+  @omit()
   y: f32 = 2.0;
 }
 @json
