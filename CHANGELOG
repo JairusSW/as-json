@@ -7,5 +7,7 @@ v0.8.6 - Fix. Forgot to stash before publishing. Stash and push what should have
 v0.9.0 - BREAKING CHANGE - API changed from JSON.parse(data, defaultValues) to JSON.parse(data). Default Values defaults to true. Large update. Refactor all the code, nullable primitives, rewrite the transform, allow extensibility with @omit keywords, and fix a plethora of bugs
 v0.9.1 - Fix #71
 v0.9.2 - Fix #75 + Build sizes significantly reduced
+v0.9.3 - Fix #76
+v0.9.4 - Fix #77
 
 [UNRELEASED] v0.9.x - Port JSON.Value from the `develop` branch to allow for union types, parsing of arbitrary data, and whatever the hell you want.
