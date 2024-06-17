@@ -1,7 +1,7 @@
 import { JSON } from "..";
 
 // @ts-ignore: Decorator
-@inline export function deserializeBox<T extends Box<any>>(data: string): T {
+export function deserializeBox<T extends Box<any>>(data: string): T {
     if (isNullable<T>() && data == "null") {
         return null;
     }
@@ -12,6 +12,6 @@ import { JSON } from "..";
     return changetype<T>(instance);
 }
 
-@inline function parseDirectInference<T>(type: T, data: string, initializeDefaultValues: boolean = false): T {
+function parseDirectInference<T>(type: T, data: string, initializeDefaultValues: boolean = false): T {
     return JSON.parse<T>(data, initializeDefaultValues)
 }

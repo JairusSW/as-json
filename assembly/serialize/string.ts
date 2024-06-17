@@ -12,7 +12,7 @@ import { Sink } from "../src/sink";
 import { unsafeCharCodeAt } from "../src/util";
 
 // @ts-ignore: Decorator
-@inline export function serializeString(data: string): string {
+export function serializeString(data: string): string {
     if (data.length === 0) {
         return QUOTE_WORD + QUOTE_WORD;
     }

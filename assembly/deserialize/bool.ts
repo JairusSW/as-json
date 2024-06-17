@@ -7,7 +7,7 @@ import { unsafeCharCodeAt } from "../src/util";
  * @returns boolean
  */
 // @ts-ignore: Decorator
-@inline export function deserializeBoolean(data: string, start: i32 = 0, end: i32 = 0): boolean {
+export function deserializeBoolean(data: string, start: i32 = 0, end: i32 = 0): boolean {
     if (!end) end = data.length;
     const len = end - start;
     const ptr = changetype<usize>(data) + <usize>(start << 1);

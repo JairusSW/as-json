@@ -6,7 +6,7 @@ const MIN_BUFFER_SIZE: u32 = MIN_BUFFER_LEN << 1;
 const NEW_LINE_CHAR: u16 = 0x0A; // \n
 
 // @ts-ignore: decorator
-@inline function nextPowerOf2(n: u32): u32 {
+function nextPowerOf2(n: u32): u32 {
     return 1 << 32 - clz(n - 1);
 }
 
@@ -79,17 +79,17 @@ export class Sink {
 
     constructor() { }
 
-    @inline get length(): i32 {
+    get length(): i32 {
         return this.offset >> 1;
     }
 
-    @inline get capacity(): i32 {
+    get capacity(): i32 {
         return this.buffer.byteLength >>> 1;
     }
-    @inline reset(): void {
+    reset(): void {
         this.offset = 0;
     }
-    @inline write(src: string, start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink | null {
+    write(src: string, start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink | null {
         let len = src.length as u32;
 
         if (start != 0 || end != i32.MAX_VALUE) {
@@ -116,7 +116,7 @@ export class Sink {
         return this;
     }
 
-    @inline writeLn(src: string = "", start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink {
+    writeLn(src: string = "", start: i32 = 0, end: i32 = i32.MAX_VALUE): Sink {
         let len = src.length as u32;
         if (start != 0 || end != i32.MAX_VALUE) {
             let from: i32;
@@ -137,7 +137,7 @@ export class Sink {
         return this;
     }
 
-    @inline writeCodePoint(code: i32): Sink {
+    writeCodePoint(code: i32): Sink {
         let hasSur = <u32>code > 0xFFFF;
         this.ensureCapacity(2 << i32(hasSur));
 
@@ -158,7 +158,7 @@ export class Sink {
         return this;
     }
 
-    @inline writeCodePoint16(code: i32): Sink {
+    writeCodePoint16(code: i32): Sink {
         this.ensureCapacity(2);
 
         let offset = this.offset;
@@ -170,7 +170,7 @@ export class Sink {
         return this;
     }
 
-    @inline writeCodePointUnsafe(code: i32): Sink {
+    writeCodePointUnsafe(code: i32): Sink {
         this.ensureCapacity(2);
 
         let offset = this.offset;
@@ -184,7 +184,7 @@ export class Sink {
         return this;
     }
 
-    @inline writeNumber<T extends number>(value: T): Sink {
+    writeNumber<T extends number>(value: T): Sink {
         let offset = this.offset;
         if (isInteger<T>()) {
             let maxCapacity = 0;
@@ -213,7 +213,7 @@ export class Sink {
         this.offset = offset;
         return this;
     }
-    @inline writeNumberUnsafe<T extends number>(value: T): Sink {
+    writeNumberUnsafe<T extends number>(value: T): Sink {
         let offset = this.offset;
         if (isInteger<T>()) {
             offset += itoa_buffered(
@@ -229,7 +229,7 @@ export class Sink {
         this.offset = offset;
         return this;
     }
-    @inline writeIntegerUnsafe<T extends number>(value: T): Sink {
+    writeIntegerUnsafe<T extends number>(value: T): Sink {
         let offset = this.offset;
         if (isInteger<T>()) {
             offset += itoa_buffered(
@@ -246,7 +246,7 @@ export class Sink {
         return this;
     }
 
-    @inline reserve(capacity: i32, clear: bool = false): void {
+    reserve(capacity: i32, clear: bool = false): void {
         if (clear) this.offset = 0;
         this.buffer = changetype<ArrayBuffer>(__renew(
             changetype<usize>(this.buffer),
@@ -254,18 +254,18 @@ export class Sink {
         ));
     }
 
-    @inline shrink(): void {
+    shrink(): void {
         this.buffer = changetype<ArrayBuffer>(__renew(
             changetype<usize>(this.buffer),
             max<u32>(this.offset, MIN_BUFFER_SIZE)
         ));
     }
 
-    @inline clear(): void {
+    clear(): void {
         this.reserve(0, true);
     }
 
-    @inline toString(): string {
+    toString(): string {
         let size = this.offset;
         if (!size) return "";
         let out = changetype<string>(__new(size, idof<string>()));
@@ -273,7 +273,7 @@ export class Sink {
         return out;
     }
 
-    @inline ensureCapacity(deltaBytes: u32): void {
+    ensureCapacity(deltaBytes: u32): void {
         let buffer = this.buffer;
         let newSize = this.offset + deltaBytes;
         if (newSize > <u32>buffer.byteLength) {

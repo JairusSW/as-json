@@ -11,7 +11,7 @@ import { Sink } from "../src/sink";
 import { serializeString } from "./string";
 
 // @ts-ignore
-@inline export function serializeArray<T extends any[]>(data: T): string {
+export function serializeArray<T extends any[]>(data: T): string {
     // @ts-ignore
     if (data.length == 0) {
         return EMPTY_BRACKET_WORD;

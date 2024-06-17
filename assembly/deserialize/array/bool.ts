@@ -3,7 +3,7 @@ import { unsafeCharCodeAt } from "../../src/util";
 import { deserializeBoolean } from "../bool";
 
 // @ts-ignore: Decorator
-@inline export function deserializeBooleanArray<T extends boolean[]>(data: string): T {
+export function deserializeBooleanArray<T extends boolean[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos = 1;
   for (let i = 1; i < data.length - 1; i++) {

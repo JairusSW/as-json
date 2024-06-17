@@ -3,7 +3,7 @@ import { unsafeCharCodeAt } from "../../src/util";
 import { deserializeString } from "../string";
 
 // @ts-ignore: Decorator
-@inline export function deserializeStringArray(data: string): string[] {
+export function deserializeStringArray(data: string): string[] {
   const result: string[] = [];
   let lastPos = 0;
   let instr = false;

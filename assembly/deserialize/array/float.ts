@@ -4,7 +4,7 @@ import { COMMA, BRACKET_RIGHT } from "../../src/chars";
 import { deserializeFloat } from "../float";
 
 // @ts-ignore: Decorator
-@inline export function deserializeFloatArray<T extends number[]>(data: string): T {
+export function deserializeFloatArray<T extends number[]>(data: string): T {
     const result = instantiate<T>();
     let lastPos = 0;
     let i = 1;

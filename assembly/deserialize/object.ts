@@ -3,7 +3,7 @@ import { CHAR_A, BACK_SLASH, COMMA, CHAR_E, CHAR_F, CHAR_L, BRACE_LEFT, BRACKET_
 import { isSpace } from "util/string";
 
 // @ts-ignore: Decorator
-@inline export function deserializeObject<T>(data: string): T {
+export function deserializeObject<T>(data: string): T {
   const schema: nonnull<T> = changetype<nonnull<T>>(
     __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
   );

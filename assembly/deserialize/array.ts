@@ -8,7 +8,7 @@ import { deserializeObjectArray } from "./array/object";
 import { deserializeStringArray } from "./array/string";
 
 // @ts-ignore: Decorator
-@inline export function deserializeArray<T extends unknown[]>(data: string): T {
+export function deserializeArray<T extends unknown[]>(data: string): T {
     if (isString<valueof<T>>()) {
         return <T>deserializeStringArray(data);
     } else if (isBoolean<valueof<T>>()) {

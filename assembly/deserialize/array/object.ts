@@ -3,7 +3,7 @@ import { JSON } from "../..";
 import { unsafeCharCodeAt } from "../../src/util";
 
 // @ts-ignore: Decorator
-@inline export function deserializeObjectArray<T extends unknown[]>(data: string): T {
+export function deserializeObjectArray<T extends unknown[]>(data: string): T {
     const result = instantiate<T>();
     let lastPos: u32 = 1;
     let depth: u32 = 0;

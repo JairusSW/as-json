@@ -27,7 +27,7 @@ import { deserializeInteger } from "./integer";
 import { deserializeFloat } from "./float";
 
 // @ts-ignore: Decorator
-@inline export function deserializeMap<T extends Map>(data: string): T {
+export function deserializeMap<T extends Map>(data: string): T {
 
     const map: nonnull<T> = changetype<nonnull<T>>(
         __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())
@@ -166,7 +166,7 @@ import { deserializeFloat } from "./float";
 }
 
 //@ts-ignore: Decorator
-@inline function deserializeMapKey<T>(key: Virtual<string>): T {
+function deserializeMapKey<T>(key: Virtual<string>): T {
     const k = key.copyOut();
     if (isString<T>()) {
         return k as T;

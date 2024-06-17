@@ -4,7 +4,7 @@ import { Sink } from "../src/sink";
 import { serializeString } from "./string";
 
 // @ts-ignore
-@inline export function serializeMap<T extends Map<any, any>>(data: T): string {
+export function serializeMap<T extends Map<any, any>>(data: T): string {
     let result = Sink.fromString(BRACE_LEFT_WORD);
     let keys = data.keys();
     let values = data.values();

@@ -20,7 +20,7 @@
     "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
-    "bench:wazmer": "wasmer --llvm ./bench/benchmark.wasm",
+    "bench:wasmer": "wasmer --llvm ./bench/benchmark.wasm",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:wavm": "wavm run ./build/test.wasm",
