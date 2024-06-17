@@ -240,7 +240,7 @@ describe("Should deserialize object arrays", () => {
 
 });
 
-describe("Ser/de Objects", () => {
+describe("Should deserialize Objects", () => {
 
   expect(
     JSON.stringify(JSON.parse<Vec3>('{"x":3.4,"y":1.2,"z":8.3}'))

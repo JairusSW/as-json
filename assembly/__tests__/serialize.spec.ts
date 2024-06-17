@@ -48,6 +48,16 @@ class Player {
   isVerified: boolean;
 }
 
+@json
+class OmitIf {
+  x: i32 = 1;
+  @omitif("this.y == -1")
+  y: i32 = -1;
+  z: i32 = 1;
+  @omitnull()
+  foo: string | null = null;
+}
+
 class Nullable { }
 type Null = Nullable | null;
 
@@ -297,7 +307,7 @@ describe("Should serialize object arrays", () => {
 
 });
 
-describe("Ser/de Objects", () => {
+describe("Should serialize objects", () => {
 
   expect(
     JSON.stringify<Vec3>({
@@ -345,6 +355,16 @@ describe("Ser/de Objects", () => {
   expect(
     JSON.stringify<ObjWithStrangeKey<string>>({ data: "foo" })
   ).toBe('{"a\\\\\\t\\"\\u0002b`c":"foo"}');
+
+});
+
+describe("Should serialize @omit'ed objects", () => {
+
+  expect(
+    JSON.stringify(<OmitIf>{
+      y: 1
+    })
+  ).toBe('{"x":1,"y":1,"z":1}');
 
 });
 

@@ -17,7 +17,7 @@
   "scripts": {
     "test": "wasmtime build/serialize.spec.wasm && wasmtime build/deserialize.spec.wasm",
     "tests:build": "asc assembly/__tests__/serialize.spec.ts -o build/serialize.spec.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always & asc assembly/__tests__/deserialize.spec.ts -o build/deserialize.spec.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always",
-    "build:test": "asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always",
+    "build:test": "JSON_DEBUG=true asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
     "bench:wasmer": "wasmer --llvm ./bench/benchmark.wasm",

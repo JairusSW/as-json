@@ -33,8 +33,9 @@ class JSONTransform extends BaseVisitor {
             if (schema.parent?.members) {
                 for (let i = 0; i < schema.parent.members.length; i++) {
                     const replace = schema.members.find((v) => v.name == schema.parent?.members[i]?.name);
-                    if (!replace)
+                    if (!replace) {
                         schema.members.unshift(schema.parent.members[i]);
+                    }
                 }
             }
         }
@@ -76,29 +77,31 @@ class JSONTransform extends BaseVisitor {
                 continue;
             if (member.flags === 1024 /* CommonFlags.Protected */)
                 continue;
+            if (member.decorators && member.decorators.find((v) => v.name.text == "omit"))
+                continue;
             const mem = new Property();
             mem.name = name.text;
             mem.type = type;
             mem.value = value;
             mem.node = member;
-            for (const decorator of member.decorators || []) {
-                if (decorator.name.text == "alias") {
-                    if (!decorator.args?.length)
-                        throw new Error("Expected 1 argument but got zero at @alias in " + node.range.source.normalizedPath);
-                    mem.flag = PropertyFlags.Alias;
-                    mem.alias = decorator.args[0].value;
-                }
-                else if (decorator.name.text == "omit") {
-                    mem.flag = PropertyFlags.Omit;
-                }
-                else if (decorator.name.text == "omitnull") {
-                    mem.flag = PropertyFlags.OmitNull;
-                }
-                else if (decorator.name.text == "omitif") {
-                    if (!decorator.args?.length)
-                        throw new Error("Expected 1 argument but got zero at @omitif in " + node.range.source.normalizedPath);
-                    mem.args?.push(decorator.args[0].value);
-                    mem.flag = PropertyFlags.OmitIf;
+            if (member.decorators) {
+                for (let i = 0; i < (member.decorators).length; i++) {
+                    const decorator = member.decorators[i];
+                    if (decorator.name.text == "alias") {
+                        if (!decorator.args?.length)
+                            throw new Error("Expected 1 argument but got zero at @alias in " + node.range.source.normalizedPath);
+                        mem.flag = PropertyFlags.Alias;
+                        mem.alias = decorator.args[0].value;
+                    }
+                    else if (decorator.name.text == "omitnull") {
+                        mem.flag = PropertyFlags.OmitNull;
+                    }
+                    else if (decorator.name.text == "omitif") {
+                        if (!decorator.args?.length)
+                            throw new Error("Expected 1 argument but got zero at @omitif in " + node.range.source.normalizedPath);
+                        mem.args?.push(decorator.args[0].value);
+                        mem.flag = PropertyFlags.OmitIf;
+                    }
                 }
             }
             if (mem.flag === PropertyFlags.Alias) {
@@ -113,7 +116,7 @@ class JSONTransform extends BaseVisitor {
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
             }
             else if (mem.flag == PropertyFlags.OmitIf) {
-                mem.serialize = "${" + mem.args[0] + " ? \"\" : '" + escapeString(JSON.stringify(mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ")}";
+                mem.serialize = "${" + mem.args[0] + " ? \"\" : '" + escapeString(JSON.stringify(mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
             }
             else if (mem.flag == PropertyFlags.Alias) {
