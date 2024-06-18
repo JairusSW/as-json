@@ -131,8 +131,15 @@ class JSONTransform extends BaseVisitor {
                 mem.name = name.text;
             }
             else if (mem.flag == PropertyFlags.Flatten) {
-                mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${__SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args[0] : '') + ")}";
-                mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args[0] + "\":' + data.substring(value_start, value_end) + \"}\");";
+                const nullable = mem.node.type.isNullable;
+                if (nullable) {
+                    mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${this." + name.text + " ? __SERIALIZE(changetype<nonnull<" + type + ">>(this." + name.text + ")" + (mem.args?.length ? '.' + mem.args[0] : '') + ") : \"null\"}";
+                    mem.deserialize = "if (value_end - value_start == 4 && load<u64>(changetype<usize>(data) + <usize>(value_start << 1)) == " + charCodeAt64("null", 0) + ") {\n        this." + name.text + " = null;\n      } else {\n        this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args[0] + "\":' + data.substring(value_start, value_end) + \"}\");\n      }";
+                }
+                else {
+                    mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${this." + name.text + " ? __SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args[0] : '') + ") : \"null\"}";
+                    mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args[0] + "\":' + data.substring(value_start, value_end) + \"}\");";
+                }
                 mem.name = name.text;
             }
             const t = mem.node.type.name.identifier.text;

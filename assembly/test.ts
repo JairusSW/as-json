@@ -8,9 +8,10 @@ class Vec3 {
   z: f32 = 0.0;
 }
 
-@json class Boxx {
-  value: string;
+@json class Boxx<T> {
+  value: T;
 }
+
 @json
 class Player {
   @alias("first name")
@@ -24,7 +25,7 @@ class Player {
   pos!: Vec3 | null;
   isVerified!: boolean;
   @flatten("value")
-  box: Boxx
+  box: Boxx<i32> | null;
 }
 
 const player: Player = {
@@ -38,7 +39,7 @@ const player: Player = {
     z: 8.3
   },
   isVerified: true,
-  box: { value: "this is a box" }
+  box: null
 };
 
 const stringified = JSON.stringify<Player>(player);

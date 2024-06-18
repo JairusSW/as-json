@@ -7,7 +7,7 @@
 ██║  ██║███████║      ╚█████╔╝███████║╚██████╔╝██║ ╚████║
 ╚═╝  ╚═╝╚══════╝       ╚════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝
 
-v0.9.4
+v0.9.5
 </pre>
 </h3>
 
@@ -105,6 +105,17 @@ const arr: Base[] = [
   new Vec2(),
   new Vec3()
 ];
+
+const serialized = JSON.stringify(arr);
+// [{"x":1.0},{"x":1.0,"y":2.0},{"y":2.0,"x":1.0,"z":3.0}]
+const parsed = JSON.parse<Base[]>(serialized);
+```
+
+Classes can even have inheritance. Here's a nasty example
+
+```js
+@json
+class Base {}
 
 const serialized = JSON.stringify(arr);
 // [{"x":1.0},{"x":1.0,"y":2.0},{"y":2.0,"x":1.0,"z":3.0}]
