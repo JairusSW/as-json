@@ -11,9 +11,23 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - run: npm ci
-      - run: npm test
+          node-version: 16      
+
+      - name: Install Wasmtime
+        uses: jcbhmr/setup-wasmtime@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: yarn
+      
+      - name: Build tests
+        run: yarn run tests:build
+
+      - name: Perform tests
+        run: yarn run test
 
   publish-gpr:
     needs: build
@@ -25,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 22
           registry-url: https://npm.pkg.github.com/
       - run: npm ci
       - run: npm publish
