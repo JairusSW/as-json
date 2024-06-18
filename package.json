@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -15,7 +15,9 @@
   ],
   "license": "MIT",
   "scripts": {
-    "test": "wasmtime build/serialize.spec.wasm && wasmtime build/deserialize.spec.wasm",
+    "test": "npm run test:serialize && npm run test:deserialize",
+    "test:serialize": "wasmtime build/serialize.spec.wasm",
+    "test:deserialize": "wasmtime build/deserialize.spec.wasm",
     "tests:build": "asc assembly/__tests__/serialize.spec.ts -o build/serialize.spec.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always & asc assembly/__tests__/deserialize.spec.ts -o build/deserialize.spec.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always",
     "build:test": "JSON_DEBUG=true asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",

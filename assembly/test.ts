@@ -15,7 +15,8 @@ class Box<T> {
 @json
 class Player {
   @alias("first name")
-  firstName!: string;
+  @omitnull()
+  firstName: string | null;
   lastName!: string;
   lastActive!: i32[];
   // Drop in a code block, function, or expression that evaluates to a boolean
@@ -29,7 +30,7 @@ class Player {
 }
 
 const player: Player = {
-  firstName: "Emmet",
+  firstName: null,
   lastName: "West",
   lastActive: [8, 27, 2022],
   age: 23,
