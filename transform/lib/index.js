@@ -126,7 +126,7 @@ class JSONTransform extends BaseVisitor {
             }
             const t = mem.node.type.name.identifier.text;
             if (this.schemasList.find(v => v.name == t)) {
-                mem.initialize = "this." + name.text + " = changetype<nonnull<" + t + ">>(__new(offsetof<nonnull<" + t + ">>(), idof<nonnull<" + t + ">>()));\n  changetype<nonnull<" + t + ">>(this." + name.text + ").__INITIALIZE()";
+                mem.initialize = "this." + name.text + " = changetype<nonnull<" + mem.type + ">>(__new(offsetof<nonnull<" + mem.type + ">>(), idof<nonnull<" + mem.type + ">>()));\n  changetype<nonnull<" + mem.type + ">>(this." + name.text + ").__INITIALIZE()";
             }
             else if (mem.value) {
                 mem.initialize = "this." + name.text + " = " + mem.value;
