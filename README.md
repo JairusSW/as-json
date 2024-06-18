@@ -1,4 +1,4 @@
-<h3 align="center">
+<h5 align="center">
 <pre>
  ╦╔═╗╔═╗╔╗╔   ╔═╗╔═╗
  ║╚═╗║ ║║║║───╠═╣╚═╗
@@ -6,7 +6,7 @@
 
 v0.9.6
 </pre>
-</h3>
+</h5>
 
 ## Installation
 
