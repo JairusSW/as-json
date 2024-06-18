@@ -8,7 +8,7 @@ class Vec3 {
   z: f32 = 0.0;
 }
 
-@json class Boxx<T> {
+class Box<T> {
   value: T;
 }
 
@@ -25,7 +25,7 @@ class Player {
   pos!: Vec3 | null;
   isVerified!: boolean;
   @flatten("value")
-  box: Boxx<i32> | null;
+  box: Box<i32> | null;
 }
 
 const player: Player = {
