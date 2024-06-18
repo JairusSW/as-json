@@ -12,6 +12,7 @@ import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { CommonFlags } from "types:assemblyscript/src/common";
+import { DecoratorNode } from "types:assemblyscript/src/ast";
 
 class JSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
@@ -105,50 +106,54 @@ class JSONTransform extends BaseVisitor {
       mem.node = member;
 
       if (member.decorators) {
-        for (let i = 0; i < (member.decorators).length; i++) {
-          const decorator = member.decorators[i]!;
+        let decorator: DecoratorNode | null = null;
+        if (decorator = member.decorators.find(v => (<IdentifierExpression>v.name).text == "alias") as DecoratorNode | null) {
           if ((<IdentifierExpression>decorator.name).text == "alias") {
             if (!decorator.args?.length) throw new Error("Expected 1 argument but got zero at @alias in " + node.range.source.normalizedPath);
-            mem.flag = PropertyFlags.Alias;
+            mem.flags.push(PropertyFlags.Alias);
             mem.alias = (decorator.args[0] as StringLiteralExpression).value;
-          } else if ((<IdentifierExpression>decorator.name).text == "omitnull") {
-            mem.flag = PropertyFlags.OmitNull;
+          }
+        }
+
+        for (let i = 0; i < (member.decorators).length; i++) {
+          const decorator = member.decorators[i]!;
+          if ((<IdentifierExpression>decorator.name).text == "omitnull") {
+            mem.flags.push(PropertyFlags.OmitNull);
           } else if ((<IdentifierExpression>decorator.name).text == "omitif") {
             if (!decorator.args?.length) throw new Error("Expected 1 argument but got zero at @omitif in " + node.range.source.normalizedPath);
             mem.args?.push((decorator.args[0] as StringLiteralExpression).value);
-            mem.flag = PropertyFlags.OmitIf;
+            mem.flags.push(PropertyFlags.OmitIf);
           } else if ((<IdentifierExpression>decorator.name).text == "flatten") {
             if (!decorator.args?.length) throw new Error("Expected 1 argument but got zero at @flatten in " + node.range.source.normalizedPath);
-            mem.flag = PropertyFlags.Flatten;
+            mem.flags.push(PropertyFlags.Flatten);
             mem.args = [(decorator.args[0] as StringLiteralExpression).value];
           }
         }
       }
 
-      if (mem.flag === PropertyFlags.Alias) {
-        mem.name = mem.alias!;
-      } else if (mem.flag === PropertyFlags.None) {
-        mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+      if (!mem.flags.length) {
+        mem.flags = [PropertyFlags.None];
+        mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
       }
 
-      if (mem.flag == PropertyFlags.OmitNull) {
-        mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + escapeString(JSON.stringify(mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
+      if (mem.flags.includes(PropertyFlags.OmitNull)) {
+        mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
-      } else if (mem.flag == PropertyFlags.OmitIf) {
-        mem.serialize = "${" + mem.args![0]! + " ? \"\" : '" + escapeString(JSON.stringify(mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
+      } else if (mem.flags.includes(PropertyFlags.OmitIf)) {
+        mem.serialize = "${" + mem.args![0]! + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
-      } else if (mem.flag == PropertyFlags.Alias) {
-        mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+      } else if (mem.flags.includes(PropertyFlags.Alias)) {
+        mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
         mem.name = name.text;
-      } else if (mem.flag == PropertyFlags.Flatten) {
+      } else if (mem.flags.includes(PropertyFlags.Flatten)) {
         const nullable = (mem.node.type as NamedTypeNode).isNullable;
         if (nullable) {
-          mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${this." + name.text + " ? __SERIALIZE(changetype<nonnull<" + type + ">>(this." + name.text + ")" + (mem.args?.length ? '.' + mem.args[0]! : '') + ") : \"null\"}";
+          mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(changetype<nonnull<" + type + ">>(this." + name.text + ")" + (mem.args?.length ? '.' + mem.args[0]! : '') + ") : \"null\"}";
           mem.deserialize = "if (value_end - value_start == 4 && load<u64>(changetype<usize>(data) + <usize>(value_start << 1)) == " + charCodeAt64("null", 0) + ") {\n        this." + name.text + " = null;\n      } else {\n        this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args![0]! + "\":' + data.substring(value_start, value_end) + \"}\");\n      }";
         } else {
-          mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${this." + name.text + " ? __SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args[0]! : '') + ") : \"null\"}";
+          mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args[0]! : '') + ") : \"null\"}";
           mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args![0]! + "\":' + data.substring(value_start, value_end) + \"}\");";
         }
         mem.name = name.text;
@@ -177,8 +182,8 @@ class JSONTransform extends BaseVisitor {
     found = false;
 
     if (
-      schema.members[0]?.flag === PropertyFlags.OmitNull
-      || schema.members[0]?.flag === PropertyFlags.OmitIf
+      schema.members[0]?.flags.includes(PropertyFlags.OmitNull)
+      || schema.members[0]?.flags.includes(PropertyFlags.OmitIf)
     ) {
       SERIALIZE_RAW += schema.members[0]?.serialize;
       SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize;
@@ -194,8 +199,8 @@ class JSONTransform extends BaseVisitor {
       const member = schema.members[i]!;
       if (member.initialize) INITIALIZE += "  " + member.initialize + ";\n";
       if (
-        member.flag === PropertyFlags.OmitNull
-        || member.flag === PropertyFlags.OmitIf
+        member.flags.includes(PropertyFlags.OmitNull)
+        || member.flags.includes(PropertyFlags.OmitIf)
       ) {
         SERIALIZE_RAW += member.serialize;
         SERIALIZE_PRETTY += member.serialize;
@@ -385,7 +390,7 @@ class Property {
   public alias: string | null = null;
   public type: string = "";
   public value: string | null = null;
-  public flag: PropertyFlags = PropertyFlags.None;
+  public flags: PropertyFlags[] = [];
   public args: string[] | null = [];
 
   public serialize: string | null = null;
