@@ -117,6 +117,10 @@ class JSONTransform extends BaseVisitor {
             if (!decorator.args?.length) throw new Error("Expected 1 argument but got zero at @omitif in " + node.range.source.normalizedPath);
             mem.args?.push((decorator.args[0] as StringLiteralExpression).value);
             mem.flag = PropertyFlags.OmitIf;
+          } else if ((<IdentifierExpression>decorator.name).text == "flatten") {
+            if (!decorator.args?.length) throw new Error("Expected 1 argument but got zero at @flatten in " + node.range.source.normalizedPath);
+            mem.flag = PropertyFlags.Flatten;
+            mem.args = [(decorator.args[0] as StringLiteralExpression).value];
           }
         }
       }
@@ -137,6 +141,10 @@ class JSONTransform extends BaseVisitor {
       } else if (mem.flag == PropertyFlags.Alias) {
         mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
         mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
+        mem.name = name.text;
+      } else if (mem.flag == PropertyFlags.Flatten) {
+        mem.serialize = escapeString(JSON.stringify(mem.name)) + ":${__SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args[0]! : '') + ")}";
+        mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args![0]! + "\":' + data.substring(value_start, value_end) + \"}\");"
         mem.name = name.text;
       }
 
@@ -362,7 +370,8 @@ enum PropertyFlags {
   Omit,
   OmitNull,
   OmitIf,
-  Alias
+  Alias,
+  Flatten
 }
 
 class Property {
