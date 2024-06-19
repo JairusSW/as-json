@@ -45,7 +45,7 @@
   "dependencies": {
     "as-container": "^0.8.0",
     "as-string-sink": "^0.5.3",
-    "as-test": "^0.0.3",
+    "as-test": "^0.0.5",
     "as-variant": "^0.4.1",
     "as-virtual": "^0.2.0"
   },
