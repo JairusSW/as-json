@@ -33,7 +33,6 @@
   "devDependencies": {
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bench": "^0.0.0-alpha",
-    "as-test": "JairusSW/as-test",
     "assemblyscript": "^0.27.22",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
@@ -46,6 +45,7 @@
   "dependencies": {
     "as-container": "^0.8.0",
     "as-string-sink": "^0.5.3",
+    "as-test": "^0.0.2",
     "as-variant": "^0.4.1",
     "as-virtual": "^0.2.0"
   },

@@ -1,7 +1,8 @@
 import { JSON } from "..";
 import {
   describe,
-  expect
+  expect,
+  run
 } from "as-test/assembly";
 
 @json
@@ -270,6 +271,8 @@ describe("Should deserialize Objects", () => {
   ).toBe(JSON.stringify(<ObjWithStrangeKey<string>>{ data: "foo" }));
 
 });
+
+run();
 
 @json
 class ObjWithString {

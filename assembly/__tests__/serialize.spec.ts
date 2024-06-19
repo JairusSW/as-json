@@ -1,7 +1,8 @@
 import { JSON } from "..";
 import {
   describe,
-  expect
+  expect,
+  run
 } from "as-test/assembly";
 
 @json
@@ -367,6 +368,8 @@ describe("Should serialize @omit'ed objects", () => {
   ).toBe('{"x":1,"y":1,"z":1}');
 
 });
+
+run();
 
 @json
 class ObjWithString {
