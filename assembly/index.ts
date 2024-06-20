@@ -23,6 +23,9 @@ import { deserializeInteger } from "./deserialize/integer";
 import { deserializeString } from "./deserialize/string";
 import { Sink } from "./src/sink";
 import { Variant } from "as-variant/assembly";
+import { MpZ } from "@hypercubed/as-mpz";
+import { serializeMpZ } from "./serialize/mpz";
+import { deserializeMpZ } from "./deserialize/mpz";
 
 /**
  * Offset of the 'storage' property in the JSON.Value class.
@@ -46,13 +49,15 @@ export namespace JSON {
     F64,
     Bool,
     String,
+    ManagedString,
     Struct,
-    Array
+    ManagedStruct,
+    Array,
+    ManagedArray
   }
+
   export class Value {
     public type: i32;
-    public length: i32 = 0;
-
     // @ts-ignore: storage is set directly through memory
     private storage: u64;
 
@@ -102,7 +107,6 @@ export namespace JSON {
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (isString<T>()) {
         this.type = JSON.Types.String;
-        this.length = String.UTF8.byteLength(value as string);
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (value instanceof Map) {
         if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
@@ -117,8 +121,6 @@ export namespace JSON {
       } else if (isArray<T>()) {
         // @ts-ignore: T satisfies constraints of any[]
         this.type = JSON.Types.Array + getArrayDepth<T>(0);
-        // @ts-ignore
-        this.length = value.length;
         store<T>(changetype<usize>(this), value, STORAGE);
       }
     }
@@ -207,6 +209,10 @@ export namespace JSON {
       }
     }
   }
+
+  export class Box<T> {
+    constructor(public value: T) {}
+  }
   /**
    * Stringifies valid JSON data.
    * ```js
@@ -247,6 +253,8 @@ export namespace JSON {
     } else if (data instanceof Map) {
       // @ts-ignore
       return serializeMap(changetype<nonnull<T>>(data));
+    } else if (data instanceof MpZ) {
+      return serializeMpZ(data);
     } else {
       throw new Error(
         `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
@@ -291,7 +299,10 @@ export namespace JSON {
     } else if (type instanceof Map) {
       // @ts-ignore
       return deserializeMap<nonnull<T>>(data.trimStart());
-    } else if (type instanceof Date) {
+    } else if (type instanceof MpZ) {
+      // @ts-ignore
+      return deserializeMpZ(data);
+    }else if (type instanceof Date) {
       // @ts-ignore
       return deserializeDate(data);
     } else {

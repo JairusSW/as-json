@@ -1,6 +1,5 @@
 node_modules
 *.lock
-build
 pnpm-lock.yaml
 package-lock.json
 .vscode

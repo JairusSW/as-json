@@ -8,6 +8,13 @@ class JSONTransform extends BaseVisitor {
         this.schemasList = [];
         this.sources = new Set();
     }
+    visitBinaryExpression(node) {
+        if (node.operator == 101 /* Token.Equals */) {
+            if (node.left.kind == 21 /* NodeKind.PropertyAccess */) {
+                console.log(node);
+            }
+        }
+    }
     visitMethodDeclaration() { }
     visitClassDeclaration(node) {
         if (!node.decorators?.length)

@@ -20,9 +20,6 @@ jobs:
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: yarn
-      
-      - name: Build tests
-        run: yarn run tests:build
-
+    
       - name: Perform tests
         run: yarn run test

@@ -118,6 +118,20 @@ const serialized = JSON.stringify(arr);
 const parsed = JSON.parse<Base[]>(serialized);
 ```
 
+It also supports arbitrary-length integers with [@hypercubed/as-mpz](https://github.com/Hypercubed/as-mpz)
+
+```js
+import { MpZ } from "@hypercubed/as-mpz";
+
+const a = MpZ.from(18448972);
+const b = MpZ.from('7881297289452930');
+const c = a.add(b);
+
+const serialized = JSON.stringify(c);
+// 7881297307901902
+const parsed = JSON.parse<MpZ>(serialized);
+```
+
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
 ## Notes

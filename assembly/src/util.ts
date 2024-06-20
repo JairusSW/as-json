@@ -1,6 +1,6 @@
-import { StringSink } from "as-string-sink/assembly";
 import { isSpace } from "util/string";
 import { BACK_SLASH, QUOTE } from "./chars";
+import { Sink } from "./sink";
 
 // @ts-ignore: Decorator
 export function isMap<T>(): bool {
@@ -15,7 +15,7 @@ export function unsafeCharCodeAt(data: string, pos: i32): i32 {
 
 // @ts-ignore: Decorator
 export function removeWhitespace(data: string): string {
-  const result = new StringSink();
+  const result = new Sink();
   let instr = false;
   for (let i = 0; i < data.length; i++) {
     const char = unsafeCharCodeAt(data, i);

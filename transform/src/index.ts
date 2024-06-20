@@ -4,21 +4,36 @@ import {
   IdentifierExpression,
   NamedTypeNode,
   StringLiteralExpression,
+  BinaryExpression,
+  DecoratorNode,
+  ElementAccessExpression,
+  Token,
   Parser,
-  Source
+  Source,
+  NodeKind
 } from "assemblyscript/dist/assemblyscript.js";
 
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { CommonFlags } from "types:assemblyscript/src/common";
-import { DecoratorNode } from "types:assemblyscript/src/ast";
+import { VariableDeclaration } from "types:assemblyscript/src/ast";
 
 class JSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
   public currentClass!: SchemaData;
   public sources = new Set<Source>();
 
+  visitVariableDeclaration(node: VariableDeclaration): void {
+    if (node.)
+  }
+  visitBinaryExpression(node: BinaryExpression): void {
+    if (node.operator == Token.Equals) {
+      if (node.left.kind == NodeKind.PropertyAccess) {
+        console.log(node)
+      }
+    }
+  }
   visitMethodDeclaration(): void { }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
