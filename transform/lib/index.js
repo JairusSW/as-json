@@ -1,4 +1,4 @@
-import { FieldDeclaration } from "assemblyscript/dist/assemblyscript.js";
+import { FieldDeclaration, IdentifierExpression, Node, NewExpression, ObjectLiteralExpression, CallExpression, PropertyAccessExpression, AssertionExpression } from "assemblyscript/dist/assemblyscript.js";
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
@@ -7,15 +7,130 @@ class JSONTransform extends BaseVisitor {
         super(...arguments);
         this.schemasList = [];
         this.sources = new Set();
+        this.boxRefs = new Map();
+    }
+    visitVariableDeclaration(node) {
+        let typ = "";
+        // const foo = new Foo();
+        if (node.initializer instanceof NewExpression && this.schemasList.find((v) => v.name == node.initializer.typeName.identifier.text)) {
+            console.log(toString(node));
+            this.boxRefs.set(node.name.text, node.initializer.typeName.identifier.text);
+        }
+        // const foo: Foo = {};
+        // const foo = {} as Foo;
+        // const foo = <Foo>{};
+        else if (node.initializer instanceof ObjectLiteralExpression && this.schemasList.find((v) => v.name == node.type.name.identifier.text)) {
+            console.log(toString(node));
+            this.boxRefs.set(node.name.text, node.type.name.identifier.text);
+        }
+        // const foo = changetype<Foo>(ptr);
+        else if (node.initializer instanceof CallExpression && this.schemasList.find((v) => node.initializer.typeArguments?.find((e) => (typ = v.name) == e.name.identifier.text))) {
+            console.log(toString(node));
+            this.boxRefs.set(node.name.text, typ);
+        }
     }
     visitBinaryExpression(node) {
         if (node.operator == 101 /* Token.Equals */) {
             if (node.left.kind == 21 /* NodeKind.PropertyAccess */) {
-                console.log(node);
+                //console.log(node)
             }
         }
     }
     visitMethodDeclaration() { }
+    visitAssertionExpression(node) {
+        //console.log("ASSERT: " + toString(node));
+    }
+    visitPropertyAccessExpression(node) {
+        let subNode = node;
+        let baseRef = "";
+        while (true) {
+            if (subNode.expression instanceof IdentifierExpression) {
+                if (this.boxRefs.has(subNode.expression.text)) {
+                    //console.log(subNode);
+                    baseRef = subNode.expression.text;
+                    break;
+                }
+                else {
+                    break;
+                }
+            }
+            else if (subNode.expression instanceof PropertyAccessExpression) {
+                subNode = subNode.expression;
+            }
+            else if (subNode.expression instanceof AssertionExpression) {
+                //console.log("ASSERT: ", subNode.expression);
+                subNode = subNode.expression;
+            }
+            else {
+                break;
+            }
+        }
+        subNode = node;
+        if (baseRef) {
+            const baseType = this.boxRefs.get(baseRef);
+            console.log("Base: " + baseType);
+            let properties = [];
+            let lastNode = subNode;
+            const schema = (this.schemasList.find((e) => e.name === baseType) || (this.currentClass.name === baseType) ? this.currentClass : null);
+            while (true) {
+                if (subNode instanceof PropertyAccessExpression) {
+                    //console.log("PROPERTY: " + toString(subNode));        
+                    //console.log(subNode)          
+                    lastNode = subNode;
+                    subNode = subNode.expression;
+                }
+                else if (subNode instanceof AssertionExpression) {
+                    //console.log("ASSERT: " + toString(subNode));        
+                    //console.log(subNode);
+                    if (schema?.members.find((e) => e.name === subNode.expression.property?.text)) {
+                        const newExpression = Node.createPropertyAccessExpression(subNode, Node.createIdentifierExpression("value", node.range), node.range);
+                        node.expression = newExpression;
+                        node.property = lastNode.property;
+                        //console.log("HERE WE GO: " + toString(node));
+                    }
+                    lastNode = subNode;
+                    subNode = subNode.expression;
+                }
+                else if (subNode instanceof IdentifierExpression) {
+                    //console.log("IDENTIFIER: " + toString(subNode));
+                    break;
+                }
+            } /*
+            const newProperty = Node.createAssertionExpression(
+              AssertionKind.NonNull,
+              Node.createPropertyAccessExpression(
+                Node.createIdentifierExpression(
+                  "vec",
+                  node.range
+                ),
+                Node.createIdentifierExpression(
+                  "x",
+                  node.range
+                ),
+                node.range
+              ),
+              null,
+              node.range
+            );
+      
+            const newAccessor = Node.createIdentifierExpression(
+              "value",
+              node.range
+            );
+      
+            if (node.property) {
+            }
+            const newPropertyAccess = Node.createPropertyAccessExpression(
+              newProperty,
+              newAccessor!,
+              node.range
+            )
+            console.log("Sub Node:  ", toString(subNode))
+            console.log("Old Access: ", toString(node));
+            node.expression = newPropertyAccess;
+            console.log("New Access: " + toString(node));*/
+        }
+    }
     visitClassDeclaration(node) {
         if (!node.decorators?.length)
             return;
@@ -32,6 +147,31 @@ class JSONTransform extends BaseVisitor {
         const schema = new SchemaData();
         schema.node = node;
         schema.name = node.name.text;
+        this.currentClass = schema;
+        for (const _member of node.members) {
+            if (!(_member instanceof FieldDeclaration))
+                continue;
+            const member = _member;
+            if (member.type?.isNullable && isPrimitiveType(member.type?.name.identifier.text)) {
+                const accessorType = Node.createSimpleTypeName("JSON", node.range);
+                accessorType.next = Node.createSimpleTypeName("Box", node.range);
+                const newTypeGeneric = member.type;
+                member.type.isNullable = false;
+                const newType = Node.createNamedType(accessorType, [
+                    newTypeGeneric
+                ], true, node.range);
+                member.type = newType;
+                if (member.initializer) {
+                    const initializer = Node.createNewExpression(accessorType, [
+                        newTypeGeneric
+                    ], [
+                        member.initializer
+                    ], node.range);
+                    member.initializer = initializer;
+                }
+                console.log(toString(member));
+            }
+        }
         const members = [
             ...node.members.filter(v => v instanceof FieldDeclaration)
         ];
@@ -424,4 +564,19 @@ function escapeSlash(data) {
 }
 function escapeQuote(data) {
     return data.replace(/\"/g, "\\\"");
+}
+function isPrimitiveType(data) {
+    return data == "u8"
+        || data == "u16"
+        || data == "u16"
+        || data == "u32"
+        || data == "u64"
+        || data == "i8"
+        || data == "i16"
+        || data == "i32"
+        || data == "i64"
+        || data == "f32"
+        || data == "f64"
+        || data == "bool"
+        || data == "boolean";
 }

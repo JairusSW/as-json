@@ -1,11 +1,10 @@
-import { MpZ } from "@hypercubed/as-mpz";
 import { JSON } from ".";
 
-const a = MpZ.from(18448972);
-const b = MpZ.from('7881297289452930');
-const c = a.add(b);
+// @json or @serializable work here
+@json
+class Vec3 {
+  x: f64 | null = 1.0;
+}
 
-const serialized = JSON.stringify(c);
-const parsed = JSON.parse<MpZ>(serialized);
-
-console.log("Serialized: " + serialized)
+const vec = new Vec3();
+console.log(vec.x!.toString());
