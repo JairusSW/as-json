@@ -155,6 +155,16 @@ if (vec.y) {
 
 NOTE: There are a few quirks to using nullable primitives. First, you'll get a warning about usize (ignore it, its fine) and secondly, you'll get a wasm validation error if you do not have a `!` operator after accessing an element. Eg. `console.log(vec.y.toString())` fails, but `console.log(vec.y!.toString())` works.
 
+You can also add it to your `asconfig.json`
+
+{
+  // ...
+  "options": {
+    "transform": ["json-as/transform"],
+    "disableWarning": [226]
+  }
+}
+
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
 ## Notes

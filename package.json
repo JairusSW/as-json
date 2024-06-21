@@ -16,9 +16,9 @@
   "license": "MIT",
   "scripts": {
     "test": "wasmtime build/test.spec.wasm",
-    "pretest": "mkdir -p build && asc assembly/__tests__/test.spec.ts -o build/test.spec.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always > build/test.spec.log",
-    "build:test": "JSON_DEBUG=true asc assembly/test.ts -o build/test.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 0 --shrinkLevel 0 --noAssert --uncheckedBehavior always",
-    "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
+    "pretest": "mkdir -p build && asc assembly/__tests__/test.spec.ts --target test > build/test.spec.log",
+    "build:test": "JSON_DEBUG=true asc assembly/test.ts --target debug",
+    "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
     "bench:wasmer": "wasmer --llvm ./bench/benchmark.wasm",
     "build:transform": "tsc -p ./transform",
