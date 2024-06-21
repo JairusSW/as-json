@@ -20,3 +20,4 @@ v0.9.8 - Update dependencies
  - Performance improvements
  - Introduce options
  - Custom serializers
+ - Support arbitrary-length integers (@hypercubed/as-mpz)
