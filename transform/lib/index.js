@@ -553,6 +553,10 @@ export default class Transformer extends Transform {
                     source.statements.unshift(parser.parseTopLevelStatement(tokenizer2));
                     parser.currentSource = source;
                     transformer.mustImport = false;
+                    // @ts-ignore
+                    if (process && process.env["JSON_DEBUG"].toString().toLowerCase() == "all") {
+                        console.log(toString(source));
+                    }
                 }
             }
         }

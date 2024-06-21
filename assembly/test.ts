@@ -14,7 +14,7 @@ vec.x = null;
 vec.x = 9;
 
 console.log(vec.x!.toString());
-if (vec.b) {
+if (vec.b == null) {
   console.log(vec.b!.toString());
 } else {
   console.log("vec.b is null!")

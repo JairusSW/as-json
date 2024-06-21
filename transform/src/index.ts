@@ -23,7 +23,8 @@ import {
   TrueExpression,
   FalseExpression,
   SourceKind,
-  Tokenizer
+  Tokenizer,
+  NullExpression
 } from "assemblyscript/dist/assemblyscript.js";
 
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
@@ -39,8 +40,12 @@ class JSONTransform extends BaseVisitor {
   visitVariableDeclaration(node: VariableDeclaration): void {
     let typ: string = "";
     let className = "";
+    // const tempFoo = foo;
+    if (node.initializer instanceof IdentifierExpression && this.boxRefs.has((<IdentifierExpression>node.initializer).text)) {
+      this.boxRefs.set(node.name.text, this.boxRefs.get((<IdentifierExpression>node.initializer).text)!);
+    }
     // const foo = new Foo();
-    if (node.initializer instanceof NewExpression && this.schemasList.find((v) => v.name == (className = (<NewExpression>node.initializer).typeName.identifier.text))) {
+    else if (node.initializer instanceof NewExpression && this.schemasList.find((v) => v.name == (className = (<NewExpression>node.initializer).typeName.identifier.text))) {
       this.boxRefs.set(node.name.text, className);
     }
     // const foo: Foo = {};
@@ -101,7 +106,7 @@ class JSONTransform extends BaseVisitor {
       if (node.left.kind == NodeKind.PropertyAccess) {
         const left = node.left as PropertyAccessExpression;
         // TODO
-        if (toString(left).startsWith("vec.")) {
+        if ((this.boxRefs.has(toString(left).split(".")[0]!))) {
           if (
             (
               node.right instanceof LiteralExpression
@@ -666,7 +671,11 @@ export default class Transformer extends Transform {
           parser.currentSource = tokenizer2.source;
           source.statements.unshift(parser.parseTopLevelStatement(tokenizer2)!);
           parser.currentSource = source;
-          transformer.mustImport = false;
+          transformer.mustImport = false;    
+          // @ts-ignore
+          if (process && process.env["JSON_DEBUG"].toString().toLowerCase() == "all") {
+            console.log(toString(source));
+          }
         }
       }
     }
