@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Bun/Wasmtime CI
 
 on: [push, pull_request]
 
@@ -14,15 +14,14 @@ jobs:
       - name: Install Wasmtime
         uses: jcbhmr/setup-wasmtime@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
 
-      - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: yarn
+      - name: Install Dependencies
+        run: bun install
       
-      - name: Build
-        run: yarn run pretest
+      - name: Build Tests
+        run: bun run pretest
 
-      - name: Test
-        run: yarn run test
+      - name: Run Tests
+        run: bun run test
