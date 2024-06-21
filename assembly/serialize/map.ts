@@ -1,6 +1,6 @@
-import { COLON, COMMA, BRACE_LEFT_WORD, BRACE_RIGHT } from "../src/chars";
+import { COLON, COMMA, BRACE_LEFT_WORD, BRACE_RIGHT } from "../chars";
 import { JSON } from "..";
-import { Sink } from "../src/sink";
+import { Sink } from "../sink";
 import { serializeString } from "./string";
 
 // @ts-ignore

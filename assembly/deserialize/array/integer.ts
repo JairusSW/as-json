@@ -1,6 +1,6 @@
 import { isSpace } from "util/string";
-import { unsafeCharCodeAt } from "../../src/util";
-import { COMMA, BRACKET_RIGHT } from "../../src/chars";
+import { unsafeCharCodeAt } from "../../util";
+import { COMMA, BRACKET_RIGHT } from "../../chars";
 import { deserializeInteger } from "../integer";
 
 // @ts-ignore: Decorator

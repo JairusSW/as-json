@@ -7,9 +7,9 @@ import {
     QUOTE,
     QUOTE_WORD,
     TAB
-} from "../src/chars";
-import { Sink } from "../src/sink";
-import { unsafeCharCodeAt } from "../src/util";
+} from "../chars";
+import { Sink } from "../sink";
+import { unsafeCharCodeAt } from "../util";
 
 // @ts-ignore: Decorator
 export function serializeString(data: string): string {

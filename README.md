@@ -132,6 +132,29 @@ const serialized = JSON.stringify(c);
 const parsed = JSON.parse<MpZ>(serialized);
 ```
 
+It also supports nullable primitive types, something that AssemblyScript usually can't do
+
+```js
+@json
+class Vec2 {
+  x: f64 | null = 1.0;
+  y: f32 | null = 2.0;
+}
+
+const vec: Vec2 = {
+  x: 1.0,
+  y: null
+}
+
+vec.y = 2.0;
+
+if (vec.y) {
+  // do something
+}
+```
+
+NOTE: There are a few quirks to using nullable primitives. First, you'll get a warning about usize (ignore it, its fine) and secondly, you'll get a wasm validation error if you do not have a `!` operator after accessing an element. Eg. `console.log(vec.y.toString())` fails, but `console.log(vec.y!.toString())` works.
+
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
 ## Notes

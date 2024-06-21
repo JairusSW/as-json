@@ -1,6 +1,6 @@
 import { JSON } from "..";
-import { Sink } from "../src/sink";
-import { __atoi_fast } from "../src/util";
+import { Sink } from "../sink";
+import { __atoi_fast } from "../util";
 import { serializeUnknownArray } from "./array/unknown";
 import { serializeBool } from "./bool";
 import { serializeFloat } from "./float";

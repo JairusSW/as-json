@@ -1,4 +1,4 @@
-import { NULL_WORD } from "../src/chars";
+import { NULL_WORD } from "../chars";
 import { JSON } from "..";
 import { Box } from "as-container";
 

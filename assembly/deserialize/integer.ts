@@ -1,4 +1,4 @@
-import { snip_fast } from "../src/util";
+import { snip_fast } from "../util";
 
 // @ts-ignore: Decorator
 export function deserializeInteger<T>(data: string): T {

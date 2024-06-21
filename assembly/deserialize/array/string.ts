@@ -1,5 +1,5 @@
-import { BACK_SLASH, QUOTE } from "../../src/chars";
-import { unsafeCharCodeAt } from "../../src/util";
+import { BACK_SLASH, QUOTE } from "../../chars";
+import { unsafeCharCodeAt } from "../../util";
 import { deserializeString } from "../string";
 
 // @ts-ignore: Decorator

@@ -1,6 +1,6 @@
-import { BRACKET_LEFT, BRACKET_RIGHT } from "../../src/chars";
+import { BRACKET_LEFT, BRACKET_RIGHT } from "../../chars";
 import { JSON } from "../..";
-import { unsafeCharCodeAt } from "../../src/util";
+import { unsafeCharCodeAt } from "../../util";
 
 // @ts-ignore: Decorator
 export function deserializeArrayArray<T extends unknown[][]>(data: string): T {

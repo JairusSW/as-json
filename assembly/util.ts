@@ -258,7 +258,7 @@ export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u
  */
 
 // @ts-ignore
-@global export function __atoi_fast<T extends number>(str: string, start: u32 = 0, end: u32 = 0): T {
+export function __atoi_fast<T extends number>(str: string, start: u32 = 0, end: u32 = 0): T {
   // @ts-ignore
   let val: T = 0;
   if (!end) end = start + u32(str.length << 1);

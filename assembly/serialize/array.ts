@@ -6,8 +6,8 @@ import {
     BRACKET_LEFT_WORD,
     BRACKET_RIGHT,
     BRACKET_RIGHT_WORD
-} from "../src/chars";
-import { Sink } from "../src/sink";
+} from "../chars";
+import { Sink } from "../sink";
 import { serializeString } from "./string";
 
 // @ts-ignore

@@ -18,10 +18,10 @@ import { deserializeBox } from "./deserialize/box";
 import { deserializeObject } from "./deserialize/object";
 import { deserializeMap } from "./deserialize/map";
 import { deserializeDate } from "./deserialize/date";
-import { FALSE_WORD, NULL_WORD, TRUE_WORD } from "./src/chars";
+import { FALSE_WORD, NULL_WORD, TRUE_WORD } from "./chars";
 import { deserializeInteger } from "./deserialize/integer";
 import { deserializeString } from "./deserialize/string";
-import { Sink } from "./src/sink";
+import { Sink } from "./sink";
 import { Variant } from "as-variant/assembly";
 import { MpZ } from "@hypercubed/as-mpz";
 import { serializeMpZ } from "./serialize/mpz";
@@ -216,6 +216,7 @@ export namespace JSON {
       return new Box(value);
     }
   }
+  
   /**
    * Stringifies valid JSON data.
    * ```js
@@ -314,14 +315,4 @@ export namespace JSON {
       );
     }
   }
-}
-
-// This allows JSON.stringify and JSON.parse to be available globally through an alias
-// @ts-ignore: Decorator
-@global function __SERIALIZE<T>(data: T): string {
-  return JSON.stringify(data);
-}
-// @ts-ignore: Decorator
-@global function __DESERIALIZE<T>(data: string): T {
-  return JSON.parse<T>(data);
 }

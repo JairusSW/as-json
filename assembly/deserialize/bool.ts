@@ -1,5 +1,5 @@
-import { CHAR_F, CHAR_T } from "../src/chars";
-import { unsafeCharCodeAt } from "../src/util";
+import { CHAR_F, CHAR_T } from "../chars";
+import { unsafeCharCodeAt } from "../util";
 
 /**
  * Deserialize a string to type boolean

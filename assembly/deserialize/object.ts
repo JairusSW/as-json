@@ -1,5 +1,5 @@
-import { containsCodePoint, unsafeCharCodeAt } from "../src/util";
-import { CHAR_A, BACK_SLASH, COMMA, CHAR_E, CHAR_F, CHAR_L, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, CHAR_R, BRACE_RIGHT, BRACKET_RIGHT, CHAR_S, CHAR_T, CHAR_U } from "../src/chars";
+import { containsCodePoint, unsafeCharCodeAt } from "../util";
+import { CHAR_A, BACK_SLASH, COMMA, CHAR_E, CHAR_F, CHAR_L, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, CHAR_R, BRACE_RIGHT, BRACKET_RIGHT, CHAR_S, CHAR_T, CHAR_U } from "../chars";
 import { isSpace } from "util/string";
 
 // @ts-ignore: Decorator

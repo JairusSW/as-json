@@ -1,5 +1,5 @@
 import { bench, blackbox } from "as-bench/assembly/bench";
-import { __atoi_fast } from "../assembly/src/util";
+import { __atoi_fast } from "../assembly/util";
 import { JSON } from "../assembly";
 
 @json
