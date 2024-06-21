@@ -16,7 +16,7 @@
   "license": "MIT",
   "scripts": {
     "test": "wasmtime build/test.spec.wasm",
-    "pretest": "mkdir -p build && asc assembly/__tests__/test.spec.ts --target test > build/test.spec.log",
+    "pretest": "asc assembly/__tests__/test.spec.ts --target test",
     "build:test": "JSON_DEBUG=true asc assembly/test.ts --target debug",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
@@ -35,12 +35,12 @@
     "assemblyscript": "^0.27.27",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
+    "json-as": "./",
     "microtime": "^3.1.1",
     "prettier": "^3.3.2",
     "tinybench": "^2.8.0",
     "typescript": "^5.5.2",
-    "visitor-as": "^0.11.4",
-    "json-as": "./"
+    "visitor-as": "^0.11.4"
   },
   "dependencies": {
     "@hypercubed/as-mpz": "^2.2.0",
