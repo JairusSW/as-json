@@ -4,7 +4,7 @@ import {
   expect,
   run
 } from "as-test/assembly";
-import { DerivedObject, Null, ObjWithStrangeKey, ObjectWithFloat, OmitIf, Player, Vec3 } from "./types.spec";
+import { DerivedObject, Null, ObjWithStrangeKey, ObjectWithFloat, OmitIf, Player, Vec3 } from "./types";
 import { MpZ } from "@hypercubed/as-mpz";
 
 describe("Should serialize strings", () => {
@@ -558,4 +558,7 @@ describe("Should deserialize Objects", () => {
 
 });
 
-run();
+run({
+  log: true,
+  coverage: true
+});

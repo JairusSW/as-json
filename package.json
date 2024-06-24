@@ -31,8 +31,7 @@
   "devDependencies": {
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bench": "^0.0.0-alpha",
-    "as-test": "^0.1.0",
-    "assemblyscript": "^0.27.27",
+    "assemblyscript": "^0.27.28",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
     "json-as": "./",
@@ -45,6 +44,7 @@
   "dependencies": {
     "@hypercubed/as-mpz": "^2.2.0",
     "as-string-sink": "^0.5.3",
+    "as-test": "^0.1.2",
     "as-virtual": "^0.2.0"
   },
   "overrides": {

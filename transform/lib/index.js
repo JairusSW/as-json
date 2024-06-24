@@ -13,8 +13,12 @@ class JSONTransform extends BaseVisitor {
     visitVariableDeclaration(node) {
         let typ = "";
         let className = "";
+        // const tempFoo = foo;
+        if (node.initializer instanceof IdentifierExpression && this.boxRefs.has(node.initializer.text)) {
+            this.boxRefs.set(node.name.text, this.boxRefs.get(node.initializer.text));
+        }
         // const foo = new Foo();
-        if (node.initializer instanceof NewExpression && this.schemasList.find((v) => v.name == (className = node.initializer.typeName.identifier.text))) {
+        else if (node.initializer instanceof NewExpression && this.schemasList.find((v) => v.name == (className = node.initializer.typeName.identifier.text))) {
             this.boxRefs.set(node.name.text, className);
         }
         // const foo: Foo = {};
@@ -58,7 +62,7 @@ class JSONTransform extends BaseVisitor {
             if (node.left.kind == 21 /* NodeKind.PropertyAccess */) {
                 const left = node.left;
                 // TODO
-                if (toString(left).startsWith("vec.")) {
+                if ((this.boxRefs.has(toString(left).split(".")[0]))) {
                     if ((node.right instanceof LiteralExpression
                         && (node.right.literalKind === 1 /* LiteralKind.Integer */
                             || node.right.literalKind === 0 /* LiteralKind.Float */))
@@ -554,7 +558,7 @@ export default class Transformer extends Transform {
                     parser.currentSource = source;
                     transformer.mustImport = false;
                     // @ts-ignore
-                    if (process && process.env["JSON_DEBUG"].toString().toLowerCase() == "all") {
+                    if (process && process.env["JSON_DEBUG"]?.toString().toLowerCase() == "all") {
                         console.log(toString(source));
                     }
                 }

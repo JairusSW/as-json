@@ -673,7 +673,7 @@ export default class Transformer extends Transform {
           parser.currentSource = source;
           transformer.mustImport = false;    
           // @ts-ignore
-          if (process && process.env["JSON_DEBUG"].toString().toLowerCase() == "all") {
+          if (process && process.env["JSON_DEBUG"]?.toString().toLowerCase() == "all") {
             console.log(toString(source));
           }
         }
