@@ -44,7 +44,7 @@
   "dependencies": {
     "@hypercubed/as-mpz": "^2.2.0",
     "as-string-sink": "^0.5.3",
-    "as-test": "^0.1.2",
+    "as-test": "^0.1.4",
     "as-virtual": "^0.2.0"
   },
   "overrides": {
