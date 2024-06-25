@@ -1,21 +1,12 @@
-// @json or @serializable work here
-@json
-class Vec3 {
-  x: f64 | null = 1.0;
-  b: boolean | null = true;
-}
+import { JSON } from ".";
+import { Vec3 as Vec3a } from "./types";
+import { Vec3 as Vec3b } from "./types";
 
-const vec: Vec3 = {
-  x: 3.0,
-  b: null
-}
+const veca = new Vec3a();
+const vecb = new Vec3b();
 
-vec.x = null;
-vec.x = 9;
+const serializeda = JSON.stringify(veca);
+console.log("SERIALIZED-A: " + serializeda);
 
-console.log(vec.x!.toString());
-if (vec.b == null) {
-  console.log(vec.b!.toString());
-} else {
-  console.log("vec.b is null!")
-}
+const serialziedb = JSON.stringify(vecb);
+console.log("SERIALIZED-B: " + serialziedb);

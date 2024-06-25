@@ -21,3 +21,4 @@ v0.9.8 - Update dependencies
  - Introduce options
  - Custom serializers
  - Support arbitrary-length integers (@hypercubed/as-mpz)
+ - Remove as-container (Box<T>)

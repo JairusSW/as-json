@@ -250,7 +250,7 @@ class JSONTransform extends BaseVisitor {
             let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
             // @ts-ignore
             if (process && process.env["JSON_DEBUG"]) {
-                console.log(toString(node));
+                console.log("File: " + node.range.source.normalizedPath + "\n" + toString(node) + "\n\n");
             }
             const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
             //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
@@ -499,7 +499,7 @@ class JSONTransform extends BaseVisitor {
         //console.log(sortedMembers);
         // @ts-ignore
         if (process && process.env["JSON_DEBUG"]) {
-            console.log(toString(node));
+            console.log("File: " + node.range.source.normalizedPath + "\n" + toString(node) + "\n\n");
         }
         const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
         //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
@@ -559,7 +559,7 @@ export default class Transformer extends Transform {
                     transformer.mustImport = false;
                     // @ts-ignore
                     if (process && process.env["JSON_DEBUG"]?.toString().toLowerCase() == "all") {
-                        console.log(toString(source));
+                        console.log("File: " + source.normalizedPath + "\n" + toString(source) + "\n\n");
                     }
                 }
             }

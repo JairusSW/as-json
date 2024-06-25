@@ -360,7 +360,7 @@ class JSONTransform extends BaseVisitor {
 
       // @ts-ignore
       if (process && process.env["JSON_DEBUG"]) {
-        console.log(toString(node));
+        console.log("File: " + node.range.source.normalizedPath + "\n" + toString(node) + "\n\n");
       }
 
       const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
@@ -600,7 +600,7 @@ class JSONTransform extends BaseVisitor {
     //console.log(sortedMembers);
     // @ts-ignore
     if (process && process.env["JSON_DEBUG"]) {
-      console.log(toString(node));
+      console.log("File: " + node.range.source.normalizedPath + "\n" + toString(node) + "\n\n");
     }
 
     const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
@@ -671,10 +671,10 @@ export default class Transformer extends Transform {
           parser.currentSource = tokenizer2.source;
           source.statements.unshift(parser.parseTopLevelStatement(tokenizer2)!);
           parser.currentSource = source;
-          transformer.mustImport = false;    
+          transformer.mustImport = false;
           // @ts-ignore
           if (process && process.env["JSON_DEBUG"]?.toString().toLowerCase() == "all") {
-            console.log(toString(source));
+            console.log("File: " + source.normalizedPath + "\n" + toString(source) + "\n\n");
           }
         }
       }

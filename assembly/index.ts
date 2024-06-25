@@ -1,10 +1,6 @@
 /// <reference path="./index.d.ts" />
-
-import { Box } from "as-container/assembly";
-
 import { serializeString } from "./serialize/string";
 import { serializeBool } from "./serialize/bool";
-import { serializeBox } from "./serialize/box";
 import { serializeInteger } from "./serialize/integer";
 import { serializeFloat } from "./serialize/float";
 import { serializeObject } from "./serialize/object";
@@ -14,7 +10,6 @@ import { serializeMap } from "./serialize/map";
 import { deserializeBoolean } from "./deserialize/bool";
 import { deserializeArray } from "./deserialize/array";
 import { deserializeFloat } from "./deserialize/float";
-import { deserializeBox } from "./deserialize/box";
 import { deserializeObject } from "./deserialize/object";
 import { deserializeMap } from "./deserialize/map";
 import { deserializeDate } from "./deserialize/date";
@@ -241,10 +236,6 @@ export namespace JSON {
       // @ts-ignore
     } else if (isString<nonnull<T>>()) {
       return serializeString(changetype<string>(data));
-    } else if (data instanceof Box) {
-      // @ts-ignore
-      return serializeBox(changetype<nonnull<T>>(data));
-      // @ts-ignore
     } else if (isDefined(data.__SERIALIZE)) {
       // @ts-ignore
       return serializeObject(changetype<nonnull<T>>(data));
@@ -293,11 +284,7 @@ export namespace JSON {
       return deserializeArray<nonnull<T>>(data);
     }
     let type: nonnull<T> = changetype<nonnull<T>>(0);
-    if (type instanceof Box) {
-      // @ts-ignore
-      return deserializeBox<nonnull<T>>(data);
-      // @ts-ignore
-    } else if (isDefined(type.__DESERIALIZE)) {
+    if (isDefined(type.__DESERIALIZE)) {
       // @ts-ignore
       return deserializeObject<nonnull<T>>(data.trimStart());
     } else if (type instanceof Map) {
