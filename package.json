@@ -17,7 +17,7 @@
   "scripts": {
     "test": "wasmtime build/test.spec.wasm",
     "pretest": "asc assembly/__tests__/test.spec.ts --target test",
-    "build:test": "JSON_DEBUG=all asc assembly/test.ts --target debug",
+    "build:test": "JSON_DEBUG=write asc assembly/test.ts --target debug",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
     "bench:wasmer": "wasmer --llvm ./bench/benchmark.wasm",
