@@ -3,8 +3,8 @@ import { JSON } from "..";
 import { Sink } from "../sink";
 import { serializeString } from "./string";
 
-// @ts-ignore
-export function serializeMap<T extends Map<any, any>>(data: T): string {
+// @ts-ignore: Decorator valid here
+@inline export function serializeMap<T extends Map<any, any>>(data: T): string {
     let result = Sink.fromString(BRACE_LEFT_WORD);
     let keys = data.keys();
     let values = data.values();

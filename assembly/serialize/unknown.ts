@@ -1,7 +1,6 @@
 import { JSON } from "..";
 import { Sink } from "../sink";
 import { __atoi_fast } from "../util";
-import { serializeUnknownArray } from "./array/unknown";
 import { serializeBool } from "./bool";
 import { serializeFloat } from "./float";
 import { serializeInteger } from "./integer";
@@ -13,7 +12,8 @@ import { serializeString } from "./string";
  * @param data - The JSON.Value to be serialized.
  * @returns The serialized result.
  */
-export function serializeUnknown(data: JSON.Value): string {
+// @ts-ignore: Decorator valid here
+@inline export function serializeUnknown(data: JSON.Value): string {
     const type = data.type;
     switch (type) {
         case JSON.Types.String: {
@@ -41,5 +41,5 @@ export function serializeUnknown(data: JSON.Value): string {
             return serializeFloat(data.get<f64>());
         }
     }
-    return serializeUnknownArray(data.get<JSON.Value[]>());
+    return "ERROR"//serializeUnknownArray(data.get<JSON.Value[]>());
 }

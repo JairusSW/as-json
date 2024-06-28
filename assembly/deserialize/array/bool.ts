@@ -2,8 +2,8 @@ import { CHAR_E, CHAR_F, CHAR_T } from "../../chars";
 import { unsafeCharCodeAt } from "../../util";
 import { deserializeBoolean } from "../bool";
 
-// @ts-ignore: Decorator
-export function deserializeBooleanArray<T extends boolean[]>(data: string): T {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeBooleanArray<T extends boolean[]>(data: string): T {
   const result = instantiate<T>();
   let lastPos = 1;
   for (let i = 1; i < data.length - 1; i++) {

@@ -2,8 +2,8 @@ import { BACK_SLASH, QUOTE } from "../../chars";
 import { unsafeCharCodeAt } from "../../util";
 import { deserializeString } from "../string";
 
-// @ts-ignore: Decorator
-export function deserializeStringArray(data: string): string[] {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeStringArray(data: string): string[] {
   const result: string[] = [];
   let lastPos = 0;
   let instr = false;

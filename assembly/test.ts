@@ -1,12 +1,25 @@
-import { JSON } from ".";
-import { Vec3 as Vec3a } from "./types";
-import { Vec3 as Vec3b } from "./types";
+export function add(a: i32 = 1, b: i32 = 2, c: i32 = 3): i32 {
+    return a + b + c;
+}
 
-const veca = new Vec3a();
-const vecb = new Vec3b();
+// add() Should transform to
 
-const serializeda = JSON.stringify(veca);
-console.log("SERIALIZED-A: " + serializeda);
+// if we call the GraphQL, say add(a: 2, c: 9), b is not defined--this is not possible.
+// So, in that case, we set the bits in this order
+// 0b1010000000000000
+//   abcdefghijklmnop
+//   |||
+//   2|9
+//    2 <--- set to default since toggle is 0
+// Thus, that gives us the following arguments:
+// a: 2, b: 2, c: 9
 
-const serialziedb = JSON.stringify(vecb);
-console.log("SERIALIZED-B: " + serialziedb);
+export function _add(a: i32, b: i32, c: i32, _mask: u64): i32 {
+    if ((_mask & 1) == 0) a = 1;
+    if ((_mask >> 1 & 1) == 0) b = 2;
+    if ((_mask >> 2 & 1) == 0) c = 3;
+    return a + b + c;
+}
+
+console.log("add(1,2,3: " + add(1,2,3).toString());
+console.log("add(2,nil,9): " + _add(2,0,9,0b101).toString());

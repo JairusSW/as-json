@@ -2,8 +2,8 @@ import { BRACKET_LEFT, BRACKET_RIGHT } from "../../chars";
 import { JSON } from "../..";
 import { unsafeCharCodeAt } from "../../util";
 
-// @ts-ignore: Decorator
-export function deserializeArrayArray<T extends unknown[][]>(data: string): T {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeArrayArray<T extends unknown[][]>(data: string): T {
     const result = instantiate<T>();
     let lastPos = 0;
     let depth = 0;

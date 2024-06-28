@@ -10,8 +10,8 @@ import {
 import { Sink } from "../sink";
 import { serializeString } from "./string";
 
-// @ts-ignore
-export function serializeArray<T extends any[]>(data: T): string {
+// @ts-ignore: Decorator valid here
+@inline export function serializeArray<T extends any[]>(data: T): string {
     // @ts-ignore
     if (data.length == 0) {
         return EMPTY_BRACKET_WORD;

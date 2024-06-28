@@ -1,5 +1,5 @@
-// @ts-ignore: Decorator
-export function deserializeFloat<T>(data: string): T {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeFloat<T>(data: string): T {
     // @ts-ignore
     const type: T = 0;
     // @ts-ignore

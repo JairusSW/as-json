@@ -1,5 +1,5 @@
-// @ts-ignore
-export function deserializeDate(dateTimeString: string): Date {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeDate(dateTimeString: string): Date {
     // Use AssemblyScript's date parser
     const d = Date.fromString(dateTimeString);
   

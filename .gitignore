@@ -6,5 +6,4 @@ package-lock.json
 logs
 as-tral
 *.lockb
-*.lockb
 .vscode/

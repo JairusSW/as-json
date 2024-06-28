@@ -17,8 +17,8 @@ import {
 import { Sink } from "../sink";
 import { unsafeCharCodeAt } from "../util";
 
-// @ts-ignore: Decorator
-export function deserializeString(data: string, start: i32 = 0, end: i32 = 0): string {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeString(data: string, start: i32 = 0, end: i32 = 0): string {
     end = end || data.length - 1;
     let result = Sink.withCapacity(end - start - 1);
     let last = start + 1;

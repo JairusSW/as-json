@@ -3,8 +3,8 @@ import { unsafeCharCodeAt } from "../../util";
 import { COMMA, BRACKET_RIGHT } from "../../chars";
 import { deserializeInteger } from "../integer";
 
-// @ts-ignore: Decorator
-export function deserializeIntegerArray<T extends number[]>(data: string): T {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeIntegerArray<T extends number[]>(data: string): T {
     const result = instantiate<T>();
     let lastPos = 0;
     let i = 1;

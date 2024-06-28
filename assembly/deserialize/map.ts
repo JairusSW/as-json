@@ -26,8 +26,8 @@ import { isSpace } from "util/string";
 import { deserializeInteger } from "./integer";
 import { deserializeFloat } from "./float";
 
-// @ts-ignore: Decorator
-export function deserializeMap<T extends Map>(data: string): T {
+// @ts-ignore: Decorator valid here
+@inline export function deserializeMap<T extends Map>(data: string): T {
 
     const map: nonnull<T> = changetype<nonnull<T>>(
         __new(offsetof<nonnull<T>>(), idof<nonnull<T>>())

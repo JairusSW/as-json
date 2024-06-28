@@ -7,7 +7,7 @@ import { deserializeMapArray } from "./array/map";
 import { deserializeObjectArray } from "./array/object";
 import { deserializeStringArray } from "./array/string";
 
-// @ts-ignore: Decorator
+// @ts-ignore: Decorator valid here
 export function deserializeArray<T extends unknown[]>(data: string): T {
     if (isString<valueof<T>>()) {
         return <T>deserializeStringArray(data);
@@ -31,7 +31,7 @@ export function deserializeArray<T extends unknown[]>(data: string): T {
         if (isDefined(type.__DESERIALIZE)) {
             return deserializeObjectArray<T>(data);
         }
+    } else {
+        ERROR("Could not parse array of type " + nameof<T>() + "!");
     }
-
-    throw new Error("Could not parse array of type " + nameof<T>() + "!");
 }

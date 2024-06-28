@@ -11,8 +11,8 @@ import {
 import { Sink } from "../sink";
 import { unsafeCharCodeAt } from "../util";
 
-// @ts-ignore: Decorator
-export function serializeString(data: string): string {
+// @ts-ignore: Decorator valid here
+@inline export function serializeString(data: string): string {
     if (data.length === 0) {
         return QUOTE_WORD + QUOTE_WORD;
     }
