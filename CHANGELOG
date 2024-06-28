@@ -13,7 +13,7 @@ v0.9.5 - Fix #46
 v0.9.6 - Fix bugs
 v0.9.7 - Update testing framework and readme logo
 v0.9.8 - Update dependencies
-
+v0.9.8a - Fix #80 - Empty Maps were not serialized to {}, instead, threw memory out of bounds
 [UNRELEASED] v0.9.9
  - Allow nullable primitives
  - Port over JSON.Value
