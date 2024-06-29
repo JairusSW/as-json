@@ -4,266 +4,22 @@ import {
   IdentifierExpression,
   NamedTypeNode,
   StringLiteralExpression,
-  BinaryExpression,
-  DecoratorNode,
-  Token,
   Parser,
-  Source,
-  NodeKind,
-  Node,
-  NewExpression,
-  ObjectLiteralExpression,
-  CallExpression,
-  PropertyAccessExpression,
-  VariableDeclaration,
-  CommonFlags,
-  AssertionExpression,
-  LiteralExpression,
-  LiteralKind,
-  TrueExpression,
-  FalseExpression,
-  SourceKind,
-  Tokenizer,
-  NullExpression
+  Source
 } from "assemblyscript/dist/assemblyscript.js";
 
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
+import { CommonFlags } from "types:assemblyscript/src/common";
+import { DecoratorNode } from "types:assemblyscript/src/ast";
 
 class JSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
   public currentClass!: SchemaData;
   public sources = new Set<Source>();
-  public boxRefs = new Map<string, string>();
-  public mustImport: boolean = false;
-  visitVariableDeclaration(node: VariableDeclaration): void {
-    let typ: string = "";
-    let className = "";
-    // const tempFoo = foo;
-    if (node.initializer instanceof IdentifierExpression && this.boxRefs.has((<IdentifierExpression>node.initializer).text)) {
-      this.boxRefs.set(node.name.text, this.boxRefs.get((<IdentifierExpression>node.initializer).text)!);
-    }
-    // const foo = new Foo();
-    else if (node.initializer instanceof NewExpression && this.schemasList.find((v) => v.name == (className = (<NewExpression>node.initializer).typeName.identifier.text))) {
-      this.boxRefs.set(node.name.text, className);
-    }
-    // const foo: Foo = {};
-    // const foo = {} as Foo;
-    // const foo = <Foo>{};
-    else if (node.initializer instanceof ObjectLiteralExpression && this.schemasList.find((v) => v.name == (className = (<NamedTypeNode>node.type).name.identifier.text))) {
 
-      this.boxRefs.set(node.name.text, className);
-      const schema = (this.schemasList.find((e) => e.name == (<NamedTypeNode>node.type).name.identifier.text) || ((this.currentClass.name === className) ? this.currentClass : null));
-      if (!schema) return;
-      for (let i = 0; i < (<ObjectLiteralExpression>node.initializer).names.length; i++) {
-        const name = (<ObjectLiteralExpression>node.initializer).names[i]!;
-        const value = (<ObjectLiteralExpression>node.initializer).values[i]!;
-        if (schema.boxRefs.has(name.text)) {
-          if (
-            (
-              value instanceof LiteralExpression
-              && (
-                value.literalKind === LiteralKind.Integer
-                || value.literalKind === LiteralKind.Float
-              )
-            )
-            || value instanceof TrueExpression
-            || value instanceof FalseExpression
-          ) {
-            this.mustImport = true;
-            const accessorType = Node.createSimpleTypeName(
-              "__JSON",
-              node.range
-            );
-            accessorType.next = Node.createSimpleTypeName(
-              "Box",
-              node.range
-            );
-            const newTypeGeneric = schema.boxRefs.get(name.text)!;
-            const initializer = Node.createNewExpression(
-              accessorType,
-              [
-                newTypeGeneric
-              ],
-              [
-                value
-              ],
-              node.range
-            );
-            (<ObjectLiteralExpression>node.initializer).values[i] = initializer;
-          }
-        }
-      }
-    }
-    // const foo = changetype<Foo>(ptr);
-    else if (node.initializer instanceof CallExpression && this.schemasList.find((v) => (<CallExpression>node.initializer).typeArguments?.find((e) => (typ = v.name) == (<NamedTypeNode>e).name.identifier.text))) {
-      this.boxRefs.set(node.name.text, typ);
-    }
-  }
-  visitBinaryExpression(node: BinaryExpression): void {
-    if (node.operator == Token.Equals) {
-      if (node.left.kind == NodeKind.PropertyAccess) {
-        const left = node.left as PropertyAccessExpression;
-        // TODO
-        if ((this.boxRefs.has(toString(left).split(".")[0]!))) {
-          if (
-            (
-              node.right instanceof LiteralExpression
-              && (
-                node.right.literalKind === LiteralKind.Integer
-                || node.right.literalKind === LiteralKind.Float
-              )
-            )
-            || node.right instanceof TrueExpression
-            || node.right instanceof FalseExpression
-          ) {
-            let schema: SchemaData | null = null;
-            let subLeft = left;
-            while (true) {
-              if (subLeft instanceof IdentifierExpression) {
-                const baseType = this.boxRefs.get(subLeft.text);
-                schema = (this.schemasList.find((e) => e.name === baseType) || (this.currentClass.name === baseType) ? this.currentClass : null);
-                break;
-              } else if (subLeft.expression) {
-                // @ts-ignore
-                subLeft = subLeft.expression;
-              } else {
-                break;
-              }
-            }
-            if (!schema) return;
-            this.mustImport = true;
-            const accessorType = Node.createSimpleTypeName(
-              "__JSON",
-              node.range
-            );
-            accessorType.next = Node.createSimpleTypeName(
-              "Box",
-              node.range
-            );
-            const newTypeGeneric = schema.boxRefs.get(left.property.text)!;
-            const initializer = Node.createNewExpression(
-              accessorType,
-              [
-                newTypeGeneric
-              ],
-              [
-                node.right
-              ],
-              node.range
-            );
-            node.right = initializer;
-          }
-        }
-      }
-    }
-  }
   visitMethodDeclaration(): void { }
-  visitPropertyAccessExpression(node: PropertyAccessExpression): void {
-    let subNode: AssertionExpression | IdentifierExpression | PropertyAccessExpression = node;
-    let baseRef = "";
-    while (true) {
-      // @ts-ignore
-      if (subNode.expression instanceof IdentifierExpression) {
-        // @ts-ignore
-        if (this.boxRefs.has((<IdentifierExpression>subNode.expression).text)) {
-          //console.log(subNode);
-          // @ts-ignore
-          baseRef = (<IdentifierExpression>subNode.expression).text;
-          break;
-        } else {
-          break;
-        }
-        // @ts-ignore
-      } else if (subNode.expression) {
-        // @ts-ignore
-        subNode = subNode.expression;
-      } else {
-        break;
-      }
-    }
-    subNode = node;
-    if (baseRef) {
-      const baseType = this.boxRefs.get(baseRef);
-      let properties: IdentifierExpression[] = [];
-      let lastNode: AssertionExpression | IdentifierExpression | PropertyAccessExpression = subNode;
-      const schema = (this.schemasList.find((e) => e.name === baseType) || (this.currentClass.name === baseType) ? this.currentClass : null);
-      while (true) {
-        if (subNode instanceof AssertionExpression || subNode instanceof PropertyAccessExpression) {
-          //console.log(subNode);
-          // @ts-ignore
-          if (schema?.members.find((e) => e.name === subNode.expression.property?.text)) {
-            let newExpression = Node.createPropertyAccessExpression(
-              subNode,
-              Node.createIdentifierExpression(
-                "value",
-                node.range
-              ),
-              node.range
-            );
-
-            const _newExpression = newExpression;
-
-            for (let i = 0; i < properties.length - 1; i++) {
-              const prop = properties[i]!;
-              newExpression = Node.createPropertyAccessExpression(
-                newExpression,
-                prop,
-                node.range
-              );
-            }
-            if (subNode instanceof AssertionExpression) {
-              // @ts-ignore
-              subNode = subNode.expression;
-            }
-            let t = Node.createPropertyAccessExpression(
-              Node.createParenthesizedExpression(
-                Node.createTernaryExpression(
-                  subNode,
-                  _newExpression,
-                  Node.createNullExpression(node.range),
-                  node.range
-                ),
-                node.range
-              ),
-              properties[0]!,
-              node.range
-            )
-            for (let i = 1; i < properties.length; i++) {
-              const prop = properties[i]!;
-              t = Node.createPropertyAccessExpression(
-                t,
-                prop,
-                node.range
-              );
-            }
-            node.expression = t.expression;
-            node.property = t.property;
-            this.mustImport = true;
-            break;
-          } else {
-            lastNode = subNode;
-            // @ts-ignore
-            subNode = subNode.expression;
-            // @ts-ignore
-            if (lastNode.property) properties.push(lastNode.property);
-          }
-        } else if (subNode instanceof IdentifierExpression) {
-          break;
-          // @ts-ignore
-        } else if (subNode.expression) {
-          lastNode = subNode;
-          // @ts-ignore
-          subNode = subNode.expression;
-          // @ts-ignore
-          if (lastNode.property) properties.push(lastNode.property);
-        } else {
-          break;
-        }
-      }
-    }
-  }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
 
@@ -277,57 +33,9 @@ class JSONTransform extends BaseVisitor {
     }
     if (!found) return;
 
-    this.mustImport = true;
-
     const schema = new SchemaData();
     schema.node = node;
     schema.name = node.name.text;
-
-    this.currentClass = schema;
-
-    for (const _member of node.members) {
-      if (!(_member instanceof FieldDeclaration)) continue;
-      const member = _member as FieldDeclaration;
-      if (member.type?.isNullable && isPrimitiveType((<NamedTypeNode>member.type)?.name.identifier.text)) {
-        const accessorType = Node.createSimpleTypeName(
-          "__JSON",
-          node.range
-        );
-        accessorType.next = Node.createSimpleTypeName(
-          "Box",
-          node.range
-        );
-        const newTypeGeneric = member.type as NamedTypeNode;
-        member.type.isNullable = false;
-
-        const refType = member.type;
-        schema.boxRefs.set(member.name.text, refType as NamedTypeNode);
-
-        const newType = Node.createNamedType(
-          accessorType,
-          [
-            newTypeGeneric
-          ],
-          true,
-          node.range
-        );
-        member.type = newType;
-
-        if (member.initializer) {
-          const initializer = Node.createNewExpression(
-            accessorType,
-            [
-              newTypeGeneric
-            ],
-            [
-              member.initializer
-            ],
-            node.range
-          )
-          member.initializer = initializer;
-        }
-      }
-    }
 
     const members = [
       ...node.members.filter(v => v instanceof FieldDeclaration)
@@ -358,9 +66,11 @@ class JSONTransform extends BaseVisitor {
 
       let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
 
-      // @ts-ignore
-      if (process && process.env["JSON_DEBUG"]) {
-        console.log("File: " + node.range.source.normalizedPath + "\n" + toString(node) + "\n\n");
+      if (process.env["JSON_DEBUG"]) {
+        console.log(SERIALIZE_RAW_EMPTY);
+        //console.log(SERIALIZE_PRETTY_EMPTY);
+        console.log(INITIALIZE_EMPTY);
+        console.log(DESERIALIZE_EMPTY);
       }
 
       const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
@@ -423,28 +133,28 @@ class JSONTransform extends BaseVisitor {
 
       if (!mem.flags.length) {
         mem.flags = [PropertyFlags.None];
-        mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__JSON.stringify<" + type + ">(this." + name.text + ")}";
-        mem.deserialize = "this." + name.text + " = " + "__JSON.parse<" + type + ">(data.substring(value_start, value_end));"
+        mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+        mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
       }
 
       if (mem.flags.includes(PropertyFlags.OmitNull)) {
-        mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __JSON.stringify<" + type + ">(this." + name.text + ") + \",\"}";
-        mem.deserialize = "this." + name.text + " = " + "__JSON.parse<" + type + ">(data.substring(value_start, value_end));"
+        mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
+        mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
       } else if (mem.flags.includes(PropertyFlags.OmitIf)) {
-        mem.serialize = "${" + mem.args![0]! + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __JSON.stringify<" + type + ">(this." + name.text + ") + \",\"}";
-        mem.deserialize = "this." + name.text + " = " + "__JSON.parse<" + type + ">(data.substring(value_start, value_end));"
+        mem.serialize = "${" + mem.args![0]! + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
+        mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
       } else if (mem.flags.includes(PropertyFlags.Alias)) {
-        mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__JSON.stringify<" + type + ">(this." + name.text + ")}";
-        mem.deserialize = "this." + name.text + " = " + "__JSON.parse<" + type + ">(data.substring(value_start, value_end));"
+        mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+        mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));"
         mem.name = name.text;
       } else if (mem.flags.includes(PropertyFlags.Flatten)) {
         const nullable = (mem.node.type as NamedTypeNode).isNullable;
         if (nullable) {
           mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(changetype<nonnull<" + type + ">>(this." + name.text + ")" + (mem.args?.length ? '.' + mem.args[0]! : '') + ") : \"null\"}";
-          mem.deserialize = "if (value_end - value_start == 4 && load<u64>(changetype<usize>(data) + <usize>(value_start << 1)) == " + charCodeAt64("null", 0) + ") {\n        this." + name.text + " = null;\n      } else {\n        this." + name.text + " = " + "__JSON.parse<" + type + ">('{\"" + mem.args![0]! + "\":' + data.substring(value_start, value_end) + \"}\");\n      }";
+          mem.deserialize = "if (value_end - value_start == 4 && load<u64>(changetype<usize>(data) + <usize>(value_start << 1)) == " + charCodeAt64("null", 0) + ") {\n        this." + name.text + " = null;\n      } else {\n        this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args![0]! + "\":' + data.substring(value_start, value_end) + \"}\");\n      }";
         } else {
           mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args[0]! : '') + ") : \"null\"}";
-          mem.deserialize = "this." + name.text + " = " + "__JSON.parse<" + type + ">('{\"" + mem.args![0]! + "\":' + data.substring(value_start, value_end) + \"}\");";
+          mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args![0]! + "\":' + data.substring(value_start, value_end) + \"}\");";
         }
         mem.name = name.text;
       }
@@ -598,9 +308,12 @@ class JSONTransform extends BaseVisitor {
     DESERIALIZE += "\n  return false;\n}"
 
     //console.log(sortedMembers);
-    // @ts-ignore
-    if (process && process.env["JSON_DEBUG"]) {
-      console.log("File: " + node.range.source.internalPath + "\n" + toString(node) + "\n\n");
+
+    if (process.env["JSON_DEBUG"]) {
+      console.log(SERIALIZE_RAW);
+      //console.log(SERIALIZE_PRETTY);
+      console.log(INITIALIZE);
+      console.log(DESERIALIZE);
     }
 
     const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
@@ -650,37 +363,6 @@ export default class Transformer extends Transform {
       // Ignore all lib and std. Visit everything else.
       if (!isStdlib(source)) {
         transformer.visit(source);
-        if (transformer.mustImport) {
-          const tokenizer = new Tokenizer(
-            new Source(
-              SourceKind.User,
-              source.normalizedPath,
-              "import { JSON as __JSON } from \"json-as/assembly\";"
-            )
-          );
-          parser.currentSource = tokenizer.source;
-          source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
-          parser.currentSource = source;
-          const tokenizer2 = new Tokenizer(
-            new Source(
-              SourceKind.User,
-              source.normalizedPath,
-              "import { __atoi_fast } from \"json-as/assembly/util\";"
-            )
-          );
-          parser.currentSource = tokenizer2.source;
-          source.statements.unshift(parser.parseTopLevelStatement(tokenizer2)!);
-          parser.currentSource = source;
-          transformer.mustImport = false;
-          // @ts-ignore
-          if (process && process.env["JSON_DEBUG"]?.toString().toLowerCase() == "all") {
-            console.log("File: " + source.normalizedPath + "\n" + toString(source) + "\n\n");
-          }
-          // @ts-ignore
-          if (process && process.env["JSON_DEBUG"]?.toString().toLowerCase() == "write") {
-            this.writeFile(source.internalPath + ".ts", toString(source), process.cwd());
-          }
-        }
       }
     }
     // Check that every parent and child class is hooked up correctly
@@ -722,7 +404,6 @@ class SchemaData {
   public name: string = "";
   public members: Property[] = []
   public parent: SchemaData | null = null;
-  public boxRefs: Map<string, NamedTypeNode> = new Map<string, NamedTypeNode>();
   public node!: ClassDeclaration;
 }
 
@@ -762,20 +443,4 @@ function escapeSlash(data: string): string {
 
 function escapeQuote(data: string): string {
   return data.replace(/\"/g, "\\\"");
-}
-
-function isPrimitiveType(data: string): boolean {
-  return data == "u8"
-    || data == "u16"
-    || data == "u16"
-    || data == "u32"
-    || data == "u64"
-    || data == "i8"
-    || data == "i16"
-    || data == "i32"
-    || data == "i64"
-    || data == "f32"
-    || data == "f64"
-    || data == "bool"
-    || data == "boolean";
 }
