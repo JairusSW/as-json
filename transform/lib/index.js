@@ -41,21 +41,26 @@ class JSONTransform extends BaseVisitor {
         }
         if (!members.length) {
             let SERIALIZE_RAW_EMPTY = "__SERIALIZE(): string {\n  return \"{}\";\n}";
+            let SERIALIZE_BL_EMPTY = "__SERIALIZE_BL(): void {\n  bl.write_c(123);\n  bl.write_c(125);\n}";
             //let SERIALIZE_PRETTY_EMPTY = "__SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
             let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
             let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
             if (process.env["JSON_DEBUG"]) {
                 console.log(SERIALIZE_RAW_EMPTY);
+                console.log(SERIALIZE_BL_EMPTY);
                 //console.log(SERIALIZE_PRETTY_EMPTY);
                 console.log(INITIALIZE_EMPTY);
                 console.log(DESERIALIZE_EMPTY);
             }
             const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
+            const SERIALIZE_BL_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_BL_EMPTY, node);
             //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
             const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
             const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
             if (!node.members.find(v => v.name.text == "__SERIALIZE"))
                 node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
+            if (!node.members.find(v => v.name.text == "__SERIALIZE_BL"))
+                node.members.push(SERIALIZE_BL_METHOD_EMPTY);
             if (!node.members.find(v => v.name.text == "__INITIALIZE"))
                 node.members.push(INITIALIZE_METHOD_EMPTY);
             if (!node.members.find(v => v.name.text == "__DESERIALIZE"))
@@ -115,11 +120,14 @@ class JSONTransform extends BaseVisitor {
             }
             if (!mem.flags.length) {
                 mem.flags = [PropertyFlags.None];
-                mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+                const key = escapeString(JSON.stringify(mem.alias || mem.name));
+                mem.serialize = key + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+                mem.serialize_bl.push("  __SERIALIZE_BL<" + type + ">(this." + name.text + ");");
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
             }
             if (mem.flags.includes(PropertyFlags.OmitNull)) {
                 mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
+                const str = escapeString(JSON.stringify(mem.alias || mem.name));
                 mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
             }
             else if (mem.flags.includes(PropertyFlags.OmitIf)) {
@@ -153,6 +161,7 @@ class JSONTransform extends BaseVisitor {
             schema.members.push(mem);
         }
         let SERIALIZE_RAW = "__SERIALIZE(): string {\n  let out = `{";
+        let SERIALIZE_BL = "__SERIALIZE_BL(): void {\n";
         let SERIALIZE_PRETTY = "__SERIALIZE_PRETTY(): string {\n  let out = `{";
         let INITIALIZE = "__INITIALIZE(): this {\n";
         let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
@@ -169,6 +178,9 @@ class JSONTransform extends BaseVisitor {
             SERIALIZE_RAW += schema.members[0]?.serialize + ",";
             SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize + ",\\n";
             found = true;
+            SERIALIZE_BL += strToCalls("{" + escapeString(JSON.stringify(schema.members[0]?.alias || schema.members[0]?.name)) + ":") + "\n";
+            ;
+            SERIALIZE_BL += schema.members[0]?.serialize_bl.shift() + "\n";
         }
         if (schema.members[0]?.initialize)
             INITIALIZE += "  " + schema.members[0]?.initialize + ";\n";
@@ -179,20 +191,34 @@ class JSONTransform extends BaseVisitor {
             if (member.flags.includes(PropertyFlags.OmitNull)
                 || member.flags.includes(PropertyFlags.OmitIf)) {
                 SERIALIZE_RAW += member.serialize;
+                //SERIALIZE_BL += member.serialize_bl;
                 SERIALIZE_PRETTY += member.serialize;
             }
             else {
                 SERIALIZE_RAW += member.serialize + ",";
+                if (i == schema.members.length - 1) {
+                    SERIALIZE_BL += strToCalls("," + escapeString(JSON.stringify(member.alias || member.name)) + ":") + "\n";
+                    ;
+                    SERIALIZE_BL += member.serialize_bl.shift() + "\n";
+                    ;
+                }
+                else {
+                    SERIALIZE_BL += strToCalls("," + escapeString(JSON.stringify(member.alias || member.name)) + ":") + "\n";
+                    ;
+                    SERIALIZE_BL += member.serialize_bl.shift() + "\n";
+                }
                 SERIALIZE_PRETTY += indent + member.serialize + ",\\n";
                 found = true;
             }
         }
         if (found) {
             SERIALIZE_RAW += "`;\n  store<u16>(changetype<usize>(out) + ((out.length - 1) << 1), 125);\n  return out;\n}";
+            SERIALIZE_BL += "  bl.write_c(125);\n}\n";
             SERIALIZE_PRETTY += "`;\n  store<u32>(changetype<usize>(out) + ((out.length - 2) << 1), 8192010);\n  return out;\n}";
         }
         else {
             SERIALIZE_RAW += "`;\n};";
+            SERIALIZE_BL += "}\n";
             SERIALIZE_PRETTY += "`;\n};";
         }
         INITIALIZE += "  return this;\n}";
@@ -297,16 +323,20 @@ class JSONTransform extends BaseVisitor {
         //console.log(sortedMembers);
         if (process.env["JSON_DEBUG"]) {
             console.log(SERIALIZE_RAW);
+            console.log(SERIALIZE_BL);
             //console.log(SERIALIZE_PRETTY);
             console.log(INITIALIZE);
             console.log(DESERIALIZE);
         }
         const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
+        const SERIALIZE_BL_METHOD = SimpleParser.parseClassMember(SERIALIZE_BL, node);
         //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
         const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
         const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
         if (!node.members.find(v => v.name.text == "__SERIALIZE"))
             node.members.push(SERIALIZE_RAW_METHOD);
+        if (!node.members.find(v => v.name.text == "__SERIALIZE_BL"))
+            node.members.push(SERIALIZE_BL_METHOD);
         if (!node.members.find(v => v.name.text == "__INITIALIZE"))
             node.members.push(INITIALIZE_METHOD);
         if (!node.members.find(v => v.name.text == "__DESERIALIZE"))
@@ -378,6 +408,7 @@ class Property {
         this.flags = [];
         this.args = [];
         this.serialize = null;
+        this.serialize_bl = [];
         this.deserialize = null;
         this.initialize = null;
     }
@@ -418,3 +449,76 @@ function escapeSlash(data) {
 function escapeQuote(data) {
     return data.replace(/\"/g, "\\\"");
 }
+function strToCalls(data) {
+    let out = "";
+    const len = data.length - 1;
+    if (len >= 8) {
+        let i = 0;
+        for (; i < len - 7; i += 8) {
+            const a = BigInt(data.charCodeAt(i));
+            const b = BigInt(data.charCodeAt(i + 1));
+            const c = BigInt(data.charCodeAt(i + 2));
+            const d = BigInt(data.charCodeAt(i + 3));
+            const e = BigInt(data.charCodeAt(i + 4));
+            const f = BigInt(data.charCodeAt(i + 5));
+            const g = BigInt(data.charCodeAt(i + 6));
+            const h = BigInt(data.charCodeAt(i + 7));
+            out += "  bl.write_128(i16x8(" + a + ", " + b + ", " + c + ", " + d + ", " + e + ", " + f + ", " + g + ", " + h + ")); /* " + data.charAt(i) + data.charAt(i + 1) + data.charAt(i + 2) + data.charAt(i + 3) + data.charAt(i + 4) + data.charAt(i + 5) + data.charAt(i + 6) + data.charAt(i + 7) + " */\n";
+        }
+        if (i < len) {
+            if (len - i >= 4) {
+                const a = BigInt(data.charCodeAt(i));
+                const b = BigInt(data.charCodeAt(i + 1));
+                const c = BigInt(data.charCodeAt(i + 2));
+                const d = BigInt(data.charCodeAt(i + 3));
+                out += "  bl.write_64(" + ((d << BigInt(48)) | (c << BigInt(32)) | (b << BigInt(16)) | a) + "/* " + data.charAt(i) + data.charAt(i + 1) + data.charAt(i + 2) + data.charAt(i + 3) + " */\n";
+                i += 4;
+            }
+            if (len - i >= 2) {
+                const a = data.charCodeAt(i);
+                const b = data.charCodeAt(i + 1);
+                out += "  bl.write_32(" + ((b << 16) | a) + "); /* " + data.charAt(i) + data.charAt(i + 1) + " */\n";
+                i += 2;
+            }
+            console.log('i: ' + i.toString());
+            console.log('len: ' + len.toString());
+            if (len == i) {
+                out += "  bl.write_16(" + data.charCodeAt(i) + "); /* " + data.charAt(i) + " */\n";
+                i++;
+            }
+        }
+        else {
+            out += "  bl.write_16(" + data.charCodeAt(len) + "); /* " + data.charAt(len) + " */\n";
+        }
+    }
+    else if (len >= 4) {
+        let i = 0;
+        for (; i < len - 3; i += 4) {
+            const a = BigInt(data.charCodeAt(i));
+            const b = BigInt(data.charCodeAt(i + 1));
+            const c = BigInt(data.charCodeAt(i + 2));
+            const d = BigInt(data.charCodeAt(i + 3));
+            out += "  bl.write_64(" + ((d << BigInt(48)) | (c << BigInt(32)) | (b << BigInt(16)) | a) + "/* " + data.charAt(i) + data.charAt(i + 1) + data.charAt(i + 2) + data.charAt(i + 3) + " */\n";
+        }
+        if (i < len) {
+            const a = data.charCodeAt(len - 1);
+            const b = data.charCodeAt(len);
+            out += "  bl.write_32(" + ((b << 16) | a) + "); /* " + data.charAt(len - 1) + data.charAt(len) + " */\n";
+        }
+        else {
+            out += "  bl.write_16(" + data.charCodeAt(len) + "); /* " + data.charAt(len) + " */\n";
+        }
+    }
+    else if (len >= 2) {
+        let i = 0;
+        for (; i < len; i += 2) {
+            const a = data.charCodeAt(i);
+            const b = data.charCodeAt(i + 1);
+            out += "  bl.write_32(" + ((b << 16) | a) + "); /* " + data.charAt(i) + data.charAt(i + 1) + " */\n";
+        }
+        if (i != len)
+            out += "  bl.write_16(" + data.charCodeAt(len) + "); /* " + data.charAt(len) + " */\n";
+    }
+    return out;
+}
+console.log(strToCalls('{"x":1,"y":2,"z":3}'));
