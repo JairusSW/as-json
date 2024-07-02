@@ -17,8 +17,8 @@
   "scripts": {
     "test": "wasmtime build/test.spec.wasm",
     "pretest": "asc assembly/__tests__/test.spec.ts --target test",
-    "build:test": "JSON_DEBUG=true asc assembly/test.ts --target debug --enable simd",
-    "build:bench": "JSON_DEBUG=true asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub --enable bulk-memory --enable simd",
+    "build:test": "asc assembly/test.ts --target debug",
+    "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
     "bench:wasmer": "wasmer --llvm ./bench/benchmark.wasm",
     "build:transform": "tsc -p ./transform",

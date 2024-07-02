@@ -362,31 +362,3 @@ export function containsCodePoint(str: string, code: u32, start: i32, end: i32):
   }
   return false;
 }
-
-export function _intTo16(int: i32): i32 {
-  if (int < 10) {
-    // 0-10
-    return 48 + int;
-  } else {
-    // a-f
-    return 87 + int;
-  }
-}
-
-@inline export function intTo16(int: i32): i32 {
-  const high = int >> 4;
-  const low = int & 0x0F;
-  if (low < 10) {
-    if (high < 10) {
-      return ((48 + low) << 16) | 48 + high;
-    } else {
-      return ((48 + low) << 16) | 87 + high;
-    }
-  } else {
-    if (high < 10) {
-      return ((87 + low) << 16) | 48 + high;
-    } else {
-      return ((87 + low) << 16) | 87 + high;
-    }
-  }
-}

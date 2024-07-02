@@ -112,7 +112,7 @@ export class Sink {
             changetype<usize>(src) + (<usize>start << 1),
             size
         );
-        //this.offset = offset + size;
+        this.offset = offset + size;
         return this;
     }
 

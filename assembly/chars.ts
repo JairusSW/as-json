@@ -74,17 +74,3 @@
 @inline export const FORM_FEED = 12; // \f
 // @ts-ignore: Decorator is valid here
 @inline export const CARRIAGE_RETURN = 13; // \r
-
-export const TRUE_PTR = changetype<usize>("true");
-export const FALSE_PTR = changetype<usize>("false");
-export const NULL_PTR = changetype<usize>("null");
-export const EMPTY_BRACES_PTR = changetype<usize>("{}");
-export const EMPTY_BRACKET_PTR = changetype<usize>("[]");
-export const EMPTY_QUOTE_PTR = changetype<usize>("\"\"");
-export const BACKSPACE_PTR = changetype<usize>("\\b");
-export const TAB_PTR = changetype<usize>("\\t");
-export const NEW_LINE_PTR = changetype<usize>("\\n");
-export const FORM_FEED_PTR = changetype<usize>("\\f");
-export const CARRIAGE_RETURN_PTR = changetype<usize>("\\r");
-export const FOUR_DIGIT_ESC_PTR = changetype<usize>("\\u000");
-export const TWO_DIGIT_ESC_PTR = changetype<usize>("\\u00");
