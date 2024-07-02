@@ -15,10 +15,14 @@ v0.9.7 - Update testing framework and readme logo
 v0.9.8 - Update dependencies
 v0.9.8a - Fix #80 - Empty Maps were not serialized to {}, instead, threw memory out of bounds
 v0.9.8b - Fix #81 - Revert transform
-[UNRELEASED] v0.9.9
+v0.9.9 - Fix #82 - Initialize maps
+v0.9.9a - Remove extraneous logs from transform
+
+[UNRELEASED] v1.0.0
  - Allow nullable primitives
  - Port over JSON.Value
  - Performance improvements
+ - Add SIMD support
  - Introduce options
  - Custom serializers
  - Support arbitrary-length integers (@hypercubed/as-mpz)

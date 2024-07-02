@@ -3,7 +3,7 @@
  __|  ||   __||     ||   | | ___ |  _  ||   __|
 |  |  ||__   ||  |  || | | ||___||     ||__   |
 |_____||_____||_____||_|___|     |__|__||_____|
-v0.9.9
+v0.9.9a
 </pre>
 </h5>
 
@@ -187,6 +187,7 @@ Below are benchmark results comparing JavaScript's built-in JSON implementation 
 
 My library beats JSON (written in C++) on all counts *and*, I see many places where I can pull at least a 60% uplift in performance if I implement it.
 
+Note: SIMD is in-development and only available on the `v1` branch on GitHub
 
 Serialization Benchmarks:
 

@@ -170,8 +170,24 @@ class JSONTransform extends BaseVisitor {
         mem.initialize = "this." + name.text + " = \"\"";
       } else if (t === "Array") {
         mem.initialize = "this." + name.text + " = instantiate<" + mem.type + ">()";
-      } else {
-        console.log(t)
+      } else if (t === "bool" || t === "boolean") {
+        mem.initialize = "this." + name.text + " = false";
+      } else if (
+        t === "u8" ||
+        t === "u16" ||
+        t === "u32" ||
+        t === "u64" ||
+        t === "i8" ||
+        t === "i16" ||
+        t === "i32" ||
+        t === "i64"
+      ) {
+        mem.initialize = "this." + name.text + " = 0";
+      } else if (
+        t === "f32" ||
+        t === "f64"
+      ) {
+        mem.initialize = "this." + name.text + " = 0.0";
       }
 
       schema.members.push(mem);

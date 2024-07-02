@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.9.9",
+  "version": "0.9.9a",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -26,7 +26,8 @@
     "test:wavm": "wavm run ./build/test.wasm",
     "test:lunatic": "lunatic ./build/test.wasm",
     "test:wasm3": "wasm3 ./build/test.wasm",
-    "prettier": "as-prettier -w ."
+    "prettier": "as-prettier -w .",
+    "preinstall": "bun link json-as"
   },
   "devDependencies": {
     "@assemblyscript/wasi-shim": "^0.1.0",

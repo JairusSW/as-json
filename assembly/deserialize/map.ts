@@ -72,6 +72,8 @@ import { deserializeFloat } from "./float";
                     depth--;
                     if (depth === 0) {
                         ++objectValueIndex;
+                        console.log("Index: " + nameof<indexof<T>>());
+                        console.log("Value: " + nameof<valueof<T>>());
                         map.set(deserializeMapKey<indexof<T>>(key), JSON.parse<valueof<T>>(data.slice(outerLoopIndex, objectValueIndex)));
                         outerLoopIndex = objectValueIndex;
                         isKey = false;
