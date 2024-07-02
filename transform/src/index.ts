@@ -5,14 +5,14 @@ import {
   NamedTypeNode,
   StringLiteralExpression,
   Parser,
-  Source
+  Source,
+  NodeKind
 } from "assemblyscript/dist/assemblyscript.js";
 
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { CommonFlags } from "types:assemblyscript/src/common";
-import { DecoratorNode } from "types:assemblyscript/src/ast";
 
 class JSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
@@ -38,7 +38,7 @@ class JSONTransform extends BaseVisitor {
     schema.name = node.name.text;
 
     const members = [
-      ...node.members.filter(v => v instanceof FieldDeclaration)
+      ...node.members.filter(v => v.kind === NodeKind.FieldDeclaration)
     ];
 
     if (node.extendsType) {
@@ -86,7 +86,6 @@ class JSONTransform extends BaseVisitor {
     }
 
     for (const member of members) {
-      if (!(member instanceof FieldDeclaration)) continue;
       const name = member.name;
       if (!member.type) {
         throw new Error("Fields must be strongly typed! Found " + toString(member) + " at " + node.range.source.normalizedPath);

@@ -17,6 +17,7 @@ v0.9.8a - Fix #80 - Empty Maps were not serialized to {}, instead, threw memory 
 v0.9.8b - Fix #81 - Revert transform
 v0.9.9 - Fix #82 - Initialize maps
 v0.9.9a - Remove extraneous logs from transform
+v0.9.10 - Fix transform type checks. switch to nodekind checks
 
 [UNRELEASED] v1.0.0
  - Allow nullable primitives

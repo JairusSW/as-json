@@ -559,6 +559,5 @@ describe("Should deserialize Objects", () => {
 });
 
 run({
-  log: true,
-  coverage: true
+  log: true
 });

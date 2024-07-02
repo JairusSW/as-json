@@ -1,4 +1,3 @@
-import { FieldDeclaration } from "assemblyscript/dist/assemblyscript.js";
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
@@ -26,7 +25,7 @@ class JSONTransform extends BaseVisitor {
         schema.node = node;
         schema.name = node.name.text;
         const members = [
-            ...node.members.filter(v => v instanceof FieldDeclaration)
+            ...node.members.filter(v => v.kind === 54 /* NodeKind.FieldDeclaration */)
         ];
         if (node.extendsType) {
             schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text);
@@ -63,8 +62,6 @@ class JSONTransform extends BaseVisitor {
             this.schemasList.push(schema);
         }
         for (const member of members) {
-            if (!(member instanceof FieldDeclaration))
-                continue;
             const name = member.name;
             if (!member.type) {
                 throw new Error("Fields must be strongly typed! Found " + toString(member) + " at " + node.range.source.normalizedPath);
