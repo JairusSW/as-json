@@ -7,3 +7,4 @@ logs
 as-tral
 *.lockb
 .vscode/
+build/
