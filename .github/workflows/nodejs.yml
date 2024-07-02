@@ -17,6 +17,9 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
 
+      - name: Link Dependencies
+        run: bun link json-as
+        
       - name: Install Dependencies
         run: bun install
       
