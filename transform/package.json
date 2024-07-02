@@ -1,6 +1,6 @@
 {
   "name": "@json-as/transform",
-  "version": "0.9.9a",
+  "version": "0.9.10",
   "description": "JSON encoder/decoder for AssemblyScript",
   "main": "./lib/index.js",
   "author": "Jairus Tanaka",
