@@ -150,6 +150,18 @@ class JSONTransform extends BaseVisitor {
             else if (mem.value) {
                 mem.initialize = "this." + name.text + " = " + mem.value;
             }
+            else if (t === "Map") {
+                mem.initialize = "this." + name.text + " = new " + mem.type + "()";
+            }
+            else if (t === "string") {
+                mem.initialize = "this." + name.text + " = \"\"";
+            }
+            else if (t === "Array") {
+                mem.initialize = "this." + name.text + " = instantiate<" + mem.type + ">()";
+            }
+            else {
+                console.log(t);
+            }
             schema.members.push(mem);
         }
         let SERIALIZE_RAW = "__SERIALIZE(): string {\n  let out = `{";

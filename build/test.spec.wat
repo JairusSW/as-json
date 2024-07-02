@@ -69943,13 +69943,13 @@
  (func $assembly/__tests__/types/DerivedObject#__INITIALIZE (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 4
+  i32.const 8
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
   global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store
+  i64.const 0
+  i64.store
   i32.const 19248
   local.set $1
   global.get $~lib/memory/__stack_pointer
@@ -69960,7 +69960,33 @@
   local.get $0
   local.set $1
   global.get $~lib/memory/__stack_pointer
-  i32.const 4
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 832
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $assembly/__tests__/types/BaseObject#set:a
+  local.get $0
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 832
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $assembly/__tests__/types/DerivedObject#set:b
+  local.get $0
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
   i32.add
   global.set $~lib/memory/__stack_pointer
   local.get $1
@@ -78872,6 +78898,47 @@
   i32.store
   local.get $1
   call $~lib/as-test/assembly/coverage/__COVER
+  local.get $0
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 832
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $assembly/__tests__/types/Player#set:firstName
+  local.get $0
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 832
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $assembly/__tests__/types/Player#set:lastName
+  local.get $0
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 0
+  i32.const 0
+  call $~lib/array/Array<i32>#constructor
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $assembly/__tests__/types/Player#set:lastActive
   local.get $0
   local.set $1
   global.get $~lib/memory/__stack_pointer
