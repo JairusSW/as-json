@@ -5,7 +5,6 @@ import {
   run
 } from "as-test/assembly";
 import { DerivedObject, Null, ObjWithStrangeKey, ObjectWithFloat, OmitIf, Player, Vec3 } from "./types";
-import { MpZ } from "@hypercubed/as-mpz";
 
 describe("Should serialize strings", () => {
 
@@ -48,18 +47,6 @@ describe("Should serialize integers", () => {
   expect(
     JSON.stringify<i64>(-101)
   ).toBe("-101");
-
-});
-
-describe("Should serialize MpZ (Big Int)", () => {
-
-  expect(
-    JSON.stringify<MpZ>(MpZ.from(0))
-  ).toBe("0");
-
-  expect(
-    JSON.stringify<MpZ>(MpZ.from(2).pow(512))
-  ).toBe("13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096");
 
 });
 
@@ -367,18 +354,6 @@ describe("Should deserialize integers", () => {
   expect(
     JSON.parse<i64>("-101")
   ).toBe(<i64>-101);
-
-});
-
-describe("Should deserialize MpZ (Big Int)", () => {
-
-  expect(
-    JSON.parse<MpZ>("0").toString()
-  ).toBe("0");
-
-  expect(
-    JSON.parse<MpZ>("13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096").toString()
-  ).toBe("13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084096");
 
 });
 

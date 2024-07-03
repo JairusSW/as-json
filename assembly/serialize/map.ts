@@ -4,7 +4,6 @@ import { Sink } from "../sink";
 
 // @ts-ignore: Decorator valid here
 @inline export function serializeMap<T extends Map<any, any>>(data: T): string {
-    if (changetype<usize>(data) == <usize>0) return "{}";
     let result = Sink.fromString(BRACE_LEFT_WORD);
     if (!data.size) return "{}";
     let keys = data.keys();

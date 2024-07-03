@@ -12,9 +12,7 @@ import { serializeString } from "./string";
 
 // @ts-ignore: Decorator valid here
 @inline export function serializeArray<T extends any[]>(data: T): string {
-    if (changetype<usize>(data) == <usize>0) return EMPTY_BRACKET_WORD;
-    // @ts-ignore
-    else if (data.length == 0) {
+    if (data.length == 0) {
         return EMPTY_BRACKET_WORD;
         // @ts-ignore
     } else if (isString<valueof<T>>()) {

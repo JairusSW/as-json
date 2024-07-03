@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.9.10",
+  "version": "0.9.11",
   "description": "JSON encoder/decoder for AssemblyScript",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -16,8 +16,8 @@
   "license": "MIT",
   "scripts": {
     "test": "ast test",
-    "pretest": "ast build",
-    "build:test": "JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm",
+    "pretest": "rm -rf ./build/ && ast build",
+    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm",
     "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub",
     "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
     "bench:wasmer": "wasmer --llvm ./bench/benchmark.wasm",
@@ -32,6 +32,7 @@
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bench": "^0.0.0-alpha",
     "as-console": "^7.0.0",
+    "as-test": "0.1.7",
     "assemblyscript": "^0.27.28",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
@@ -41,12 +42,7 @@
     "typescript": "^5.5.3",
     "visitor-as": "^0.11.4"
   },
-  "dependencies": {
-    "@hypercubed/as-mpz": "^2.2.0",
-    "as-string-sink": "^0.5.3",
-    "as-test": "^0.1.6",
-    "as-virtual": "^0.2.0"
-  },
+  "dependencies": { "as-virtual": "^0.2.0" },
   "overrides": {
     "assemblyscript": "$assemblyscript"
   },
@@ -60,7 +56,11 @@
     "serialize",
     "deserialize",
     "dynamic",
-    "serde"
+    "serde",
+    "SIMD",
+    "optimized",
+    "fast",
+    "algorithm"
   ],
   "bugs": {
     "url": "https://github.com/JairusSW/as-json/issues"

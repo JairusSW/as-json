@@ -31,8 +31,8 @@ export function deserializeArray<T extends unknown[]>(data: string): T {
         if (isDefined(type.__DESERIALIZE)) {
             return deserializeObjectArray<T>(data);
         }
-        ERROR("Could not parse array of type " + nameof<T>() + "! Make sure to add the @json decorator over classes!");
+        throw new Error("Could not parse array of type " + nameof<T>() + "! Make sure to add the @json decorator over classes!");
     } else {
-        ERROR("Could not parse array of type " + nameof<T>() + "!");
+        throw new Error("Could not parse array of type " + nameof<T>() + "!");
     }
 }
