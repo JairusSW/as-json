@@ -13,7 +13,7 @@ import { deserializeFloat } from "./deserialize/float";
 import { deserializeObject } from "./deserialize/object";
 import { deserializeMap } from "./deserialize/map";
 import { deserializeDate } from "./deserialize/date";
-import { NULL_WORD } from "./chars";
+import { NULL_WORD } from "./custom/chars";
 import { deserializeInteger } from "./deserialize/integer";
 import { deserializeString } from "./deserialize/string";
 

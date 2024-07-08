@@ -1,4 +1,4 @@
-import { isMap } from "../util";
+import { isMap } from "../custom/util";
 import { deserializeArrayArray } from "./array/array";
 import { deserializeBooleanArray } from "./array/bool";
 import { deserializeFloatArray } from "./array/float";

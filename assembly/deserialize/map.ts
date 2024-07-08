@@ -1,5 +1,5 @@
 import { Virtual } from "as-virtual/assembly";
-import { containsCodePoint, unsafeCharCodeAt } from "../util";
+import { containsCodePoint, unsafeCharCodeAt } from "../custom/util";
 import {
     CHAR_A,
     BACK_SLASH,
@@ -18,7 +18,7 @@ import {
     CHAR_S,
     CHAR_T,
     CHAR_U
-} from "../chars";
+} from "../custom/chars";
 import { deserializeBoolean } from "./bool";
 import { JSON } from "..";
 import { deserializeString } from "./string";
@@ -72,8 +72,6 @@ import { deserializeFloat } from "./float";
                     depth--;
                     if (depth === 0) {
                         ++objectValueIndex;
-                        console.log("Index: " + nameof<indexof<T>>());
-                        console.log("Value: " + nameof<valueof<T>>());
                         map.set(deserializeMapKey<indexof<T>>(key), JSON.parse<valueof<T>>(data.slice(outerLoopIndex, objectValueIndex)));
                         outerLoopIndex = objectValueIndex;
                         isKey = false;

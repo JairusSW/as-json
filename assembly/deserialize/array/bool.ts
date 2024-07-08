@@ -1,5 +1,5 @@
-import { CHAR_E, CHAR_F, CHAR_T } from "../../chars";
-import { unsafeCharCodeAt } from "../../util";
+import { CHAR_E, CHAR_F, CHAR_T } from "../../custom/chars";
+import { unsafeCharCodeAt } from "../../custom/util";
 import { deserializeBoolean } from "../bool";
 
 // @ts-ignore: Decorator valid here

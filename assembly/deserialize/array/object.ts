@@ -1,6 +1,6 @@
-import { BRACE_LEFT, BRACE_RIGHT } from "../../chars";
+import { BRACE_LEFT, BRACE_RIGHT } from "../../custom/chars";
 import { JSON } from "../..";
-import { unsafeCharCodeAt } from "../../util";
+import { unsafeCharCodeAt } from "../../custom/util";
 
 // @ts-ignore: Decorator valid here
 @inline export function deserializeObjectArray<T extends unknown[]>(data: string): T {

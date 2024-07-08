@@ -6,8 +6,8 @@ import {
     BRACKET_LEFT_WORD,
     BRACKET_RIGHT,
     BRACKET_RIGHT_WORD
-} from "../chars";
-import { Sink } from "../sink";
+} from "../custom/chars";
+import { Sink } from "../custom/sink";
 import { serializeString } from "./string";
 
 // @ts-ignore: Decorator valid here

@@ -1,19 +1,32 @@
-import { bench, blackbox } from "as-bench/assembly/bench";
-import { __atoi_fast } from "../assembly/util";
-import { JSON } from "../assembly";
+import { bench } from "as-bench/assembly/bench";
+import { serializeString } from "../assembly/serialize/string";
+import { bs } from "../assembly/custom/bs";
 
 @json
 class Vec3 {
     x: i32;
     y: i32;
     z: i32;
+    __SERIALIZE_BS(): void {
+        bs.write_128_u(i16x8(123, 34, 120, 34, 58, 49, 44, 34)); /* {"x":1," */
+        bs.write_128_u(i16x8(121, 34, 58, 50, 44, 34, 122, 34)); /* y":2,"z" */
+        bs.write_32_u(3342394); /* :3 */
+        bs.write_16_u(125); /* } */
+    }
 }
-
+const out = memory.data(1000);
 const vec: Vec3 = {
     x: 3,
     y: 1,
     z: 8,
 }
+bench("Stringify Vec3", () => {
+    vec.__SERIALIZE_BS();
+    //bs.reset()
+})
+bench("Stringify String", () => {
+    serializeString('Hello World');
+});
 /*
 bench("Parse Number SNIP", () => {
     blackbox<i32>(snip_fast<i32>("12345"));
@@ -29,7 +42,7 @@ bench("Parse Number STDLIB", () => {
 
 bench("Stringify Object (Vec3)", () => {
     blackbox<string>(JSON.stringify(vec));
-});*/
+});
 
 bench("Parse Object (Vec3)", () => {
     blackbox<Vec3>(JSON.parse<Vec3>('{"x":0,"y":0,"z":0}'));

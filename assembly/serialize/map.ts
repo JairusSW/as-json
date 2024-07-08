@@ -1,6 +1,6 @@
-import { COLON, COMMA, BRACE_LEFT_WORD, BRACE_RIGHT } from "../chars";
+import { COLON, COMMA, BRACE_LEFT_WORD, BRACE_RIGHT } from "../custom/chars";
 import { JSON } from "..";
-import { Sink } from "../sink";
+import { Sink } from "../custom/sink";
 
 // @ts-ignore: Decorator valid here
 @inline export function serializeMap<T extends Map<any, any>>(data: T): string {
