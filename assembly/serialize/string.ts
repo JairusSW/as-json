@@ -15,7 +15,7 @@ import { _intTo16, intTo16 } from "../custom/util";
 @inline export function serializeString(data: string): string {
     const len = data.length << 1;
     if (len === 0) {
-        bs.write_16(2228258); /* {} */
+        bs.write_32(2228258); /* "" */
         return bs.out<string>();
     }
 
