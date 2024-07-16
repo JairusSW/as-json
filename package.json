@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",

@@ -21,6 +21,7 @@ v0.9.10 - Fix transform type checks. switch to nodekind checks
 v0.9.11 - Remove MpZ--implement custom serializers and deserializers in the works
 v0.9.12 - Add compat with aspect
 v0.9.13 - Fix empty strings not indexing correctly
+v0.9.14 - Ignore properties of type Function
 
 [UNRELEASED] v1.0.0
  - Allow nullable primitives

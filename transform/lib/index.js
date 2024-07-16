@@ -1,3 +1,4 @@
+import { FieldDeclaration } from "assemblyscript/dist/assemblyscript.js";
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
@@ -63,10 +64,14 @@ class JSONTransform extends BaseVisitor {
         }
         for (const member of members) {
             const name = member.name;
+            if (!(member instanceof FieldDeclaration))
+                continue;
             if (!member.type) {
                 throw new Error("Fields must be strongly typed! Found " + toString(member) + " at " + node.range.source.normalizedPath);
             }
             const type = toString(member.type);
+            if (type.startsWith("(") && type.includes("=>"))
+                continue;
             const value = member.initializer ? toString(member.initializer) : null;
             if (member.flags == 32 /* CommonFlags.Static */)
                 continue;
@@ -140,7 +145,7 @@ class JSONTransform extends BaseVisitor {
                 }
                 mem.name = name.text;
             }
-            const t = mem.node.type.name.identifier.text;
+            const t = mem.node.type.name?.identifier.text;
             if (this.schemasList.find(v => v.name == t)) {
                 mem.initialize = "this." + name.text + " = changetype<nonnull<" + mem.type + ">>(__new(offsetof<nonnull<" + mem.type + ">>(), idof<nonnull<" + mem.type + ">>()));\n  changetype<nonnull<" + mem.type + ">>(this." + name.text + ").__INITIALIZE()";
             }
