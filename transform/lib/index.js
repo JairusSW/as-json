@@ -117,8 +117,13 @@ class JSONTransform extends BaseVisitor {
             }
             if (!mem.flags.length) {
                 mem.flags = [PropertyFlags.None];
-                mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
-                mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
+                if (type == "JSON.Raw") {
+                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":" + "\"${this." + name.text + "}\"";
+                }
+                else {
+                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
+                    mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end));";
+                }
             }
             if (mem.flags.includes(PropertyFlags.OmitNull)) {
                 mem.serialize = "${changetype<usize>(this." + mem.name + ") == <usize>0" + " ? \"\" : '" + escapeString(JSON.stringify(mem.alias || mem.name)) + ":' + __SERIALIZE<" + type + ">(this." + name.text + ") + \",\"}";
@@ -136,11 +141,11 @@ class JSONTransform extends BaseVisitor {
             else if (mem.flags.includes(PropertyFlags.Flatten)) {
                 const nullable = mem.node.type.isNullable;
                 if (nullable) {
-                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(changetype<nonnull<" + type + ">>(this." + name.text + ")" + (mem.args?.length ? '.' + mem.args[0] : '') + ") : \"null\"}";
+                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(changetype<nonnull<" + type + ">>(this." + name.text + ")" + (mem.args?.length ? '.' + mem.args.join(".") : '') + ") : \"null\"}";
                     mem.deserialize = "if (value_end - value_start == 4 && load<u64>(changetype<usize>(data) + <usize>(value_start << 1)) == " + charCodeAt64("null", 0) + ") {\n        this." + name.text + " = null;\n      } else {\n        this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args[0] + "\":' + data.substring(value_start, value_end) + \"}\");\n      }";
                 }
                 else {
-                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args[0] : '') + ") : \"null\"}";
+                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + " ? __SERIALIZE(this." + name.text + (mem.args?.length ? '.' + mem.args.join(".") : '') + ") : \"null\"}";
                     mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<" + type + ">('{\"" + mem.args[0] + "\":' + data.substring(value_start, value_end) + \"}\");";
                 }
                 mem.name = name.text;
@@ -163,6 +168,9 @@ class JSONTransform extends BaseVisitor {
             }
             else if (t === "bool" || t === "boolean") {
                 mem.initialize = "this." + name.text + " = false";
+            }
+            else if (t === "JSON.Raw") {
+                mem.initialize = "this." + name.text + " = \"\"";
             }
             else if (t === "u8" ||
                 t === "u16" ||
@@ -284,6 +292,8 @@ class JSONTransform extends BaseVisitor {
             let f = true;
             for (let i = 0; i < memberSet.length; i++) {
                 const member = memberSet[i];
+                if (!member.deserialize)
+                    continue;
                 const name = encodeKey(member.alias || member.name);
                 if (name.length === 1) {
                     DESERIALIZE += `      case ${name.charCodeAt(0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
