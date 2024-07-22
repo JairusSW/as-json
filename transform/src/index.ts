@@ -48,12 +48,13 @@ class JSONTransform extends BaseVisitor {
       ) as SchemaData | null;
 
       if (schema.parent?.members) {
-        for (let i = 0; i < schema.parent.members.length; i++) {
+        for (let i = schema.parent.members.length - 1; i >= 0; i--) {
           const replace = schema.members.find(
             (v) => v.name == schema.parent?.members[i]?.name
           );
           if (!replace) {
-            schema.members.unshift(schema.parent.members[i]!);
+            //schema.members.unshift(schema.parent?.members[i]!);
+            members.unshift(schema.parent?.members[i]!.node);
           }
         }
       }

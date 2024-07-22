@@ -1,33 +1,28 @@
 // import { JSON } from ".";
 import { JSON } from ".";
 @json
-class Vec3 {
-  x: f32 = 0.0;
-  y: f32 = 0.0;
-  z: f32 = 0.0;
+class Message {
+  constructor(role: string, content: string) {
+    this._role = role;
+    this.content = content;
+  }
+
+
+  @alias("role")
+  protected _role: string;
+
+  get role(): string {
+    return this._role;
+  }
+
+  content: string;
 }
 
 @json
-class Player {
-  firstName!: string;
-  lastName!: string;
-  lastActive!: i32[];
-  age!: i32;
-  pos!: JSON.Raw;
-  isVerified!: boolean;
+class UserMessage extends Message {
+  constructor(content: string) {
+    super("user", content);
+  }
 }
-
-const player: Player = {
-  firstName: "Emmet",
-  lastName: "West",
-  lastActive: [8, 27, 2022],
-  age: 23,
-  pos: "{\"x\":3.4,\"y\":1.2,\"z\":8.3}",
-  isVerified: true
-};
-
-const stringified = JSON.stringify<Player>(player);
-console.log(stringified);
-console.log(idof<JSON.Raw>().toString());
-console.log(idof<string>().toString())
-// const parsed = JSON.parse<Player>(stringified);
+console.log(JSON.stringify(new Message("user", "foo")))
+console.log(JSON.stringify(new UserMessage("foo")));
