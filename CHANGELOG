@@ -24,6 +24,7 @@ v0.9.13 - Fix empty strings not indexing correctly
 v0.9.14 - Ignore properties of type Function
 v0.9.15 - Support JSON.Raw blocks
 v0.9.16 - JSON.Raw should be completely untouched
+v0.9.17 - A schema's parent's fields should be included properly
 
 [UNRELEASED] v1.0.0
  - Allow nullable primitives
