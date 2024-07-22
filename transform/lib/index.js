@@ -118,8 +118,8 @@ class JSONTransform extends BaseVisitor {
             if (!mem.flags.length) {
                 mem.flags = [PropertyFlags.None];
                 if (type == "JSON.Raw") {
-                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<string>(this." + name.text + ")}";
-                    mem.deserialize = "this." + name.text + " = " + "__DESERIALIZE<string>(data.substring(value_start, value_end));";
+                    mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${this." + name.text + "}";
+                    mem.deserialize = "this." + name.text + " = " + "data.substring(value_start, value_end);";
                 }
                 else {
                     mem.serialize = escapeString(JSON.stringify(mem.alias || mem.name)) + ":${__SERIALIZE<" + type + ">(this." + name.text + ")}";
