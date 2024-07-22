@@ -9,12 +9,9 @@ class Vec3 {
 
 @json
 class Player {
-  @alias("first name")
   firstName!: string;
   lastName!: string;
   lastActive!: i32[];
-  // Drop in a code block, function, or expression that evaluates to a boolean
-  @omitif("this.age < 18")
   age!: i32;
   pos!: JSON.Raw;
   isVerified!: boolean;

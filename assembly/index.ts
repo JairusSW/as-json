@@ -74,7 +74,7 @@ export namespace JSON {
      */
     @inline set<T>(value: T): void {
       if (isBoolean<T>()) {
-        this.type = JSON.Types.Boolean;
+        this.type = JSON.Types.Bool;
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (value instanceof u8 || value instanceof i8) {
         this.type = JSON.Types.U8;
