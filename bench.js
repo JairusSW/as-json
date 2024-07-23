@@ -26,15 +26,15 @@ import { Bench } from "tinybench";
 // └─────────┴───────────────────────────┴─────────────┴────────────────────┴──────────┴─────────┘
 
 const vec = {
-    x: 3,
-    y: 1,
-    z: 8,
+  x: 3,
+  y: 1,
+  z: 8,
 };
 
 let data;
 
 const bench = new Bench({ time: 1000 })
-    /*.add("stringify float", () => {
+  /*.add("stringify float", () => {
         data = JSON.stringify(1.2345)
     })
     .add("parse float", () => {
@@ -66,10 +66,10 @@ const bench = new Bench({ time: 1000 })
         data = JSON.stringify('Hello "World!');
     })
 */
-    .add("Parse String", () => {
-        data = JSON.parse('[[],[[]],[[],[[]]]]');
-    })
-    .todo("unimplemented .add");
+  .add("Parse String", () => {
+    data = JSON.parse("[[],[[]],[[],[[]]]]");
+  })
+  .todo("unimplemented .add");
 
 await bench.run();
 

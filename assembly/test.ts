@@ -2,11 +2,12 @@
 import { JSON } from ".";
 @json
 class Message {
+  @alias("raw_foo")
+  public raw: JSON.Raw = "[1,2,3]";
   constructor(role: string, content: string) {
     this._role = role;
     this.content = content;
   }
-
 
   @alias("role")
   protected _role: string;
@@ -24,5 +25,5 @@ class UserMessage extends Message {
     super("user", content);
   }
 }
-console.log(JSON.stringify(new Message("user", "foo")))
+console.log(JSON.stringify(new Message("user", "foo")));
 console.log(JSON.stringify(new UserMessage("foo")));

@@ -4,12 +4,12 @@
     "module": "ES2015",
     "downlevelIteration": true,
     "outDir": "./lib/",
-    
+
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
-    "strictBindCallApply": true ,
+    "strictBindCallApply": true,
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,

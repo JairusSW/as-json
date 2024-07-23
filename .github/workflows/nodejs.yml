@@ -4,22 +4,21 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
-      
+
       - name: Install Wasmtime
         uses: jcbhmr/setup-wasmtime@v2
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
-        
+
       - name: Install Dependencies
         run: bun install
-      
+
       - name: Build Tests
         run: bun run pretest
 

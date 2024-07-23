@@ -1,14 +1,12 @@
 {
-  "input": [
-    "./assembly/__tests__/*.spec.ts"
-  ],
+  "input": ["./assembly/__tests__/*.spec.ts"],
   "outDir": "./build",
   "config": "none",
   "plugins": {
     "coverage": false
   },
   "buildOptions": {
-    "args": [],
+    "args": ["--transform ./transform"],
     "target": "wasi"
   },
   "runOptions": {

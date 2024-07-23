@@ -1,27 +1,26 @@
-
 @json
 export class ObjWithString {
-    s!: string;
+  s!: string;
 }
 
 @json
 export class ObjWithStrangeKey<T> {
-    @alias('a\\\t"\x02b`c')
-    data!: T;
+  @alias('a\\\t"\x02b`c')
+  data!: T;
 }
 @json
 export class ObjectWithStringArray {
-    sa!: string[];
+  sa!: string[];
 }
 
 @json
 export class ObjectWithFloat {
-    f!: f64;
+  f!: f64;
 }
 
 @json
 export class ObjectWithFloatArray {
-    fa!: f64[];
+  fa!: f64[];
 }
 
 @json
@@ -68,7 +67,7 @@ export class Player {
   isVerified: boolean;
 }
 
-export class Nullable { }
+export class Nullable {}
 export type Null = Nullable | null;
 
 @json
@@ -78,5 +77,5 @@ export class OmitIf {
   y: i32 = -1;
   z: i32 = 1;
   @omitnull()
-  foo: string | null = null
+  foo: string | null = null;
 }

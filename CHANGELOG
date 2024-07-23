@@ -25,6 +25,7 @@ v0.9.14 - Ignore properties of type Function
 v0.9.15 - Support JSON.Raw blocks
 v0.9.16 - JSON.Raw should be completely untouched
 v0.9.17 - A schema's parent's fields should be included properly
+v0.9.18 - Should be able to use @alias and @omit*** or JSON.Raw
 
 [UNRELEASED] v1.0.0
  - Allow nullable primitives

@@ -18,7 +18,6 @@ declare function alias(name: string): Function;
  */
 declare function omit(): Function;
 
-
 /**
  * Property decorator that allows a field to be omitted when equal to an Expression.
  */
