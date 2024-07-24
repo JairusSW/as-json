@@ -2,7 +2,6 @@ import {
   ClassDeclaration,
   FieldDeclaration,
   IdentifierExpression,
-  StringLiteralExpression,
   Parser,
   Source,
   NodeKind,
@@ -467,7 +466,6 @@ class Property {
     PropertyFlags,
     string[]
   >();
-  public args: string[] | null = [];
 
   public serialize: string | null = null;
   public deserialize: string | null = null;
@@ -494,7 +492,11 @@ class Property {
     }
 
     if (this.flags.has(PropertyFlags.OmitIf)) {
-      const condition = this.args![0];
+      const condition = this.flags.get(PropertyFlags.OmitIf)![0];
+      if (!condition)
+        throw new Error(
+          "Could not find condition when using decorator @omitif! Provide at least one condition",
+        );
       this.serialize =
         "${" +
         condition +
@@ -575,9 +577,7 @@ function getArgs(args: Expression[] | null): string[] {
   if (!args) return [];
   let out: string[] = [];
   for (const arg of args) {
-    if (arg instanceof StringLiteralExpression) {
-      out.push(arg.value);
-    }
+    out.push(toString(arg));
   }
   return out;
 }

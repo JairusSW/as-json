@@ -1,7 +1,4 @@
-import {
-  FieldDeclaration,
-  StringLiteralExpression,
-} from "assemblyscript/dist/assemblyscript.js";
+import { FieldDeclaration } from "assemblyscript/dist/assemblyscript.js";
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
@@ -414,7 +411,6 @@ class Property {
     this.type = "";
     this.value = null;
     this.flags = new Map();
-    this.args = [];
     this.serialize = null;
     this.deserialize = null;
     this.initialize = null;
@@ -435,7 +431,11 @@ class Property {
         "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end))";
     }
     if (this.flags.has(PropertyFlags.OmitIf)) {
-      const condition = this.args[0];
+      const condition = this.flags.get(PropertyFlags.OmitIf)[0];
+      if (!condition)
+        throw new Error(
+          "Could not find condition when using decorator @omitif! Provide at least one condition",
+        );
       this.serialize =
         "${" +
         condition +
@@ -506,9 +506,7 @@ function getArgs(args) {
   if (!args) return [];
   let out = [];
   for (const arg of args) {
-    if (arg instanceof StringLiteralExpression) {
-      out.push(arg.value);
-    }
+    out.push(toString(arg));
   }
   return out;
 }
