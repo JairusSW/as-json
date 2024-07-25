@@ -24,7 +24,7 @@ class JSONTransform extends BaseVisitor {
   public currentClass!: SchemaData;
   public sources = new Set<Source>();
 
-  visitMethodDeclaration(): void { }
+  visitMethodDeclaration(): void {}
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
 
@@ -109,9 +109,9 @@ class JSONTransform extends BaseVisitor {
       if (!member.type) {
         throw new Error(
           "Fields must be strongly typed! Found " +
-          toString(member) +
-          " at " +
-          node.range.source.normalizedPath,
+            toString(member) +
+            " at " +
+            node.range.source.normalizedPath,
         );
       }
       const type = toString(member.type!);
@@ -143,9 +143,9 @@ class JSONTransform extends BaseVisitor {
               if (!args.length)
                 throw new Error(
                   "Expected 1 argument but got zero at @alias in " +
-                  node.range.source.normalizedPath,
+                    node.range.source.normalizedPath,
                 );
-              mem.alias = args[0]!
+              mem.alias = args[0]!;
               mem.flags.set(PropertyFlags.Alias, args);
               break;
             }
@@ -157,7 +157,7 @@ class JSONTransform extends BaseVisitor {
               if (!decorator.args?.length)
                 throw new Error(
                   "Expected 1 argument but got zero at @omitif in " +
-                  node.range.source.normalizedPath,
+                    node.range.source.normalizedPath,
                 );
               mem.flags.set(PropertyFlags.OmitIf, args);
               break;

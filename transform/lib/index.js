@@ -100,7 +100,6 @@ class JSONTransform extends BaseVisitor {
                                 throw new Error("Expected 1 argument but got zero at @alias in " +
                                     node.range.source.normalizedPath);
                             mem.alias = args[0];
-                            console.log("alias: " + mem.alias);
                             mem.flags.set(PropertyFlags.Alias, args);
                             break;
                         }
