@@ -107,25 +107,16 @@ const serialized = JSON.stringify(arr);
 const parsed = JSON.parse<Base[]>(serialized);
 ```
 
-Classes can even have inheritance. Here's a nasty example
-
-```js
-@json
-class Base {}
-
-const serialized = JSON.stringify(arr);
-// [{"x":1.0},{"x":1.0,"y":2.0},{"y":2.0,"x":1.0,"z":3.0}]
-const parsed = JSON.parse<Base[]>(serialized);
-```
-
 You can also add it to your `asconfig.json`
 
+```json
 {
-// ...
-"options": {
-"transform": ["json-as/transform"]
+  // ...
+  "options": {
+    "transform": ["json-as/transform"]
+  }
 }
-}
+````
 
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
