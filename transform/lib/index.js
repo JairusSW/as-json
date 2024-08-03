@@ -87,8 +87,11 @@ class JSONTransform extends BaseVisitor {
             mem.type = type;
             mem.value = value;
             mem.node = member;
-            if (type == "JSON.Raw") {
+            if (type.includes("JSON.Raw")) {
                 mem.flags.set(PropertyFlags.JSON_Raw, []);
+            }
+            if (member.type.isNullable) {
+                mem.flags.set(PropertyFlags.Null, []);
             }
             if (member.decorators) {
                 for (const decorator of member.decorators) {
@@ -214,8 +217,8 @@ class JSONTransform extends BaseVisitor {
                 "`;\n  store<u32>(changetype<usize>(out) + ((out.length - 2) << 1), 8192010);\n  return out;\n}";
         }
         else {
-            SERIALIZE_RAW += "`;\n};";
-            SERIALIZE_PRETTY += "`;\n};";
+            SERIALIZE_RAW += "}`;\n  return out;\n}";
+            SERIALIZE_PRETTY += "}`;\n  return out;\n}";
         }
         INITIALIZE += "  return this;\n}";
         const sortedMembers = [];
@@ -307,12 +310,12 @@ class JSONTransform extends BaseVisitor {
                 else {
                     if (f) {
                         f = false;
-                        DESERIALIZE += `    if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+                        DESERIALIZE += `    if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
                     }
                     else {
                         DESERIALIZE =
                             DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
-                                ` else if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+                                ` else if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
                     }
                 }
             }
@@ -400,11 +403,12 @@ export default class Transformer extends Transform {
 }
 var PropertyFlags;
 (function (PropertyFlags) {
-    PropertyFlags[PropertyFlags["Omit"] = 0] = "Omit";
-    PropertyFlags[PropertyFlags["OmitNull"] = 1] = "OmitNull";
-    PropertyFlags[PropertyFlags["OmitIf"] = 2] = "OmitIf";
-    PropertyFlags[PropertyFlags["Alias"] = 3] = "Alias";
-    PropertyFlags[PropertyFlags["JSON_Raw"] = 4] = "JSON_Raw";
+    PropertyFlags[PropertyFlags["Null"] = 0] = "Null";
+    PropertyFlags[PropertyFlags["Omit"] = 1] = "Omit";
+    PropertyFlags[PropertyFlags["OmitNull"] = 2] = "OmitNull";
+    PropertyFlags[PropertyFlags["OmitIf"] = 3] = "OmitIf";
+    PropertyFlags[PropertyFlags["Alias"] = 4] = "Alias";
+    PropertyFlags[PropertyFlags["JSON_Raw"] = 5] = "JSON_Raw";
 })(PropertyFlags || (PropertyFlags = {}));
 class Property {
     constructor() {
@@ -426,8 +430,14 @@ class Property {
         if (this.flags.has(PropertyFlags.Omit))
             return;
         if (this.flags.has(PropertyFlags.JSON_Raw)) {
-            this.right_s = "this." + name;
-            this.right_d = "data.substring(value_start, value_end);";
+            if (this.flags.has(PropertyFlags.Null)) {
+                this.right_s = "(this." + name + " || \"null\")";
+                this.right_d = "value_start === value_end - 4 && 30399761348886638 === load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
+            }
+            else {
+                this.right_s = "this." + name;
+                this.right_d = "data.substring(value_start, value_end);";
+            }
         }
         else {
             this.right_s = "__SERIALIZE<" + type + ">(this." + name + ")";

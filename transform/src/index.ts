@@ -24,7 +24,7 @@ class JSONTransform extends BaseVisitor {
   public currentClass!: SchemaData;
   public sources = new Set<Source>();
 
-  visitMethodDeclaration(): void {}
+  visitMethodDeclaration(): void { }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
 
@@ -109,9 +109,9 @@ class JSONTransform extends BaseVisitor {
       if (!member.type) {
         throw new Error(
           "Fields must be strongly typed! Found " +
-            toString(member) +
-            " at " +
-            node.range.source.normalizedPath,
+          toString(member) +
+          " at " +
+          node.range.source.normalizedPath,
         );
       }
       const type = toString(member.type!);
@@ -128,8 +128,12 @@ class JSONTransform extends BaseVisitor {
       mem.value = value;
       mem.node = member;
 
-      if (type == "JSON.Raw") {
+      if (type.includes("JSON.Raw")) {
         mem.flags.set(PropertyFlags.JSON_Raw, []);
+      }
+
+      if (member.type.isNullable) {
+        mem.flags.set(PropertyFlags.Null, []);
       }
 
       if (member.decorators) {
@@ -143,7 +147,7 @@ class JSONTransform extends BaseVisitor {
               if (!args.length)
                 throw new Error(
                   "Expected 1 argument but got zero at @alias in " +
-                    node.range.source.normalizedPath,
+                  node.range.source.normalizedPath,
                 );
               mem.alias = args[0]!;
               mem.flags.set(PropertyFlags.Alias, args);
@@ -157,7 +161,7 @@ class JSONTransform extends BaseVisitor {
               if (!decorator.args?.length)
                 throw new Error(
                   "Expected 1 argument but got zero at @omitif in " +
-                    node.range.source.normalizedPath,
+                  node.range.source.normalizedPath,
                 );
               mem.flags.set(PropertyFlags.OmitIf, args);
               break;
@@ -268,8 +272,8 @@ class JSONTransform extends BaseVisitor {
       SERIALIZE_PRETTY +=
         "`;\n  store<u32>(changetype<usize>(out) + ((out.length - 2) << 1), 8192010);\n  return out;\n}";
     } else {
-      SERIALIZE_RAW += "`;\n};";
-      SERIALIZE_PRETTY += "`;\n};";
+      SERIALIZE_RAW += "}`;\n  return out;\n}";
+      SERIALIZE_PRETTY += "}`;\n  return out;\n}";
     }
 
     INITIALIZE += "  return this;\n}";
@@ -353,11 +357,11 @@ class JSONTransform extends BaseVisitor {
         } else {
           if (f) {
             f = false;
-            DESERIALIZE += `    if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+            DESERIALIZE += `    if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
           } else {
             DESERIALIZE =
               DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
-              ` else if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+              ` else if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
           }
         }
       }
@@ -456,6 +460,7 @@ export default class Transformer extends Transform {
 }
 
 enum PropertyFlags {
+  Null,
   Omit,
   OmitNull,
   OmitIf,
@@ -489,8 +494,13 @@ class Property {
     if (this.flags.has(PropertyFlags.Omit)) return;
 
     if (this.flags.has(PropertyFlags.JSON_Raw)) {
-      this.right_s = "this." + name;
-      this.right_d = "data.substring(value_start, value_end);";
+      if (this.flags.has(PropertyFlags.Null)) {
+        this.right_s = "(this." + name + " || \"null\")";
+        this.right_d = "value_start === value_end - 4 && 30399761348886638 === load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
+      } else {
+        this.right_s = "this." + name;
+        this.right_d = "data.substring(value_start, value_end);";
+      }
     } else {
       this.right_s = "__SERIALIZE<" + type + ">(this." + name + ")";
       this.right_d =
