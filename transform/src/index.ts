@@ -280,28 +280,27 @@ class JSONTransform extends BaseVisitor {
 
     const sortedMembers: Property[][] = [];
     const _sorted = schema.members.sort(
-      (a, b) => a.name.length - b.name.length,
+      (a, b) => (a.alias?.length! || a.name.length) - (b.alias?.length! || b.name.length),
     );
-    let len = 0;
-    let offset = 0;
-    sortedMembers.push([_sorted[0]!]);
-    len = _sorted[0]?.name.length!;
-    for (let i = 1; i < _sorted.length; i++) {
+    let len = -1;
+    let offset = -1;
+    for (let i = 0; i < _sorted.length; i++) {
       const member = _sorted[i]!;
-      if (member.alias?.length || member.name.length > len) {
-        sortedMembers.push([member]);
-        len = member.alias?.length || member.name.length;
-        offset++;
+      const _name = member.alias || member.name;
+      if (_name.length === len) {
+        sortedMembers[offset]?.push(member);
       } else {
-        sortedMembers[offset]!.push(member);
+        sortedMembers.push([member]);
+        len = _name.length;
+        offset++;
       }
     }
 
     let first = true;
     for (const memberSet of sortedMembers) {
       const firstMember = memberSet[0]!;
-      const name = encodeKey(firstMember.alias || firstMember.name);
-      if (name.length === 1) {
+      const _name = encodeKey(firstMember.alias || firstMember.name);
+      if (_name.length === 1) {
         if (first) {
           DESERIALIZE +=
             "  if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
@@ -310,7 +309,7 @@ class JSONTransform extends BaseVisitor {
           DESERIALIZE +=
             "else if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
         }
-      } else if (name.length === 2) {
+      } else if (_name.length === 2) {
         if (first) {
           DESERIALIZE +=
             "  if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
@@ -319,7 +318,7 @@ class JSONTransform extends BaseVisitor {
           DESERIALIZE +=
             "else if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
         }
-      } else if (name.length === 4) {
+      } else if (_name.length === 4) {
         if (first) {
           DESERIALIZE +=
             "  if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
@@ -330,44 +329,44 @@ class JSONTransform extends BaseVisitor {
         }
       } else {
         if (first) {
-          DESERIALIZE += "  if (" + name.length + " === len) {\n";
+          DESERIALIZE += "  if (" + _name.length + " === len) {\n";
           first = false;
         } else {
-          DESERIALIZE += "else if (" + name.length + " === len) {\n";
+          DESERIALIZE += "else if (" + _name.length + " === len) {\n";
         }
       }
       let f = true;
       for (let i = 0; i < memberSet.length; i++) {
         const member = memberSet[i]!;
         if (!member.deserialize) continue;
-        const name = encodeKey(member.alias || member.name);
-        if (name.length === 1) {
-          DESERIALIZE += `      case ${name.charCodeAt(0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
-        } else if (name.length === 2) {
-          DESERIALIZE += `      case ${charCodeAt32(name, 0)}: {\n        ${member.deserialize}\n        return true;\n      }\n`;
-        } else if (name.length === 4) {
+        const _name = encodeKey(member.alias || member.name);
+        if (_name.length === 1) {
+          DESERIALIZE += `      case ${_name.charCodeAt(0)}: { /* ${_name} */\n        ${member.deserialize}\n        return true;\n      }\n`;
+        } else if (_name.length === 2) {
+          DESERIALIZE += `      case ${charCodeAt32(_name, 0)}: { /* ${_name} */\n        ${member.deserialize}\n        return true;\n      }\n`;
+        } else if (_name.length === 4) {
           if (f) {
             f = false;
-            DESERIALIZE += `    if (${charCodeAt64(name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+            DESERIALIZE += `    if (${charCodeAt64(_name, 0)} === code) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
           } else {
             DESERIALIZE =
               DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
-              `else if (${charCodeAt64(name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+              `else if (${charCodeAt64(_name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
           }
         } else {
           if (f) {
             f = false;
-            DESERIALIZE += `    if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+            DESERIALIZE += `    if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
           } else {
             DESERIALIZE =
               DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
-              ` else if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(name))}"), changetype<usize>(data) + (key_start << 1), ${name.length << 1})) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+              ` else if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
           }
         }
       }
-      if (name.length < 3) {
+      if (_name.length < 3) {
         DESERIALIZE += `      default: {\n        return false;\n      }\n    }\n`;
-      } else if (name.length == 4) {
+      } else if (_name.length == 4) {
         DESERIALIZE =
           DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
           ` else {\n      return false;\n    }\n`;
