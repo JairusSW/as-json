@@ -1,6 +1,6 @@
 {
   "name": "@json-as/transform",
-  "version": "0.9.20",
+  "version": "0.9.21",
   "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
   "main": "./lib/index.js",
   "author": "Jairus Tanaka",
