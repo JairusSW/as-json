@@ -1,14 +1,12 @@
-const f1_10000 = 26844;
-
 @inline export function itoa_fast(out: usize, val: u32): void {
   const low = val % 100000;
   const high = val / 100000;
 
-  let tmp_high = high * (f1_10000) - (high / 4);
-  let tmp_low = low * (f1_10000) - (low / 4);
+  let tmp_high = high * (26844) - (high / 4);
+  let tmp_low = low * (26844) - (low / 4);
 
   const h1 = 48 + (tmp_high >> 28);
-  tmp_high = (tmp_high & 0x0fffffff) * 5;
+  tmp_high = (tmp_high & 268435455) * 5;
 
   const h2 = 48 + (tmp_high >> 27);
   tmp_high = (tmp_high & 134217727) * 5;
@@ -22,7 +20,7 @@ const f1_10000 = 26844;
   const h5 = 48 + (tmp_low >> 24);
 
   const l1 = 48 + (tmp_low >> 28);
-  tmp_low = (tmp_low & 0x0fffffff) * 5;
+  tmp_low = (tmp_low & 268435455) * 5;
 
   const l2 = 48 + (tmp_low >> 27);
   tmp_low = (tmp_low & 134217727) * 5;
