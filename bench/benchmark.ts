@@ -1,6 +1,8 @@
 import { bench } from "as-bench/assembly/bench";
 import { serializeString } from "../assembly/serialize/string";
 import { bs } from "../assembly/custom/bs";
+import { itoa_fast } from "../assembly/custom/itoa";
+import { itoa_buffered } from "util/number";
 
 @json
 class Vec3 {
@@ -20,13 +22,21 @@ const vec: Vec3 = {
   y: 1,
   z: 8,
 };
-bench("Stringify Vec3", () => {
-  vec.__SERIALIZE_BS();
-  //bs.reset()
+
+bench("itoa fast", () => {
+    itoa_fast(out, 1234567890)
 });
-bench("Stringify String", () => {
-  serializeString("Hello World");
-});
+
+bench("itoa", () => {
+    itoa_buffered(out, 1234567890)
+})
+// bench("Stringify Vec3", () => {
+//   vec.__SERIALIZE_BS();
+//   //bs.reset()
+// });
+// bench("Stringify String", () => {
+//   serializeString("Hello World");
+// });
 /*
 bench("Parse Number SNIP", () => {
     blackbox<i32>(snip_fast<i32>("12345"));

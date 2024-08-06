@@ -1,14 +1,5 @@
-// import { JSON } from ".";
-import { JSON } from ".";
+import { itoa_fast } from "./custom/itoa";
 
-@json
-class ContentBlock {
-  @omitnull()
-  input: JSON.Raw | null = null;
-}
-
-const foo: ContentBlock = {
-  input: "123"
-}
-
-console.log(JSON.stringify(foo))
+const out = changetype<usize>(new ArrayBuffer(40));
+itoa_fast(out, 1234567890);
+console.log(String.UTF16.decodeUnsafe(out, 20));

@@ -11,12 +11,17 @@ import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
 import { bs } from "../custom/bs";
 import { _intTo16, intTo16 } from "../custom/util";
 
+
 // @ts-ignore: Decorator valid here
 @inline export function serializeString(data: string): string {
+    return bs.out<string>();x
+}
+// @ts-ignore: Decorator valid here
+@inline export function serializeString_BS(data: string): void {
     const len = data.length << 1;
     if (len === 0) {
         bs.write_32(2228258); /* "" */
-        return bs.out<string>();
+        return;
     }
 
     bs.write_16(QUOTE);
@@ -80,5 +85,4 @@ import { _intTo16, intTo16 } from "../custom/util";
     }
     bs.write_s_se_u(<string>data, last, changetype<OBJECT>(changetype<usize>(data) - TOTAL_OVERHEAD).rtSize);
     bs.write_16(QUOTE);
-    return bs.out<string>();
 }
