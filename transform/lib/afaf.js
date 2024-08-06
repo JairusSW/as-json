@@ -1,6 +1,6 @@
 import { IntegerLiteralExpression, Node, } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
-import { toString, isStdlib } from "visitor-as/dist/utils.js";
+import { toString } from "visitor-as/dist/utils.js";
 import { Visitor } from "./visitor.js";
 class AFAFTransform extends Visitor {
     constructor() {
@@ -38,6 +38,7 @@ class AFAFTransform extends Visitor {
     }
     visitCallExpression(node) {
         for (let i = 0; i < node.args.length; i++) {
+            // @ts-ignore
             node.args[i] = this.changeInt(node.args[i]) || node.args[i];
         }
     }
@@ -75,7 +76,7 @@ export default class Transformer extends Transform {
         });
         // Loop over every source
         for (const source of sources) {
-            if (!isStdlib(source))
+            if (source.sourceKind === 1 /* SourceKind.UserEntry */ || source.sourceKind === 0 /* SourceKind.User */)
                 transformer.visit(source);
         }
     }
