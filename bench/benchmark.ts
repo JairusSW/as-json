@@ -1,27 +1,47 @@
 import { bench } from "as-bench/assembly/bench";
-import { serializeString } from "../assembly/serialize/string";
-import { bs } from "../assembly/custom/bs";
-import { itoa_fast } from "../assembly/custom/itoa";
 import { itoa_buffered } from "util/number";
 
-@json
-class Vec3 {
-    x: i32;
-    y: i32;
-    z: i32;
-    __SERIALIZE_BS(): void {
-        bs.write_128_u(i16x8(123, 34, 120, 34, 58, 49, 44, 34)); /* {"x":1," */
-        bs.write_128_u(i16x8(121, 34, 58, 50, 44, 34, 122, 34)); /* y":2,"z" */
-        bs.write_32_u(3342394); /* :3 */
-        bs.write_16_u(125); /* } */
-    }
+@inline function itoa_fast(out: usize, val: u32): void {
+    const low = val % 100000;
+    const high = val / 100000;
+
+    let tmp_high = high * (26844) - (high / 4);
+    let tmp_low = low * (26844) - (low / 4);
+
+    const h1 = 48 + (tmp_high >> 28);
+    tmp_high = (tmp_high & 268435455) * 5;
+
+    const h2 = 48 + (tmp_high >> 27);
+    tmp_high = (tmp_high & 134217727) * 5;
+
+    const h3 = 48 + (tmp_high >> 26);
+    tmp_high = (tmp_high & 67108863) * 5;
+
+    const h4 = 48 + (tmp_high >> 25);
+    tmp_high = (tmp_high & 33554431) * 5;
+
+    const h5 = 48 + (tmp_low >> 24);
+
+    const l1 = 48 + (tmp_low >> 28);
+    tmp_low = (tmp_low & 268435455) * 5;
+
+    const l2 = 48 + (tmp_low >> 27);
+    tmp_low = (tmp_low & 134217727) * 5;
+
+    const l3 = 48 + (tmp_low >> 26);
+    tmp_low = (tmp_low & 67108863) * 5;
+
+    const l4 = 48 + (tmp_low >> 25);
+    tmp_low = (tmp_low & 33554431) * 5;
+
+    const l5 = 48 + (tmp_low >> 24);
+
+    store<v128>(out, i32x4(h1 | (h2 << 16), h3 | (h4 << 16), h5 | (l1 << 16), l2 | (l3 << 16)));
+    store<u32>(out, l4 | (l5 << 16), 16);
+
 }
+
 const out = memory.data(1000);
-const vec: Vec3 = {
-    x: 3,
-    y: 1,
-    z: 8,
-};
 
 bench("itoa fast", () => {
     itoa_fast(out, 1234567890)
@@ -30,58 +50,3 @@ bench("itoa fast", () => {
 bench("itoa", () => {
     itoa_buffered(out, 1234567890)
 })
-// bench("Stringify Vec3", () => {
-//   vec.__SERIALIZE_BS();
-//   //bs.reset()
-// });
-// bench("Stringify String", () => {
-//   serializeString("Hello World");
-// });
-/*
-bench("Parse Number SNIP", () => {
-    blackbox<i32>(snip_fast<i32>("12345"));
-});
-
-bench("Parse Number ATOI", () => {
-    blackbox<i32>(__atoi_fast<i32>("12345"));
-})
-
-bench("Parse Number STDLIB", () => {
-    blackbox<i32>(i32.parse("12345"));
-});
-
-bench("Stringify Object (Vec3)", () => {
-    blackbox<string>(JSON.stringify(vec));
-});
-
-bench("Parse Object (Vec3)", () => {
-    blackbox<Vec3>(JSON.parse<Vec3>('{"x":0,"y":0,"z":0}'));
-});/*
-
-bench("Stringify Number Array", () => {
-    blackbox<string>(JSON.stringify<i32[]>([1, 2, 3]));
-});
-
-bench("Parse Number Array", () => {
-    blackbox<i32[]>(JSON.parse<i32[]>(blackbox("[1,2,3]")));
-});
-
-bench("Stringify String", () => {
-    blackbox<string>(JSON.stringify(blackbox('Hello "World!')));
-});
-
-bench("Parse Number ATOI", () => {
-    blackbox<i32>(__atoi_fast<i32>("12345"));
-})
-
-bench("Parse String", () => {
-    blackbox<string>(JSON.parse<string>(blackbox('"Hello "World!"')));
-});
-/*
-bench("Stringify Boolean Array", () => {
-    blackbox(JSON.stringify<boolean[]>([true, false, true]));
-});
-
-bench("Stringify String Array", () => {
-    blackbox(JSON.stringify<string[]>(["a", "b", "c"]));
-});*/

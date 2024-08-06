@@ -76,7 +76,7 @@ export default class Transformer extends Transform {
         });
         // Loop over every source
         for (const source of sources) {
-            if (source.sourceKind === 1 /* SourceKind.UserEntry */ || source.sourceKind === 0 /* SourceKind.User */)
+            if (source.sourceKind === 1 /* SourceKind.UserEntry */)
                 transformer.visit(source);
         }
     }
