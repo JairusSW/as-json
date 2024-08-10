@@ -67,7 +67,7 @@ const bench = new Bench({ time: 1000 })
     })
 */
   .add("Parse String", () => {
-    data = JSON.parse("[[],[[]],[[],[[]]]]");
+    data = JSON.stringify("hello \"world abc");
   })
   .todo("unimplemented .add");
 

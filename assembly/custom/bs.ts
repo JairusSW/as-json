@@ -93,6 +93,11 @@ export namespace bs {
         POINTER += 16;
         if (MAX_CACHE <= POINTER) bs.shrink();
     }
+    @inline export function write_128_n(chars: v128, n: usize): void {
+        store<v128>(POINTER, chars);
+        POINTER += n;
+        if (MAX_CACHE <= POINTER) bs.shrink();
+    }
     @inline export function write_128_u(chars: v128): void {
         store<v128>(POINTER, chars);
         //POINTER += 16;

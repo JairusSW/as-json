@@ -1,5 +1,8 @@
-import { itoa_fast } from "./custom/itoa";
+import { bs } from "./custom/bs";
+import { serialize_simd } from "./serialize/string";
 
-const out = changetype<usize>(new ArrayBuffer(40));
-itoa_fast(out, 1234567890);
-console.log(String.UTF16.decodeUnsafe(out, 20));
+const out = new ArrayBuffer(1024);
+
+serialize_simd("hello \"world abc", out);
+
+console.log(String.UTF16.decode(out))

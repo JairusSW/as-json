@@ -17,11 +17,8 @@
   "scripts": {
     "test": "ast test && rm -rf ./build/",
     "pretest": "rm -rf ./build/ && ast build",
-    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform --transform ./transform/lib/afaf.js -o ./build/test.wasm --enable simd",
-    "build:bench": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub --enable simd",
-    "build:bench:fast": "asc bench/benchmark.ts -o bench/benchmark.wasm --transform ./transform --transform ./transform/lib/afaf.js --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub --enable simd",
-    "bench:wasmtime": "wasmtime ./bench/benchmark.wasm",
-    "bench:wasmer": "wasmer --llvm ./bench/benchmark.wasm",
+    "bench": "astral --enable simd --runtime stub",
+    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --enable simd",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:wavm": "wavm run ./build/test.wasm",
@@ -30,6 +27,7 @@
     "prettier": "prettier -w ."
   },
   "devDependencies": {
+    "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "@types/node": "^20.14.12",
     "as-bench": "^0.0.0-alpha",
