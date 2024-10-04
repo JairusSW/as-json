@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "0.9.21",
+  "version": "0.9.22",
   "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
   "types": "assembly/index.ts",
   "author": "Jairus Tanaka",
@@ -11,14 +11,15 @@
     "Frankk Taylor",
     "lekiano",
     "Florian Guitton",
-    "Matt Johnson-Pint"
+    "Matt Johnson-Pint",
+    "Tomáš Hromada"
   ],
   "license": "MIT",
   "scripts": {
     "test": "ast test && rm -rf ./build/",
     "pretest": "rm -rf ./build/ && ast build",
     "bench": "astral --enable simd --runtime stub",
-    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --enable simd",
+    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --enable simd --enable relaxed-simd",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
     "test:wavm": "wavm run ./build/test.wasm",

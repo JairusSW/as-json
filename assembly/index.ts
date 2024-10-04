@@ -13,11 +13,10 @@ import { deserializeFloat } from "./deserialize/float";
 import { deserializeObject } from "./deserialize/object";
 import { deserializeMap } from "./deserialize/map";
 import { deserializeDate } from "./deserialize/date";
-import { BRACKET_LEFT, NULL_WORD } from "./custom/chars";
+import { NULL_WORD } from "./custom/chars";
 import { deserializeInteger } from "./deserialize/integer";
 import { deserializeString } from "./deserialize/string";
 import { Sink } from "./custom/sink";
-import { bs } from "./custom/bs";
 import { getArrayDepth } from "./custom/util";
 
 /**
@@ -157,179 +156,6 @@ export namespace JSON {
     @inline static from<T>(value: T): Box<T> {
       return new Box(value);
     }
-    @inline
-    @operator("==")
-    eq(other: this): bool {
-      if (isNullable<T>() && changetype<usize>(this) == <usize>0) {
-        if (changetype<usize>(other) == <usize>0) return true;
-      }
-      return this.value == other.value;
-    }
-
-    @inline
-    @operator("!=")
-    notEq(other: this): bool {
-      if (isNullable<T>() && changetype<usize>(this) == <usize>0) {
-        if (changetype<usize>(this) == changetype<usize>(other)) return true;
-      }
-      return this.value != other.value;
-    }
-
-    @inline
-    @operator(">")
-    gt(other: this): bool {
-      return this._val > other._val;
-    }
-
-    @inline
-    @operator(">=")
-    ge(other: this): bool {
-      return this._val >= other._val;
-    }
-
-    @inline
-    @operator("<")
-    lt(other: this): bool {
-      return this._val < other._val;
-    }
-
-    @inline
-    @operator("<=")
-    le(other: this): bool {
-      return this._val <= other._val;
-    }
-
-    @inline
-    @operator(">>")
-    shr(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val >> other._val);
-    }
-
-    @inline
-    @operator(">>>")
-    shr_u(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val >>> other._val);
-    }
-
-    @inline
-    @operator("<<")
-    shl(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val << other._val);
-    }
-
-    @inline
-    @operator("&")
-    and(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val & other._val);
-    }
-
-    @inline
-    @operator("|")
-    or(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val | other._val);
-    }
-
-    @inline
-    @operator("^")
-    xor(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val ^ other._val);
-    }
-
-    @inline
-    @operator("+")
-    add(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val + other._val);
-    }
-
-    @inline
-    @operator("-")
-    sub(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val - other._val);
-    }
-
-    @inline
-    @operator("*")
-    mul(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val * other._val);
-    }
-
-    @inline
-    @operator("/")
-    div(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val / other._val);
-    }
-
-    @inline
-    @operator("**")
-    pow(other: this): this {
-      // @ts-ignore
-      return instantiate<this>((this._val ** other._val) as T);
-    }
-
-    @inline
-    @operator("%")
-    rem(other: this): this {
-      // @ts-ignore
-      return instantiate<this>(this._val % other._val);
-    }
-
-    @inline
-    @operator.prefix("!")
-    isEmpty(): bool {
-      return !this._val;
-    }
-
-    @inline
-    @operator.prefix("~")
-    not(): this {
-      return instantiate<this>(~this._val);
-    }
-
-    @inline
-    @operator.prefix("+")
-    pos(): this {
-      return instantiate<this>(+this._val);
-    }
-
-    @inline
-    @operator.prefix("-")
-    neg(): this {
-      return instantiate<this>(-this._val);
-    }
-
-    @operator.prefix("++")
-    preInc(): this {
-      // @ts-ignore
-      ++this._val;
-      return this;
-    }
-
-    @operator.prefix("--")
-    preDec(): this {
-      // @ts-ignore
-      --this._val;
-      return this;
-    }
-
-    @operator.postfix("++")
-    postInc(): this {
-      return this.clone().preInc();
-    }
-
-    @operator.postfix("--")
-    postDec(): this {
-      return this.clone().preDec();
-    }
   }
 
   /**
@@ -403,7 +229,7 @@ export namespace JSON {
       return deserializeArray<nonnull<T>>(data);
     }
     let type: nonnull<T> = changetype<nonnull<T>>(0);
-    // @ts-ignore: Defined by trasnform
+    // @ts-ignore: Defined by transform
     if (isDefined(type.__DESERIALIZE)) {
       // @ts-ignore
       return deserializeObject<nonnull<T>>(data.trimStart());

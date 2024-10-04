@@ -41,8 +41,13 @@ function needsEscaping(data: string): bool {
     return v128.any_true(running);
 }
 
+/**
+ * A prototype SIMD implementation for string serialization which can only work in 128-byte (or 16 chars with wtf-16).
+ * 
+ * A faster version could perhaps look like the following:
+ */
 // @ts-ignore: Decorator
-@inline export function serialize_simd(src: string, dst: usize): void {
+@inline export function serialize_simd_v1(src: string, dst: usize): void {
     let src_ptr = changetype<usize>(src);
     let dst_ptr = changetype<usize>(dst) + 2;
 
@@ -58,13 +63,12 @@ function needsEscaping(data: string): bool {
         const concat_indices = v128.or(quote_indices, backslash_indices);
 
         const escape_indices = i16x8.lt_u(currentBlock, i16x8.splat(32));
-    
+
         if (v128.any_true(v128.or(escape_indices, concat_indices))) {
             const mask = i16x8.bitmask(concat_indices);
 
             const anomalies = popcnt(mask);
             const start_index = (clz(mask) & ~1) + 2 // This essentially floors to the nearest even integer
-            //console.log(start_index.toString())
             if (anomalies === 1) {
                 memory.copy(dst_ptr, src_ptr, start_index >> 1);
                 store<u16>(dst_ptr + start_index, 34);
@@ -72,18 +76,69 @@ function needsEscaping(data: string): bool {
             }
 
             if (v128.any_true(escape_indices)) {
-                
+
             }
-            //vis(src_ptr, mask);
             dst_ptr += 16;
             src_ptr += 16;
         } else {
             v128.store(dst_ptr, currentBlock);
-            //vis(src_ptr, 0);
             src_ptr += 16;
             dst_ptr += 16;
         }
     }
+}
+
+const back_slash_reg = i16x8.splat(92); // "\"
+const quote_reg = i16x8.splat(34); // "\""
+
+// @ts-ignore: Decorator
+@inline export function serialize_simd_v2(src: string, dst: usize): void {
+    let src_ptr = changetype<usize>(src);
+    let dst_ptr = changetype<usize>(dst);
+
+    let i = 0;
+    const len = src.length;
+
+    while (i < len) {
+        const block = v128.load16x4_u(src_ptr);
+        console.log("block: " + prt(block));
+        const backslash_mask = i16x8.eq(block, back_slash_reg);
+        const quote_mask = i16x8.eq(block, quote_reg);
+        const is_quote_or_backslash = v128.or(quote_mask, backslash_mask);
+        console.log("mask:  " + prt10(is_quote_or_backslash))
+        
+
+        // store<v128>(dst_ptr, expanded);
+        src_ptr += 8;
+        dst_ptr += 16;
+        i += 8;
+    }
+}
+
+function prt(obj: v128): string {
+    let out = "";
+    out += i16x8.extract_lane_u(obj, 0).toString() + " ";
+    out += i16x8.extract_lane_u(obj, 1).toString() + " ";
+    out += i16x8.extract_lane_u(obj, 2).toString() + " ";
+    out += i16x8.extract_lane_u(obj, 3).toString() + " ";
+    out += i16x8.extract_lane_u(obj, 4).toString() + " ";
+    out += i16x8.extract_lane_u(obj, 5).toString() + " ";
+    out += i16x8.extract_lane_u(obj, 6).toString() + " ";
+    out += i16x8.extract_lane_u(obj, 7).toString();
+    return out;
+}
+
+function prt10(obj: v128): string {
+    let out = "";
+    out += (i16x8.extract_lane_u(obj, 0) ? "1" : "0") + " ";
+    out += (i16x8.extract_lane_u(obj, 1) ? "1" : "0") + " ";
+    out += (i16x8.extract_lane_u(obj, 2) ? "1" : "0") + " ";
+    out += (i16x8.extract_lane_u(obj, 3) ? "1" : "0") + " ";
+    out += (i16x8.extract_lane_u(obj, 4) ? "1" : "0") + " ";
+    out += (i16x8.extract_lane_u(obj, 5) ? "1" : "0") + " ";
+    out += (i16x8.extract_lane_u(obj, 6) ? "1" : "0") + " ";
+    out += i16x8.extract_lane_u(obj, 7) ? "1" : "0";
+    return out;
 }
 
 function vis(src_ptr: usize, mask: i32): void {
@@ -98,6 +153,7 @@ function vis(src_ptr: usize, mask: i32): void {
     console.log(chars);
     console.log(bits);
 }
+
 // @ts-ignore: Decorator
 @inline export function serializeString(data: string): string {
     if (!needsEscaping(data)) {

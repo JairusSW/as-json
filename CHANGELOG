@@ -28,7 +28,7 @@ v0.9.17 - A schema's parent's fields should be included properly
 v0.9.18 - Should be able to use @alias and @omit*** or JSON.Raw
 v0.9.19 - Fix arguments in @omitif declarations not working properly
 v0.9.20 - Strings were being received with quotes attached via the toString functionality. Removed that.
-v0.9.21 - Fix #89
+v0.9.22 - Fix #89
 
 [UNRELEASED] v1.0.0
  - Allow nullable primitives
