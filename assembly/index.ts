@@ -18,6 +18,7 @@ import { deserializeInteger } from "./deserialize/integer";
 import { deserializeString } from "./deserialize/string";
 import { Sink } from "./custom/sink";
 import { bs } from "./custom/bs";
+import { getArrayDepth } from "./custom/util";
 
 /**
  * Offset of the 'storage' property in the JSON.Value class.
