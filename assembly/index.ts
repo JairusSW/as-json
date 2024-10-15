@@ -3,7 +3,7 @@ import { serializeString } from "./serialize/string";
 import { serializeBool } from "./serialize/bool";
 import { serializeInteger } from "./serialize/integer";
 import { serializeFloat } from "./serialize/float";
-import { serializeObject } from "./serialize/object";
+import { serializeObject, serializeObject_Pretty } from "./serialize/object";
 import { serializeDate } from "./serialize/date";
 import { serializeArray } from "./serialize/array";
 import { serializeMap } from "./serialize/map";
@@ -18,6 +18,13 @@ import { deserializeInteger } from "./deserialize/integer";
 import { deserializeString } from "./deserialize/string";
 import { Sink } from "./custom/sink";
 import { getArrayDepth } from "./custom/util";
+
+// Config
+class SerializeOptions {
+  public pretty: bool = false;
+}
+
+const DEFAULT_SERIALIZE_OPTIONS = new SerializeOptions();
 
 /**
  * Offset of the 'storage' property in the JSON.Value class.
@@ -167,7 +174,7 @@ export namespace JSON {
    * @returns string
    */
   // @ts-ignore: Decorator
-  export function stringify<T>(data: T): string {
+  export function stringify<T>(data: T/*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
     if (isBoolean<T>()) {
       return serializeBool(data as bool);
     } else if (isInteger<T>()) {
@@ -184,6 +191,10 @@ export namespace JSON {
       return serializeString(changetype<string>(data));
       // @ts-ignore: Supplied by transform
     } else if (isDefined(data.__SERIALIZE)) {
+      /*if (options.pretty) {
+        // @ts-ignore
+        return serializeObject_Pretty(changetype<nonnull<T>>(data));
+      }*/
       // @ts-ignore
       return serializeObject(changetype<nonnull<T>>(data));
     } else if (data instanceof Date) {

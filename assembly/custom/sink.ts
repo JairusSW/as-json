@@ -16,33 +16,16 @@ export class Sink {
 
   static withCapacity(capacity: i32): Sink {
     const sink = new Sink();
-    sink.buffer = changetype<ArrayBuffer>(
-      __new(
-        max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1),
-        idof<ArrayBuffer>(),
-      ),
-    );
+    sink.buffer = changetype<ArrayBuffer>(__new(max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1), idof<ArrayBuffer>()));
     return sink;
   }
 
-  static fromString(
-    initial: string = "",
-    capacity: i32 = MIN_BUFFER_LEN,
-  ): Sink {
+  static fromString(initial: string = "", capacity: i32 = MIN_BUFFER_LEN): Sink {
     const sink = new Sink();
     const size = (<u32>initial.length) << 1;
-    sink.buffer = changetype<ArrayBuffer>(
-      __new(
-        max<u32>(size, max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1)),
-        idof<ArrayBuffer>(),
-      ),
-    );
+    sink.buffer = changetype<ArrayBuffer>(__new(max<u32>(size, max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1)), idof<ArrayBuffer>()));
     if (size) {
-      memory.copy(
-        changetype<usize>(sink.buffer),
-        changetype<usize>(initial),
-        size,
-      );
+      memory.copy(changetype<usize>(sink.buffer), changetype<usize>(initial), size);
       sink.offset += size;
     }
     return sink;
@@ -53,34 +36,18 @@ export class Sink {
     const size = (<u32>initial.length) << 1;
     sink.buffer = changetype<ArrayBuffer>(__new(size, idof<ArrayBuffer>()));
     if (size) {
-      memory.copy(
-        changetype<usize>(sink.buffer),
-        changetype<usize>(initial),
-        size,
-      );
+      memory.copy(changetype<usize>(sink.buffer), changetype<usize>(initial), size);
       sink.offset += size;
     }
     return sink;
   }
 
-  static fromBuffer(
-    initial: ArrayBuffer,
-    capacity: i32 = MIN_BUFFER_LEN,
-  ): Sink {
+  static fromBuffer(initial: ArrayBuffer, capacity: i32 = MIN_BUFFER_LEN): Sink {
     const sink = new Sink();
     const size = <u32>initial.byteLength;
-    sink.buffer = changetype<ArrayBuffer>(
-      __new(
-        max<u32>(size, max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1)),
-        idof<ArrayBuffer>(),
-      ),
-    );
+    sink.buffer = changetype<ArrayBuffer>(__new(max<u32>(size, max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1)), idof<ArrayBuffer>()));
     if (size) {
-      memory.copy(
-        changetype<usize>(sink.buffer),
-        changetype<usize>(initial),
-        size,
-      );
+      memory.copy(changetype<usize>(sink.buffer), changetype<usize>(initial), size);
       sink.offset = size;
     }
     return sink;
@@ -116,11 +83,7 @@ export class Sink {
     this.ensureCapacity(size);
     let offset = this.offset;
 
-    memory.copy(
-      changetype<usize>(this.buffer) + offset,
-      changetype<usize>(src) + ((<usize>start) << 1),
-      size,
-    );
+    memory.copy(changetype<usize>(this.buffer) + offset, changetype<usize>(src) + ((<usize>start) << 1), size);
     this.offset = offset + size;
     return this;
   }
@@ -140,8 +103,7 @@ export class Sink {
     this.ensureCapacity(size + 2);
     let offset = this.offset;
     let dest = changetype<usize>(this.buffer) + offset;
-    if (size)
-      memory.copy(dest, changetype<usize>(src) + ((<usize>start) << 1), size);
+    if (size) memory.copy(dest, changetype<usize>(src) + ((<usize>start) << 1), size);
     store<u16>(dest + size, NEW_LINE_CHAR);
     this.offset = offset + (size + 2);
     return this;
@@ -209,12 +171,10 @@ export class Sink {
         maxCapacity = 21 << 1;
       }
       this.ensureCapacity(maxCapacity);
-      offset +=
-        itoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
+      offset += itoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
     } else {
       this.ensureCapacity(32 << 1);
-      offset +=
-        dtoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
+      offset += dtoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
     }
     this.offset = offset;
     return this;
@@ -222,11 +182,9 @@ export class Sink {
   writeNumberUnsafe<T extends number>(value: T): Sink {
     let offset = this.offset;
     if (isInteger<T>()) {
-      offset +=
-        itoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
+      offset += itoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
     } else {
-      offset +=
-        dtoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
+      offset += dtoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
     }
     this.offset = offset;
     return this;
@@ -234,11 +192,9 @@ export class Sink {
   writeIntegerUnsafe<T extends number>(value: T): Sink {
     let offset = this.offset;
     if (isInteger<T>()) {
-      offset +=
-        itoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
+      offset += itoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
     } else {
-      offset +=
-        dtoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
+      offset += dtoa_buffered(changetype<usize>(this.buffer) + offset, value) << 1;
     }
     this.offset = offset;
     return this;
@@ -246,21 +202,11 @@ export class Sink {
 
   reserve(capacity: i32, clear: bool = false): void {
     if (clear) this.offset = 0;
-    this.buffer = changetype<ArrayBuffer>(
-      __renew(
-        changetype<usize>(this.buffer),
-        max<u32>(this.offset, max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1)),
-      ),
-    );
+    this.buffer = changetype<ArrayBuffer>(__renew(changetype<usize>(this.buffer), max<u32>(this.offset, max<u32>(MIN_BUFFER_SIZE, (<u32>capacity) << 1))));
   }
 
   shrink(): void {
-    this.buffer = changetype<ArrayBuffer>(
-      __renew(
-        changetype<usize>(this.buffer),
-        max<u32>(this.offset, MIN_BUFFER_SIZE),
-      ),
-    );
+    this.buffer = changetype<ArrayBuffer>(__renew(changetype<usize>(this.buffer), max<u32>(this.offset, MIN_BUFFER_SIZE)));
   }
 
   clear(): void {
@@ -279,9 +225,7 @@ export class Sink {
     let buffer = this.buffer;
     let newSize = this.offset + deltaBytes;
     if (newSize > <u32>buffer.byteLength) {
-      this.buffer = changetype<ArrayBuffer>(
-        __renew(changetype<usize>(buffer), nextPowerOf2(newSize)),
-      );
+      this.buffer = changetype<ArrayBuffer>(__renew(changetype<usize>(buffer), nextPowerOf2(newSize)));
     }
   }
 }

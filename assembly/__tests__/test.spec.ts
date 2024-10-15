@@ -1,14 +1,6 @@
 import { JSON } from "json-as";
 import { describe, expect, run } from "as-test/assembly";
-import {
-  DerivedObject,
-  Null,
-  ObjWithStrangeKey,
-  ObjectWithFloat,
-  OmitIf,
-  Player,
-  Vec3,
-} from "./types";
+import { DerivedObject, Null, ObjWithStrangeKey, ObjectWithFloat, OmitIf, Player, Vec3 } from "./types";
 
 describe("Should serialize class inheritance", () => {
   const obj = new DerivedObject("1", "2");
@@ -25,23 +17,15 @@ describe("Should serialize integer arrays", () => {
 
   expect(JSON.stringify<u64[]>([0, 100, 101])).toBe("[0,100,101]");
 
-  expect(JSON.stringify<i32[]>([0, 100, 101, -100, -101])).toBe(
-    "[0,100,101,-100,-101]",
-  );
+  expect(JSON.stringify<i32[]>([0, 100, 101, -100, -101])).toBe("[0,100,101,-100,-101]");
 
-  expect(JSON.stringify<i64[]>([0, 100, 101, -100, -101])).toBe(
-    "[0,100,101,-100,-101]",
-  );
+  expect(JSON.stringify<i64[]>([0, 100, 101, -100, -101])).toBe("[0,100,101,-100,-101]");
 });
 
 describe("Should serialize float arrays", () => {
-  expect(
-    JSON.stringify<f64[]>([7.23, 10e2, 10e2, 123456e-5, 123456e-5, 0.0, 7.23]),
-  ).toBe("[7.23,1000.0,1000.0,1.23456,1.23456,0.0,7.23]");
+  expect(JSON.stringify<f64[]>([7.23, 10e2, 10e2, 123456e-5, 123456e-5, 0.0, 7.23])).toBe("[7.23,1000.0,1000.0,1.23456,1.23456,0.0,7.23]");
 
-  expect(JSON.stringify<f64[]>([1e21, 1e22, 1e-7, 1e-8, 1e-9])).toBe(
-    "[1e+21,1e+22,1e-7,1e-8,1e-9]",
-  );
+  expect(JSON.stringify<f64[]>([1e21, 1e22, 1e-7, 1e-8, 1e-9])).toBe("[1e+21,1e+22,1e-7,1e-8,1e-9]");
 });
 
 describe("Should serialize boolean arrays", () => {
@@ -51,39 +35,21 @@ describe("Should serialize boolean arrays", () => {
 });
 
 describe("Should serialize string arrays", () => {
-  expect(
-    JSON.stringify<string[]>([
-      'string "with random spa\nces and \nnewlines\n\n\n',
-    ]),
-  ).toBe('["string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"]');
+  expect(JSON.stringify<string[]>(['string "with random spa\nces and \nnewlines\n\n\n'])).toBe('["string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"]');
 });
 
 describe("Should serialize nested integer arrays", () => {
-  expect(JSON.stringify<i64[][]>([[100, 101], [-100, -101], [0]])).toBe(
-    "[[100,101],[-100,-101],[0]]",
-  );
+  expect(JSON.stringify<i64[][]>([[100, 101], [-100, -101], [0]])).toBe("[[100,101],[-100,-101],[0]]");
 });
 
 describe("Should serialize nested float arrays", () => {
-  expect(
-    JSON.stringify<f64[][]>([
-      [7.23],
-      [10e2],
-      [10e2],
-      [123456e-5],
-      [123456e-5],
-      [0.0],
-      [7.23],
-    ]),
-  ).toBe("[[7.23],[1000.0],[1000.0],[1.23456],[1.23456],[0.0],[7.23]]");
+  expect(JSON.stringify<f64[][]>([[7.23], [10e2], [10e2], [123456e-5], [123456e-5], [0.0], [7.23]])).toBe("[[7.23],[1000.0],[1000.0],[1.23456],[1.23456],[0.0],[7.23]]");
 });
 
 describe("Should serialize nested boolean arrays", () => {
   expect(JSON.stringify<bool[][]>([[true], [false]])).toBe("[[true],[false]]");
 
-  expect(JSON.stringify<boolean[][]>([[true], [false]])).toBe(
-    "[[true],[false]]",
-  );
+  expect(JSON.stringify<boolean[][]>([[true], [false]])).toBe("[[true],[false]]");
 });
 
 describe("Should serialize object arrays", () => {
@@ -125,27 +91,19 @@ describe("Should serialize objects", () => {
       },
       isVerified: true,
     }),
-  ).toBe(
-    '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}',
-  );
+  ).toBe('{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}');
 
   expect(JSON.stringify<ObjectWithFloat>({ f: 7.23 })).toBe('{"f":7.23}');
 
-  expect(JSON.stringify<ObjectWithFloat>({ f: 0.000001 })).toBe(
-    '{"f":0.000001}',
-  );
+  expect(JSON.stringify<ObjectWithFloat>({ f: 0.000001 })).toBe('{"f":0.000001}');
 
   expect(JSON.stringify<ObjectWithFloat>({ f: 1e-7 })).toBe('{"f":1e-7}');
 
-  expect(JSON.stringify<ObjectWithFloat>({ f: 1e20 })).toBe(
-    '{"f":100000000000000000000.0}',
-  );
+  expect(JSON.stringify<ObjectWithFloat>({ f: 1e20 })).toBe('{"f":100000000000000000000.0}');
 
   expect(JSON.stringify<ObjectWithFloat>({ f: 1e21 })).toBe('{"f":1e+21}');
 
-  expect(JSON.stringify<ObjWithStrangeKey<string>>({ data: "foo" })).toBe(
-    '{"a\\\\\\t\\"\\u0002b`c":"foo"}',
-  );
+  expect(JSON.stringify<ObjWithStrangeKey<string>>({ data: "foo" })).toBe('{"a\\\\\\t\\"\\u0002b`c":"foo"}');
 });
 
 describe("Should serialize @omit'ed objects", () => {
@@ -169,83 +127,39 @@ describe("Should deserialize nulls", () => {
 });
 
 describe("Should deserialize integer arrays", () => {
-  expect(JSON.stringify(JSON.parse<u32[]>("[0,100,101]"))).toBe(
-    JSON.stringify([0, 100, 101]),
-  );
+  expect(JSON.stringify(JSON.parse<u32[]>("[0,100,101]"))).toBe(JSON.stringify([0, 100, 101]));
 
-  expect(JSON.stringify(JSON.parse<i32[]>("[0,100,101,-100,-101]"))).toBe(
-    JSON.stringify([0, 100, 101, -100, -101]),
-  );
+  expect(JSON.stringify(JSON.parse<i32[]>("[0,100,101,-100,-101]"))).toBe(JSON.stringify([0, 100, 101, -100, -101]));
 });
 
 describe("Should deserialize float arrays", () => {
-  expect(
-    JSON.stringify(
-      JSON.parse<f64[]>("[7.23,1000.0,1000.0,1.23456,1.23456,0.0,7.23]"),
-    ),
-  ).toBe(JSON.stringify([7.23, 1000.0, 1000.0, 1.23456, 1.23456, 0.0, 7.23]));
+  expect(JSON.stringify(JSON.parse<f64[]>("[7.23,1000.0,1000.0,1.23456,1.23456,0.0,7.23]"))).toBe(JSON.stringify([7.23, 1000.0, 1000.0, 1.23456, 1.23456, 0.0, 7.23]));
 
-  expect(
-    JSON.stringify(JSON.parse<f64[]>("[1e+21,1e+22,1e-7,1e-8,1e-9]")),
-  ).toBe(JSON.stringify([1e21, 1e22, 1e-7, 1e-8, 1e-9]));
+  expect(JSON.stringify(JSON.parse<f64[]>("[1e+21,1e+22,1e-7,1e-8,1e-9]"))).toBe(JSON.stringify([1e21, 1e22, 1e-7, 1e-8, 1e-9]));
 });
 
 describe("Should deserialize boolean arrays", () => {
-  expect(JSON.stringify(JSON.parse<boolean[]>("[true,false]"))).toBe(
-    JSON.stringify([true, false]),
-  );
+  expect(JSON.stringify(JSON.parse<boolean[]>("[true,false]"))).toBe(JSON.stringify([true, false]));
 });
 
 describe("Should deserialize string arrays", () => {
-  expect(
-    JSON.stringify(
-      JSON.parse<string[]>(
-        '["string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"]',
-      ),
-    ),
-  ).toBe(JSON.stringify(['string "with random spa\nces and \nnewlines\n\n\n']));
+  expect(JSON.stringify(JSON.parse<string[]>('["string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"]'))).toBe(JSON.stringify(['string "with random spa\nces and \nnewlines\n\n\n']));
 });
 
 describe("Should deserialize nested integer arrays", () => {
-  expect(
-    JSON.stringify(JSON.parse<i64[][]>("[[100,101],[-100,-101],[0]]")),
-  ).toBe(JSON.stringify([[100, 101], [-100, -101], [0]]));
+  expect(JSON.stringify(JSON.parse<i64[][]>("[[100,101],[-100,-101],[0]]"))).toBe(JSON.stringify([[100, 101], [-100, -101], [0]]));
 });
 
 describe("Should deserialize nested float arrays", () => {
-  expect(
-    JSON.stringify(
-      JSON.parse<f64[][]>(
-        "[[7.23],[1000.0],[1000.0],[1.23456],[1.23456],[0.0],[7.23]]",
-      ),
-    ),
-  ).toBe(
-    JSON.stringify([
-      [7.23],
-      [1000.0],
-      [1000.0],
-      [1.23456],
-      [1.23456],
-      [0.0],
-      [7.23],
-    ]),
-  );
+  expect(JSON.stringify(JSON.parse<f64[][]>("[[7.23],[1000.0],[1000.0],[1.23456],[1.23456],[0.0],[7.23]]"))).toBe(JSON.stringify([[7.23], [1000.0], [1000.0], [1.23456], [1.23456], [0.0], [7.23]]));
 });
 
 describe("Should deserialize nested boolean arrays", () => {
-  expect(JSON.stringify(JSON.parse<boolean[][]>("[[true],[false]]"))).toBe(
-    JSON.stringify([[true], [false]]),
-  );
+  expect(JSON.stringify(JSON.parse<boolean[][]>("[[true],[false]]"))).toBe(JSON.stringify([[true], [false]]));
 });
 
 describe("Should deserialize object arrays", () => {
-  expect(
-    JSON.stringify(
-      JSON.parse<Vec3[]>(
-        '[{"x":3.4,"y":1.2,"z":8.3},{"x":3.4,"y":-2.1,"z":9.3}]',
-      ),
-    ),
-  ).toBe(
+  expect(JSON.stringify(JSON.parse<Vec3[]>('[{"x":3.4,"y":1.2,"z":8.3},{"x":3.4,"y":-2.1,"z":9.3}]'))).toBe(
     JSON.stringify(<Vec3[]>[
       { x: 3.4, y: 1.2, z: 8.3 },
       { x: 3.4, y: -2.1, z: 9.3 },
@@ -254,17 +168,9 @@ describe("Should deserialize object arrays", () => {
 });
 
 describe("Should deserialize Objects", () => {
-  expect(JSON.stringify(JSON.parse<Vec3>('{"x":3.4,"y":1.2,"z":8.3}'))).toBe(
-    JSON.stringify(<Vec3>{ x: 3.4, y: 1.2, z: 8.3 }),
-  );
+  expect(JSON.stringify(JSON.parse<Vec3>('{"x":3.4,"y":1.2,"z":8.3}'))).toBe(JSON.stringify(<Vec3>{ x: 3.4, y: 1.2, z: 8.3 }));
 
-  expect(
-    JSON.stringify(
-      JSON.parse<Player>(
-        '{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}',
-      ),
-    ),
-  ).toBe(
+  expect(JSON.stringify(JSON.parse<Player>('{"firstName":"Emmet","lastName":"West","lastActive":[8,27,2022],"age":23,"pos":{"x":3.4,"y":1.2,"z":8.3},"isVerified":true}'))).toBe(
     JSON.stringify(<Player>{
       firstName: "Emmet",
       lastName: "West",
@@ -275,19 +181,11 @@ describe("Should deserialize Objects", () => {
     }),
   );
 
-  expect(JSON.stringify(JSON.parse<ObjectWithFloat>('{"f":7.23}'))).toBe(
-    JSON.stringify(<ObjectWithFloat>{ f: 7.23 }),
-  );
+  expect(JSON.stringify(JSON.parse<ObjectWithFloat>('{"f":7.23}'))).toBe(JSON.stringify(<ObjectWithFloat>{ f: 7.23 }));
 
-  expect(JSON.stringify(JSON.parse<ObjectWithFloat>('{"f":0.000001}'))).toBe(
-    JSON.stringify(<ObjectWithFloat>{ f: 0.000001 }),
-  );
+  expect(JSON.stringify(JSON.parse<ObjectWithFloat>('{"f":0.000001}'))).toBe(JSON.stringify(<ObjectWithFloat>{ f: 0.000001 }));
 
-  expect(
-    JSON.stringify(
-      JSON.parse<ObjWithStrangeKey<string>>('{"a\\\\\\t\\"\\u0002b`c":"foo"}'),
-    ),
-  ).toBe(JSON.stringify(<ObjWithStrangeKey<string>>{ data: "foo" }));
+  expect(JSON.stringify(JSON.parse<ObjWithStrangeKey<string>>('{"a\\\\\\t\\"\\u0002b`c":"foo"}'))).toBe(JSON.stringify(<ObjWithStrangeKey<string>>{ data: "foo" }));
 });
 
 run({

@@ -116,7 +116,7 @@ You can also add it to your `asconfig.json`
     "transform": ["json-as/transform"]
   }
 }
-````
+```
 
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
