@@ -1,9 +1,10 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, DeclarationStatement, NamedTypeNode } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, DeclarationStatement, NamedTypeNode, NodeKind, typesToRefs, Type, TypeKind, TypeFlags, Resolver } from "assemblyscript/dist/assemblyscript.js";
 
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import chalk from "chalk";
+import { Program } from "types:assemblyscript/src/program";
 
 const json_types = ["Array", "string", "String", "u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f32", "f64", "bool", "boolean", "Map", "Date"];
 
@@ -327,12 +328,12 @@ class JSONTransform extends BaseVisitor {
 
 export default class Transformer extends Transform {
   // Trigger the transform after parse.
-  afterParse(parser: Parser): void {
+  afterInitialize(program: Program): void | Promise<void> {
     // Create new transform
     const transformer = new JSONTransform();
 
     // Sort the sources so that user scripts are visited last
-    const sources = parser.sources
+    const sources = program.sources
       .filter((source) => !isStdlib(source))
       .sort((_a, _b) => {
         const a = _a.internalPath;
@@ -353,14 +354,13 @@ export default class Transformer extends Transform {
         transformer.visit(source);
       }
     }
+
+    const resolver = new Resolver(program);
     // Check that every parent and child class is hooked up correctly
     const schemas = transformer.schemasList;
     for (const schema of schemas) {
       checkInheritance(schema, schemas);
-      const invalidType = checkTypeCorrectness(schema, schemas);
-      if (invalidType) {
-        logError(`Type ${invalidType.type} implemented in property ${invalidType.path} is not a JSON-compatible type!\nEither decorate it with @omit or fix it!`);
-      }
+      checkTypeCorrectness(schema, schemas, resolver);
     }
   }
 }
@@ -375,44 +375,44 @@ function checkInheritance(schema: SchemaData, schemas: SchemaData[]): void {
 
 function checkTypeCorrectness(
   schema: SchemaData,
-  schemas: SchemaData[]
-): {
-  type: string;
-  path: string;
-} | null {
-  const parent = schemas.find((v) => v.name === schema.parent?.name);
-  const generic_types = [...(schema?.node.typeParameters?.map<string>((v) => v.name.text) || []), ...(parent?.node.typeParameters?.map<string>((v) => v.name.text) || [])];
-  const member_types = [...(schema.members.map((v) => (<NamedTypeNode>v.node.type).name.identifier.text) || [])];
-  const scopeTypes = new Set<string>([...json_types, ...generic_types, ...member_types]);
+  schemas: SchemaData[],
+  resolver: Resolver,
+  validTypes: Set<string> | null = null
+): void {
+  if (!validTypes) {
+    const parent = schemas.find((v) => v.name === schema.parent?.name);
+    const generic_types = [
+      ...(schema?.node.typeParameters?.map<string>((v) => v.name.text) || []),
+      ...(parent?.node.typeParameters?.map<string>((v) => v.name.text) || [])
+    ];
 
-  for (const typ of member_types) {
-    if (typ === "JSON") continue; // JSON.Raw, JSON.Box, JSON.Any, ect...
-    if (json_types.includes(typ)) continue;
-    if (generic_types.includes(typ)) continue;
-    const check = schemas.find((v) => v.name == typ);
-    if (!check) logError(`Type ${typ} is not a JSON compatible type or does not include the @json flag!`);
+    validTypes = new Set<string>([...json_types, ...generic_types].filter(v => v !== "JSON"));
   }
 
   for (const member of schema.members) {
-    const invalidType = checkType(schema, schemas, member.node.type as NamedTypeNode, member, scopeTypes, schema.name);
-    if (invalidType) logError(`Type ${invalidType.type} in ${invalidType.path} does not implement a JSON compatible type!\n${chalk.dim(`  at ${member.node.range.source.normalizedPath.replace("~lib/", "./node_modules/")}`)}`);
+    const type = member.node.type as NamedTypeNode;
+    const typeName = toString(type);
+    if (!validTypes.has(typeName)) {
+      if (isPrimitive(type) && type.isNullable) {
+        logError(`Type ${toString(type)} is not supported by the AssemblyScript language!`);
+      }
+      if (!validTypes.has(toString(type)))
+        console.log(resolver.resolveTypeName());
+      console.log(type)
+      return
+    }
   }
-
-  return null;
 }
 
 function checkType(
   schema: SchemaData,
   schemas: SchemaData[],
-  typ: NamedTypeNode,
-  member: Property,
-  scopeTypes: Set<string>,
-  path: string,
+  property: Property,
 ): {
   type: string;
   path: string;
 } | null {
-  path += "." + member.name;
+  path += "." + property.name;
   if (schemas.find(v => v.node.name.text === typ.name.identifier.text)) scopeTypes.add(typ.name.identifier.text);
   if (!scopeTypes.has(typ.name.identifier.text)) return { type: toString(typ), path };
 
@@ -420,7 +420,7 @@ function checkType(
 
   if (typ.typeArguments?.length && typ.typeArguments?.length > 0) {
     for (const ty of typ.typeArguments.filter((v) => v instanceof NamedTypeNode)) {
-      const check = checkType(schema, schemas, ty, member, scopeTypes, path);
+      const check = checkType(schema, schemas, ty, property, scopeTypes, path);
       if (check) return { type: toString(typ), path };
     }
   } else {
