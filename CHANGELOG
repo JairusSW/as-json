@@ -30,6 +30,7 @@ v0.9.19 - Fix arguments in @omitif declarations not working properly
 v0.9.20 - Strings were being received with quotes attached via the toString functionality. Removed that.
 v0.9.22 - Fix #89 and #93. Several bug fixes some severe such as ",null" being prepended when using @omit. Properly warn when a schema has fields that are not compatible with json
 v0.9.23 - Comment out SIMD-related code for now
+v9.9.24 - Remove transform changes from previous release
 
 [UNRELEASED] v1.0.0
  - Allow nullable primitives
