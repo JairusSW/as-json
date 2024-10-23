@@ -1,90 +1,119 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, DeclarationStatement, NamedTypeNode, NodeKind, typesToRefs, Type, TypeKind, TypeFlags, Resolver } from "assemblyscript/dist/assemblyscript.js";
+import {
+  ClassDeclaration,
+  FieldDeclaration,
+  IdentifierExpression,
+  Parser,
+  Source,
+  NodeKind,
+  Expression,
+  CommonFlags,
+  StringLiteralExpression,
+  IntegerLiteralExpression,
+  FloatLiteralExpression,
+  NullExpression,
+  TrueExpression,
+  FalseExpression,
+} from "assemblyscript/dist/assemblyscript.js";
 
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
-import chalk from "chalk";
-import { Program } from "types:assemblyscript/src/program";
-
-const json_types = ["Array", "string", "String", "u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f32", "f64", "bool", "boolean", "Map", "Date"];
 
 class JSONTransform extends BaseVisitor {
-  public types = json_types;
   public schemasList: SchemaData[] = [];
   public currentClass!: SchemaData;
   public sources = new Set<Source>();
 
-  appendParentFields(node: ClassDeclaration, schema: SchemaData, members: DeclarationStatement[]): void {
-    if (node.extendsType) {
-      if (schema.parent?.members) {
-        for (let i = schema.parent.members.length - 1; i >= 0; i--) {
-          const replace = schema.members.find((v) => v.name == schema.parent?.members[i]?.name);
-          if (!replace) {
-            members.unshift(schema.parent?.members[i]!.node);
-          }
-        }
-        this.appendParentFields(schema.parent.node, schema, members);
-      }
-    }
-  }
-
-  handleEmptyClass(node: ClassDeclaration, schema: SchemaData, members: DeclarationStatement[]): void {
-    let SERIALIZE_RAW_EMPTY = '__SERIALIZE(): string {\n  return "{}";\n}';
-    let SERIALIZE_PRETTY_EMPTY = '__SERIALIZE_PRETTY(): string {\n  return "{}";\n}';
-
-    let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
-
-    let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
-
-    if (process.env["JSON_DEBUG"]) {
-      console.log(SERIALIZE_RAW_EMPTY);
-      console.log(SERIALIZE_PRETTY_EMPTY);
-      console.log(INITIALIZE_EMPTY);
-      console.log(DESERIALIZE_EMPTY);
-    }
-
-    const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
-    const SERIALIZE_PRETTY_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_PRETTY_EMPTY, node);
-    const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
-    const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
-
-    if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
-    if (!node.members.find((v) => v.name.text == "__SERIALIZE_PRETTY")) node.members.push(SERIALIZE_PRETTY_METHOD_EMPTY);
-    if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD_EMPTY);
-    if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD_EMPTY);
-  }
-  filterMembers(members: DeclarationStatement[]): FieldDeclaration[] {
-    return members.filter((v) => v instanceof FieldDeclaration && !v.decorators?.find((v) => (<IdentifierExpression>v.name).text == "omit")) as FieldDeclaration[];
-  }
+  visitMethodDeclaration(): void { }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
-    if (!node.decorators.find((v) => (<IdentifierExpression>v.name).text == "json" || (<IdentifierExpression>v.name).text == "serializable")) return;
-    this.types = json_types;
+
+    let found = false;
+    for (const decorator of node.decorators) {
+      const name = (<IdentifierExpression>decorator.name).text;
+      if (name === "json" || name === "serializable") {
+        found = true;
+        break;
+      }
+    }
+    if (!found) return;
 
     const schema = new SchemaData();
     schema.node = node;
     schema.name = node.name.text;
 
+    const members = [
+      ...node.members.filter((v) => v.kind === NodeKind.FieldDeclaration),
+    ];
+
     if (node.extendsType) {
-      schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text) as SchemaData | null;
+      schema.parent = this.schemasList.find(
+        (v) => v.name == node.extendsType?.name.identifier.text,
+      ) as SchemaData | null;
+
+      if (schema.parent?.members) {
+        for (let i = schema.parent.members.length - 1; i >= 0; i--) {
+          const replace = schema.members.find(
+            (v) => v.name == schema.parent?.members[i]?.name,
+          );
+          if (!replace) {
+            members.unshift(schema.parent?.members[i]!.node);
+          }
+        }
+      }
     }
 
-    const _members = [...node.members];
-
-    this.appendParentFields(node, schema, _members);
-
-    const members = this.filterMembers(_members);
-
     if (!members.length) {
-      this.handleEmptyClass(node, schema, members);
+      let SERIALIZE_RAW_EMPTY = '__SERIALIZE(): string {\n  return "{}";\n}';
+      //let SERIALIZE_PRETTY_EMPTY = "__SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
+
+      let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
+
+      let DESERIALIZE_EMPTY =
+        "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
+
+      if (process.env["JSON_DEBUG"]) {
+        console.log(SERIALIZE_RAW_EMPTY);
+        //console.log(SERIALIZE_PRETTY_EMPTY);
+        console.log(INITIALIZE_EMPTY);
+        console.log(DESERIALIZE_EMPTY);
+      }
+
+      const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(
+        SERIALIZE_RAW_EMPTY,
+        node,
+      );
+      //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
+      const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(
+        INITIALIZE_EMPTY,
+        node,
+      );
+      const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(
+        DESERIALIZE_EMPTY,
+        node,
+      );
+
+      if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
+        node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
+      if (!node.members.find((v) => v.name.text == "__INITIALIZE"))
+        node.members.push(INITIALIZE_METHOD_EMPTY);
+      if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
+        node.members.push(DESERIALIZE_METHOD_EMPTY);
+
+      this.schemasList.push(schema);
     }
 
     for (const member of members) {
       const name = member.name;
+      if (!(member instanceof FieldDeclaration)) continue;
       if (!member.type) {
-        throw new Error("Fields must be strongly typed! Found " + toString(member) + " at " + node.range.source.normalizedPath);
+        throw new Error(
+          "Fields must be strongly typed! Found " +
+          toString(member) +
+          " at " +
+          node.range.source.normalizedPath,
+        );
       }
-
       const type = toString(member.type!);
       if (type.startsWith("(") && type.includes("=>")) continue;
       const value = member.initializer ? toString(member.initializer!) : null;
@@ -115,7 +144,11 @@ class JSONTransform extends BaseVisitor {
 
           switch (decoratorName) {
             case "alias": {
-              if (!args.length) throw new Error("Expected 1 argument but got zero at @alias in " + node.range.source.normalizedPath);
+              if (!args.length)
+                throw new Error(
+                  "Expected 1 argument but got zero at @alias in " +
+                  node.range.source.normalizedPath,
+                );
               mem.alias = args[0]!;
               mem.flags.set(PropertyFlags.Alias, args);
               break;
@@ -125,7 +158,11 @@ class JSONTransform extends BaseVisitor {
               break;
             }
             case "omitif": {
-              if (!decorator.args?.length) throw new Error("Expected 1 argument but got zero at @omitif in " + node.range.source.normalizedPath);
+              if (!decorator.args?.length)
+                throw new Error(
+                  "Expected 1 argument but got zero at @omitif in " +
+                  node.range.source.normalizedPath,
+                );
               mem.flags.set(PropertyFlags.OmitIf, args);
               break;
             }
@@ -137,10 +174,23 @@ class JSONTransform extends BaseVisitor {
         }
       }
 
-      if (!mem.flags.get(PropertyFlags.Omit)) mem.generate();
+      mem.generate();
 
       if (this.schemasList.find((v) => v.name == type)) {
-        mem.initialize = "this." + name.text + " = changetype<nonnull<" + mem.type + ">>(__new(offsetof<nonnull<" + mem.type + ">>(), idof<nonnull<" + mem.type + ">>()));\n  changetype<nonnull<" + mem.type + ">>(this." + name.text + ").__INITIALIZE()";
+        mem.initialize =
+          "this." +
+          name.text +
+          " = changetype<nonnull<" +
+          mem.type +
+          ">>(__new(offsetof<nonnull<" +
+          mem.type +
+          ">>(), idof<nonnull<" +
+          mem.type +
+          ">>()));\n  changetype<nonnull<" +
+          mem.type +
+          ">>(this." +
+          name.text +
+          ").__INITIALIZE()";
       } else if (mem.value) {
         mem.initialize = "this." + name.text + " = " + mem.value;
       } else if (type === "Map") {
@@ -148,12 +198,22 @@ class JSONTransform extends BaseVisitor {
       } else if (type === "string") {
         mem.initialize = "this." + name.text + ' = ""';
       } else if (type === "Array") {
-        mem.initialize = "this." + name.text + " = instantiate<" + mem.type + ">()";
+        mem.initialize =
+          "this." + name.text + " = instantiate<" + mem.type + ">()";
       } else if (type === "bool" || type === "boolean") {
         mem.initialize = "this." + name.text + " = false";
       } else if (type === "JSON.Raw") {
         mem.initialize = "this." + name.text + ' = ""';
-      } else if (type === "u8" || type === "u16" || type === "u32" || type === "u64" || type === "i8" || type === "i16" || type === "i32" || type === "i64") {
+      } else if (
+        type === "u8" ||
+        type === "u16" ||
+        type === "u32" ||
+        type === "u64" ||
+        type === "i8" ||
+        type === "i16" ||
+        type === "i32" ||
+        type === "i64"
+      ) {
         mem.initialize = "this." + name.text + " = 0";
       } else if (type === "f32" || type === "f64") {
         mem.initialize = "this." + name.text + " = 0.0";
@@ -167,41 +227,50 @@ class JSONTransform extends BaseVisitor {
 
     let INITIALIZE = "__INITIALIZE(): this {\n";
 
-    let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
+    let DESERIALIZE =
+      "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
     let indent = "  ";
 
     if (!schema.members.length) return;
 
-    let found = false;
+    found = false;
 
-    if (schema.members[0]?.flags.has(PropertyFlags.OmitNull) || schema.members[0]?.flags.has(PropertyFlags.OmitIf)) {
+    if (
+      schema.members[0]?.flags.has(PropertyFlags.OmitNull) ||
+      schema.members[0]?.flags.has(PropertyFlags.OmitIf)
+    ) {
       SERIALIZE_RAW += schema.members[0]?.serialize;
-      SERIALIZE_PRETTY += "\\n" + indent + schema.members[0]?.serialize_pretty;
+      SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize;
     } else {
       SERIALIZE_RAW += schema.members[0]?.serialize + ",";
-      SERIALIZE_PRETTY += "\\n" + indent + schema.members[0]?.serialize_pretty + ",\\n";
+      SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize + ",\\n";
       found = true;
     }
 
-    if (schema.members[0]?.initialize) INITIALIZE += "  " + schema.members[0]?.initialize + ";\n";
+    if (schema.members[0]?.initialize)
+      INITIALIZE += "  " + schema.members[0]?.initialize + ";\n";
 
     for (let i = 1; i < schema.members.length; i++) {
       const member = schema.members[i]!;
       if (member.initialize) INITIALIZE += "  " + member.initialize + ";\n";
-      if (member.flags.has(PropertyFlags.Omit)) continue;
-      if (member.flags.has(PropertyFlags.OmitNull) || member.flags.has(PropertyFlags.OmitIf)) {
+      if (
+        member.flags.has(PropertyFlags.OmitNull) ||
+        member.flags.has(PropertyFlags.OmitIf)
+      ) {
         SERIALIZE_RAW += member.serialize;
-        SERIALIZE_PRETTY += member.serialize_pretty;
+        SERIALIZE_PRETTY += member.serialize;
       } else {
         SERIALIZE_RAW += member.serialize + ",";
-        SERIALIZE_PRETTY += indent + member.serialize_pretty + ",\\n";
+        SERIALIZE_PRETTY += indent + member.serialize + ",\\n";
         found = true;
       }
     }
 
     if (found) {
-      SERIALIZE_RAW += "`;\n  store<u16>(changetype<usize>(out) + ((out.length - 1) << 1), 125);\n  return out;\n}";
-      SERIALIZE_PRETTY += "`;\n  store<u32>(changetype<usize>(out) + ((out.length - 2) << 1), 8192010);\n  return out;\n}";
+      SERIALIZE_RAW +=
+        "`;\n  store<u16>(changetype<usize>(out) + ((out.length - 1) << 1), 125);\n  return out;\n}";
+      SERIALIZE_PRETTY +=
+        "`;\n  store<u32>(changetype<usize>(out) + ((out.length - 2) << 1), 8192010);\n  return out;\n}";
     } else {
       SERIALIZE_RAW += "}`;\n  return out;\n}";
       SERIALIZE_PRETTY += "}`;\n  return out;\n}";
@@ -210,7 +279,9 @@ class JSONTransform extends BaseVisitor {
     INITIALIZE += "  return this;\n}";
 
     const sortedMembers: Property[][] = [];
-    const _sorted = schema.members.sort((a, b) => (a.alias?.length! || a.name.length) - (b.alias?.length! || b.name.length));
+    const _sorted = schema.members.sort(
+      (a, b) => (a.alias?.length! || a.name.length) - (b.alias?.length! || b.name.length),
+    );
     let len = -1;
     let offset = -1;
     for (let i = 0; i < _sorted.length; i++) {
@@ -231,24 +302,30 @@ class JSONTransform extends BaseVisitor {
       const _name = encodeKey(firstMember.alias || firstMember.name);
       if (_name.length === 1) {
         if (first) {
-          DESERIALIZE += "  if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE +=
+            "  if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
           first = false;
         } else {
-          DESERIALIZE += "else if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE +=
+            "else if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
         }
       } else if (_name.length === 2) {
         if (first) {
-          DESERIALIZE += "  if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE +=
+            "  if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
           first = false;
         } else {
-          DESERIALIZE += "else if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
+          DESERIALIZE +=
+            "else if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
         }
       } else if (_name.length === 4) {
         if (first) {
-          DESERIALIZE += "  if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
+          DESERIALIZE +=
+            "  if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
           first = false;
         } else {
-          DESERIALIZE += "else if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
+          DESERIALIZE +=
+            "else if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
         }
       } else {
         if (first) {
@@ -272,23 +349,31 @@ class JSONTransform extends BaseVisitor {
             f = false;
             DESERIALIZE += `    if (${charCodeAt64(_name, 0)} === code) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
           } else {
-            DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + `else if (${charCodeAt64(_name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+            DESERIALIZE =
+              DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
+              `else if (${charCodeAt64(_name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
           }
         } else {
           if (f) {
             f = false;
             DESERIALIZE += `    if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
           } else {
-            DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
+            DESERIALIZE =
+              DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
+              ` else if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
           }
         }
       }
       if (_name.length < 3) {
         DESERIALIZE += `      default: {\n        return false;\n      }\n    }\n`;
       } else if (_name.length == 4) {
-        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`;
+        DESERIALIZE =
+          DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
+          ` else {\n      return false;\n    }\n`;
       } else {
-        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`;
+        DESERIALIZE =
+          DESERIALIZE.slice(0, DESERIALIZE.length - 1) +
+          ` else {\n      return false;\n    }\n`;
       }
       DESERIALIZE += "  } ";
     }
@@ -299,20 +384,25 @@ class JSONTransform extends BaseVisitor {
 
     if (process.env["JSON_DEBUG"]) {
       console.log(SERIALIZE_RAW);
-      console.log(SERIALIZE_PRETTY);
+      //console.log(SERIALIZE_PRETTY);
       console.log(INITIALIZE);
       console.log(DESERIALIZE);
     }
 
-    const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
-    const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
+    const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(
+      SERIALIZE_RAW,
+      node,
+    );
+    //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
     const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
 
-    if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD);
-    if (!node.members.find((v) => v.name.text == "__SERIALIZE_PRETTY")) node.members.push(SERIALIZE_PRETTY_METHOD);
-    if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
-    if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
+    if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
+      node.members.push(SERIALIZE_RAW_METHOD);
+    if (!node.members.find((v) => v.name.text == "__INITIALIZE"))
+      node.members.push(INITIALIZE_METHOD);
+    if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
+      node.members.push(DESERIALIZE_METHOD);
 
     this.schemasList.push(schema);
   }
@@ -328,23 +418,23 @@ class JSONTransform extends BaseVisitor {
 
 export default class Transformer extends Transform {
   // Trigger the transform after parse.
-  afterInitialize(program: Program): void | Promise<void> {
+  afterParse(parser: Parser): void {
     // Create new transform
     const transformer = new JSONTransform();
 
     // Sort the sources so that user scripts are visited last
-    const sources = program.sources
+    const sources = parser.sources
       .filter((source) => !isStdlib(source))
       .sort((_a, _b) => {
         const a = _a.internalPath;
         const b = _b.internalPath;
-        if (a[0] !== "~" && b[0] === "~") {
-          return 1;
-        }
         if (a[0] === "~" && b[0] !== "~") {
           return -1;
+        } else if (a[0] !== "~" && b[0] === "~") {
+          return 1;
+        } else {
+          return 0;
         }
-        return 0;
       });
 
     // Loop over every source
@@ -354,85 +444,18 @@ export default class Transformer extends Transform {
         transformer.visit(source);
       }
     }
-
-    const resolver = new Resolver(program);
     // Check that every parent and child class is hooked up correctly
     const schemas = transformer.schemasList;
     for (const schema of schemas) {
-      checkInheritance(schema, schemas);
-      checkTypeCorrectness(schema, schemas, resolver);
-    }
-  }
-}
-
-function checkInheritance(schema: SchemaData, schemas: SchemaData[]): void {
-  if (!schema.parent && schema.node.extendsType) {
-    if (schemas.find(v => v.node.name.text === schema.node.extendsType?.name.identifier.text!)) return;
-    const extending = toString(schema.node.extendsType);
-    logError(`Schema ${schema.name} extends ${extending}, but ${extending} does not include the @json decorator!`);
-  }
-}
-
-function checkTypeCorrectness(
-  schema: SchemaData,
-  schemas: SchemaData[],
-  resolver: Resolver,
-  validTypes: Set<string> | null = null
-): void {
-  if (!validTypes) {
-    const parent = schemas.find((v) => v.name === schema.parent?.name);
-    const generic_types = [
-      ...(schema?.node.typeParameters?.map<string>((v) => v.name.text) || []),
-      ...(parent?.node.typeParameters?.map<string>((v) => v.name.text) || [])
-    ];
-
-    validTypes = new Set<string>([...json_types, ...generic_types].filter(v => v !== "JSON"));
-  }
-
-  for (const member of schema.members) {
-    const type = member.node.type as NamedTypeNode;
-    const typeName = toString(type);
-    if (!validTypes.has(typeName)) {
-      if (isPrimitive(type) && type.isNullable) {
-        logError(`Type ${toString(type)} is not supported by the AssemblyScript language!`);
+      if (schema.parent) {
+        const parent = schemas.find((v) => v.name === schema.parent?.name);
+        if (!parent)
+          throw new Error(
+            `Class ${schema.name} extends its parent class ${schema.parent}, but ${schema.parent} does not include a @json or @serializable decorator! Add the decorator and rebuild.`,
+          );
       }
-      if (!validTypes.has(toString(type)))
-        console.log(resolver.resolveTypeName());
-      console.log(type)
-      return
     }
   }
-}
-
-function checkType(
-  schema: SchemaData,
-  schemas: SchemaData[],
-  property: Property,
-): {
-  type: string;
-  path: string;
-} | null {
-  path += "." + property.name;
-  if (schemas.find(v => v.node.name.text === typ.name.identifier.text)) scopeTypes.add(typ.name.identifier.text);
-  if (!scopeTypes.has(typ.name.identifier.text)) return { type: toString(typ), path };
-
-  if (typ.isNullable && isPrimitive(typ)) return { type: toString(typ), path };
-
-  if (typ.typeArguments?.length && typ.typeArguments?.length > 0) {
-    for (const ty of typ.typeArguments.filter((v) => v instanceof NamedTypeNode)) {
-      const check = checkType(schema, schemas, ty, property, scopeTypes, path);
-      if (check) return { type: toString(typ), path };
-    }
-  } else {
-    if (scopeTypes.has(typ.name.identifier.text)) return null;
-  }
-
-  return null;
-}
-
-function logError(message: string): never {
-  console.log("\n" + chalk.bold.bgRed(" Error ") + chalk.dim(":") + " " + message + "\n");
-  process.exit(1);
 }
 
 enum PropertyFlags {
@@ -449,10 +472,12 @@ class Property {
   public alias: string | null = null;
   public type: string = "";
   public value: string | null = null;
-  public flags: Map<PropertyFlags, string[]> = new Map<PropertyFlags, string[]>();
+  public flags: Map<PropertyFlags, string[]> = new Map<
+    PropertyFlags,
+    string[]
+  >();
 
   public serialize: string | null = null;
-  public serialize_pretty: string | null = null;
   public deserialize: string | null = null;
   public initialize: string | null = null;
 
@@ -469,7 +494,7 @@ class Property {
 
     if (this.flags.has(PropertyFlags.JSON_Raw)) {
       if (this.flags.has(PropertyFlags.Null)) {
-        this.right_s = "(this." + name + ' || "null")';
+        this.right_s = "(this." + name + " || \"null\")";
         this.right_d = "value_start === value_end - 4 && 30399761348886638 === load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
       } else {
         this.right_s = "this." + name;
@@ -477,22 +502,38 @@ class Property {
       }
     } else {
       this.right_s = "__SERIALIZE<" + type + ">(this." + name + ")";
-      this.right_d = "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end))";
+      this.right_d =
+        "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end))";
     }
 
     if (this.flags.has(PropertyFlags.OmitIf)) {
       const condition = this.flags.get(PropertyFlags.OmitIf)![0];
-      if (!condition) throw new Error("Could not find condition when using decorator @omitif! Provide at least one condition");
-      this.serialize = "${" + condition + ' ? "" : \'' + escapedName + ":' + " + this.right_s + ' + ","}';
-      this.serialize_pretty = "${" + condition + ' ? "" : \'' + escapedName + ": ' + " + this.right_s + ' + ","}';
+      if (!condition)
+        throw new Error(
+          "Could not find condition when using decorator @omitif! Provide at least one condition",
+        );
+      this.serialize =
+        "${" +
+        condition +
+        ' ? "" : \'' +
+        escapedName +
+        ":' + " +
+        this.right_s +
+        ' + ","}';
       this.deserialize = "this." + name + " = " + this.right_d + ";";
     } else if (this.flags.has(PropertyFlags.OmitNull)) {
-      this.serialize = "${changetype<usize>(this." + name + ") == <usize>0" + ' ? "" : \'' + escapedName + ":' + " + this.right_s + ' + ","}';
-      this.serialize_pretty = "${changetype<usize>(this." + name + ") == <usize>0" + ' ? "" : \'' + escapedName + ": ' + " + this.right_s + ' + ","}';
+      this.serialize =
+        "${changetype<usize>(this." +
+        name +
+        ") == <usize>0" +
+        ' ? "" : \'' +
+        escapedName +
+        ":' + " +
+        this.right_s +
+        ' + ","}';
       this.deserialize = "this." + name + " = " + this.right_d + ";";
     } else {
       this.serialize = escapedName + ":${" + this.right_s + "}";
-      this.serialize_pretty = escapedName + ": ${" + this.right_s + "}";
       this.deserialize = "this." + name + " = " + this.right_d + ";";
     }
   }
@@ -511,7 +552,9 @@ function charCodeAt32(data: string, offset: number): number {
 
 function charCodeAt64(data: string, offset: number): bigint {
   if (offset + 3 >= data.length) {
-    throw new Error("The string must have at least 4 characters from the specified offset.");
+    throw new Error(
+      "The string must have at least 4 characters from the specified offset.",
+    );
   }
 
   const firstCharCode = BigInt(data.charCodeAt(offset));
@@ -519,7 +562,11 @@ function charCodeAt64(data: string, offset: number): bigint {
   const thirdCharCode = BigInt(data.charCodeAt(offset + 2));
   const fourthCharCode = BigInt(data.charCodeAt(offset + 3));
 
-  const u64Value = (fourthCharCode << 48n) | (thirdCharCode << 32n) | (secondCharCode << 16n) | firstCharCode;
+  const u64Value =
+    (fourthCharCode << 48n) |
+    (thirdCharCode << 32n) |
+    (secondCharCode << 16n) |
+    firstCharCode;
 
   return u64Value;
 }
@@ -562,10 +609,4 @@ function getArgs(args: Expression[] | null): string[] {
     }
   }
   return out;
-}
-
-function isPrimitive(type: NamedTypeNode): boolean {
-  const primitives = new Set(["u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f32", "f64", "bool", "boolean"]);
-
-  return primitives.has(type.name.identifier.text);
 }

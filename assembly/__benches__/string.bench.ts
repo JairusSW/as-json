@@ -1,8 +1,3 @@
-import { bs } from "../custom/bs";
-import { serializeBool, serializeBool_BS } from "../serialize/bool";
-import { serialize_simd_v1, serializeString, serializeString_BS } from "../serialize/string";
-
-const out = memory.data(65536);
 
 bench("UTF-16 to UTF-8", () => {
   blackbox<ArrayBuffer>(String.UTF8.encode(blackbox<string>("hello world")));

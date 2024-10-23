@@ -1,14 +1,3 @@
-import {
-    BACK_SLASH,
-    BACKSPACE,
-    CARRIAGE_RETURN,
-    FORM_FEED,
-    NEW_LINE,
-    QUOTE,
-    TAB
-} from "../custom/chars";
-import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
-import { bs } from "../custom/bs";
 import { _intTo16, intTo16, unsafeCharCodeAt } from "../custom/util";
 import { Sink } from "../custom/sink";
 
