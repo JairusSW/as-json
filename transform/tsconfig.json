@@ -1,30 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "downlevelIteration": true,
-    "outDir": "./lib/",
-
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noPropertyAccessFromIndexSignature": true,
-
-    "moduleResolution": "node",
-    "esModuleInterop": false,
-
-    "skipLibCheck": false,
-    "forceConsistentCasingInFileNames": true
+    "target": "ES2022",
+    "module": "ES2020",
+    "moduleResolution": "Node",
+    "removeComments": true,
+    "outDir": "./lib",
+    "sourceMap": true
   }
 }

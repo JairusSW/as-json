@@ -24,7 +24,7 @@ class JSONTransform extends BaseVisitor {
         schema.node = node;
         schema.name = node.name.text;
         const members = [
-            ...node.members.filter((v) => v.kind === 54 /* NodeKind.FieldDeclaration */),
+            ...node.members.filter((v) => v.kind === 54),
         ];
         if (node.extendsType) {
             schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text);
@@ -39,17 +39,14 @@ class JSONTransform extends BaseVisitor {
         }
         if (!members.length) {
             let SERIALIZE_RAW_EMPTY = '__SERIALIZE(): string {\n  return "{}";\n}';
-            //let SERIALIZE_PRETTY_EMPTY = "__SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
             let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
             let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
             if (process.env["JSON_DEBUG"]) {
                 console.log(SERIALIZE_RAW_EMPTY);
-                //console.log(SERIALIZE_PRETTY_EMPTY);
                 console.log(INITIALIZE_EMPTY);
                 console.log(DESERIALIZE_EMPTY);
             }
             const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
-            //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
             const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
             const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
             if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
@@ -74,11 +71,11 @@ class JSONTransform extends BaseVisitor {
             if (type.startsWith("(") && type.includes("=>"))
                 continue;
             const value = member.initializer ? toString(member.initializer) : null;
-            if (member.flags == 32 /* CommonFlags.Static */)
+            if (member.flags == 32)
                 continue;
-            if (member.flags === 512 /* CommonFlags.Private */)
+            if (member.flags === 512)
                 continue;
-            if (member.flags === 1024 /* CommonFlags.Protected */)
+            if (member.flags === 1024)
                 continue;
             const mem = new Property();
             mem.name = name.text;
@@ -122,7 +119,7 @@ class JSONTransform extends BaseVisitor {
                     }
                 }
             }
-            mem.generate();
+            mem.generate(false);
             if (this.schemasList.find((v) => v.name == type)) {
                 mem.initialize =
                     "this." +
@@ -332,39 +329,36 @@ class JSONTransform extends BaseVisitor {
             DESERIALIZE += "  } ";
         }
         DESERIALIZE += "\n  return false;\n}";
-        //console.log(sortedMembers);
         if (process.env["JSON_DEBUG"]) {
             console.log(SERIALIZE_RAW);
-            //console.log(SERIALIZE_PRETTY);
             console.log(INITIALIZE);
             console.log(DESERIALIZE);
         }
         const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
-        //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
+        const DESERIALIZE_SAFE = DESERIALIZE.replaceAll("__DESERIALIZE", "__DESERIALIZE_SAFE");
         const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
         const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
+        const DESERIALIZE_SAFE_METHOD = SimpleParser.parseClassMember(DESERIALIZE_SAFE, node);
         if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
             node.members.push(SERIALIZE_RAW_METHOD);
         if (!node.members.find((v) => v.name.text == "__INITIALIZE"))
             node.members.push(INITIALIZE_METHOD);
         if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
             node.members.push(DESERIALIZE_METHOD);
+        if (!node.members.find((v) => v.name.text == "__DESERIALIZE_SAFE"))
+            node.members.push(DESERIALIZE_SAFE_METHOD);
         this.schemasList.push(schema);
     }
     visitSource(node) {
         super.visitSource(node);
-        // Only add the import statement to sources that have JSON decorated classes.
         if (!this.sources.has(node)) {
             return;
         }
     }
 }
 export default class Transformer extends Transform {
-    // Trigger the transform after parse.
     afterParse(parser) {
-        // Create new transform
         const transformer = new JSONTransform();
-        // Sort the sources so that user scripts are visited last
         const sources = parser.sources
             .filter((source) => !isStdlib(source))
             .sort((_a, _b) => {
@@ -380,14 +374,11 @@ export default class Transformer extends Transform {
                 return 0;
             }
         });
-        // Loop over every source
         for (const source of sources) {
-            // Ignore all lib and std. Visit everything else.
             if (!isStdlib(source)) {
                 transformer.visit(source);
             }
         }
-        // Check that every parent and child class is hooked up correctly
         const schemas = transformer.schemasList;
         for (const schema of schemas) {
             if (schema.parent) {
@@ -419,7 +410,7 @@ class Property {
     node;
     right_s = "";
     right_d = "";
-    generate() {
+    generate(safe) {
         const name = this.name;
         const escapedName = escapeString(JSON.stringify(this.alias || this.name));
         const type = this.type;
@@ -438,7 +429,7 @@ class Property {
         else {
             this.right_s = "__SERIALIZE<" + type + ">(this." + name + ")";
             this.right_d =
-                "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end))";
+                (safe ? "__DESERIALIZE_SAFE" : "__DESERIALIZE") + "<" + type + ">(data.substring(value_start, value_end))";
         }
         if (this.flags.has(PropertyFlags.OmitIf)) {
             const condition = this.flags.get(PropertyFlags.OmitIf)[0];
@@ -537,3 +528,4 @@ function getArgs(args) {
     }
     return out;
 }
+//# sourceMappingURL=index.js.map

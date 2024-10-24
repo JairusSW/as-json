@@ -1,6 +1,7 @@
 import { isSpace } from "util/string";
-import { BACK_SLASH, QUOTE } from "./chars";
+import { BACK_SLASH, BRACE_LEFT, BRACKET_LEFT, CHAR_F, CHAR_T, QUOTE } from "./chars";
 import { Sink } from "./sink";
+import { JSON } from "..";
 
 // @ts-ignore: Decorator
 export function isMap<T>(): bool {
@@ -9,12 +10,12 @@ export function isMap<T>(): bool {
 }
 
 // @ts-ignore: Decorator
-export function unsafeCharCodeAt(data: string, pos: i32): i32 {
+@inline export function unsafeCharCodeAt(data: string, pos: i32): i32 {
   return load<u16>(changetype<usize>(data) + ((<usize>pos) << 1));
 }
 
 // @ts-ignore: Decorator
-export function removeWhitespace(data: string): string {
+@inline export function removeWhitespace(data: string): string {
   const result = new Sink();
   let instr = false;
   for (let i = 0; i < data.length; i++) {
@@ -35,7 +36,7 @@ export function removeWhitespace(data: string): string {
 }
 
 // @ts-ignore: Decorator
-export function escapeChar(char: string): string {
+@inline export function escapeChar(char: string): string {
   switch (unsafeCharCodeAt(char, 0)) {
     case 0x22:
       return '\\"';
@@ -93,7 +94,7 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
  * @param str - Any number. Can include scientific notation.
 */
 // @ts-ignore: Decorator
-export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u32 = 0): T {
+@inline export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u32 = 0): T {
   if (isSigned<T>()) {
     const firstChar: u32 = load<u16>(changetype<usize>(str));
     if (firstChar === 48) return 0 as T;
@@ -258,7 +259,7 @@ export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u
  */
 
 // @ts-ignore
-export function __atoi_fast<T extends number>(str: string, start: u32 = 0, end: u32 = 0): T {
+@inline export function __atoi_fast<T extends number>(str: string, start: u32 = 0, end: u32 = 0): T {
   // @ts-ignore
   let val: T = 0;
   if (!end) end = start + u32(str.length << 1);
@@ -293,7 +294,7 @@ export function __atoi_fast<T extends number>(str: string, start: u32 = 0, end: 
  */
 
 // @ts-ignore
-export function parseSciInteger<T extends number>(str: string): T {
+@inline export function parseSciInteger<T extends number>(str: string): T {
   // @ts-ignore
   let val: T = 0;
   let offset = 0;
@@ -328,7 +329,7 @@ export function parseSciInteger<T extends number>(str: string): T {
 }
 
 // @ts-ignore
-function sciNote<T extends number>(num: T): T {
+@inline function sciNote<T extends number>(num: T): T {
   let res = 1;
   // @ts-ignore
   if (num > 0) {
@@ -345,7 +346,7 @@ function sciNote<T extends number>(num: T): T {
 }
 
 // @ts-ignore
-function equalsSlice(p1_data: string, p1_start: i32, p1_end: i32, p2_data: string, p2_start: i32, p2_end: i32): boolean {
+@inline function equalsSlice(p1_data: string, p1_start: i32, p1_end: i32, p2_data: string, p2_start: i32, p2_end: i32): boolean {
   const p1_len = p1_end - p1_start;
   const p2_len = p2_end - p2_start;
   if (p1_len != p2_len) return false;
@@ -356,14 +357,15 @@ function equalsSlice(p1_data: string, p1_start: i32, p1_end: i32, p2_data: strin
 }
 
 // @ts-ignore
-export function containsCodePoint(str: string, code: u32, start: i32, end: i32): bool {
+@inline export function containsCodePoint(str: string, code: u32, start: i32, end: i32): bool {
   for (let i = start; i <= end; i++) {
     if (unsafeCharCodeAt(str, i) == code) return true;
   }
   return false;
 }
 
-export function _intTo16(int: i32): i32 {
+// @ts-ignore: Decorator
+@inline export function _intTo16(int: i32): i32 {
   if (int < 10) {
     // 0-10
     return 48 + int;
@@ -373,6 +375,7 @@ export function _intTo16(int: i32): i32 {
   }
 }
 
+// @ts-ignore: Decorator
 @inline export function intTo16(int: i32): i32 {
   const high = int >> 4;
   const low = int & 0x0F;
