@@ -32,6 +32,8 @@ v0.9.22 - Fix #89 and #93. Several bug fixes some severe such as ",null" being p
 v0.9.23 - Comment out SIMD-related code for now
 v0.9.24 - Remove transform changes from previous release
 v0.9.25 - Implement JSON.parseSafe
+v0.9.26 - Remove unnecessary dependencies
+
 [UNRELEASED] v1.0.0
  - Allow nullable primitives
  - Port over JSON.Value
