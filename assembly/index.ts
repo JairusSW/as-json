@@ -7,15 +7,15 @@ import { serializeObject, serializeObject_Pretty } from "./serialize/object";
 import { serializeDate } from "./serialize/date";
 import { serializeArray } from "./serialize/array";
 import { serializeMap } from "./serialize/map";
-import { deserializeBoolean } from "./deserialize/bool";
-import { deserializeArray } from "./deserialize/array";
+import { deserializeBoolean, deserializeBoolean_Safe } from "./deserialize/bool";
+import { deserializeArray, deserializeArray_Safe } from "./deserialize/array";
 import { deserializeFloat } from "./deserialize/float";
-import { deserializeObject } from "./deserialize/object";
-import { deserializeMap } from "./deserialize/map";
+import { deserializeObject, deserializeObject_Safe } from "./deserialize/object";
+import { deserializeMap, deserializeMap_Safe } from "./deserialize/map";
 import { deserializeDate } from "./deserialize/date";
-import { NULL_WORD } from "./custom/chars";
-import { deserializeInteger } from "./deserialize/integer";
-import { deserializeString } from "./deserialize/string";
+import { BRACE_LEFT, BRACKET_LEFT, CHAR_F, CHAR_N, CHAR_T, NULL_WORD, QUOTE } from "./custom/chars";
+import { deserializeInteger, deserializeInteger_Safe } from "./deserialize/integer";
+import { deserializeString, deserializeString_Safe } from "./deserialize/string";
 import { Sink } from "./custom/sink";
 import { getArrayDepth } from "./custom/util";
 
@@ -174,7 +174,7 @@ export namespace JSON {
    * @returns string
    */
   // @ts-ignore: Decorator
-  export function stringify<T>(data: T/*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
+  @inline export function stringify<T>(data: T/*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
     if (isBoolean<T>()) {
       return serializeBool(data as bool);
     } else if (isInteger<T>()) {
@@ -222,7 +222,7 @@ export namespace JSON {
    */
 
   // @ts-ignore: Decorator
-  export function parse<T>(data: string): T {
+  @inline export function parse<T>(data: string): T {
     if (isBoolean<T>()) {
       return deserializeBoolean(data) as T;
     } else if (isInteger<T>()) {
@@ -256,14 +256,62 @@ export namespace JSON {
       );
     }
   }
+  /**
+   * Parses valid JSON strings into their original format (safely).
+   * ```js
+   * JSON.parseSafe<T>(data)
+   * ```
+   * @param data string
+   * @returns T
+   */
+
+  // @ts-ignore: Decorator
+  @inline export function parseSafe<T>(data: string): T {
+    if (isBoolean<T>()) {
+      return deserializeBoolean_Safe(data) as T;
+    } else if (isInteger<T>()) {
+      return deserializeInteger_Safe<T>(data);
+    } else if (isFloat<T>()) {
+      return deserializeFloat<T>(data);
+    } else if (isNullable<T>() && data.length === 4 && data == "null") {
+      // @ts-ignore
+      return null;
+    } else if (isString<T>()) {
+      // @ts-ignore
+      return deserializeString_Safe(data);
+    } else if (isArray<T>()) {
+      // @ts-ignore
+      return deserializeArray_Safe<nonnull<T>>(data);
+    }
+    let type: nonnull<T> = changetype<nonnull<T>>(0);
+    // @ts-ignore: Defined by transform
+    if (isDefined(type.__DESERIALIZE)) {
+      // @ts-ignore
+      return deserializeObject_Safe<nonnull<T>>(data.trimStart());
+    } else if (type instanceof Map) {
+      // @ts-ignore
+      return deserializeMap_Safe<nonnull<T>>(data.trimStart());
+    } else if (type instanceof Date) {
+      // @ts-ignore
+      return deserializeDate_Safe(data);
+    } else {
+      throw new Error(
+        `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
+      );
+    }
+  }
 }
 
 // This allows JSON.stringify and JSON.parse to be available globally through an alias
 // @ts-ignore: Decorator
-@global function __SERIALIZE<T>(data: T): string {
+@global @inline function __SERIALIZE<T>(data: T): string {
   return JSON.stringify(data);
 }
 // @ts-ignore: Decorator
-@global function __DESERIALIZE<T>(data: string): T {
+@global @inline function __DESERIALIZE<T>(data: string): T {
   return JSON.parse<T>(data);
+}
+// @ts-ignore: Decorator
+@global @inline function __DESERIALIZE_SAFE<T>(data: string): T {
+  return JSON.parseSafe<T>(data);
 }

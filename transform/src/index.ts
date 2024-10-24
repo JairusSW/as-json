@@ -174,7 +174,7 @@ class JSONTransform extends BaseVisitor {
         }
       }
 
-      mem.generate();
+      mem.generate(false);
 
       if (this.schemasList.find((v) => v.name == type)) {
         mem.initialize =
@@ -393,9 +393,12 @@ class JSONTransform extends BaseVisitor {
       SERIALIZE_RAW,
       node,
     );
+    
+    const DESERIALIZE_SAFE = DESERIALIZE.replaceAll("__DESERIALIZE", "__DESERIALIZE_SAFE")
     //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
     const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
+    const DESERIALIZE_SAFE_METHOD = SimpleParser.parseClassMember(DESERIALIZE_SAFE, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
       node.members.push(SERIALIZE_RAW_METHOD);
@@ -403,6 +406,8 @@ class JSONTransform extends BaseVisitor {
       node.members.push(INITIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
       node.members.push(DESERIALIZE_METHOD);
+    if (!node.members.find((v) => v.name.text == "__DESERIALIZE_SAFE"))
+      node.members.push(DESERIALIZE_SAFE_METHOD);
 
     this.schemasList.push(schema);
   }
@@ -486,7 +491,7 @@ class Property {
   private right_s: string = "";
   private right_d: string = "";
 
-  public generate(): void {
+  public generate(safe: boolean): void {
     const name = this.name;
     const escapedName = escapeString(JSON.stringify(this.alias || this.name));
     const type = this.type;
@@ -503,7 +508,7 @@ class Property {
     } else {
       this.right_s = "__SERIALIZE<" + type + ">(this." + name + ")";
       this.right_d =
-        "__DESERIALIZE<" + type + ">(data.substring(value_start, value_end))";
+        (safe ? "__DESERIALIZE_SAFE" : "__DESERIALIZE") + "<" + type + ">(data.substring(value_start, value_end))";
     }
 
     if (this.flags.has(PropertyFlags.OmitIf)) {

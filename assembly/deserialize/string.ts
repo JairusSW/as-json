@@ -155,3 +155,10 @@ import { unsafeCharCodeAt } from "../custom/util";
 //         result.write(data, last, end);
 //     }
 // }
+
+// @ts-ignore: Decorator valid here
+@inline export function deserializeString_Safe(data: string, start: i32 = 0, end: i32 = 0): string {
+    const firstChar = load<u8>(changetype<usize>(data));
+    if (firstChar != QUOTE) throw new Error("Mismatched Types! Expected string but got \""+data.slice(0, 100)+"\" instead!");
+    return deserializeString(data, start, end);
+}
