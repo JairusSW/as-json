@@ -4,6 +4,20 @@ const SPLAT_92 = i16x8.splat(92);
 
 /**
  * Prototype SSE2 implementation
+ * Example: he\llo w"orld
+ * 1. Write " to output
+ * 2. Load a i16x8 block
+ * 3. Check for chars that need to be escaped
+ * 4. If there are chars to be escaped
+ *  a. Copy block to output
+ *  b. Write "\" (92)
+ *  c. Write the rest of the block
+ *  d. Repeat
+ * 5. If src.byte_length is not a multiple of 8
+ *  a. Iterate char-by-char
+ *  b. Check if it needs to be escaped
+ *  c. Escape char
+ * 6. Append " to output
  * @param src 
  * @param dst 
  */
@@ -28,17 +42,14 @@ const SPLAT_92 = i16x8.splat(92);
 
         if (v128.any_true(char_indices)) {
             let mask = i16x8.bitmask(char_indices);
-            let anomalies = popcnt(mask);
             let lane_index = ctz(mask) << 1;
 
             v128.store(dst_ptr, v128.load(src_ptr));
-            while (anomalies > 0) {
-                // vis(src_ptr, mask);
+            while (mask != 0) {
                 const dst_offset = dst_ptr + lane_index;
                 store<u16>(dst_offset, 92);
                 v128.store(dst_offset, v128.load(src_ptr + lane_index), 2);
                 mask &= mask - 1;
-                anomalies--;
                 lane_index = ctz(mask) << 1;
                 dst_ptr += 2;
             }

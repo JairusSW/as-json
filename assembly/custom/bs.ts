@@ -1,7 +1,7 @@
 import { dtoa_buffered, itoa_buffered } from "util/number";
 import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
 // @ts-ignore
-@inline const MAX_LEN: usize = 65536;
+@inline const MAX_LEN: usize = 1024;
 const STORE: usize[] = [];
 let STORE_LEN: usize = 0;
 const CACHE = memory.data(i32(MAX_LEN));
