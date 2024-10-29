@@ -1,4 +1,4 @@
-import { JSON } from "..";
+import { JSON } from "../..";
 import {
     COMMA,
     COMMA_WORD,
@@ -6,8 +6,8 @@ import {
     BRACKET_LEFT_WORD,
     BRACKET_RIGHT,
     BRACKET_RIGHT_WORD
-} from "../custom/chars";
-import { Sink } from "../custom/sink";
+} from "../../custom/chars";
+import { Sink } from "../../custom/sink";
 import { serializeString } from "./string";
 
 // @ts-ignore: Decorator valid here

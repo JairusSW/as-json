@@ -1,5 +1,5 @@
-import { _intTo16, intTo16, unsafeCharCodeAt } from "../custom/util";
-import { Sink } from "../custom/sink";
+import { _intTo16, intTo16, unsafeCharCodeAt } from "../../custom/util";
+import { Sink } from "../../custom/sink";
 
 // function needsEscaping(data: string): bool {
 //     let len = data.length;

@@ -1,5 +1,5 @@
 import { Virtual } from "as-virtual/assembly";
-import { containsCodePoint, unsafeCharCodeAt } from "../custom/util";
+import { containsCodePoint, unsafeCharCodeAt } from "../../custom/util";
 import {
     CHAR_A,
     BACK_SLASH,
@@ -18,9 +18,9 @@ import {
     CHAR_S,
     CHAR_T,
     CHAR_U
-} from "../custom/chars";
+} from "../../custom/chars";
 import { deserializeBoolean } from "./bool";
-import { JSON } from "..";
+import { JSON } from "../..";
 import { deserializeString } from "./string";
 import { isSpace } from "util/string";
 import { deserializeInteger } from "./integer";

@@ -1,21 +1,21 @@
 /// <reference path="./index.d.ts" />
-import { serializeString } from "./serialize/string";
-import { serializeBool } from "./serialize/bool";
-import { serializeInteger } from "./serialize/integer";
-import { serializeFloat } from "./serialize/float";
-import { serializeObject, serializeObject_Pretty } from "./serialize/object";
-import { serializeDate } from "./serialize/date";
-import { serializeArray } from "./serialize/array";
-import { serializeMap } from "./serialize/map";
-import { deserializeBoolean, deserializeBoolean_Safe } from "./deserialize/bool";
-import { deserializeArray, deserializeArray_Safe } from "./deserialize/array";
-import { deserializeFloat } from "./deserialize/float";
-import { deserializeObject, deserializeObject_Safe } from "./deserialize/object";
-import { deserializeMap, deserializeMap_Safe } from "./deserialize/map";
-import { deserializeDate } from "./deserialize/date";
+import { serializeString } from "./serialize/simple/string";
+import { serializeBool } from "./serialize/simple/bool";
+import { serializeInteger } from "./serialize/simple/integer";
+import { serializeFloat } from "./serialize/simple/float";
+import { serializeObject } from "./serialize/simple/object";
+import { serializeDate } from "./serialize/simple/date";
+import { serializeArray } from "./serialize/simple/array";
+import { serializeMap } from "./serialize/simple/map";
+import { deserializeBoolean, deserializeBoolean_Safe } from "./deserialize/simple/bool";
+import { deserializeArray, deserializeArray_Safe } from "./deserialize/simple/array";
+import { deserializeFloat } from "./deserialize/simple/float";
+import { deserializeObject, deserializeObject_Safe } from "./deserialize/simple/object";
+import { deserializeMap, deserializeMap_Safe } from "./deserialize/simple/map";
+import { deserializeDate } from "./deserialize/simple/date";
 import { BRACE_LEFT, BRACKET_LEFT, CHAR_F, CHAR_N, CHAR_T, NULL_WORD, QUOTE } from "./custom/chars";
-import { deserializeInteger, deserializeInteger_Safe } from "./deserialize/integer";
-import { deserializeString, deserializeString_Safe } from "./deserialize/string";
+import { deserializeInteger, deserializeInteger_Safe } from "./deserialize/simple/integer";
+import { deserializeString, deserializeString_Safe } from "./deserialize/simple/string";
 import { Sink } from "./custom/sink";
 import { getArrayDepth } from "./custom/util";
 

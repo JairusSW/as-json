@@ -13,9 +13,9 @@ import {
     CHAR_T,
     TAB,
     CHAR_U
-} from "../custom/chars";
-import { Sink } from "../custom/sink";
-import { unsafeCharCodeAt } from "../custom/util";
+} from "../../custom/chars";
+import { Sink } from "../../custom/sink";
+import { unsafeCharCodeAt } from "../../custom/util";
 
 // @ts-ignore: Decorator valid here
 @inline export function deserializeString(data: string, start: i32 = 0, end: i32 = 0): string {

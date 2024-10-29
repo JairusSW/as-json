@@ -1,4 +1,4 @@
-import { QUOTE } from "../custom/chars";
+import { QUOTE } from "../../custom/chars";
 
 // @ts-ignore: Decorator valid here
 @inline export function deserializeDate(dateTimeString: string): Date {
