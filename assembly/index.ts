@@ -173,8 +173,7 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  // @ts-ignore: Decorator
-  @inline export function stringify<T>(data: T/*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
+  export function stringify<T>(data: T/*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
     if (isBoolean<T>()) {
       return serializeBool(data as bool);
     } else if (isInteger<T>()) {
@@ -220,9 +219,7 @@ export namespace JSON {
    * @param data string
    * @returns T
    */
-
-  // @ts-ignore: Decorator
-  @inline export function parse<T>(data: string): T {
+  export function parse<T>(data: string): T {
     if (isBoolean<T>()) {
       return deserializeBoolean(data) as T;
     } else if (isInteger<T>()) {
@@ -264,9 +261,7 @@ export namespace JSON {
    * @param data string
    * @returns T
    */
-
-  // @ts-ignore: Decorator
-  @inline export function parseSafe<T>(data: string): T {
+  export function parseSafe<T>(data: string): T {
     if (isBoolean<T>()) {
       return deserializeBoolean_Safe(data) as T;
     } else if (isInteger<T>()) {

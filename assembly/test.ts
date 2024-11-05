@@ -1,5 +1,5 @@
 import { JSON } from "."
-import { serialize_simd_v1 } from "./serialize/simd/string";
+import { serializeString_SIMD } from "./serialize/simd/string";
 
 @json
 class Vec3 {
@@ -29,7 +29,7 @@ class Vec3 {
 //   // ^ this is not okay
 // }
 const out = new ArrayBuffer(128);
-const len = serialize_simd_v1("h\\ell\"o wor\"ld", changetype<usize>(out));
+const len = serializeString_SIMD("h\\ell\"o wor\"ld", changetype<usize>(out));
 const serialized = String.UTF16.decodeUnsafe(changetype<usize>(out), out.byteLength);
 console.log("Serialized: " + serialized);
 // const deserialized = JSON.parseSafe<Vec3>(`{"x":1,"y":true,"z":3}`);

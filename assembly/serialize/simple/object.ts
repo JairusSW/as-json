@@ -1,5 +1,6 @@
 interface GeneratedInterface {
     __SERIALIZE(): string;
+    __SERIALIZE_PRETTY(): string;
 }
 
 // @ts-ignore: Decorator valid here
