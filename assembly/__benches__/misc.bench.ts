@@ -4,16 +4,17 @@ import { serializeString } from "../serialize/simple/string";
 import { serializeString_BS } from "../serialize/bs/string";
 import { bs } from "../custom/bs";
 
-// bench("Serialize String (Simple)", () => {
-//     blackbox<string>(serializeString("h\\ello w"));
-// });
+const str = "hello wo"
+bench("Serialize String (Simple)", () => {
+    serializeString(str);
+});
 
 // bench("Serialize String (BS)", () => {
 //     serializeString_BS("h\\ello w");
 //     bs.reset();
 // });
 
-const out = new ArrayBuffer(22);
+const out = new ArrayBuffer(16);
 bench("Serialize String (SIMD)", () => {
-    blackbox<usize>(serializeString_SIMD("hello wo", changetype<usize>(out)));
+    serializeString_SIMD(str, changetype<usize>(out));
 });
