@@ -1,6 +1,8 @@
 import { JSON } from "."
 import { serializeString_SIMD } from "./serialize/simd/string";
-
+const a = memory.data<u16>([
+  92, 117, 48, 48
+])
 @json
 class Vec3 {
   public x: i32 = 0;
@@ -29,8 +31,9 @@ class Vec3 {
 //   // ^ this is not okay
 // }
 const out = new ArrayBuffer(128);
-const len = serializeString_SIMD("h\\e\tllo wor\"ld", changetype<usize>(out));
+const len = serializeString_SIMD("h\ne\tllo wor\"ld", changetype<usize>(out));
 const serialized = String.UTF16.decodeUnsafe(changetype<usize>(out), out.byteLength);
 console.log("Serialized: " + serialized);
+console.log(load<u64>(a).toString())
 // const deserialized = JSON.parseSafe<Vec3>(`{"x":1,"y":true,"z":3}`);
 // console.log("Deserialized: " + JSON.stringify(deserialized));
