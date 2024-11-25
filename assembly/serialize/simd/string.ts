@@ -34,9 +34,10 @@ const SPLAT_92 = i16x8.splat(92); /* \ */
 const SPLAT_32 = i16x8.splat(32); /* [ESC] */
 
 /**
- * SSE2 implementation
- * @param src 
- * @param dst 
+ * Serializes strings into their JSON counterparts using SIMD operations
+ * @param src string to serialize
+ * @param dst buffer to write to
+ * @returns number of bytes written
  */
 // @ts-ignore: Decorator
 @inline export function serializeString_SIMD(src: string, dst: usize): usize {
@@ -53,43 +54,49 @@ const SPLAT_32 = i16x8.splat(32); /* [ESC] */
 
         const backslash_indices = i16x8.eq(block, SPLAT_92);
         const quote_indices = i16x8.eq(block, SPLAT_34);
-        const char_indices = v128.or(quote_indices, backslash_indices);
-
         const escape_indices = i16x8.lt_u(block, SPLAT_32);
-        const sieve = v128.or(char_indices, escape_indices);
+        const sieve = v128.or(v128.or(backslash_indices, quote_indices), escape_indices);
 
         v128.store(dst_ptr, block);
 
-        if (v128.any_true(sieve)) {
-            let sieve_mask = i16x8.bitmask(sieve);
-            do {
-                const lane_index = ctz(sieve_mask) << 1;
-                const dst_offset = dst_ptr + lane_index;
-                const src_offset = src_ptr + lane_index;
-                const table_index = load<u16>(src_offset) << 2;
-                const escaped = load<u32>(ESCAPE_TABLE + table_index);
+        let mask = i16x8.bitmask(sieve);
+
+        while (mask != 0) {
+            const lane_index = ctz(mask) << 1;
+            const dst_offset = dst_ptr + lane_index;
+            const src_offset = src_ptr + lane_index;
+            const code = load<u16>(src_offset) << 2;
+            const escaped = load<u32>(ESCAPE_TABLE + code);
+            if (escaped < 6684764) {
+                store<u64>(dst_offset, 13511005048209500);
+                store<u32>(dst_offset, escaped, 8);
+                v128.store(dst_offset, v128.load(src_offset, 2), 12);
+                mask &= mask - 1;
+                dst_ptr += 10;
+            } else {
                 store<u32>(dst_offset, escaped);
                 v128.store(dst_offset, v128.load(src_offset, 2), 4);
-                sieve_mask &= sieve_mask - 1;
+                mask &= mask - 1;
                 dst_ptr += 2;
-            } while (sieve_mask != 0);
-
-            src_ptr += 16;
-            dst_ptr += 16;
+            }
         }
+
+        src_ptr += 16;
+        dst_ptr += 16;
     }
 
-    do {
-        let char_code = load<u16>(src_ptr);
-        if (char_code == 92 || char_code == 34) {
-            store<u16>(dst_ptr, 92);
+    while (src_ptr < src_end) {
+        const char_code = load<u16>(src_ptr);
+        if (char_code == 92 || char_code == 34 || char_code < 32) {
+            const escaped = load<u32>(ESCAPE_TABLE + (char_code << 2));
+            store<u32>(dst_ptr, escaped);
             dst_ptr += 2;
         }
         store<u16>(dst_ptr, char_code);
         dst_ptr += 2;
         src_ptr += 2;
-    } while (src_ptr < src_end);
+    }
 
     store<u8>(dst_ptr, 34); /* " */
-    return 0//dst_ptr - changetype<usize>(dst) + 2;
+    return dst_ptr - changetype<usize>(dst) + 2;
 }

@@ -1,6 +1,11 @@
 import { _intTo16 } from "../../custom/util";
 import { Sink } from "../../custom/sink";
 
+/**
+ * Serializes valid strings into their JSON counterpart
+ * @param data string
+ * @returns JSON
+ */
 // @ts-ignore: Decorator
 @inline export function serializeString(data: string): string {
     // if (!needsEscaping(data)) {

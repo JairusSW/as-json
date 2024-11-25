@@ -31,7 +31,7 @@ class Vec3 {
 //   // ^ this is not okay
 // }
 const out = new ArrayBuffer(128);
-const len = serializeString_SIMD("h\ne\tllo wor\"ld", changetype<usize>(out));
+const len = serializeString_SIMD("h" + String.fromCharCode(2) + "\ne\tllo wor\"ld", changetype<usize>(out));
 const serialized = String.UTF16.decodeUnsafe(changetype<usize>(out), out.byteLength);
 console.log("Serialized: " + serialized);
 console.log(load<u64>(a).toString())
