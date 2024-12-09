@@ -14,7 +14,7 @@ bench("Match Type (array)", () => {
 });
 
 bench("Match Type (struct)", () => {
-    blackbox<boolean>(matchType(blackbox<string>("{"), JSON.Types.Obj));
+    blackbox<boolean>(matchType(blackbox<string>("{"), JSON.Types.Struct));
 });
 
 bench("Match Type (raw)", () => {
@@ -26,7 +26,7 @@ bench("Match Type (raw)", () => {
     if (JSON.Types.String == type && firstChar == QUOTE) return true;
     else if (JSON.Types.Bool == type && (firstChar == CHAR_T || firstChar == CHAR_F)) return true;
     else if (JSON.Types.Array == type && firstChar == BRACKET_LEFT) return true;
-    else if (JSON.Types.Obj == type && firstChar == BRACE_LEFT) return true;
+    else if (JSON.Types.Struct == type && firstChar == BRACE_LEFT) return true;
     else if (type < 7 && type > 0 && (firstChar < 58 && firstChar > 46)) return true;
     else if (JSON.Types.Raw == type) return true;
     else return false;

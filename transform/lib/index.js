@@ -38,7 +38,7 @@ class JSONTransform extends BaseVisitor {
             }
         }
         if (!members.length) {
-            let SERIALIZE_RAW_EMPTY = '__SERIALIZE(): string {\n  return "{}";\n}';
+            let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize): string {\n  return "{}";\n}';
             let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
             let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
             if (process.env["JSON_DEBUG"]) {
@@ -170,7 +170,7 @@ class JSONTransform extends BaseVisitor {
             }
             schema.members.push(mem);
         }
-        let SERIALIZE_RAW = "__SERIALIZE(): string {\n  let out = `{";
+        let SERIALIZE_RAW = "__SERIALIZE(ptr: usize): string {\n  let out = `{";
         let SERIALIZE_PRETTY = "__SERIALIZE_PRETTY(): string {\n  let out = `{";
         let INITIALIZE = "__INITIALIZE(): this {\n";
         let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
@@ -418,16 +418,16 @@ class Property {
             return;
         if (this.flags.has(PropertyFlags.JSON_Raw)) {
             if (this.flags.has(PropertyFlags.Null)) {
-                this.right_s = "(this." + name + " || \"null\")";
+                this.right_s = "(load<" + type + ">(ptr, offsetof<this>(\"" + name + "\")) || \"null\")";
                 this.right_d = "value_start === value_end - 4 && 30399761348886638 === load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
             }
             else {
-                this.right_s = "this." + name;
+                this.right_s = "load<" + type + ">(ptr, offsetof<this>(\"" + name + "\"))";
                 this.right_d = "data.substring(value_start, value_end);";
             }
         }
         else {
-            this.right_s = "__SERIALIZE<" + type + ">(this." + name + ")";
+            this.right_s = "__SERIALIZE<" + type + ">(load<" + type + ">(ptr, offsetof<this>(\"" + name + "\")))";
             this.right_d =
                 (safe ? "__DESERIALIZE_SAFE" : "__DESERIALIZE") + "<" + type + ">(data.substring(value_start, value_end))";
         }
