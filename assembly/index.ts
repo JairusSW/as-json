@@ -13,7 +13,7 @@ import { deserializeFloat } from "./deserialize/float";
 import { deserializeObject, deserializeObject_Safe } from "./deserialize/object";
 import { deserializeMap, deserializeMap_Safe } from "./deserialize/map";
 import { deserializeDate } from "./deserialize/date";
-import { BRACE_LEFT, BRACKET_LEFT, CHAR_F, CHAR_N, CHAR_T, NULL_WORD, QUOTE } from "./custom/chars";
+import { NULL_WORD } from "./custom/chars";
 import { deserializeInteger, deserializeInteger_Safe } from "./deserialize/integer";
 import { deserializeString, deserializeString_Safe } from "./deserialize/string";
 import { Sink } from "./custom/sink";
@@ -32,10 +32,25 @@ const DEFAULT_SERIALIZE_OPTIONS = new SerializeOptions();
 // @ts-ignore: Decorator valid here
 @inline const STORAGE = offsetof<JSON.Value>("storage");
 
+// @ts-ignore: Decorator valid here
+@inline const TYPE_STORAGE = offsetof<TypeSaverElement<u64>>("storage")
+class TypeSaver {}
+class TypeSaverElement<T> extends TypeSaver {
+  public storage: u64;
+  constructor(value: T) {
+    super();
+    store<T>(changetype<usize>(this), value, TYPE_STORAGE);
+  }
+  get(): T {
+    return load<T>(changetype<usize>(this), TYPE_STORAGE);
+  }
+}
+
 /**
  * JSON Encoder/Decoder for AssemblyScript
  */
 export namespace JSON {
+  export class Base {}
   /**
    * Enum representing the different types supported by JSON.
    */
@@ -104,12 +119,18 @@ export namespace JSON {
       } else if (isString<T>()) {
         this.type = JSON.Types.String;
         store<T>(changetype<usize>(this), value, STORAGE);
-      } else if (value instanceof Map) {
-        if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
-          abort("Maps must be of type Map<string, JSON.Value>!");
-        }
+      // } else if (value instanceof Map) {
+      //   if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
+      //     abort("Maps must be of type Map<string, JSON.Value>!");
+      //   }
+      //   this.type = JSON.Types.Map;
+      //   store<T>(changetype<usize>(this), value, STORAGE);
+      //   
+      // @ts-ignore
+      } else if (isDefined(value.__SERIALIZE)) {
         this.type = JSON.Types.Obj;
-        store<T>(changetype<usize>(this), value, STORAGE);
+        // @ts-ignore
+        store<Base>(changetype<usize>(this), changetype<JSON.Base>(value), STORAGE, sizeof<usize>());
       } else if (isArray<T>()) {
         // @ts-ignore: T satisfies constraints of any[]
         this.type = JSON.Types.Array + getArrayDepth<T>(0);
@@ -131,6 +152,9 @@ export namespace JSON {
      * @returns The string representation of the JSON.Value.
      */
     toString(): string {
+      console.log("obj")
+      const obj = this.get<Base>();
+      return obj.__SERIALIZE();
       switch (this.type) {
         case JSON.Types.U8: return this.get<u8>().toString();
         case JSON.Types.U16: return this.get<u16>().toString();
@@ -138,6 +162,12 @@ export namespace JSON {
         case JSON.Types.U64: return this.get<u64>().toString();
         case JSON.Types.String: return "\"" + this.get<string>() + "\"";
         case JSON.Types.Bool: return this.get<boolean>() ? "true" : "false";
+        case JSON.Types.Obj: {
+          console.log("obj")
+          const obj = this.get<JSON.Base>();
+          if (!isDefined(obj.__SERIALIZE)) throw new Error("Expected object to have a deserialize method but found none!")
+          return obj.__SERIALIZE();
+        }
         default: {
           const arr = this.get<JSON.Value[]>();
           if (!arr.length) return "[]";
