@@ -18,6 +18,7 @@ import { deserializeInteger, deserializeInteger_Safe } from "./deserialize/simpl
 import { deserializeString, deserializeString_Safe } from "./deserialize/simple/string";
 import { Sink } from "./custom/sink";
 import { getArrayDepth } from "./custom/util";
+import { serializeArbitrary } from "./serialize/simple/arbitrary";
 
 // Config
 class SerializeOptions {
@@ -49,11 +50,13 @@ export namespace JSON {
     F64 = 6,
     Bool = 7,
     String = 8,
-    Obj = 8,
-    Array = 9
+    Object = 9,
+    Array = 10,
+    Struct = 11
   }
   export type Raw = string;
   export class Value {
+    static METHODS: Map<u32, u32> = new Map<u32, u32>();
     public type: i32;
 
     // @ts-ignore
@@ -108,11 +111,19 @@ export namespace JSON {
         if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
           abort("Maps must be of type Map<string, JSON.Value>!");
         }
-        this.type = JSON.Types.Obj;
+        this.type = JSON.Types.Struct;
         store<T>(changetype<usize>(this), value, STORAGE);
-      } else if (isArray<T>()) {
+        // @ts-ignore
+      } else if (isDefined(value.__SERIALIZE)) {
+        this.type = idof<T>() + JSON.Types.Struct;
+        // @ts-ignore
+        if (!JSON.Value.METHODS.has(idof<T>())) JSON.Value.METHODS.set(idof<T>(), value.__SERIALIZE.index);
+        // @ts-ignore
+        store<T>(changetype<usize>(this), value, STORAGE);
+        // @ts-ignore
+      } else if (isArray<T>() && idof<valueof<T>>() == idof<JSON.Value>()) {
         // @ts-ignore: T satisfies constraints of any[]
-        this.type = JSON.Types.Array + getArrayDepth<T>(0);
+        this.type = JSON.Types.Array;
         store<T>(changetype<usize>(this), value, STORAGE);
       }
     }
@@ -127,7 +138,6 @@ export namespace JSON {
 
     /**
      * Converts the JSON.Value to a string representation.
-     * @param useString - If true, treats Buffer as a string.
      * @returns The string representation of the JSON.Value.
      */
     toString(): string {
@@ -138,7 +148,7 @@ export namespace JSON {
         case JSON.Types.U64: return this.get<u64>().toString();
         case JSON.Types.String: return "\"" + this.get<string>() + "\"";
         case JSON.Types.Bool: return this.get<boolean>() ? "true" : "false";
-        default: {
+        case JSON.Types.Array: {
           const arr = this.get<JSON.Value[]>();
           if (!arr.length) return "[]";
           const out = Sink.fromStringLiteral("[");
@@ -155,9 +165,15 @@ export namespace JSON {
           out.write("]");
           return out.toString();
         }
+        default: {
+          const fn = JSON.Value.METHODS.get(this.type - JSON.Types.Struct);
+          const value = this.get<usize>();
+          return call_indirect<string>(fn, 0, value);
+        }
       }
     }
   }
+
   export class Box<T> {
     constructor(public value: T) { }
     @inline static from<T>(value: T): Box<T> {
@@ -205,6 +221,8 @@ export namespace JSON {
     } else if (data instanceof Map) {
       // @ts-ignore
       return serializeMap(changetype<nonnull<T>>(data));
+    } else if (data instanceof JSON.Value) {
+      return serializeArbitrary(data);
     } else {
       throw new Error(
         `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`

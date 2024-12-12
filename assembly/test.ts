@@ -1,13 +1,10 @@
 import { JSON } from "."
-import { serializeString_SIMD } from "./serialize/simd/string";
-const a = memory.data<u16>([
-  92, 117, 48, 48
-])
+
 @json
 class Vec3 {
-  public x: i32 = 0;
-  public y: i32 = 0;
-  public z: i32 = 0;
+  public x: i32 = 1;
+  public y: i32 = 2;
+  public z: i32 = 3;
 }
 
 // @json
@@ -30,10 +27,10 @@ class Vec3 {
 //   }
 //   // ^ this is not okay
 // }
-const out = new ArrayBuffer(128);
-const len = serializeString_SIMD("h" + String.fromCharCode(2) + "\ne\tllo wor\"ld", changetype<usize>(out));
-const serialized = String.UTF16.decodeUnsafe(changetype<usize>(out), out.byteLength);
-console.log("Serialized: " + serialized);
-console.log(load<u64>(a).toString())
+const val = JSON.Value.from(new Vec3());
+
+// const serialized = JSON.stringify(new Vec3());
+console.log("Serialized: " + val.toString());
+console.log(JSON.stringify(JSON.Value.from([val, val])));
 // const deserialized = JSON.parseSafe<Vec3>(`{"x":1,"y":true,"z":3}`);
 // console.log("Deserialized: " + JSON.stringify(deserialized));
