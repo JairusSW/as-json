@@ -13,11 +13,10 @@ import { deserializeFloat } from "./deserialize/simple/float";
 import { deserializeObject, deserializeObject_Safe } from "./deserialize/simple/object";
 import { deserializeMap, deserializeMap_Safe } from "./deserialize/simple/map";
 import { deserializeDate } from "./deserialize/simple/date";
-import { BRACE_LEFT, BRACKET_LEFT, CHAR_F, CHAR_N, CHAR_T, NULL_WORD, QUOTE } from "./custom/chars";
+import { NULL_WORD } from "./custom/chars";
 import { deserializeInteger, deserializeInteger_Safe } from "./deserialize/simple/integer";
 import { deserializeString, deserializeString_Safe } from "./deserialize/simple/string";
 import { Sink } from "./custom/sink";
-import { getArrayDepth } from "./custom/util";
 import { serializeArbitrary } from "./serialize/simple/arbitrary";
 
 // Config
@@ -54,7 +53,7 @@ export namespace JSON {
     String = 8,
     Object = 9,
     Array = 10,
-    Struct = 11
+    Struct = 11,
   }
   export type Raw = JSONRAW;
   export class Value {
@@ -64,7 +63,9 @@ export namespace JSON {
     // @ts-ignore
     private storage: u64;
 
-    private constructor() { unreachable(); }
+    private constructor() {
+      unreachable();
+    }
 
     /**
      * Creates an JSON.Value instance from a given value.
@@ -144,12 +145,18 @@ export namespace JSON {
      */
     toString(): string {
       switch (this.type) {
-        case JSON.Types.U8: return this.get<u8>().toString();
-        case JSON.Types.U16: return this.get<u16>().toString();
-        case JSON.Types.U32: return this.get<u32>().toString();
-        case JSON.Types.U64: return this.get<u64>().toString();
-        case JSON.Types.String: return "\"" + this.get<string>() + "\"";
-        case JSON.Types.Bool: return this.get<boolean>() ? "true" : "false";
+        case JSON.Types.U8:
+          return this.get<u8>().toString();
+        case JSON.Types.U16:
+          return this.get<u16>().toString();
+        case JSON.Types.U32:
+          return this.get<u32>().toString();
+        case JSON.Types.U64:
+          return this.get<u64>().toString();
+        case JSON.Types.String:
+          return '"' + this.get<string>() + '"';
+        case JSON.Types.Bool:
+          return this.get<boolean>() ? "true" : "false";
         case JSON.Types.Array: {
           const arr = this.get<JSON.Value[]>();
           if (!arr.length) return "[]";
@@ -177,7 +184,8 @@ export namespace JSON {
   }
 
   export class Box<T> {
-    constructor(public value: T) { }
+    constructor(public value: T) {}
+
     @inline static from<T>(value: T): Box<T> {
       return new Box(value);
     }
@@ -191,7 +199,7 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  export function stringify<T>(data: T/*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
+  export function stringify<T>(data: T /*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
     if (isBoolean<T>()) {
       return serializeBool(data as bool);
     } else if (isInteger<T>()) {
@@ -226,9 +234,7 @@ export namespace JSON {
     } else if (data instanceof JSON.Value) {
       return serializeArbitrary(data);
     } else {
-      throw new Error(
-        `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
+      throw new Error(`Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
   }
   /**
@@ -268,9 +274,7 @@ export namespace JSON {
       // @ts-ignore
       return deserializeDate(data);
     } else {
-      throw new Error(
-        `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
+      throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
   }
   /**
@@ -310,9 +314,7 @@ export namespace JSON {
       // @ts-ignore
       return deserializeDate_Safe(data);
     } else {
-      throw new Error(
-        `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
+      throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
   }
 }

@@ -1,9 +1,9 @@
 import { serializeString_SIMD } from "../serialize/simd/string";
 import { serializeString } from "../serialize/simple/string";
 
-const str = "hello wo"
+const str = "hello wo";
 bench("Serialize String (Simple)", () => {
-    serializeString(str);
+  serializeString(str);
 });
 
 // bench("Serialize String (BS)", () => {
@@ -13,5 +13,5 @@ bench("Serialize String (Simple)", () => {
 
 const out = new ArrayBuffer(16);
 bench("Serialize String (SIMD)", () => {
-    serializeString_SIMD(str, changetype<usize>(out));
+  serializeString_SIMD(str, changetype<usize>(out));
 });

@@ -14,6 +14,6 @@ import { QUOTE } from "../../custom/chars";
 // @ts-ignore: Decorator valid here
 @inline export function deserializeDate_Safe(dateTimeString: string): Date {
   const firstChar = load<u8>(changetype<usize>(dateTimeString));
-  if (firstChar != QUOTE) throw new Error("Mismatched Types! Expected Date but got \"" + dateTimeString.slice(0, 100) + "\" instead!");
+  if (firstChar != QUOTE) throw new Error('Mismatched Types! Expected Date but got "' + dateTimeString.slice(0, 100) + '" instead!');
   return deserializeDate(dateTimeString);
 }

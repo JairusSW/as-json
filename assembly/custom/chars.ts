@@ -59,9 +59,9 @@
 // @ts-ignore: Decorator is valid here
 @inline export const BRACKET_RIGHT_WORD = "]";
 // @ts-ignore: Decorator is valid here
-@inline export const QUOTE_WORD = "\"";
+@inline export const QUOTE_WORD = '"';
 // @ts-ignore: Decorator is valid here
-@inline export const EMPTY_QUOTE_WORD = "\"\"";
+@inline export const EMPTY_QUOTE_WORD = '""';
 
 // Escape Codes
 // @ts-ignore: Decorator is valid here

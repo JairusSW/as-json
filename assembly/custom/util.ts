@@ -21,10 +21,7 @@ export function isMap<T>(): bool {
   for (let i = 0; i < data.length; i++) {
     const char = unsafeCharCodeAt(data, i);
     if (instr === false && char === QUOTE) instr = true;
-    else if (
-      instr === true && char === QUOTE
-      && unsafeCharCodeAt(data, i - 1) !== BACK_SLASH
-    ) instr = false;
+    else if (instr === true && char === QUOTE && unsafeCharCodeAt(data, i - 1) !== BACK_SLASH) instr = false;
 
     if (instr === false) {
       if (!isSpace(char)) result.write(data.charAt(i));
@@ -82,17 +79,17 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
  * Loads 32 bits and retrieves the high/low bits.
  * The reason why we only load 4 bytes at a time is that numbers in the 32-bit range are 7 chars long at most.
  * Using SIMD or 64 bit loads would only work well when parsing large 128+ numbers.
- * 
+ *
  * Here are some benchmarks
- * Parsing: "12345" 
+ * Parsing: "12345"
  * Results are spread over 5000ms
- * 
+ *
  * SNIP: 270M iterations
  * ATOI: 285M iterations
- * ParseInt: 176M iterations 
- * 
+ * ParseInt: 176M iterations
+ *
  * @param str - Any number. Can include scientific notation.
-*/
+ */
 // @ts-ignore: Decorator
 @inline export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u32 = 0): T {
   if (isSigned<T>()) {
@@ -105,31 +102,31 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
       offset += 2;
       if (len >= 4) {
         // 32-bit route
-        for (; offset < (len - 3); offset += 4) {
+        for (; offset < len - 3; offset += 4) {
           const ch = load<u32>(changetype<usize>(str) + <usize>offset);
-          const low = ch & 0xFFFF;
+          const low = ch & 0xffff;
           const high = ch >> 16;
           // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
           if (low > 57) {
             // The first char (f) is E or e
             // We push the offset up by two and apply the notation.
             if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-              return -(val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+              return -(val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return -(val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
+              return -(val * 10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1)) as T;
             }
           } else if (high > 57) {
             // The first char (f) is E or e
             // We push the offset up by two and apply the notation.
             if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
-              return -(val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+              return -(val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return -(val * (10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1))) as T;
+              return -(val * 10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1)) as T;
             }
           } else {
-            val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
+            val = (val * 100 + (low - 48) * 10 + (high - 48)) as T;
           }
         }
       }
@@ -141,43 +138,43 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
           if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-            return -(val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+            return -(val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
           } else {
             // Inlined this operation instead of using a loop
-            return -(val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
+            return -(val * 10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1)) as T;
           }
         } else {
-          val = (val * 10) + (ch - 48) as T;
+          val = (val * 10 + (ch - 48)) as T;
         }
       }
       return -val as T;
     } else {
       if (len >= 4) {
         // Duplet 16 bit lane load
-        for (; offset < (len - 3); offset += 4) {
+        for (; offset < len - 3; offset += 4) {
           const ch = load<u32>(changetype<usize>(str) + <usize>offset);
-          const low = ch & 0xFFFF;
+          const low = ch & 0xffff;
           const high = ch >> 16;
           // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
           if (low > 57) {
             // The first char (f) is E or e
             // We push the offset up by two and apply the notation.
             if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-              return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+              return (val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
+              return (val * 10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1)) as T;
             }
           } else if (high > 57) {
             if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
-              return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+              return (val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
             } else {
               // Inlined this operation instead of using a loop
-              return (val * (10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1))) as T;
+              return (val * 10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1)) as T;
             }
           } else {
             // Optimized with multiplications and shifts.
-            val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
+            val = (val * 100 + (low - 48) * 10 + (high - 48)) as T;
           }
         }
       }
@@ -188,14 +185,14 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
         // e is 101 and E is 69.
         if (ch > 57) {
           if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-            val = (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+            val = (val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
           } else {
             // Inlined this operation instead of using a loop
-            val = (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
+            val = (val * 10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1)) as T;
           }
           return val as T;
         } else {
-          val = (val * 10) + (ch - 48) as T;
+          val = (val * 10 + (ch - 48)) as T;
         }
       }
       return val as T;
@@ -207,30 +204,30 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
     if (len == 0) len = u32(str.length << 1);
     if (len >= 4) {
       // Duplet 16 bit lane load
-      for (; offset < (len - 3); offset += 4) {
+      for (; offset < len - 3; offset += 4) {
         const ch = load<u32>(changetype<usize>(str) + <usize>offset);
-        const low = ch & 0xFFFF;
+        const low = ch & 0xffff;
         const high = ch >> 16;
         // 9 is 57. The highest group of two numbers is 114, so if a e or an E is included, this will fire.
         if (low > 57) {
           // The first char (f) is E or e
           // We push the offset up by two and apply the notation.
           if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-            return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+            return (val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
           } else {
             // Inlined this operation instead of using a loop
-            return (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
+            return (val * 10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1)) as T;
           }
         } else if (high > 57) {
           if (load<u16>(changetype<usize>(str) + <usize>offset + 4) == 45) {
-            return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+            return (val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
           } else {
             // Inlined this operation instead of using a loop
-            return (val * (10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1))) as T;
+            return (val * 10 ** (__atoi_fast<u32>(str, offset + 4, offset + 6) + 1)) as T;
           }
         } else {
           // Optimized with multiplications and shifts.
-          val = (val * 100 + ((low - 48) * 10) + (high - 48)) as T;
+          val = (val * 100 + (low - 48) * 10 + (high - 48)) as T;
         }
       }
     }
@@ -241,13 +238,13 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
       // e is 101 and E is 69.
       if (ch > 57) {
         if (load<u16>(changetype<usize>(str) + <usize>offset + 2) == 45) {
-          return (val / (10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1))) as T;
+          return (val / 10 ** (__atoi_fast<u32>(str, offset + 6, offset + 8) - 1)) as T;
         } else {
           // Inlined this operation instead of using a loop
-          return (val * (10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1))) as T;
+          return (val * 10 ** (__atoi_fast<u32>(str, offset + 2, offset + 4) + 1)) as T;
         }
       } else {
-        val = (val * 10) + (ch - 48) as T;
+        val = (val * 10 + (ch - 48)) as T;
       }
     }
     return val as T;
@@ -268,18 +265,18 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
     if (load<u16>(changetype<usize>(str) + <usize>start) === 45) {
       start += 2;
       for (; start < end; start += 2) {
-        val = (val * 10) + (load<u16>(changetype<usize>(str) + <usize>start) - 48) as T;
+        val = (val * 10 + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
       }
       return -val as T;
     } else {
       for (; start < end; start += 2) {
-        val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
+        val = (val * 10 + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
       }
       return val as T;
     }
   } else {
     for (; start < end; start += 2) {
-      val = ((val * 10) + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
+      val = (val * 10 + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
     }
     return val as T;
   }
@@ -351,7 +348,7 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
   const p2_len = p2_end - p2_start;
   if (p1_len != p2_len) return false;
   if (p1_len == 2) {
-    return load<u16>(changetype<usize>(p1_data) + p1_start) == load<u16>(changetype<usize>(p2_data) + p2_start)
+    return load<u16>(changetype<usize>(p1_data) + p1_start) == load<u16>(changetype<usize>(p2_data) + p2_start);
   }
   return memory.compare(changetype<usize>(p1_data) + p1_start, changetype<usize>(p2_data) + p2_start, p1_len) === 0;
 }
@@ -378,18 +375,18 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
 // @ts-ignore: Decorator
 @inline export function intTo16(int: i32): i32 {
   const high = int >> 4;
-  const low = int & 0x0F;
+  const low = int & 0x0f;
   if (low < 10) {
     if (high < 10) {
-      return ((48 + low) << 16) | 48 + high;
+      return ((48 + low) << 16) | (48 + high);
     } else {
-      return ((48 + low) << 16) | 87 + high;
+      return ((48 + low) << 16) | (87 + high);
     }
   } else {
     if (high < 10) {
-      return ((87 + low) << 16) | 48 + high;
+      return ((87 + low) << 16) | (48 + high);
     } else {
-      return ((87 + low) << 16) | 87 + high;
+      return ((87 + low) << 16) | (87 + high);
     }
   }
 }

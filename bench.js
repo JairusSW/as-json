@@ -34,9 +34,9 @@ const vec = {
 let data;
 
 const bench = new Bench({ time: 1000 })
-    .add("stringify float", () => {
-        data = JSON.stringify("h\\ello wor\"ld")
-    })/*
+  .add("stringify float", () => {
+    data = JSON.stringify('h\\ello wor"ld');
+  }) /*
     .add("parse float", () => {
         data = JSON.parse("1.2345")
     })

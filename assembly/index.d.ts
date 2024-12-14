@@ -29,5 +29,5 @@ declare function omitif(condition: string): Function;
 declare function omitnull(): Function;
 
 export namespace JSON {
-    export type Raw = string;
+  export type Raw = string;
 }

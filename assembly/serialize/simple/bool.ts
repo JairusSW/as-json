@@ -6,5 +6,5 @@
 
 // @ts-ignore: Decorator valid here
 @inline export function serializeBool(data: bool): string {
-    return data ? "true" : "false";
+  return data ? "true" : "false";
 }

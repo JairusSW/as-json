@@ -1,4 +1,5 @@
-import { JSON } from "."
+import { JSON } from ".";
+
 
 @json
 class Vec3 {

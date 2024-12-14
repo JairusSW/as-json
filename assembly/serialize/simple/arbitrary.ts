@@ -1,14 +1,21 @@
 import { JSON } from "../..";
 import { Sink } from "../../custom/sink";
 
+
 @inline export function serializeArbitrary(data: JSON.Value): string {
   switch (data.type) {
-    case JSON.Types.U8: return data.get<u8>().toString();
-    case JSON.Types.U16: return data.get<u16>().toString();
-    case JSON.Types.U32: return data.get<u32>().toString();
-    case JSON.Types.U64: return data.get<u64>().toString();
-    case JSON.Types.String: return JSON.stringify(data.get<string>());
-    case JSON.Types.Bool: return data.get<boolean>() ? "true" : "false";
+    case JSON.Types.U8:
+      return data.get<u8>().toString();
+    case JSON.Types.U16:
+      return data.get<u16>().toString();
+    case JSON.Types.U32:
+      return data.get<u32>().toString();
+    case JSON.Types.U64:
+      return data.get<u64>().toString();
+    case JSON.Types.String:
+      return JSON.stringify(data.get<string>());
+    case JSON.Types.Bool:
+      return data.get<boolean>() ? "true" : "false";
     case JSON.Types.Array: {
       const arr = data.get<JSON.Value[]>();
       if (!arr.length) return "[]";
