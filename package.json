@@ -44,6 +44,7 @@
     "json-as": "./"
   },
   "dependencies": {
+    "as-container": "^0.8.0",
     "as-virtual": "^0.2.0"
   },
   "overrides": {

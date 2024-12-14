@@ -6,6 +6,7 @@ class Vec3 {
   public y: i32 = 2;
   public z: i32 = 3;
 }
+JSON.stringify<JSON.Raw>();
 
 // @json
 // class Base {

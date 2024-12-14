@@ -28,8 +28,6 @@ declare function omitif(condition: string): Function;
  */
 declare function omitnull(): Function;
 
-/**
- * Property decorator that allows a field to be flattened.
- * @param fieldName - Points to the field to flatten. Can use dot-notation here like @omit("foo.identifier.text")
- */
-declare function flatten(fieldName: string = "value"): Function;
+export namespace JSON {
+    export type Raw = string;
+}
