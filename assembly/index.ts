@@ -26,6 +26,7 @@ class SerializeOptions {
 
 class JSONRAW {}
 
+export type Raw = JSONRAW;
 const DEFAULT_SERIALIZE_OPTIONS = new SerializeOptions();
 
 /**
@@ -55,7 +56,7 @@ export namespace JSON {
     Array = 10,
     Struct = 11,
   }
-  export type Raw = JSONRAW;
+  export type Raw = string;
   export class Value {
     static METHODS: Map<u32, u32> = new Map<u32, u32>();
     public type: i32;

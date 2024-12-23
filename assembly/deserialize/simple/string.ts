@@ -24,11 +24,6 @@ import { unsafeCharCodeAt } from "../../custom/util";
         last = i + 1;
         break;
       }
-      case FWD_SLASH: {
-        result.writeCodePoint(FWD_SLASH);
-        last = i + 1;
-        break;
-      }
       case CHAR_B: {
         result.writeCodePoint(BACKSPACE);
         last = i + 1;

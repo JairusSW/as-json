@@ -12,9 +12,6 @@ import { Sink } from "../../custom/sink";
   //     return "\"" + data + "\"";
   // }
 
-  if (data.length === 0) {
-    return '""';
-  }
   let result = Sink.fromString('"');
 
   let last: i32 = 0;

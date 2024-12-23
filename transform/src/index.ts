@@ -3,6 +3,9 @@ import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Sourc
 import { toString, isStdlib } from "visitor-as/dist/utils.js";
 import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
 import { Transform } from "assemblyscript/dist/transform.js";
+import { CallExpression } from "types:assemblyscript/src/ast";
+import binaryen from "binaryen";
+import { Program } from "types:assemblyscript/src/program";
 
 class JSONTransform extends BaseVisitor {
   public schemasList: SchemaData[] = [];
@@ -315,6 +318,10 @@ class JSONTransform extends BaseVisitor {
     if (!this.sources.has(node)) {
       return;
     }
+  }
+  visitCallExpression(node: CallExpression): void {
+    if (!toString(node).startsWith("JSON.stringify(raw)")) return;
+    console.log(node)
   }
 }
 
