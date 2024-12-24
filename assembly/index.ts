@@ -333,17 +333,3 @@ export namespace JSON {
     }
   }
 }
-
-// This allows JSON.stringify and JSON.parse to be available globally through an alias
-// @ts-ignore: Decorator
-@global @inline function __SERIALIZE<T>(data: T): string {
-  return JSON.stringify(data);
-}
-// @ts-ignore: Decorator
-@global @inline function __DESERIALIZE<T>(data: string): T {
-  return JSON.parse<T>(data);
-}
-// @ts-ignore: Decorator
-@global @inline function __DESERIALIZE_SAFE<T>(data: string): T {
-  return JSON.parseSafe<T>(data);
-}

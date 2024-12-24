@@ -1,4 +1,4 @@
-import { CHAR_B, BACK_SLASH, BACKSPACE, CARRIAGE_RETURN, CHAR_F, FORM_FEED, FWD_SLASH, CHAR_N, NEW_LINE, QUOTE, CHAR_R, CHAR_T, TAB, CHAR_U } from "../../custom/chars";
+import { CHAR_B, BACK_SLASH, BACKSPACE, CARRIAGE_RETURN, CHAR_F, FORM_FEED, CHAR_N, NEW_LINE, QUOTE, CHAR_R, CHAR_T, TAB, CHAR_U } from "../../custom/chars";
 import { Sink } from "../../custom/sink";
 import { unsafeCharCodeAt } from "../../custom/util";
 

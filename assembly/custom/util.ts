@@ -390,31 +390,3 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
     }
   }
 }
-
-
-function bits(mask: u32): string {
-  let out = ""
-  for (let i = 31; i >= 0; i--) {
-      const bit = (mask >> i) & 1;
-      out += bit.toString();
-  }
-  return out;
-}
-
-
-function lanes<T extends number>(vec: v128): string {
-  let buf = new ArrayBuffer(16);
-  v128.store(changetype<usize>(buf), vec);
-  let out = "";
-  for (let i = 0; i < 16; i += sizeof<T>()) {
-      const lane = load<T>(changetype<usize>(buf) + i);
-      out += abs(lane).toString() + " ";
-  }
-  return out.trimEnd();
-}
-
-function str(vec: v128): string {
-  let buf = new ArrayBuffer(16);
-  v128.store(changetype<usize>(buf), vec);
-  return String.UTF16.decode(buf);
-}

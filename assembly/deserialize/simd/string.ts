@@ -38,40 +38,42 @@ const SPLAT_92 = i16x8.splat(92); /* \ */
 
   const src_end = src_ptr + changetype<OBJECT>(changetype<usize>(src) - TOTAL_OVERHEAD).rtSize - 4;
   const src_end_15 = src_end - 15;
-  let offset = 0;
 
-  while (src_ptr < src_end_15) {
-    const block = v128.load(src_ptr);
-    v128.store(dst_ptr, block);
+  // while (src_ptr < src_end_15) {
+  //   const block = v128.load(src_ptr);
+  //   v128.store(dst_ptr, block);
 
-    const backslash_indices = i16x8.eq(block, SPLAT_92);
-    let mask = i16x8.bitmask(backslash_indices);
-    while (mask != 0) {
-      const lane_index = ctz(mask) << 1;
-      const dst_offset = dst_ptr + lane_index - offset;
-      const src_offset = src_ptr + lane_index;
-      const code = load<u16>(src_offset, 2) << 1;
-      const escaped = load<u16>(ESCAPE_TABLE + code);
-      store<u16>(dst_offset, escaped);
-      v128.store(dst_offset, v128.load(src_offset, 4), 2);
-      mask &= mask - 1;
-      offset += 2;
-    }
+  //   const backslash_indices = i16x8.eq(block, SPLAT_92);
+  //   let mask = i16x8.bitmask(backslash_indices);
+  //   while (mask != 0) {
+  //     const lane_index = ctz(mask) << 1;
+  //     const dst_offset = dst_ptr + lane_index;
+  //     const src_offset = src_ptr + lane_index;
+  //     const code = load<u16>(src_offset, 2) << 1;
+  //     const escaped = load<u16>(ESCAPE_TABLE + code);
+  //     store<u16>(dst_offset, escaped);
+  //     v128.store(dst_offset, v128.load(src_offset, 4), 2);
+  //     mask &= mask - 1;
+  //     dst_ptr -= 2;
+  //   }
 
-    src_ptr += 16;
-    dst_ptr += 16;
-  }
+  //   src_ptr += 16;
+  //   dst_ptr += 16;
+  // }
 
   while (src_ptr < src_end) {
-    const char_code = load<u16>(src_ptr);
-    if (char_code == BACK_SLASH) {
-      const escaped = load<u16>(ESCAPE_TABLE + (char_code << 2), 2);
-      store<u16>(dst_ptr, escaped);
+    let code = load<u16>(src_ptr);
+    if (code == BACK_SLASH) {
+      code = load<u16>(ESCAPE_TABLE + (code << 2), 2);
+      store<u16>(dst_ptr, code);
+      dst_ptr += 2;
+      src_ptr += 2;
+    } else {
+      store<u16>(dst_ptr, code);
+      dst_ptr += 2;
       src_ptr += 2;
     }
-    store<u16>(dst_ptr, char_code);
-    dst_ptr += 2;
-    src_ptr += 2;
   }
-  return dst_ptr - dst - offset;
+
+  return dst_ptr - dst;
 }
