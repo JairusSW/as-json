@@ -2,8 +2,7 @@ import { unsafeCharCodeAt } from "../../custom/util";
 import { CHAR_A, BACK_SLASH, COMMA, CHAR_E, CHAR_F, CHAR_L, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, CHAR_R, BRACE_RIGHT, BRACKET_RIGHT, CHAR_S, CHAR_T, CHAR_U } from "../../custom/chars";
 import { isSpace } from "util/string";
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeObject<T>(data: string): T {
+export function deserializeObject<T>(data: string): T {
   const schema: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
 
   // @ts-ignore
@@ -105,8 +104,7 @@ import { isSpace } from "util/string";
   return schema;
 }
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeObject_Safe<T>(data: string): T {
+export function deserializeObject_Safe<T>(data: string): T {
   const firstChar = load<u8>(changetype<usize>(data));
   if (firstChar != BRACE_LEFT) throw new Error("Mismatched Types! Expected " + nameof<T>() + ' but got "' + data.slice(0, 100) + '" instead!');
   const schema: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));

@@ -1,11 +1,8 @@
-import { bs } from "../custom/bs";
 import { deserializeString_SIMD } from "../deserialize/simd/string";
-import { serializeString_BS } from "../serialize/bs/string";
 import { serializeString_SIMD } from "../serialize/simd/string";
-import { serializeString } from "../serialize/simple/string";
 import { bench } from "as-bench/assembly/index"
-const str = "hello wo";
-const str2 = "\"hello wo\"";
+const str = '""""""""';
+const str2 = '"\"\"\"\"\"\"\"\""';
 
 // bench("Serialize String (Simple)", () => {
 //   serializeString(str);

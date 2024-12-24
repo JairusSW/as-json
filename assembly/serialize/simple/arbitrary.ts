@@ -2,7 +2,7 @@ import { JSON } from "../..";
 import { Sink } from "../../custom/sink";
 
 
-@inline export function serializeArbitrary(data: JSON.Value): string {
+export function serializeArbitrary(data: JSON.Value): string {
   switch (data.type) {
     case JSON.Types.U8:
       return data.get<u8>().toString();

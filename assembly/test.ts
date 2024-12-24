@@ -6,8 +6,7 @@ const str = '""""""""';
 const SPLAT_34 = i16x8.splat(34);
 const sieve = i16x8.eq(v128.load(changetype<usize>(str)), SPLAT_34);
 const mask = i16x8.bitmask(sieve);
-console.log("0b" + bits(mask))
-console.log((clz(mask)).toString());
+console.log("0b" + bits(mask));
 console.log("Lane: " + (ctz(mask)).toString())
 
 function bits(mask: u32): string {

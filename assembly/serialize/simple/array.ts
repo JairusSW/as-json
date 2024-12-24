@@ -3,8 +3,7 @@ import { COMMA, COMMA_WORD, EMPTY_BRACKET_WORD, BRACKET_LEFT_WORD, BRACKET_RIGHT
 import { Sink } from "../../custom/sink";
 import { serializeString } from "./string";
 
-// @ts-ignore: Decorator valid here
-@inline export function serializeArray<T extends any[]>(data: T): string {
+export function serializeArray<T extends any[]>(data: T): string {
   if (data.length == 0) {
     return EMPTY_BRACKET_WORD;
     // @ts-ignore
