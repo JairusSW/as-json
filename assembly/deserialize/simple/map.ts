@@ -130,10 +130,3 @@ function deserializeMapKey<T>(key: Virtual<string>): T {
 
   throw new Error(`JSON: Cannot parse JSON object to a Map with a key of type ${nameof<T>()}`);
 }
-
-// @ts-ignore: Decorator valid here
-@inline export function deserializeMap_Safe<T extends Map>(data: string): T {
-  const firstChar = load<u8>(changetype<usize>(data));
-  if (firstChar != BRACE_LEFT) throw new Error("Mismatched Types! Expected " + nameof<T>() + ' but got "' + data.slice(0, 100) + '" instead!');
-  return deserializeMap<T>(data);
-}

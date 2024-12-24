@@ -10,10 +10,3 @@ import { QUOTE } from "../../custom/chars";
   // is globally aliased to wasi_Date (or some other superclass).
   return new Date(d.getTime());
 }
-
-// @ts-ignore: Decorator valid here
-@inline export function deserializeDate_Safe(dateTimeString: string): Date {
-  const firstChar = load<u8>(changetype<usize>(dateTimeString));
-  if (firstChar != QUOTE) throw new Error('Mismatched Types! Expected Date but got "' + dateTimeString.slice(0, 100) + '" instead!');
-  return deserializeDate(dateTimeString);
-}

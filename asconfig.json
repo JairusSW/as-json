@@ -30,7 +30,7 @@
   },
   "options": {
     "transform": [],
-    "disableWarning": [226]
+    "disableWarning": []
   },
   "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json"
 }

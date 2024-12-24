@@ -24,7 +24,7 @@ class SerializeOptions {
   public pretty: bool = false;
 }
 
-class JSONRAW {}
+class JSONRAW { }
 
 export type Raw = JSONRAW;
 const DEFAULT_SERIALIZE_OPTIONS = new SerializeOptions();
@@ -121,46 +121,6 @@ export namespace JSON {
     } else if (type instanceof Date) {
       // @ts-ignore
       return deserializeDate(data);
-    } else {
-      throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
-    }
-  }
-  /**
-   * Parses valid JSON strings into their original format (safely).
-   * ```js
-   * JSON.parseSafe<T>(data)
-   * ```
-   * @param data string
-   * @returns T
-   */
-  export function parseSafe<T>(data: string): T {
-    if (isBoolean<T>()) {
-      return deserializeBoolean_Safe(data) as T;
-    } else if (isInteger<T>()) {
-      return deserializeInteger_Safe<T>(data);
-    } else if (isFloat<T>()) {
-      return deserializeFloat<T>(data);
-    } else if (isNullable<T>() && data.length === 4 && data == "null") {
-      // @ts-ignore
-      return null;
-    } else if (isString<T>()) {
-      // @ts-ignore
-      return deserializeString_Safe(data);
-    } else if (isArray<T>()) {
-      // @ts-ignore
-      return deserializeArray_Safe<nonnull<T>>(data);
-    }
-    let type: nonnull<T> = changetype<nonnull<T>>(0);
-    // @ts-ignore: Defined by transform
-    if (isDefined(type.__DESERIALIZE)) {
-      // @ts-ignore
-      return deserializeObject_Safe<nonnull<T>>(data.trimStart());
-    } else if (type instanceof Map) {
-      // @ts-ignore
-      return deserializeMap_Safe<nonnull<T>>(data.trimStart());
-    } else if (type instanceof Date) {
-      // @ts-ignore
-      return deserializeDate_Safe(data);
     } else {
       throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
@@ -317,17 +277,17 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) {}
-  /**
-   * Creates a reference to a primitive type
-   * This means that it can create a nullable primitive
-   * ```js
-   * JSON.stringify<Box<i32> | null>(null);
-   * // null
-   * ```
-   * @param from T
-   * @returns Box<T>
-   */
+    constructor(public value: T) { }
+    /**
+     * Creates a reference to a primitive type
+     * This means that it can create a nullable primitive
+     * ```js
+     * JSON.stringify<Box<i32> | null>(null);
+     * // null
+     * ```
+     * @param from T
+     * @returns Box<T>
+     */
     @inline static from<T>(value: T): Box<T> {
       return new Box(value);
     }
