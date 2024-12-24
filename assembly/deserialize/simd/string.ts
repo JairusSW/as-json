@@ -1,5 +1,5 @@
 import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
-import { BACK_SLASH, CHAR_B, CHAR_F, CHAR_N, CHAR_R, CHAR_T, CHAR_U, FWD_SLASH, QUOTE } from "../../custom/chars";
+import { BACK_SLASH } from "../../custom/chars";
 
 const ESCAPE_TABLE = memory.data<u16>([
   0, 0, 0, 0, 0, 0, 0, 0, // 0-7
@@ -23,14 +23,11 @@ const ESCAPE_TABLE = memory.data<u16>([
   0, 0, 0, 0, 0, 0, 0, 0, // 144-151
 ]);
 
-const SPLAT_34 = i16x8.splat(34); /* " */
 const SPLAT_92 = i16x8.splat(92); /* \ */
 
-const SPLAT_32 = i16x8.splat(32); /* [ESC] */
-
 /**
- * Serializes strings into their JSON counterparts using SIMD operations
- * @param src string to serialize
+ * Deserializes strings back into into their original form using SIMD operations
+ * @param src string to deserialize
  * @param dst buffer to write to
  * @returns number of bytes written
  */
@@ -41,27 +38,24 @@ const SPLAT_32 = i16x8.splat(32); /* [ESC] */
 
   const src_end = src_ptr + changetype<OBJECT>(changetype<usize>(src) - TOTAL_OVERHEAD).rtSize - 4;
   const src_end_15 = src_end - 15;
+  let offset = 0;
 
   while (src_ptr < src_end_15) {
     const block = v128.load(src_ptr);
-
-    const backslash_indices = i16x8.eq(block, SPLAT_92);
-
     v128.store(dst_ptr, block);
 
+    const backslash_indices = i16x8.eq(block, SPLAT_92);
     let mask = i16x8.bitmask(backslash_indices);
-
     while (mask != 0) {
       const lane_index = ctz(mask) << 1;
-      const dst_offset = dst_ptr + lane_index;
+      const dst_offset = dst_ptr + lane_index - offset;
       const src_offset = src_ptr + lane_index;
-      const code = load<u16>(src_offset, 2) << 2;
-      const escaped = load<u32>(ESCAPE_TABLE + code);
-
-      store<u32>(dst_offset, escaped);
-      v128.store(dst_offset, v128.load(src_offset, 2), 2);
+      const code = load<u16>(src_offset, 2) << 1;
+      const escaped = load<u16>(ESCAPE_TABLE + code);
+      store<u16>(dst_offset, escaped);
+      v128.store(dst_offset, v128.load(src_offset, 4), 2);
       mask &= mask - 1;
-      src_ptr += 2;
+      offset += 2;
     }
 
     src_ptr += 16;
@@ -79,5 +73,5 @@ const SPLAT_32 = i16x8.splat(32); /* [ESC] */
     dst_ptr += 2;
     src_ptr += 2;
   }
-  return dst_ptr - changetype<usize>(dst);
+  return dst_ptr - dst - offset;
 }

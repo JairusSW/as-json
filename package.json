@@ -18,7 +18,7 @@
   "scripts": {
     "test": "ast test && rm -rf ./build/",
     "pretest": "rm -rf ./build/ && ast build",
-    "build:bench": "rm -rf ./build/ && asc assembly/__benches__/misc.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --enable gc --enable simd",
+    "build:bench": "rm -rf ./build/ && asc assembly/__benches__/misc.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub --enable simd",
     "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat -O3 --enable simd",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
@@ -30,7 +30,7 @@
     "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "@types/node": "^20.14.12",
-    "as-bench": "^0.0.0-alpha",
+    "as-bench": "JairusSW/as-bench",
     "as-console": "^7.0.0",
     "as-test": "0.3.1",
     "assemblyscript": "^0.27.29",

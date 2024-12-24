@@ -1,42 +1,28 @@
-import { JSON } from ".";
 import { deserializeString_SIMD } from "./deserialize/simd/string";
+import { serializeString_SIMD } from "./serialize/simd/string";
+const out = changetype<usize>(new ArrayBuffer(64));
+
+const str = '""""""""';
+const SPLAT_34 = i16x8.splat(34);
+const sieve = i16x8.eq(v128.load(changetype<usize>(str)), SPLAT_34);
+const mask = i16x8.bitmask(sieve);
+console.log("0b" + bits(mask))
+console.log((clz(mask)).toString());
+console.log("Lane: " + (ctz(mask)).toString())
+
+function bits(mask: u32): string {
+    let out = ""
+    for (let i = 31; i >= 0; i--) {
+        const bit = (mask >> i) & 1;
+        out += bit.toString();
+    }
+    return out;
+}
 
 
-// @json
-// class Vec3 {
-//   public x: i32 = 1;
-//   public y: i32 = 2;
-//   public z: i32 = 3;
-// }
-// JSON.stringify<JSON.Raw>();
 
-// @json
-// class Base {
-//   public bam: string = "harekogkeorgke"
-// }
+const serialized = String.UTF16.decodeUnsafe(out, serializeString_SIMD(str, out));
+const deserialized = String.UTF16.decodeUnsafe(out, deserializeString_SIMD(serialized, out));
+console.log("Serialized:   " + serialized);
 
-// @json
-// class Foo extends Base {
-//   public bar: JSON.Raw = "\"this is ok\'"
-//   public baz: i32 = 0;
-//   public pos: Vec3<Vec3<i32>> = {
-//     x: 1,
-//     y: 2,
-//     z: {
-//       x: 1,
-//       y: 2,
-//       z: 3
-//     }
-//   }
-//   // ^ this is not okay
-// // }
-// const val = JSON.Value.from(new Vec3());
-
-const out = new ArrayBuffer(32);
-// const serialized = JSON.stringify(new Vec3());
-// console.log("Serialized: " + val.toString());
-// console.log(JSON.stringify(JSON.Value.from([val, val])));
-const len = deserializeString_SIMD("\"he\\\"llo \"", changetype<usize>(out))
-console.log("Deserialized: " + String.UTF16.decode(out.slice(0, len)))
-// const deserialized = JSON.parseSafe<Vec3>(`{"x":1,"y":true,"z":3}`);
-// console.log("Deserialized: " + JSON.stringify(deserialized));
+console.log("Deserialized: " + deserialized);
