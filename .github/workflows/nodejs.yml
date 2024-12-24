@@ -19,8 +19,5 @@ jobs:
       - name: Install Dependencies
         run: bun install
 
-      - name: Build Tests
-        run: bun run pretest
-
       - name: Run Tests
         run: bun run test
