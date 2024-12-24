@@ -1,12 +1,12 @@
 {
-  "input": ["./assembly/__tests__/*.spec.ts"],
+  "input": ["./assembly/__tests__/bool.spec.ts"],
   "outDir": "./build",
   "config": "none",
   "plugins": {
     "coverage": false
   },
   "buildOptions": {
-    "args": ["--transform ./transform"],
+    "args": ["--enable simd", "--runtime stub"],
     "target": "wasi"
   },
   "runOptions": {

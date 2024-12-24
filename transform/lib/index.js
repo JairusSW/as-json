@@ -1,12 +1,36 @@
-import { FieldDeclaration, IdentifierExpression, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression } from "assemblyscript/dist/assemblyscript.js";
-import { toString, isStdlib } from "visitor-as/dist/utils.js";
-import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
+import { IdentifierExpression, Source, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, Tokenizer } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
-class JSONTransform extends BaseVisitor {
+import { Visitor } from "./visitor.js";
+import { SimpleParser, toString } from "./util.js";
+import * as path from "path";
+import { fileURLToPath } from "url";
+console.log("Loaded transform");
+class JSONTransform extends Visitor {
+    parser;
     schemasList = [];
-    currentClass;
+    schema;
     sources = new Set();
+    imports = [];
+    requiredImport = null;
     visitMethodDeclaration() { }
+    visitImportStatement(node) {
+        const source = this.parser.sources.find(src => src.internalPath == node.internalPath);
+        if (!source)
+            return;
+        let valid = false;
+        for (const src of source.statements) {
+            if (src.kind == 59) {
+                const namespace = src;
+                if (namespace.name.text == "JSON") {
+                    valid = true;
+                    break;
+                }
+            }
+        }
+        if (!valid)
+            return;
+        this.imports.push(node);
+    }
     visitClassDeclaration(node) {
         if (!node.decorators?.length)
             return;
@@ -20,23 +44,24 @@ class JSONTransform extends BaseVisitor {
         }
         if (!found)
             return;
-        const schema = new SchemaData();
-        schema.node = node;
-        schema.name = node.name.text;
+        console.log(toString(node));
+        this.schema = new SchemaData();
+        this.schema.node = node;
+        this.schema.name = node.name.text;
         const members = [...node.members.filter((v) => v.kind === 54)];
         if (node.extendsType) {
-            schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text);
-            if (schema.parent?.members) {
-                for (let i = schema.parent.members.length - 1; i >= 0; i--) {
-                    const replace = schema.members.find((v) => v.name == schema.parent?.members[i]?.name);
+            this.schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text);
+            if (this.schema.parent?.members) {
+                for (let i = this.schema.parent.members.length - 1; i >= 0; i--) {
+                    const replace = this.schema.members.find((v) => v.name == this.schema.parent?.members[i]?.name);
                     if (!replace) {
-                        members.unshift(schema.parent?.members[i].node);
+                        members.unshift(this.schema.parent?.members[i].node);
                     }
                 }
             }
         }
         if (!members.length) {
-            let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize): string {\n  return "{}";\n}';
+            let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize = 0): string {\n  return "{}";\n}';
             let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
             let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
             if (process.env["JSON_DEBUG"]) {
@@ -53,30 +78,32 @@ class JSONTransform extends BaseVisitor {
                 node.members.push(INITIALIZE_METHOD_EMPTY);
             if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
                 node.members.push(DESERIALIZE_METHOD_EMPTY);
-            this.schemasList.push(schema);
+            this.schemasList.push(this.schema);
         }
-        for (const member of members) {
-            const name = member.name;
-            if (!(member instanceof FieldDeclaration))
+        for (const _member of members) {
+            if (_member.kind !== 54)
                 continue;
+            const member = _member;
             if (!member.type) {
                 throw new Error("Fields must be strongly typed! Found " + toString(member) + " at " + node.range.source.normalizedPath);
             }
-            const type = toString(member.type);
-            if (type.startsWith("(") && type.includes("=>"))
-                continue;
-            const value = member.initializer ? toString(member.initializer) : null;
             if (member.flags == 32)
                 continue;
             if (member.flags === 512)
                 continue;
             if (member.flags === 1024)
                 continue;
+            const type = toString(member.type);
+            const name = member.name;
+            const value = member.initializer ? toString(member.initializer) : null;
+            if (type.startsWith("(") && type.includes("=>"))
+                continue;
             const mem = new Property();
             mem.name = name.text;
             mem.type = type;
             mem.value = value;
             mem.node = member;
+            this.schema.members.push(mem);
             if (type.includes("JSON.Raw")) {
                 mem.flags.set(PropertyFlags.JSON_Raw, []);
             }
@@ -112,7 +139,7 @@ class JSONTransform extends BaseVisitor {
                     }
                 }
             }
-            mem.generate(false);
+            mem.generate();
             if (this.schemasList.find((v) => v.name == type)) {
                 mem.initialize = "this." + name.text + " = changetype<nonnull<" + mem.type + ">>(__new(offsetof<nonnull<" + mem.type + ">>(), idof<nonnull<" + mem.type + ">>()));\n  changetype<nonnull<" + mem.type + ">>(this." + name.text + ").__INITIALIZE()";
             }
@@ -140,29 +167,39 @@ class JSONTransform extends BaseVisitor {
             else if (type === "f32" || type === "f64") {
                 mem.initialize = "this." + name.text + " = 0.0";
             }
-            schema.members.push(mem);
         }
-        let SERIALIZE_RAW = "__SERIALIZE(ptr: usize): string {\n  let out = `{";
+        let SERIALIZE_RAW = "__SERIALIZE(ptr: usize = 0): string {\n  if (ptr == 0) ptr = changetype<usize>(this);\n  let out = `{";
         let SERIALIZE_PRETTY = "__SERIALIZE_PRETTY(): string {\n  let out = `{";
         let INITIALIZE = "__INITIALIZE(): this {\n";
         let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
         let indent = "  ";
-        if (!schema.members.length)
-            return;
         found = false;
-        if (schema.members[0]?.flags.has(PropertyFlags.OmitNull) || schema.members[0]?.flags.has(PropertyFlags.OmitIf)) {
-            SERIALIZE_RAW += schema.members[0]?.serialize;
-            SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize;
+        if (!this.imports.find(i => i.declarations.find(d => d.foreignName.text == "JSON"))) {
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = path.dirname(__filename);
+            let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../assembly/index.ts"));
+            if (!relativePath.startsWith(".") && !relativePath.startsWith("/"))
+                relativePath = "./" + relativePath;
+            const txt = "import { JSON } from \"" + relativePath + "\";";
+            if (!this.requiredImport) {
+                this.requiredImport = txt;
+                if (process.env["JSON_DEBUG"])
+                    console.log(txt + "\n");
+            }
+        }
+        if (this.schema.members[0]?.flags.has(PropertyFlags.OmitNull) || this.schema.members[0]?.flags.has(PropertyFlags.OmitIf)) {
+            SERIALIZE_RAW += this.schema.members[0]?.serialize;
+            SERIALIZE_PRETTY += "\\n" + this.schema.members[0]?.serialize;
         }
         else {
-            SERIALIZE_RAW += schema.members[0]?.serialize + ",";
-            SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize + ",\\n";
+            SERIALIZE_RAW += this.schema.members[0]?.serialize + ",";
+            SERIALIZE_PRETTY += "\\n" + this.schema.members[0]?.serialize + ",\\n";
             found = true;
         }
-        if (schema.members[0]?.initialize)
-            INITIALIZE += "  " + schema.members[0]?.initialize + ";\n";
-        for (let i = 1; i < schema.members.length; i++) {
-            const member = schema.members[i];
+        if (this.schema.members[0]?.initialize)
+            INITIALIZE += "  " + this.schema.members[0]?.initialize + ";\n";
+        for (let i = 1; i < this.schema.members.length; i++) {
+            const member = this.schema.members[i];
             if (member.initialize)
                 INITIALIZE += "  " + member.initialize + ";\n";
             if (member.flags.has(PropertyFlags.OmitNull) || member.flags.has(PropertyFlags.OmitIf)) {
@@ -185,7 +222,7 @@ class JSONTransform extends BaseVisitor {
         }
         INITIALIZE += "  return this;\n}";
         const sortedMembers = [];
-        const _sorted = schema.members.sort((a, b) => (a.alias?.length || a.name.length) - (b.alias?.length || b.name.length));
+        const _sorted = this.schema.members.sort((a, b) => (a.alias?.length || a.name.length) - (b.alias?.length || b.name.length));
         let len = -1;
         let offset = -1;
         for (let i = 0; i < _sorted.length; i++) {
@@ -289,37 +326,24 @@ class JSONTransform extends BaseVisitor {
             console.log(DESERIALIZE);
         }
         const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
-        const DESERIALIZE_SAFE = DESERIALIZE.replaceAll("__DESERIALIZE", "__DESERIALIZE_SAFE");
         const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
         const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
-        const DESERIALIZE_SAFE_METHOD = SimpleParser.parseClassMember(DESERIALIZE_SAFE, node);
         if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
             node.members.push(SERIALIZE_RAW_METHOD);
         if (!node.members.find((v) => v.name.text == "__INITIALIZE"))
             node.members.push(INITIALIZE_METHOD);
         if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
             node.members.push(DESERIALIZE_METHOD);
-        if (!node.members.find((v) => v.name.text == "__DESERIALIZE_SAFE"))
-            node.members.push(DESERIALIZE_SAFE_METHOD);
-        this.schemasList.push(schema);
     }
     visitSource(node) {
+        this.imports = [];
         super.visitSource(node);
-        if (!this.sources.has(node)) {
-            return;
-        }
-    }
-    visitCallExpression(node) {
-        if (!toString(node).startsWith("JSON.stringify(raw)"))
-            return;
-        console.log(node);
     }
 }
 export default class Transformer extends Transform {
     afterParse(parser) {
         const transformer = new JSONTransform();
         const sources = parser.sources
-            .filter((source) => !isStdlib(source))
             .sort((_a, _b) => {
             const a = _a.internalPath;
             const b = _b.internalPath;
@@ -333,9 +357,15 @@ export default class Transformer extends Transform {
                 return 0;
             }
         });
+        transformer.parser = parser;
         for (const source of sources) {
-            if (!isStdlib(source)) {
-                transformer.visit(source);
+            transformer.visit(source);
+            if (transformer.requiredImport) {
+                const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.requiredImport));
+                parser.currentSource = tokenizer.source;
+                source.statements.unshift(parser.parseTopLevelStatement(tokenizer));
+                parser.currentSource = source;
+                transformer.requiredImport = null;
             }
         }
         const schemas = transformer.schemasList;
@@ -369,7 +399,7 @@ class Property {
     node;
     right_s = "";
     right_d = "";
-    generate(safe) {
+    generate() {
         const name = this.name;
         const escapedName = escapeString(JSON.stringify(this.alias || this.name));
         const type = this.type;
@@ -382,12 +412,12 @@ class Property {
             }
             else {
                 this.right_s = "load<" + type + '>(ptr, offsetof<this>("' + name + '"))';
-                this.right_d = "data.substring(value_start, value_end);";
+                this.right_d = "data.substring(value_start, value_end)";
             }
         }
         else {
-            this.right_s = "__SERIALIZE<" + type + ">(load<" + type + '>(ptr, offsetof<this>("' + name + '")))';
-            this.right_d = (safe ? "__DESERIALIZE_SAFE" : "__DESERIALIZE") + "<" + type + ">(data.substring(value_start, value_end))";
+            this.right_s = "JSON.stringify<" + type + ">(load<" + type + '>(ptr, offsetof<this>("' + name + '")))';
+            this.right_d = "JSON.parse<" + type + ">(data.substring(value_start, value_end))";
         }
         if (this.flags.has(PropertyFlags.OmitIf)) {
             const condition = this.flags.get(PropertyFlags.OmitIf)[0];

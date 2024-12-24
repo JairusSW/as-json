@@ -1,18 +1,37 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression } from "assemblyscript/dist/assemblyscript.js";
-
-import { toString, isStdlib } from "visitor-as/dist/utils.js";
-import { BaseVisitor, SimpleParser } from "visitor-as/dist/index.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
-import { CallExpression } from "types:assemblyscript/src/ast";
-import binaryen from "binaryen";
-import { Program } from "types:assemblyscript/src/program";
+import { Visitor } from "./visitor.js";
+import { SimpleParser, toString } from "./util.js";
+import * as path from "path";
+import { fileURLToPath } from "url";
+console.log("Loaded transform");
 
-class JSONTransform extends BaseVisitor {
+class JSONTransform extends Visitor {
+  public parser!: Parser;
   public schemasList: SchemaData[] = [];
-  public currentClass!: SchemaData;
+  public schema!: SchemaData;
   public sources = new Set<Source>();
+  public imports: ImportStatement[] = [];
+  public requiredImport: string | null = null;
 
-  visitMethodDeclaration(): void {}
+  visitMethodDeclaration(): void { }
+  visitImportStatement(node: ImportStatement): void {
+    const source = this.parser.sources.find(src => src.internalPath == node.internalPath);
+    if (!source) return;
+
+    let valid = false;
+    for (const src of source.statements) {
+      if (src.kind == NodeKind.NamespaceDeclaration) {
+        const namespace = src as NamespaceDeclaration;
+        if (namespace.name.text == "JSON") {
+          valid = true;
+          break;
+        }
+      }
+    }
+    if (!valid) return;
+    this.imports.push(node);
+  }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
 
@@ -26,27 +45,29 @@ class JSONTransform extends BaseVisitor {
     }
     if (!found) return;
 
-    const schema = new SchemaData();
-    schema.node = node;
-    schema.name = node.name.text;
+    console.log(toString(node))
+
+    this.schema = new SchemaData();
+    this.schema.node = node;
+    this.schema.name = node.name.text;
 
     const members = [...node.members.filter((v) => v.kind === NodeKind.FieldDeclaration)];
 
     if (node.extendsType) {
-      schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text) as SchemaData | null;
+      this.schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text) as SchemaData | null;
 
-      if (schema.parent?.members) {
-        for (let i = schema.parent.members.length - 1; i >= 0; i--) {
-          const replace = schema.members.find((v) => v.name == schema.parent?.members[i]?.name);
+      if (this.schema.parent?.members) {
+        for (let i = this.schema.parent.members.length - 1; i >= 0; i--) {
+          const replace = this.schema.members.find((v) => v.name == this.schema.parent?.members[i]?.name);
           if (!replace) {
-            members.unshift(schema.parent?.members[i]!.node);
+            members.unshift(this.schema.parent?.members[i]!.node);
           }
         }
       }
     }
 
     if (!members.length) {
-      let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize): string {\n  return "{}";\n}';
+      let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize = 0): string {\n  return "{}";\n}';
       //let SERIALIZE_PRETTY_EMPTY = "__SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
 
       let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
@@ -69,28 +90,31 @@ class JSONTransform extends BaseVisitor {
       if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD_EMPTY);
       if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD_EMPTY);
 
-      this.schemasList.push(schema);
+      this.schemasList.push(this.schema);
     }
 
-    for (const member of members) {
-      const name = member.name;
-      if (!(member instanceof FieldDeclaration)) continue;
+    for (const _member of members) {
+      if (_member.kind !== NodeKind.FieldDeclaration) continue;
+      const member = _member as FieldDeclaration;
       if (!member.type) {
         throw new Error("Fields must be strongly typed! Found " + toString(member) + " at " + node.range.source.normalizedPath);
       }
-      const type = toString(member.type!);
-      if (type.startsWith("(") && type.includes("=>")) continue;
-      const value = member.initializer ? toString(member.initializer!) : null;
 
       if (member.flags == CommonFlags.Static) continue;
       if (member.flags === CommonFlags.Private) continue;
       if (member.flags === CommonFlags.Protected) continue;
 
+      const type = toString(member.type!);
+      const name = member.name;
+      const value = member.initializer ? toString(member.initializer!) : null;
+
+      if (type.startsWith("(") && type.includes("=>")) continue;
       const mem = new Property();
       mem.name = name.text;
       mem.type = type;
       mem.value = value;
       mem.node = member;
+      this.schema.members.push(mem);
 
       if (type.includes("JSON.Raw")) {
         mem.flags.set(PropertyFlags.JSON_Raw, []);
@@ -130,7 +154,7 @@ class JSONTransform extends BaseVisitor {
         }
       }
 
-      mem.generate(false);
+      mem.generate();
 
       if (this.schemasList.find((v) => v.name == type)) {
         mem.initialize = "this." + name.text + " = changetype<nonnull<" + mem.type + ">>(__new(offsetof<nonnull<" + mem.type + ">>(), idof<nonnull<" + mem.type + ">>()));\n  changetype<nonnull<" + mem.type + ">>(this." + name.text + ").__INITIALIZE()";
@@ -151,11 +175,9 @@ class JSONTransform extends BaseVisitor {
       } else if (type === "f32" || type === "f64") {
         mem.initialize = "this." + name.text + " = 0.0";
       }
-
-      schema.members.push(mem);
     }
 
-    let SERIALIZE_RAW = "__SERIALIZE(ptr: usize): string {\n  let out = `{";
+    let SERIALIZE_RAW = "__SERIALIZE(ptr: usize = 0): string {\n  if (ptr == 0) ptr = changetype<usize>(this);\n  let out = `{";
     let SERIALIZE_PRETTY = "__SERIALIZE_PRETTY(): string {\n  let out = `{";
 
     let INITIALIZE = "__INITIALIZE(): this {\n";
@@ -163,23 +185,42 @@ class JSONTransform extends BaseVisitor {
     let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
     let indent = "  ";
 
-    if (!schema.members.length) return;
-
     found = false;
 
-    if (schema.members[0]?.flags.has(PropertyFlags.OmitNull) || schema.members[0]?.flags.has(PropertyFlags.OmitIf)) {
-      SERIALIZE_RAW += schema.members[0]?.serialize;
-      SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize;
+    if (!this.imports.find(i => i.declarations.find(d => d.foreignName.text == "JSON"))) {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+
+      let relativePath = path.relative(
+        path.dirname(node.range.source.normalizedPath),
+        path.resolve(__dirname, "../../assembly/index.ts")
+      );
+
+      if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
+      // if (!existsSync(relativePath)) {
+      //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
+      // }
+
+      const txt = "import { JSON } from \"" + relativePath + "\";"
+      if (!this.requiredImport) {
+        this.requiredImport = txt;
+        if (process.env["JSON_DEBUG"]) console.log(txt + "\n");
+      }
+    }
+
+    if (this.schema.members[0]?.flags.has(PropertyFlags.OmitNull) || this.schema.members[0]?.flags.has(PropertyFlags.OmitIf)) {
+      SERIALIZE_RAW += this.schema.members[0]?.serialize;
+      SERIALIZE_PRETTY += "\\n" + this.schema.members[0]?.serialize;
     } else {
-      SERIALIZE_RAW += schema.members[0]?.serialize + ",";
-      SERIALIZE_PRETTY += "\\n" + schema.members[0]?.serialize + ",\\n";
+      SERIALIZE_RAW += this.schema.members[0]?.serialize + ",";
+      SERIALIZE_PRETTY += "\\n" + this.schema.members[0]?.serialize + ",\\n";
       found = true;
     }
 
-    if (schema.members[0]?.initialize) INITIALIZE += "  " + schema.members[0]?.initialize + ";\n";
+    if (this.schema.members[0]?.initialize) INITIALIZE += "  " + this.schema.members[0]?.initialize + ";\n";
 
-    for (let i = 1; i < schema.members.length; i++) {
-      const member = schema.members[i]!;
+    for (let i = 1; i < this.schema.members.length; i++) {
+      const member = this.schema.members[i]!;
       if (member.initialize) INITIALIZE += "  " + member.initialize + ";\n";
       if (member.flags.has(PropertyFlags.OmitNull) || member.flags.has(PropertyFlags.OmitIf)) {
         SERIALIZE_RAW += member.serialize;
@@ -202,7 +243,7 @@ class JSONTransform extends BaseVisitor {
     INITIALIZE += "  return this;\n}";
 
     const sortedMembers: Property[][] = [];
-    const _sorted = schema.members.sort((a, b) => (a.alias?.length! || a.name.length) - (b.alias?.length! || b.name.length));
+    const _sorted = this.schema.members.sort((a, b) => (a.alias?.length! || a.name.length) - (b.alias?.length! || b.name.length));
     let len = -1;
     let offset = -1;
     for (let i = 0; i < _sorted.length; i++) {
@@ -298,31 +339,29 @@ class JSONTransform extends BaseVisitor {
 
     const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
 
-    const DESERIALIZE_SAFE = DESERIALIZE.replaceAll("__DESERIALIZE", "__DESERIALIZE_SAFE");
+    // const DESERIALIZE_SAFE = DESERIALIZE.replaceAll("__DESERIALIZE", "__DESERIALIZE_SAFE");
     //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
     const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
-    const DESERIALIZE_SAFE_METHOD = SimpleParser.parseClassMember(DESERIALIZE_SAFE, node);
+    // const DESERIALIZE_SAFE_METHOD = SimpleParser.parseClassMember(DESERIALIZE_SAFE, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD);
     if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
-    if (!node.members.find((v) => v.name.text == "__DESERIALIZE_SAFE")) node.members.push(DESERIALIZE_SAFE_METHOD);
-
-    this.schemasList.push(schema);
+    // if (!node.members.find((v) => v.name.text == "__DESERIALIZE_SAFE")) node.members.push(DESERIALIZE_SAFE_METHOD);
   }
   visitSource(node: Source): void {
+    // this.currentSource = node;
+    this.imports = [];
     super.visitSource(node);
-
     // Only add the import statement to sources that have JSON decorated classes.
-    if (!this.sources.has(node)) {
-      return;
-    }
+    // if (!this.sources.has(node)) {
+    //   return;
+    // }
   }
-  visitCallExpression(node: CallExpression): void {
-    if (!toString(node).startsWith("JSON.stringify(raw)")) return;
-    console.log(node)
-  }
+  // visitCallExpression(node: CallExpression): void {
+  //   if (!toString(node).startsWith("JSON.stringify(raw)")) return;
+  // }
 }
 
 export default class Transformer extends Transform {
@@ -333,7 +372,6 @@ export default class Transformer extends Transform {
 
     // Sort the sources so that user scripts are visited last
     const sources = parser.sources
-      .filter((source) => !isStdlib(source))
       .sort((_a, _b) => {
         const a = _a.internalPath;
         const b = _b.internalPath;
@@ -346,11 +384,24 @@ export default class Transformer extends Transform {
         }
       });
 
+    transformer.parser = parser;
     // Loop over every source
     for (const source of sources) {
       // Ignore all lib and std. Visit everything else.
-      if (!isStdlib(source)) {
-        transformer.visit(source);
+      transformer.visit(source);
+
+      if (transformer.requiredImport) {
+        const tokenizer = new Tokenizer(
+          new Source(
+            SourceKind.User,
+            source.normalizedPath,
+            transformer.requiredImport,
+          ),
+        );
+        parser.currentSource = tokenizer.source;
+        source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
+        parser.currentSource = source;
+        transformer.requiredImport = null;
       }
     }
     // Check that every parent and child class is hooked up correctly
@@ -389,7 +440,7 @@ class Property {
   private right_s: string = "";
   private right_d: string = "";
 
-  public generate(safe: boolean): void {
+  public generate(): void {
     const name = this.name;
     const escapedName = escapeString(JSON.stringify(this.alias || this.name));
     const type = this.type;
@@ -401,11 +452,11 @@ class Property {
         this.right_d = "value_start === value_end - 4 && 30399761348886638 === load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
       } else {
         this.right_s = "load<" + type + '>(ptr, offsetof<this>("' + name + '"))';
-        this.right_d = "data.substring(value_start, value_end);";
+        this.right_d = "data.substring(value_start, value_end)";
       }
     } else {
-      this.right_s = "__SERIALIZE<" + type + ">(load<" + type + '>(ptr, offsetof<this>("' + name + '")))';
-      this.right_d = (safe ? "__DESERIALIZE_SAFE" : "__DESERIALIZE") + "<" + type + ">(data.substring(value_start, value_end))";
+      this.right_s = "JSON.stringify<" + type + ">(load<" + type + '>(ptr, offsetof<this>("' + name + '")))';
+      this.right_d = "JSON.parse<" + type + ">(data.substring(value_start, value_end))";
     }
 
     if (this.flags.has(PropertyFlags.OmitIf)) {
