@@ -1,10 +1,9 @@
-import { IdentifierExpression, Source, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, Tokenizer } from "assemblyscript/dist/assemblyscript.js";
+import { IdentifierExpression, Source, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, Node, Tokenizer } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
 import * as path from "path";
 import { fileURLToPath } from "url";
-console.log("Loaded transform");
 class JSONTransform extends Visitor {
     parser;
     schemasList = [];
@@ -12,8 +11,8 @@ class JSONTransform extends Visitor {
     sources = new Set();
     imports = [];
     requiredImport = null;
-    visitMethodDeclaration() { }
     visitImportStatement(node) {
+        super.visitImportStatement(node);
         const source = this.parser.sources.find(src => src.internalPath == node.internalPath);
         if (!source)
             return;
@@ -334,6 +333,36 @@ class JSONTransform extends Visitor {
             node.members.push(INITIALIZE_METHOD);
         if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
             node.members.push(DESERIALIZE_METHOD);
+        super.visitClassDeclaration(node);
+    }
+    visitCallExpression(node, ref) {
+        super.visitCallExpression(node, ref);
+        if (!(node.expression.kind == 21 &&
+            node.expression.property.text == "stringifyTo")
+            &&
+                !(node.expression.kind == 6 &&
+                    node.expression.text == "stringifyTo"))
+            return;
+        const source = node.range.source;
+        if (ref.kind == 9) {
+            const newNode = Node.createBinaryExpression(101, node.args[1], node, node.range);
+            ref.args[ref.args.indexOf(node)] = newNode;
+            console.log(toString(ref));
+        }
+        else {
+            const newNode = Node.createExpressionStatement(Node.createBinaryExpression(101, node.args[1], node, node.range));
+            const nodeIndex = source.statements.findIndex((n) => {
+                if (n == node)
+                    return true;
+                if (n.kind === 38 && n.expression == node)
+                    return true;
+                return false;
+            });
+            console.log("Index: " + nodeIndex);
+            if (nodeIndex > 0)
+                source.statements[nodeIndex] = newNode;
+            console.log(toString(source), ref.kind);
+        }
     }
     visitSource(node) {
         this.imports = [];
@@ -359,6 +388,8 @@ export default class Transformer extends Transform {
         });
         transformer.parser = parser;
         for (const source of sources) {
+            transformer.imports = [];
+            transformer.currentSource = source;
             transformer.visit(source);
             if (transformer.requiredImport) {
                 const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.requiredImport));

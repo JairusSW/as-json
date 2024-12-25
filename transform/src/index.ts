@@ -1,10 +1,11 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
 import * as path from "path";
 import { fileURLToPath } from "url";
-console.log("Loaded transform");
+import { CommentKind } from "types:assemblyscript/src/ast";
+import { Range } from "types:assemblyscript/src/diagnostics";
 
 class JSONTransform extends Visitor {
   public parser!: Parser;
@@ -14,8 +15,8 @@ class JSONTransform extends Visitor {
   public imports: ImportStatement[] = [];
   public requiredImport: string | null = null;
 
-  visitMethodDeclaration(): void { }
   visitImportStatement(node: ImportStatement): void {
+    super.visitImportStatement(node);
     const source = this.parser.sources.find(src => src.internalPath == node.internalPath);
     if (!source) return;
 
@@ -339,29 +340,63 @@ class JSONTransform extends Visitor {
 
     const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
 
-    // const DESERIALIZE_SAFE = DESERIALIZE.replaceAll("__DESERIALIZE", "__DESERIALIZE_SAFE");
     //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
     const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
-    // const DESERIALIZE_SAFE_METHOD = SimpleParser.parseClassMember(DESERIALIZE_SAFE, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD);
     if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
-    // if (!node.members.find((v) => v.name.text == "__DESERIALIZE_SAFE")) node.members.push(DESERIALIZE_SAFE_METHOD);
+    super.visitClassDeclaration(node);
+  }
+  visitCallExpression(node: CallExpression, ref: Node): void {
+    super.visitCallExpression(node, ref);
+    if (
+      !(
+        node.expression.kind == NodeKind.PropertyAccess &&
+        (node.expression as PropertyAccessExpression).property.text == "stringifyTo"
+      )
+      &&
+      !(
+        node.expression.kind == NodeKind.Identifier &&
+        (node.expression as IdentifierExpression).text == "stringifyTo"
+      )
+    ) return;
+
+    const source = node.range.source;
+
+    if (ref.kind == NodeKind.Call) {
+      const newNode = Node.createBinaryExpression(
+        Token.Equals,
+        node.args[1],
+        node,
+        node.range
+      );
+
+      (<CallExpression>ref).args[(<CallExpression>ref).args.indexOf(node)] = newNode;
+    } else {
+      const newNode = Node.createExpressionStatement(
+        Node.createBinaryExpression(
+          Token.Equals,
+          node.args[1],
+          node,
+          node.range
+        )
+      );
+
+      const nodeIndex = source.statements.findIndex((n: Node) => {
+        if (n == node) return true;
+        if (n.kind === NodeKind.Expression && (<ExpressionStatement>n).expression == node) return true;
+        return false;
+      });
+
+      if (nodeIndex > 0) source.statements[nodeIndex] = newNode;
+    }
   }
   visitSource(node: Source): void {
-    // this.currentSource = node;
     this.imports = [];
     super.visitSource(node);
-    // Only add the import statement to sources that have JSON decorated classes.
-    // if (!this.sources.has(node)) {
-    //   return;
-    // }
   }
-  // visitCallExpression(node: CallExpression): void {
-  //   if (!toString(node).startsWith("JSON.stringify(raw)")) return;
-  // }
 }
 
 export default class Transformer extends Transform {
@@ -387,6 +422,8 @@ export default class Transformer extends Transform {
     transformer.parser = parser;
     // Loop over every source
     for (const source of sources) {
+      transformer.imports = [];
+      transformer.currentSource = source;
       // Ignore all lib and std. Visit everything else.
       transformer.visit(source);
 

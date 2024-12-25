@@ -1,13 +1,27 @@
 // import { JSON } from "./index"
+import { BLOCK_MAXSIZE, OBJECT, TOTAL_OVERHEAD } from "rt/common";
+import { E_INVALIDLENGTH } from "util/error";
+import { JSON } from ".";
 
-@json
-class Vec3<T> {
-  public x: i32 = 0;
-  public y: i32 = 0;
-  public z: T;
-}
+// import { Buffer } from "./custom/buffer";
+// import { serializeString_SIMD } from "./serialize/simd/string";
 
-console.log(new Vec3<i32>().__SERIALIZE())
+// @json
+// class Vec3<T> {
+//   public x: i32 = 0;
+//   public y: i32 = 0;
+//   public z: T;
+// }
+
+let a = "hello\\ the\"re how are you doing?";
+const b = "world";
+JSON.stringifyTo(a, a)
+// console.log(JSON.stringifyTo(a, a));
+
+console.log("A: " + a.toString());
+console.log("B: " + b.toString());
+
+// console.log(new Vec3<i32>().__SERIALIZE())
 
 // @json
 // class Base {

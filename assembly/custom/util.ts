@@ -1,7 +1,6 @@
 import { isSpace } from "util/string";
-import { BACK_SLASH, BRACE_LEFT, BRACKET_LEFT, CHAR_F, CHAR_T, QUOTE } from "./chars";
+import { BACK_SLASH,  QUOTE } from "./chars";
 import { Sink } from "./sink";
-import { JSON } from "..";
 
 // @ts-ignore: Decorator
 export function isMap<T>(): bool {
@@ -12,48 +11,6 @@ export function isMap<T>(): bool {
 // @ts-ignore: Decorator
 @inline export function unsafeCharCodeAt(data: string, pos: i32): i32 {
   return load<u16>(changetype<usize>(data) + ((<usize>pos) << 1));
-}
-
-// @ts-ignore: Decorator
-@inline export function removeWhitespace(data: string): string {
-  const result = new Sink();
-  let instr = false;
-  for (let i = 0; i < data.length; i++) {
-    const char = unsafeCharCodeAt(data, i);
-    if (instr === false && char === QUOTE) instr = true;
-    else if (instr === true && char === QUOTE && unsafeCharCodeAt(data, i - 1) !== BACK_SLASH) instr = false;
-
-    if (instr === false) {
-      if (!isSpace(char)) result.write(data.charAt(i));
-    } else {
-      result.write(data.charAt(i));
-    }
-  }
-  return result.toString();
-}
-
-// @ts-ignore: Decorator
-@inline export function escapeChar(char: string): string {
-  switch (unsafeCharCodeAt(char, 0)) {
-    case 0x22:
-      return '\\"';
-    case 0x5c:
-      return "\\\\";
-    case 0x08:
-      return "\\b";
-    case 0x0a:
-      return "\\n";
-    case 0x0d:
-      return "\\r";
-    case 0x09:
-      return "\\t";
-    case 0x0c:
-      return "\\f";
-    case 0x0b:
-      return "\\u000b";
-    default:
-      return char;
-  }
 }
 
 /**
@@ -343,23 +300,13 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
 }
 
 // @ts-ignore
-@inline function equalsSlice(p1_data: string, p1_start: i32, p1_end: i32, p2_data: string, p2_start: i32, p2_end: i32): boolean {
-  const p1_len = p1_end - p1_start;
-  const p2_len = p2_end - p2_start;
-  if (p1_len != p2_len) return false;
-  if (p1_len == 2) {
-    return load<u16>(changetype<usize>(p1_data) + p1_start) == load<u16>(changetype<usize>(p2_data) + p2_start);
-  }
-  return memory.compare(changetype<usize>(p1_data) + p1_start, changetype<usize>(p2_data) + p2_start, p1_len) === 0;
-}
-
-// @ts-ignore
 @inline export function containsCodePoint(str: string, code: u32, start: i32, end: i32): bool {
   for (let i = start; i <= end; i++) {
     if (unsafeCharCodeAt(str, i) == code) return true;
   }
   return false;
 }
+
 
 // @ts-ignore: Decorator
 @inline export function _intTo16(int: i32): i32 {

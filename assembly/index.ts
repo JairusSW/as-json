@@ -7,17 +7,23 @@ import { serializeObject } from "./serialize/simple/object";
 import { serializeDate } from "./serialize/simple/date";
 import { serializeArray } from "./serialize/simple/array";
 import { serializeMap } from "./serialize/simple/map";
-import { deserializeBoolean, deserializeBoolean_Safe } from "./deserialize/simple/bool";
-import { deserializeArray, deserializeArray_Safe } from "./deserialize/simple/array";
+import { deserializeBoolean } from "./deserialize/simple/bool";
+import { deserializeArray } from "./deserialize/simple/array";
 import { deserializeFloat } from "./deserialize/simple/float";
-import { deserializeObject, deserializeObject_Safe } from "./deserialize/simple/object";
-import { deserializeMap, deserializeMap_Safe } from "./deserialize/simple/map";
+import { deserializeObject } from "./deserialize/simple/object";
+import { deserializeMap } from "./deserialize/simple/map";
 import { deserializeDate } from "./deserialize/simple/date";
-import { NULL_WORD } from "./custom/chars";
-import { deserializeInteger, deserializeInteger_Safe } from "./deserialize/simple/integer";
-import { deserializeString, deserializeString_Safe } from "./deserialize/simple/string";
-import { Sink } from "./custom/sink";
+import { deserializeInteger } from "./deserialize/simple/integer";
+import { deserializeString } from "./deserialize/simple/string";
 import { serializeArbitrary } from "./serialize/simple/arbitrary";
+
+import { Sink } from "./custom/sink";
+import { NULL_WORD } from "./custom/chars";
+import { setCapacity } from "./custom/memory";
+
+import { BLOCK_MAXSIZE, OBJECT, TOTAL_OVERHEAD } from "rt/common";
+import { E_INVALIDLENGTH } from "util/error";
+import { serializeString_SIMD } from "./serialize/simd/string";
 
 // Config
 class SerializeOptions {
@@ -40,6 +46,24 @@ const DEFAULT_SERIALIZE_OPTIONS = new SerializeOptions();
  */
 export namespace JSON {
   /**
+  * Serializes valid JSON data.
+  * ```js
+  * JSON.stringify<T>(data)
+  * ```
+  * @param data T
+  * @returns string
+  */
+    export function stringifyTo<T>(data: T, out: string): string {
+      if (isString<T>()) {
+        const oldCapacity = changetype<OBJECT>(changetype<usize>(out) - TOTAL_OVERHEAD).rtSize;
+        const outPtr = setCapacity(out, oldCapacity, oldCapacity << 1);
+        out = changetype<string>(__renew(outPtr, serializeString_SIMD(data as string, outPtr)));
+        return changetype<string>(outPtr);
+      } else {
+        return unreachable();
+      }
+    }
+  /**
    * Serializes valid JSON data.
    * ```js
    * JSON.stringify<T>(data)
@@ -47,7 +71,7 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  export function stringify<T>(data: T /*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
+  export function stringify<T>(data: T): string {
     if (isBoolean<T>()) {
       return serializeBool(data as bool);
     } else if (isInteger<T>()) {
