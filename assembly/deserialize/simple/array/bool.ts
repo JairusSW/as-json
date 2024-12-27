@@ -8,9 +8,9 @@ import { deserializeBoolean } from "../bool";
   let lastPos = 1;
   for (let i = 1; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if (char === CHAR_T || char === CHAR_F) {
+    if (char == CHAR_T || char == CHAR_F) {
       lastPos = i;
-    } else if (char === CHAR_E) {
+    } else if (char == CHAR_E) {
       i++;
       result.push(deserializeBoolean(data.slice(lastPos, i)));
     }

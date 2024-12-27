@@ -36,7 +36,7 @@ class JSONTransform extends Visitor {
         let found = false;
         for (const decorator of node.decorators) {
             const name = decorator.name.text;
-            if (name === "json" || name === "serializable") {
+            if (name == "json" || name == "serializable") {
                 found = true;
                 break;
             }
@@ -47,7 +47,7 @@ class JSONTransform extends Visitor {
         this.schema = new SchemaData();
         this.schema.node = node;
         this.schema.name = node.name.text;
-        const members = [...node.members.filter((v) => v.kind === 54)];
+        const members = [...node.members.filter((v) => v.kind == 54)];
         if (node.extendsType) {
             this.schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text);
             if (this.schema.parent?.members) {
@@ -88,9 +88,9 @@ class JSONTransform extends Visitor {
             }
             if (member.flags == 32)
                 continue;
-            if (member.flags === 512)
+            if (member.flags == 512)
                 continue;
-            if (member.flags === 1024)
+            if (member.flags == 1024)
                 continue;
             const type = toString(member.type);
             const name = member.name;
@@ -145,25 +145,25 @@ class JSONTransform extends Visitor {
             else if (mem.value) {
                 mem.initialize = "this." + name.text + " = " + mem.value;
             }
-            else if (type === "Map") {
+            else if (type == "Map") {
                 mem.initialize = "this." + name.text + " = new " + mem.type + "()";
             }
-            else if (type === "string") {
+            else if (type == "string") {
                 mem.initialize = "this." + name.text + ' = ""';
             }
-            else if (type === "Array") {
+            else if (type == "Array") {
                 mem.initialize = "this." + name.text + " = instantiate<" + mem.type + ">()";
             }
-            else if (type === "bool" || type === "boolean") {
+            else if (type == "bool" || type == "boolean") {
                 mem.initialize = "this." + name.text + " = false";
             }
-            else if (type === "JSON.Raw") {
+            else if (type == "JSON.Raw") {
                 mem.initialize = "this." + name.text + ' = ""';
             }
-            else if (type === "u8" || type === "u16" || type === "u32" || type === "u64" || type === "i8" || type === "i16" || type === "i32" || type === "i64") {
+            else if (type == "u8" || type == "u16" || type == "u32" || type == "u64" || type == "i8" || type == "i16" || type == "i32" || type == "i64") {
                 mem.initialize = "this." + name.text + " = 0";
             }
-            else if (type === "f32" || type === "f64") {
+            else if (type == "f32" || type == "f64") {
                 mem.initialize = "this." + name.text + " = 0.0";
             }
         }
@@ -227,7 +227,7 @@ class JSONTransform extends Visitor {
         for (let i = 0; i < _sorted.length; i++) {
             const member = _sorted[i];
             const _name = member.alias || member.name;
-            if (_name.length === len) {
+            if (_name.length == len) {
                 sortedMembers[offset]?.push(member);
             }
             else {
@@ -240,40 +240,40 @@ class JSONTransform extends Visitor {
         for (const memberSet of sortedMembers) {
             const firstMember = memberSet[0];
             const _name = encodeKey(firstMember.alias || firstMember.name);
-            if (_name.length === 1) {
+            if (_name.length == 1) {
                 if (first) {
-                    DESERIALIZE += "  if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
+                    DESERIALIZE += "  if (1 == len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
                     first = false;
                 }
                 else {
-                    DESERIALIZE += "else if (1 === len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
+                    DESERIALIZE += "else if (1 == len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
                 }
             }
-            else if (_name.length === 2) {
+            else if (_name.length == 2) {
                 if (first) {
-                    DESERIALIZE += "  if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
+                    DESERIALIZE += "  if (2 == len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
                     first = false;
                 }
                 else {
-                    DESERIALIZE += "else if (2 === len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
+                    DESERIALIZE += "else if (2 == len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
                 }
             }
-            else if (_name.length === 4) {
+            else if (_name.length == 4) {
                 if (first) {
-                    DESERIALIZE += "  if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
+                    DESERIALIZE += "  if (4 == len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
                     first = false;
                 }
                 else {
-                    DESERIALIZE += "else if (4 === len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
+                    DESERIALIZE += "else if (4 == len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
                 }
             }
             else {
                 if (first) {
-                    DESERIALIZE += "  if (" + _name.length + " === len) {\n";
+                    DESERIALIZE += "  if (" + _name.length + " == len) {\n";
                     first = false;
                 }
                 else {
-                    DESERIALIZE += "else if (" + _name.length + " === len) {\n";
+                    DESERIALIZE += "else if (" + _name.length + " == len) {\n";
                 }
             }
             let f = true;
@@ -282,28 +282,28 @@ class JSONTransform extends Visitor {
                 if (!member.deserialize)
                     continue;
                 const _name = encodeKey(member.alias || member.name);
-                if (_name.length === 1) {
+                if (_name.length == 1) {
                     DESERIALIZE += `      case ${_name.charCodeAt(0)}: { /* ${_name} */\n        ${member.deserialize}\n        return true;\n      }\n`;
                 }
-                else if (_name.length === 2) {
+                else if (_name.length == 2) {
                     DESERIALIZE += `      case ${charCodeAt32(_name, 0)}: { /* ${_name} */\n        ${member.deserialize}\n        return true;\n      }\n`;
                 }
-                else if (_name.length === 4) {
+                else if (_name.length == 4) {
                     if (f) {
                         f = false;
-                        DESERIALIZE += `    if (${charCodeAt64(_name, 0)} === code) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
+                        DESERIALIZE += `    if (${charCodeAt64(_name, 0)} == code) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
                     }
                     else {
-                        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + `else if (${charCodeAt64(_name, 0)} === code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
+                        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + `else if (${charCodeAt64(_name, 0)} == code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
                     }
                 }
                 else {
                     if (f) {
                         f = false;
-                        DESERIALIZE += `    if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
+                        DESERIALIZE += `    if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
                     }
                     else {
-                        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else if (0 === memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
+                        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
                     }
                 }
             }
@@ -347,22 +347,21 @@ class JSONTransform extends Visitor {
         if (ref.kind == 9) {
             const newNode = Node.createBinaryExpression(101, node.args[1], node, node.range);
             ref.args[ref.args.indexOf(node)] = newNode;
-            console.log(toString(ref));
         }
         else {
             const newNode = Node.createExpressionStatement(Node.createBinaryExpression(101, node.args[1], node, node.range));
             const nodeIndex = source.statements.findIndex((n) => {
                 if (n == node)
                     return true;
-                if (n.kind === 38 && n.expression == node)
+                if (n.kind == 38 && n.expression == node)
                     return true;
                 return false;
             });
-            console.log("Index: " + nodeIndex);
             if (nodeIndex > 0)
                 source.statements[nodeIndex] = newNode;
-            console.log(toString(source), ref.kind);
         }
+    }
+    visitBinaryExpression(node, ref) {
     }
     visitSource(node) {
         this.imports = [];
@@ -376,10 +375,10 @@ export default class Transformer extends Transform {
             .sort((_a, _b) => {
             const a = _a.internalPath;
             const b = _b.internalPath;
-            if (a[0] === "~" && b[0] !== "~") {
+            if (a[0] == "~" && b[0] !== "~") {
                 return -1;
             }
-            else if (a[0] !== "~" && b[0] === "~") {
+            else if (a[0] !== "~" && b[0] == "~") {
                 return 1;
             }
             else {
@@ -402,7 +401,7 @@ export default class Transformer extends Transform {
         const schemas = transformer.schemasList;
         for (const schema of schemas) {
             if (schema.parent) {
-                const parent = schemas.find((v) => v.name === schema.parent?.name);
+                const parent = schemas.find((v) => v.name == schema.parent?.name);
                 if (!parent)
                     throw new Error(`Class ${schema.name} extends its parent class ${schema.parent}, but ${schema.parent} does not include a @json or @serializable decorator! Add the decorator and rebuild.`);
             }
@@ -439,7 +438,7 @@ class Property {
         if (this.flags.has(PropertyFlags.JSON_Raw)) {
             if (this.flags.has(PropertyFlags.Null)) {
                 this.right_s = "(load<" + type + '>(ptr, offsetof<this>("' + name + '")) || "null")';
-                this.right_d = "value_start === value_end - 4 && 30399761348886638 === load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
+                this.right_d = "value_start == value_end - 4 && 30399761348886638 == load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
             }
             else {
                 this.right_s = "load<" + type + '>(ptr, offsetof<this>("' + name + '"))';

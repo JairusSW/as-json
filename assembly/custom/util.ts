@@ -51,8 +51,8 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
 @inline export function snip_fast<T extends number>(str: string, len: u32 = 0, offset: u32 = 0): T {
   if (isSigned<T>()) {
     const firstChar: u32 = load<u16>(changetype<usize>(str));
-    if (firstChar === 48) return 0 as T;
-    const isNegative = firstChar === 45; // Check if the number is negative
+    if (firstChar == 48) return 0 as T;
+    const isNegative = firstChar == 45; // Check if the number is negative
     let val: T = 0 as T;
     if (len == 0) len = u32(str.length << 1);
     if (isNegative) {
@@ -156,7 +156,7 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
     }
   } else {
     const firstChar: u32 = load<u16>(changetype<usize>(str));
-    if (firstChar === 48) return 0 as T;
+    if (firstChar == 48) return 0 as T;
     let val: T = 0 as T;
     if (len == 0) len = u32(str.length << 1);
     if (len >= 4) {
@@ -219,7 +219,7 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
   if (!end) end = start + u32(str.length << 1);
   if (isSigned<T>()) {
     // Negative path
-    if (load<u16>(changetype<usize>(str) + <usize>start) === 45) {
+    if (load<u16>(changetype<usize>(str) + <usize>start) == 45) {
       start += 2;
       for (; start < end; start += 2) {
         val = (val * 10 + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
@@ -253,14 +253,14 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
   let val: T = 0;
   let offset = 0;
   let firstChar = load<u16>(changetype<usize>(str) + <usize>offset);
-  if (firstChar === 45) {
+  if (firstChar == 45) {
     offset = 2;
   }
   for (; offset < str.length << 1; offset += 2) {
     const char = load<u16>(changetype<usize>(str) + <usize>offset);
-    if (char === 101 || char === 69) {
+    if (char == 101 || char == 69) {
       const char = load<u16>(changetype<usize>(str) + <usize>(offset += 2));
-      if (char === 45) {
+      if (char == 45) {
         // @ts-ignore
         val /= sciNote<T>(__atoi_fast<T>(str, (offset += 2)));
         // @ts-ignore
@@ -276,7 +276,7 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
     val = (val << 1) + (val << 3) + (char - 48);
     // We use load because in this case, there is no need to have bounds-checking
   }
-  if (firstChar === 45) {
+  if (firstChar == 45) {
     val = -val as T;
   }
   return val;
@@ -336,4 +336,9 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
       return ((87 + low) << 16) | (87 + high);
     }
   }
+}
+
+// @ts-ignore: Decorator valid here
+@inline export function nextPowerOf2(n: u32): u32 {
+  return 1 << (32 - clz(n - 1));
 }

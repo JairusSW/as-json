@@ -12,15 +12,15 @@ export function deserializeArrayArray<T extends unknown[][]>(data: string): T {
   //i++;
   for (; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if (char === BRACKET_LEFT) {
-      if (depth === 0) {
+    if (char == BRACKET_LEFT) {
+      if (depth == 0) {
         lastPos = i;
       }
       // Shifting is 6% faster than incrementing
       depth++;
-    } else if (char === BRACKET_RIGHT) {
+    } else if (char == BRACKET_RIGHT) {
       depth--;
-      if (depth === 0) {
+      if (depth == 0) {
         i++;
         result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
       }

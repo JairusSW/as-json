@@ -11,7 +11,7 @@ import { deserializeInteger } from "../integer";
   let awaitingParse = false;
   for (; i < data.length; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if (lastPos === 0 && ((char >= 48 && char <= 57) || char === 45)) {
+    if (lastPos == 0 && ((char >= 48 && char <= 57) || char == 45)) {
       awaitingParse = true;
       lastPos = i;
     } else if (awaitingParse && (isSpace(char) || char == COMMA || char == BRACKET_RIGHT) && lastPos > 0) {

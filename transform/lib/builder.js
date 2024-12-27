@@ -150,7 +150,7 @@ export class ASTBuilder extends Visitor {
                 util.indent(sb, this.indentLevel);
                 let name = names[i];
                 let value = values[i];
-                if (name === value) {
+                if (name == value) {
                     this.visitNode(name);
                 }
                 else {

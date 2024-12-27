@@ -18,14 +18,14 @@ import { deserializeFloat } from "./float";
   let outerLoopIndex = 1;
   for (; outerLoopIndex < data.length - 1; outerLoopIndex++) {
     const char = unsafeCharCodeAt(data, outerLoopIndex);
-    if (char === BRACKET_LEFT) {
+    if (char == BRACKET_LEFT) {
       for (let arrayValueIndex = outerLoopIndex; arrayValueIndex < data.length - 1; arrayValueIndex++) {
         const char = unsafeCharCodeAt(data, arrayValueIndex);
-        if (char === BRACKET_LEFT) {
+        if (char == BRACKET_LEFT) {
           depth++;
-        } else if (char === BRACKET_RIGHT) {
+        } else if (char == BRACKET_RIGHT) {
           depth--;
-          if (depth === 0) {
+          if (depth == 0) {
             ++arrayValueIndex;
             map.set(deserializeMapKey<indexof<T>>(key), JSON.parse<valueof<T>>(data.slice(outerLoopIndex, arrayValueIndex)));
             outerLoopIndex = arrayValueIndex;
@@ -34,14 +34,14 @@ import { deserializeFloat } from "./float";
           }
         }
       }
-    } else if (char === BRACE_LEFT) {
+    } else if (char == BRACE_LEFT) {
       for (let objectValueIndex = outerLoopIndex; objectValueIndex < data.length - 1; objectValueIndex++) {
         const char = unsafeCharCodeAt(data, objectValueIndex);
-        if (char === BRACE_LEFT) {
+        if (char == BRACE_LEFT) {
           depth++;
-        } else if (char === BRACE_RIGHT) {
+        } else if (char == BRACE_RIGHT) {
           depth--;
-          if (depth === 0) {
+          if (depth == 0) {
             ++objectValueIndex;
             map.set(deserializeMapKey<indexof<T>>(key), JSON.parse<valueof<T>>(data.slice(outerLoopIndex, objectValueIndex)));
             outerLoopIndex = objectValueIndex;
@@ -50,15 +50,15 @@ import { deserializeFloat } from "./float";
           }
         }
       }
-    } else if (char === QUOTE) {
+    } else if (char == QUOTE) {
       let escaping = false;
       for (let stringValueIndex = ++outerLoopIndex; stringValueIndex < data.length - 1; stringValueIndex++) {
         const char = unsafeCharCodeAt(data, stringValueIndex);
-        if (char === BACK_SLASH && !escaping) {
+        if (char == BACK_SLASH && !escaping) {
           escaping = true;
         } else {
-          if (char === QUOTE && !escaping) {
-            if (isKey === false) {
+          if (char == QUOTE && !escaping) {
+            if (isKey == false) {
               // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
               if (containsCodePoint(data, BACK_SLASH, outerLoopIndex, stringValueIndex)) {
                 key.reinst(deserializeString(data, outerLoopIndex - 1, stringValueIndex));
@@ -79,26 +79,26 @@ import { deserializeFloat } from "./float";
           escaping = false;
         }
       }
-    } else if (char == CHAR_N && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_U && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_L && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_L) {
+    } else if (char == CHAR_N && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_U && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_L && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_L) {
       if (isNullable<valueof<T>>()) {
         map.set(deserializeMapKey<indexof<T>>(key), null);
       }
       isKey = false;
-    } else if (char === CHAR_T && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_R && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_U && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_E) {
+    } else if (char == CHAR_T && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_R && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_U && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_E) {
       if (isBoolean<valueof<T>>()) {
         map.set(deserializeMapKey<indexof<T>>(key), true);
       }
       isKey = false;
-    } else if (char === CHAR_F && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_A && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_L && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_S && unsafeCharCodeAt(data, ++outerLoopIndex) === CHAR_E) {
+    } else if (char == CHAR_F && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_A && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_L && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_S && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_E) {
       if (isBoolean<valueof<T>>()) {
         map.set(deserializeMapKey<indexof<T>>(key), false);
       }
       isKey = false;
-    } else if ((char >= 48 && char <= 57) || char === 45) {
+    } else if ((char >= 48 && char <= 57) || char == 45) {
       let numberValueIndex = ++outerLoopIndex;
       for (; numberValueIndex < data.length; numberValueIndex++) {
         const char = unsafeCharCodeAt(data, numberValueIndex);
-        if (char === COLON || char === COMMA || char === BRACE_RIGHT || isSpace(char)) {
+        if (char == COLON || char == COMMA || char == BRACE_RIGHT || isSpace(char)) {
           if (isInteger<valueof<T>>()) {
             map.set(deserializeMapKey<indexof<T>>(key), deserializeInteger<valueof<T>>(data.slice(outerLoopIndex - 1, numberValueIndex)));
           } else if (isFloat<valueof<T>>()) {

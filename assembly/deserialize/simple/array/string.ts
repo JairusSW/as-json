@@ -10,11 +10,11 @@ import { deserializeString } from "../string";
   let escaping = false;
   for (let i = 1; i < data.length - 1; i++) {
     const char = unsafeCharCodeAt(data, i);
-    if (char === BACK_SLASH && !escaping) {
+    if (char == BACK_SLASH && !escaping) {
       escaping = true;
     } else {
-      if (char === QUOTE && !escaping) {
-        if (instr === false) {
+      if (char == QUOTE && !escaping) {
+        if (instr == false) {
           instr = true;
           lastPos = i;
         } else {
