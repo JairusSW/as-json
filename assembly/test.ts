@@ -10,13 +10,15 @@ import { JSON } from ".";
 //   public z: T;
 // }
 
-let a = "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u0009\u000a\u000b\u000c\u000d\u000e\u000f\u000f\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f";
+let a = "12\"345678123456";
 const b = "world";
-JSON.stringifyTo(a, a)
+let c = "000000000000000000000000000000000000000";
+JSON.stringifyTo(a, c)
 // console.log(JSON.stringifyTo(a, a));
 
 console.log("A: " + a.toString());
 console.log("B: " + b.toString());
+console.log("C: " + c.toString());
 
 // console.log(new Vec3<i32>().__SERIALIZE())
 
