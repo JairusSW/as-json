@@ -25,6 +25,7 @@ import { BLOCK_MAXSIZE, OBJECT, TOTAL_OVERHEAD } from "rt/common";
 import { E_INVALIDLENGTH } from "util/error";
 import { serializeString_SIMD } from "./serialize/simd/string";
 import { Option } from "as-container";
+import { deserializeString_SIMD } from "./deserialize/simd/string";
 
 // Config
 class SerializeOptions {
@@ -155,6 +156,25 @@ export namespace JSON {
       return serializeArbitrary(data);
     } else {
       throw new Error(`Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
+    }
+  }
+  
+  /**
+  * Serializes valid JSON data and outputs it to string
+  * ```js
+  * JSON.stringify<T>(data)
+  * ```
+  * @param data T
+  * @returns string
+  */
+  export function parseTo<T>(data: string, out: T): T {
+    if (isString<T>()) {
+      const oldCapacity = changetype<OBJECT>(changetype<usize>(out) - TOTAL_OVERHEAD).rtSize;
+      const outPtr = setCapacity(out, oldCapacity, oldCapacity << 3); // this doesn't account for \u0000+
+      out = changetype<string>(__renew(outPtr, deserializeString_SIMD(data as string, outPtr))) as T;
+      return changetype<string>(outPtr) as T;
+    } else {
+      return unreachable();
     }
   }
   /**

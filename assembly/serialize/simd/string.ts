@@ -36,7 +36,7 @@ const ESCAPE_TABLE = memory.data<u16>([
   0, 0, 0, 0, 0, 0, 0, 0, // Pair 84-87
 
   0, 0, 0, 0, 0, 0, 0, 0, // Pair 88-91
-  92, 92,                               // Pair 92-93
+  92, 92,                 // Pair 92-93
 ]);
 
 const SPLAT_34 = i16x8.splat(34); /* " */
@@ -115,7 +115,7 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
       const code = load<u16>(src_offset) << 2;
       const escaped = load<u32>(ESCAPE_TABLE + code);
       mask &= mask - 1;
-      
+
       if ((escaped & 0xFFFF) != BACK_SLASH) {
         store<u64>(dst_offset, 13511005048209500);
         store<u32>(dst_offset, escaped, 8);
@@ -139,9 +139,8 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
   }
   if (rem & 4) {
     const block = load<u32>(src_ptr);
-
     const codeA = block & 0xFFFF;
-    const codeB = block >> 16;
+    const codeB = (block >> 16) & 0xFFFF;
 
     if (codeA == 92 || codeA == 34 || codeA < 32) {
       const escaped = load<u32>(ESCAPE_TABLE + (codeA << 2));
