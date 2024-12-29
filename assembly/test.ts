@@ -10,10 +10,10 @@ import { JSON } from ".";
 //   public z: T;
 // }
 
-let a = "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007";
-let b = "000000000000000000000000000000000000000"
+let a = "\u0000\u0001";
+let b = '"string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"'
 let c = "000000000000000000000000000000000000000";
-JSON.stringifyTo(a, b)
+// JSON.stringifyTo(a, b)
 c = JSON.parseTo(b, c);
 // console.log(JSON.stringifyTo(a, a));
 
