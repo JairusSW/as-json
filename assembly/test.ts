@@ -1,25 +1,25 @@
-import { JSON } from ".";
-
-// import { Buffer } from "./custom/buffer";
-// import { serializeString_SIMD } from "./serialize/simd/string";
-
-// @json
-// class Vec3<T> {
-//   public x: i32 = 0;
-//   public y: i32 = 0;
-//   public z: T;
-// }
-
-let a = "\u0000\u0001";
-let b = '"string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"'
-let c = "000000000000000000000000000000000000000";
+import { bs } from "./custom/bs";
+import { serialize } from "./serialize/simple";
+console.log(load<u32>(changetype<usize>("{}")).toString())
+// console.log(load<u64>(changetype<usize>("null")).toString())
+// serializeString("hell\"o");
+// console.log(bs.shrinkTo<string>());
+bs.setBuffer(new ArrayBuffer(8))
+serialize(["hello","world"]);
+console.log(bs.shrinkTo<string>());
+const map = new Map<string, Date>();
+map.set("hello",new Date(0));
+map.set("foo",new Date(0));
+serialize(map);
+console.log(bs.shrinkTo<string>())
 // JSON.stringifyTo(a, b)
-c = JSON.parseTo(b, c);
 // console.log(JSON.stringifyTo(a, a));
 
-console.log("A: " + JSON.stringify(a).toString());
-console.log("B: " + b.toString());
-console.log("C: " + JSON.stringify(c));
+// console.log("A: " + JSON.stringify(a).toString());
+// console.log("B: " + b.toString());
+// console.log("C: " + JSON.stringify(c));
+
+// console.log(JSON.stringify(null, ""))
 
 // console.log(new Vec3<i32>().__SERIALIZE())
 

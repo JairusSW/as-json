@@ -1,7 +1,6 @@
 import { JSON } from "../..";
 import { Sink } from "../../custom/sink";
 
-
 export function serializeArbitrary(data: JSON.Value): string {
   switch (data.type) {
     case JSON.Types.U8:

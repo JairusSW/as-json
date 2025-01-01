@@ -16,7 +16,7 @@ class JSONTransform extends Visitor {
 
   visitImportStatement(node: ImportStatement): void {
     super.visitImportStatement(node);
-    const source = this.parser.sources.find(src => src.internalPath == node.internalPath);
+    const source = this.parser.sources.find((src) => src.internalPath == node.internalPath);
     if (!source) return;
 
     let valid = false;
@@ -45,7 +45,7 @@ class JSONTransform extends Visitor {
     }
     if (!found) return;
 
-    console.log(toString(node))
+    console.log(toString(node));
 
     this.schema = new SchemaData();
     this.schema.node = node;
@@ -187,21 +187,18 @@ class JSONTransform extends Visitor {
 
     found = false;
 
-    if (!this.imports.find(i => i.declarations.find(d => d.foreignName.text == "JSON"))) {
+    if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "JSON"))) {
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = path.dirname(__filename);
 
-      let relativePath = path.relative(
-        path.dirname(node.range.source.normalizedPath),
-        path.resolve(__dirname, "../../assembly/index.ts")
-      );
+      let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../assembly/index.ts"));
 
       if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
       // if (!existsSync(relativePath)) {
       //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
       // }
 
-      const txt = "import { JSON } from \"" + relativePath + "\";"
+      const txt = 'import { JSON } from "' + relativePath + '";';
       if (!this.requiredImport) {
         this.requiredImport = txt;
         if (process.env["JSON_DEBUG"]) console.log(txt + "\n");
@@ -350,38 +347,16 @@ class JSONTransform extends Visitor {
   }
   visitCallExpression(node: CallExpression, ref: Node): void {
     super.visitCallExpression(node, ref);
-    if (
-      !(
-        node.expression.kind == NodeKind.PropertyAccess &&
-        (node.expression as PropertyAccessExpression).property.text == "stringifyTo"
-      )
-      &&
-      !(
-        node.expression.kind == NodeKind.Identifier &&
-        (node.expression as IdentifierExpression).text == "stringifyTo"
-      )
-    ) return;
+    if (!(node.expression.kind == NodeKind.PropertyAccess && (node.expression as PropertyAccessExpression).property.text == "stringifyTo") && !(node.expression.kind == NodeKind.Identifier && (node.expression as IdentifierExpression).text == "stringifyTo")) return;
 
     const source = node.range.source;
 
     if (ref.kind == NodeKind.Call) {
-      const newNode = Node.createBinaryExpression(
-        Token.Equals,
-        node.args[1],
-        node,
-        node.range
-      );
+      const newNode = Node.createBinaryExpression(Token.Equals, node.args[1], node, node.range);
 
       (<CallExpression>ref).args[(<CallExpression>ref).args.indexOf(node)] = newNode;
     } else {
-      const newNode = Node.createExpressionStatement(
-        Node.createBinaryExpression(
-          Token.Equals,
-          node.args[1],
-          node,
-          node.range
-        )
-      );
+      const newNode = Node.createExpressionStatement(Node.createBinaryExpression(Token.Equals, node.args[1], node, node.range));
 
       const nodeIndex = source.statements.findIndex((n: Node) => {
         if (n == node) return true;
@@ -408,18 +383,17 @@ export default class Transformer extends Transform {
     const transformer = new JSONTransform();
 
     // Sort the sources so that user scripts are visited last
-    const sources = parser.sources
-      .sort((_a, _b) => {
-        const a = _a.internalPath;
-        const b = _b.internalPath;
-        if (a[0] == "~" && b[0] !== "~") {
-          return -1;
-        } else if (a[0] !== "~" && b[0] == "~") {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+    const sources = parser.sources.sort((_a, _b) => {
+      const a = _a.internalPath;
+      const b = _b.internalPath;
+      if (a[0] == "~" && b[0] !== "~") {
+        return -1;
+      } else if (a[0] !== "~" && b[0] == "~") {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
 
     transformer.parser = parser;
     // Loop over every source
@@ -430,13 +404,7 @@ export default class Transformer extends Transform {
       transformer.visit(source);
 
       if (transformer.requiredImport) {
-        const tokenizer = new Tokenizer(
-          new Source(
-            SourceKind.User,
-            source.normalizedPath,
-            transformer.requiredImport,
-          ),
-        );
+        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.requiredImport));
         parser.currentSource = tokenizer.source;
         source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
         parser.currentSource = source;

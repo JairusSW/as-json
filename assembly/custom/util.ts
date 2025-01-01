@@ -1,5 +1,5 @@
 import { isSpace } from "util/string";
-import { BACK_SLASH,  QUOTE } from "./chars";
+import { BACK_SLASH, QUOTE } from "./chars";
 import { Sink } from "./sink";
 
 // @ts-ignore: Decorator
@@ -306,7 +306,6 @@ export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
   }
   return false;
 }
-
 
 // @ts-ignore: Decorator
 @inline export function _intTo16(int: i32): i32 {

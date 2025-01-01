@@ -1,23 +1,43 @@
-import { COLON, COMMA, BRACE_LEFT_WORD, BRACE_RIGHT } from "../../custom/chars";
-import { JSON } from "../..";
-import { Sink } from "../../custom/sink";
+import { BRACE_LEFT, BRACE_RIGHT, COLON, COMMA } from "../../custom/chars";
+import { bs } from "../../custom/bs";
+import { serialize } from ".";
 
-export function serializeMap<T extends Map<any, any>>(data: T): string {
-  let result = Sink.fromString(BRACE_LEFT_WORD);
-  if (!data.size) return "{}";
-  let keys = data.keys();
-  let values = data.values();
-  const end = data.size - 1;
-  for (let i = 0; i < end; i++) {
-    result.write(JSON.stringify(unchecked(keys[i]).toString()));
-    result.writeCodePoint(COLON);
-    result.write(JSON.stringify(unchecked(values[i])));
-    result.writeCodePoint(COMMA);
+export function serializeMap<T extends Map<any, any>>(src: T): void {
+  const srcSize = src.size;
+  const srcEnd = srcSize - 1;
+
+  if (!srcSize) {
+    bs.ensureSize(4);
+    store<u32>(bs.offset, 8192123);
+    bs.offset += 4;
+    return;
   }
-  result.write(JSON.stringify(unchecked(keys[end]).toString()));
-  result.writeCodePoint(COLON);
-  result.write(JSON.stringify(unchecked(values[end])));
 
-  result.writeCodePoint(BRACE_RIGHT);
-  return result.toString();
+  let keys = src.keys();
+  let values = src.values();
+
+  bs.ensureSize(srcSize << 3); // This needs to be predicted better
+
+  store<u16>(bs.offset, BRACE_LEFT);
+  bs.offset += 2;
+
+  for (let i = 0; i < srcEnd; i++) {
+    serialize(unchecked(keys[i]));
+    bs.ensureSize(2);
+    store<u16>(bs.offset, COLON);
+    bs.offset += 2;
+    serialize(unchecked(values[i]));
+    bs.ensureSize(2);
+    store<u16>(bs.offset, COMMA);
+    bs.offset += 2;
+  }
+
+  serialize(unchecked(keys[srcEnd]));
+  bs.ensureSize(2);
+  store<u16>(bs.offset, COLON);
+  bs.offset += 2;
+  serialize(unchecked(values[srcEnd]));
+  bs.ensureSize(2);
+  store<u16>(bs.offset, BRACE_RIGHT);
+  bs.offset += 2;
 }

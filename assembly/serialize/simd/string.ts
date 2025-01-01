@@ -1,43 +1,6 @@
 import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
 import { BACK_SLASH } from "../../custom/chars";
-
-const ESCAPE_TABLE = memory.data<u16>([
-  48, 48, 48, 49, 48, 50, 48, 51, // Pair 0-3
-  48, 52, 48, 53, 48, 54, 48, 55, // Pair 4-7
-
-  92, 98, 92, 116, 92, 110, 48, 98, // Pair 8-11
-  92, 102, 92, 114, 48, 101, 48, 102, // Pair 12-15
-
-  49, 48, 49, 49, 49, 50, 49, 51, // Pair 16-19
-  49, 52, 49, 53, 49, 54, 49, 55, // Pair 20-23
-
-  49, 56, 49, 57, 49, 97, 49, 98, // Pair 24-27
-  49, 99, 49, 100, 49, 101, 49, 102, // Pair 28-31
-
-  0, 0, 0, 0, 92, 34, 0, 0, // Pair 32-35
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 36-39
-
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 40-43
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 44-47
-
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 48-51
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 52-55
-
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 56-59
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 60-63
-
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 64-67
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 68-71
-
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 72-75
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 76-79
-
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 80-83
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 84-87
-
-  0, 0, 0, 0, 0, 0, 0, 0, // Pair 88-91
-  92, 92,                 // Pair 92-93
-]);
+import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
 
 const SPLAT_34 = i16x8.splat(34); /* " */
 const SPLAT_92 = i16x8.splat(92); /* \ */
@@ -76,11 +39,11 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
       const dst_offset = dst_ptr + lane_index;
       const src_offset = src_ptr + lane_index;
       const code = load<u16>(src_offset) << 2;
-      const escaped = load<u32>(ESCAPE_TABLE + code);
+      const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + code);
 
       mask &= mask - 1;
 
-      if ((escaped & 0xFFFF) != BACK_SLASH) {
+      if ((escaped & 0xffff) != BACK_SLASH) {
         store<u64>(dst_offset, 13511005048209500);
         store<u32>(dst_offset, escaped, 8);
         v128.store(dst_offset, v128.load(src_offset, 2), 12);
@@ -92,7 +55,8 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
       }
     }
 
-    src_ptr += 16; dst_ptr += 16;
+    src_ptr += 16;
+    dst_ptr += 16;
   }
 
   let rem = src_end - src_ptr;
@@ -113,10 +77,10 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
       const dst_offset = dst_ptr + lane_index;
       const src_offset = src_ptr + lane_index;
       const code = load<u16>(src_offset) << 2;
-      const escaped = load<u32>(ESCAPE_TABLE + code);
+      const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + code);
       mask &= mask - 1;
 
-      if ((escaped & 0xFFFF) != BACK_SLASH) {
+      if ((escaped & 0xffff) != BACK_SLASH) {
         store<u64>(dst_offset, 13511005048209500);
         store<u32>(dst_offset, escaped, 8);
         while (lane_index < 6) {
@@ -135,17 +99,18 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
       }
     }
 
-    dst_ptr += 8; src_ptr += 8;
+    dst_ptr += 8;
+    src_ptr += 8;
   }
   if (rem & 4) {
     const block = load<u32>(src_ptr);
-    const codeA = block & 0xFFFF;
-    const codeB = (block >> 16) & 0xFFFF;
+    const codeA = block & 0xffff;
+    const codeB = (block >> 16) & 0xffff;
 
     if (codeA == 92 || codeA == 34 || codeA < 32) {
-      const escaped = load<u32>(ESCAPE_TABLE + (codeA << 2));
+      const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (codeA << 2));
 
-      if ((escaped & 0xFFFF) != BACK_SLASH) {
+      if ((escaped & 0xffff) != BACK_SLASH) {
         store<u64>(dst_ptr, 13511005048209500);
         store<u32>(dst_ptr, escaped, 8);
         dst_ptr += 12;
@@ -153,16 +118,15 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
         store<u32>(dst_ptr, escaped);
         dst_ptr += 4;
       }
-
     } else {
       store<u16>(dst_ptr, codeA);
       dst_ptr += 2;
     }
 
     if (codeB == 92 || codeB == 34 || codeB < 32) {
-      const escaped = load<u32>(ESCAPE_TABLE + (codeB << 2));
+      const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (codeB << 2));
 
-      if ((escaped & 0xFFFF) != BACK_SLASH) {
+      if ((escaped & 0xffff) != BACK_SLASH) {
         store<u64>(dst_ptr, 13511005048209500);
         store<u32>(dst_ptr, escaped, 8);
         dst_ptr += 12;
@@ -170,7 +134,6 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
         store<u32>(dst_ptr, escaped);
         dst_ptr += 4;
       }
-
     } else {
       store<u16>(dst_ptr, codeB);
       dst_ptr += 2;
@@ -181,9 +144,9 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
   if (rem & 2) {
     const code = load<u16>(src_ptr);
     if (code == 92 || code == 34 || code < 32) {
-      const escaped = load<u32>(ESCAPE_TABLE + (code << 2));
+      const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
 
-      if ((escaped & 0xFFFF) != BACK_SLASH) {
+      if ((escaped & 0xffff) != BACK_SLASH) {
         store<u64>(dst_ptr, 13511005048209500);
         store<u32>(dst_ptr, escaped, 8);
         dst_ptr += 12;
@@ -191,7 +154,6 @@ export function serializeString_SIMD(src: string, dst: usize): usize {
         store<u32>(dst_ptr, escaped);
         dst_ptr += 4;
       }
-
     } else {
       store<u16>(dst_ptr, code);
       dst_ptr += 2;
