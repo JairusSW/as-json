@@ -27,7 +27,7 @@ import { serializeString } from "./string";
     } else if (isString<nonnull<T>>()) {
         serializeString(src as string, staticSize);
         // @ts-ignore: Supplied by transform
-    } else if (isDefined(src.__SERIALIZE)) {
+    } else if (isDefined(src.__SERIALIZE_BS)) {
         // @ts-ignore
         serializeObject(changetype<nonnull<T>>(src), staticSize);
     } else if (src instanceof Date) {

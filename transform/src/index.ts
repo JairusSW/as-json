@@ -1,4 +1,4 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement, BinaryExpression, NamedTypeNode, Range } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement, BinaryExpression, NamedTypeNode, Range, FEATURE_SIMD } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -131,10 +131,10 @@ class JSONTransform extends Visitor {
 
     if (!this.schema.static) this.schema.members = sortMembers(this.schema.members);
 
-    let SERIALIZE_RAW = "__SERIALIZE(ptr: usize = changetype<usize>(this)): string \n  let out = `{";
-    let SERIALIZE_BS = "__SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n";
-    let INITIALIZE = "__INITIALIZE(): this {\n";
-    let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
+    let SERIALIZE_RAW = "@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string \n  let out = `{";
+    let SERIALIZE_BS = "@inline __SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n";
+    let INITIALIZE = "@inline __INITIALIZE(): this {\n";
+    let DESERIALIZE = "@inline __DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
 
     indent = "  ";
 
@@ -206,10 +206,10 @@ class JSONTransform extends Visitor {
     super.visitClassDeclaration(node);
   }
   generateEmptyMethods(node: ClassDeclaration): void {
-    let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n  return "{}";\n}';
-    let SERIALIZE_BS_EMPTY = "__SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n  bs.ensureSize(4);\n  store<u32>(bs.offset, 8192123);\n}";
-    let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
-    let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
+    let SERIALIZE_RAW_EMPTY = '@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n  return "{}";\n}';
+    let SERIALIZE_BS_EMPTY = "@inline __SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n  store<u32>(bs.offset, 8192123);\n  bs.offset += 4;\n}";
+    let INITIALIZE_EMPTY = "@inline __INITIALIZE(): this {\n  return this;\n}";
+    let DESERIALIZE_EMPTY = "@inline __DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
 
     if (process.env["JSON_DEBUG"]) {
       console.log(SERIALIZE_RAW_EMPTY);
