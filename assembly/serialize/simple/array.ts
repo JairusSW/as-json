@@ -1,5 +1,5 @@
 import { serialize_simple } from ".";
-import { bs } from "../../custom/bs";
+import { bs } from "as-bs";
 import { COMMA, BRACKET_RIGHT, BRACKET_LEFT } from "../../custom/chars";
 
 export function serializeArray<T extends any[]>(src: T, staticSize: bool = false): void {

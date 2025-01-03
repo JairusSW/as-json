@@ -1,5 +1,5 @@
 import { BRACE_LEFT, BRACE_RIGHT, COLON, COMMA } from "../../custom/chars";
-import { bs } from "../../custom/bs";
+import { bs } from "as-bs";
 import { serialize_simple } from ".";
 
 export function serializeMap<T extends Map<any, any>>(src: T, staticSize: bool = false): void {

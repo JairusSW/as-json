@@ -15,7 +15,9 @@ class JSONTransform extends Visitor {
   public schema!: Schema;
   public sources = new Set<Source>();
   public imports: ImportStatement[] = [];
-  public requiredImport: string | null = null;
+
+  public jsonImport: string | null = null;
+  public bsImport: string | null = null;
 
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
@@ -268,6 +270,12 @@ class JSONTransform extends Visitor {
     super.visitSource(node);
   }
   addRequiredImports(node: ClassDeclaration): void {
+    if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
+      if (!this.bsImport) {
+        this.bsImport = "import { bs } from \"as-bs\"";
+        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + this.bsImport + "\n");
+      }
+    }
     if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "JSON"))) {
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = path.dirname(__filename);
@@ -279,10 +287,10 @@ class JSONTransform extends Visitor {
       //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
       // }
 
-      const txt = 'import { JSON } from "' + relativePath + '";';
-      if (!this.requiredImport) {
-        this.requiredImport = txt;
-        if (process.env["JSON_DEBUG"]) console.log(txt + "\n");
+      const txt = `import { JSON } from "${relativePath}";`;
+      if (!this.jsonImport) {
+        this.jsonImport = txt;
+        if (process.env["JSON_DEBUG"]) console.log("Added json-as import: " + txt + "\n");
       }
     }
   }
@@ -315,12 +323,20 @@ export default class Transformer extends Transform {
       // Ignore all lib and std. Visit everything else.
       transformer.visit(source);
 
-      if (transformer.requiredImport) {
-        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.requiredImport));
+      if (transformer.jsonImport) {
+        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.jsonImport));
         parser.currentSource = tokenizer.source;
         source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
         parser.currentSource = source;
-        transformer.requiredImport = null;
+        transformer.jsonImport = null;
+      }
+
+      if (transformer.bsImport) {
+        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.bsImport));
+        parser.currentSource = tokenizer.source;
+        source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
+        parser.currentSource = source;
+        transformer.bsImport = null;
       }
     }
     // Check that every parent and child class is hooked up correctly

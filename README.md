@@ -1,6 +1,6 @@
-<h3 align="center">
+<h5 align="center">
   <pre>
-<span style="font-size: 0.9em;">     ██ ███████  ██████  ███    ██        █████  ███████
+<span style="font-size: 0.8em;">     ██ ███████  ██████  ███    ██        █████  ███████
      ██ ██      ██    ██ ████   ██       ██   ██ ██     
      ██ ███████ ██    ██ ██ ██  ██ █████ ███████ ███████
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
@@ -8,7 +8,7 @@
  </span>
     AssemblyScript - v1.0.0
   </pre>
-</h3>
+</h5>
 
 ## Installation
 
@@ -16,10 +16,10 @@
 npm install json-as
 ```
 
-Add the transform to your `asc` command (e.g. in package.json)
+Add the `--transform` to your `asc` command (e.g. in package.json)
 
 ```bash
---transform json-as/transform
+--transform json-as
 ```
 
 Alternatively, add it to your `asconfig.json`
@@ -28,7 +28,7 @@ Alternatively, add it to your `asconfig.json`
 {
   // ...
   "options": {
-    "transform": ["json-as/transform"]
+    "transform": ["json-as"]
   }
 }
 ```

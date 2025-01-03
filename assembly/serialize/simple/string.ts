@@ -1,6 +1,6 @@
 import { _intTo16 } from "../../custom/util";
 import { bytes } from "../../util/bytes";
-import { bs } from "../../custom/bs";
+import { bs } from "as-bs";
 import { BACK_SLASH, QUOTE } from "../../custom/chars";
 import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
 
@@ -12,14 +12,11 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
 // @ts-ignore: Decorator
 @inline export function serializeString(src: string, staticSize: bool = false): void {
   const srcSize = bytes(src);
-  // if (!bs.buffer) bs.setBuffer(__new(srcSize + 4, idof<string>()));
-  // else
   if (!staticSize) bs.ensureSize(srcSize + 4);
 
   let srcPtr = changetype<usize>(src);
-
   const srcEnd = srcPtr + srcSize;
-
+  
   store<u16>(bs.offset, QUOTE);
 
   bs.offset += 2;
@@ -33,12 +30,12 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
       bs.offset += remBytes;
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
       if ((escaped & 0xffff) != BACK_SLASH) {
-        if (!staticSize) bs.ensureCapacity(12);
+        if (!staticSize) bs.ensureSize(12);
         store<u64>(bs.offset, 13511005048209500, 0);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        if (!staticSize) bs.ensureCapacity(4);
+        if (!staticSize) bs.ensureSize(4);
         store<u32>(bs.offset, escaped, 0);
         bs.offset += 4;
       }

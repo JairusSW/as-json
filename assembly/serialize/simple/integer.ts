@@ -1,5 +1,5 @@
 import { itoa_buffered } from "util/number";
-import { bs } from "../../custom/bs";
+import { bs } from "as-bs";
 
 // @ts-ignore: Decorator valid here
 @inline export function serializeInteger<T extends number>(data: T, staticSize: bool = false): void {

@@ -3,6 +3,7 @@
   "version": "0.9.26",
   "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
   "types": "assembly/index.ts",
+  "main": "transform/lib/index.js",
   "author": "Jairus Tanaka",
   "contributors": [
     "DogWhich",
@@ -37,6 +38,7 @@
     "typescript": "latest"
   },
   "dependencies": {
+    "as-bs": "JairusSW/as-bs#a8d6deb",
     "as-container": "^0.8.0",
     "as-virtual": "^0.2.0"
   },

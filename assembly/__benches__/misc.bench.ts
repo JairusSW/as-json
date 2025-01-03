@@ -2,7 +2,7 @@ import { deserializeString_SIMD } from "../deserialize/simd/string";
 import { serializeString_SIMD } from "../serialize/simd/string";
 import { bench } from "as-bench/assembly/index";
 import { serialize_simple } from "../serialize/simple";
-import { bs } from "../custom/bs";
+import { bs } from "as-bs";
 const str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()\\\"\t\r\f\n\u0000';
 const str2 = '"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()\\\\\\"\\t\\r\\f\\n\\u0000"';
 

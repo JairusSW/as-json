@@ -1,10 +1,11 @@
-import { bs } from "./custom/bs";
+import { bs } from "as-bs";
 import { serialize_simple } from "./serialize/simple";
 import { VecBase } from "./types";
 import { bytes } from "./util/bytes";
 
 @json
 class Vec3 {
+    @omit
     base: VecBase = new VecBase();
     x: i32 = 1;
     y: i32 = 2;
