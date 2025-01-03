@@ -1,14 +1,14 @@
 import { bytes } from "../util/bytes";
 import { nextPowerOf2 } from "../util/nextPowerOf2";
 
-let maxOffset: usize = 0;
+let maxOffset: usize = __new(0, idof<ArrayBuffer>());
 
 /**
  * This serves as the central buffer
  */
 export namespace bs {
-  export let buffer: usize = 0;
-  export let offset: usize = 0;
+  export let buffer: usize = maxOffset;
+  export let offset: usize = maxOffset;
   export let byteLength: usize = 0;
 
   // @ts-ignore
@@ -32,6 +32,7 @@ export namespace bs {
 
   // @ts-ignore
   @inline export function ensureSize(size: u32): void {
+    console.log("Alloc: " + size.toString())
     const newSize = offset + size;
     if (newSize > maxOffset) {
       const newPtr = __renew(buffer, (byteLength = newSize - buffer));
@@ -56,8 +57,12 @@ export namespace bs {
   }
 
   // @ts-ignore
-  @inline export function to<T>(): T {
+  @inline export function out<T>(): T {
+    const len = offset - buffer;
+    const _out = __new(len, idof<T>());
+    memory.copy(_out, buffer, len);
+    // shrink();
     offset = buffer;
-    return changetype<T>(buffer);
+    return changetype<T>(_out);
   }
 }

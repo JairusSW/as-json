@@ -1,61 +1,66 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement, BinaryExpression, NamedTypeNode, Range } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { BinaryExpression } from "types:assemblyscript/src/ast";
+import { Property, PropertyFlags, Schema } from "./types.js";
+import { getClasses, getImportedClass } from "./linker.js";
+
+let indent = "  ";
 
 class JSONTransform extends Visitor {
   public parser!: Parser;
-  public schemasList: SchemaData[] = [];
-  public schema!: SchemaData;
+  public schemas: Schema[] = [];
+  public schema!: Schema;
   public sources = new Set<Source>();
   public imports: ImportStatement[] = [];
   public requiredImport: string | null = null;
 
-  visitImportStatement(node: ImportStatement): void {
-    super.visitImportStatement(node);
-    const source = this.parser.sources.find((src) => src.internalPath == node.internalPath);
-    if (!source) return;
-
-    let valid = false;
-    for (const src of source.statements) {
-      if (src.kind == NodeKind.NamespaceDeclaration) {
-        const namespace = src as NamespaceDeclaration;
-        if (namespace.name.text == "JSON") {
-          valid = true;
-          break;
-        }
-      }
-    }
-    if (!valid) return;
-    this.imports.push(node);
-  }
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
 
-    let found = false;
-    for (const decorator of node.decorators) {
+    if (!node.decorators.some(decorator => {
       const name = (<IdentifierExpression>decorator.name).text;
-      if (name == "json" || name == "serializable") {
-        found = true;
-        break;
-      }
-    }
-    if (!found) return;
+      return name === "json" || name === "serializable";
+    })) return;
 
-    console.log(toString(node));
-
-    this.schema = new SchemaData();
+    this.schema = new Schema();
     this.schema.node = node;
     this.schema.name = node.name.text;
+    
+    this.schemas.push(this.schema);
+    console.log("Created schema: " + this.schema.name);
 
-    const members = [...node.members.filter((v) => v.kind == NodeKind.FieldDeclaration)];
+    const members: FieldDeclaration[] = [...node.members.filter(
+      (v) =>
+        v.kind === NodeKind.FieldDeclaration &&
+        v.flags !== CommonFlags.Static &&
+        v.flags !== CommonFlags.Private &&
+        v.flags !== CommonFlags.Protected &&
+        !v.decorators?.some(decorator => (<IdentifierExpression>decorator.name).text === "omit")
+    ) as FieldDeclaration[]];
 
     if (node.extendsType) {
-      this.schema.parent = this.schemasList.find((v) => v.name == node.extendsType?.name.identifier.text) as SchemaData | null;
+      const extendsName = node.extendsType?.name.identifier.text;
+      this.schema.parent = this.schemas.find((v) => v.name == extendsName) as Schema | null;
+      if (!this.schema.parent) {
+        const internalSearch = getClasses(node.range.source).find(v => v.name.text == extendsName);
+        if (internalSearch) {
+          console.log("Found " + extendsName + " internally");
+          this.visitClassDeclaration(internalSearch);
+          this.visitClassDeclaration(node);
+          return;
+        }
 
+        const externalSearch = getImportedClass(extendsName, node.range.source, this.parser);
+        if (externalSearch) {
+          console.log("Found " + extendsName + " externally");
+          this.visitClassDeclaration(externalSearch);
+          this.visitClassDeclaration(node);
+          return;
+        }
+      }
       if (this.schema.parent?.members) {
         for (let i = this.schema.parent.members.length - 1; i >= 0; i--) {
           const replace = this.schema.members.find((v) => v.name == this.schema.parent?.members[i]?.name);
@@ -67,126 +72,202 @@ class JSONTransform extends Visitor {
     }
 
     if (!members.length) {
-      let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize = 0): string {\n  return "{}";\n}';
-      //let SERIALIZE_PRETTY_EMPTY = "__SERIALIZE_PRETTY(): string {\n  return \"{}\";\n}";
-
-      let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
-
-      let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
-
-      if (process.env["JSON_DEBUG"]) {
-        console.log(SERIALIZE_RAW_EMPTY);
-        //console.log(SERIALIZE_PRETTY_EMPTY);
-        console.log(INITIALIZE_EMPTY);
-        console.log(DESERIALIZE_EMPTY);
-      }
-
-      const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
-      //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
-      const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
-      const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
-
-      if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
-      if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD_EMPTY);
-      if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD_EMPTY);
-
-      this.schemasList.push(this.schema);
+      this.generateEmptyMethods(node);
+      return;
     }
 
-    for (const _member of members) {
-      if (_member.kind !== NodeKind.FieldDeclaration) continue;
-      const member = _member as FieldDeclaration;
-      if (!member.type) {
-        throw new Error("Fields must be strongly typed! Found " + toString(member) + " at " + node.range.source.normalizedPath);
-      }
+    this.addRequiredImports(node);
 
-      if (member.flags == CommonFlags.Static) continue;
-      if (member.flags == CommonFlags.Private) continue;
-      if (member.flags == CommonFlags.Protected) continue;
+    for (const member of members) {
+      if (!member.type) throwError("Fields must be strongly typed", node.range);
 
       const type = toString(member.type!);
       const name = member.name;
       const value = member.initializer ? toString(member.initializer!) : null;
 
       if (type.startsWith("(") && type.includes("=>")) continue;
+
       const mem = new Property();
       mem.name = name.text;
       mem.type = type;
       mem.value = value;
       mem.node = member;
-      this.schema.members.push(mem);
 
-      if (type.includes("JSON.Raw")) {
-        mem.flags.set(PropertyFlags.JSON_Raw, []);
-      }
-
-      if (member.type.isNullable) {
-        mem.flags.set(PropertyFlags.Null, []);
-      }
+      if (type.includes("JSON.Raw")) mem.flags.set(PropertyFlags.Raw, []);
 
       if (member.decorators) {
         for (const decorator of member.decorators) {
-          const decoratorName = (decorator.name as IdentifierExpression).text;
+          const decoratorName = (decorator.name as IdentifierExpression).text.toLowerCase().trim();
 
           const args = getArgs(decorator.args);
 
           switch (decoratorName) {
             case "alias": {
-              if (!args.length) throw new Error("Expected 1 argument but got zero at @alias in " + node.range.source.normalizedPath);
+              if (!args.length) throwError("@alias must have an argument of type string", member.range);
               mem.alias = args[0]!;
-              mem.flags.set(PropertyFlags.Alias, args);
-              break;
-            }
-            case "omit": {
-              mem.flags.set(PropertyFlags.Omit, args);
               break;
             }
             case "omitif": {
-              if (!decorator.args?.length) throw new Error("Expected 1 argument but got zero at @omitif in " + node.range.source.normalizedPath);
+              if (!decorator.args?.length) throwError("@omitif must have an argument that resolves to type bool", member.range);
               mem.flags.set(PropertyFlags.OmitIf, args);
+              this.schema.static = false;
               break;
             }
             case "omitnull": {
+              if (isPrimitive(type)) {
+                throwError("@omitnull cannot be used on primitive types!", member.range);
+              } else if (!member.type.isNullable) {
+                throwError("@omitnull cannot be used on non-nullable types!", member.range);
+              }
               mem.flags.set(PropertyFlags.OmitNull, args);
+              this.schema.static = false;
               break;
             }
           }
         }
       }
+      this.schema.members.push(mem);
+    }
 
-      mem.generate();
+    if (!this.schema.static) this.schema.members = sortMembers(this.schema.members);
 
-      if (this.schemasList.find((v) => v.name == type)) {
-        mem.initialize = "this." + name.text + " = changetype<nonnull<" + mem.type + ">>(__new(offsetof<nonnull<" + mem.type + ">>(), idof<nonnull<" + mem.type + ">>()));\n  changetype<nonnull<" + mem.type + ">>(this." + name.text + ").__INITIALIZE()";
-      } else if (mem.value) {
-        mem.initialize = "this." + name.text + " = " + mem.value;
-      } else if (type == "Map") {
-        mem.initialize = "this." + name.text + " = new " + mem.type + "()";
-      } else if (type == "string") {
-        mem.initialize = "this." + name.text + ' = ""';
-      } else if (type == "Array") {
-        mem.initialize = "this." + name.text + " = instantiate<" + mem.type + ">()";
-      } else if (type == "bool" || type == "boolean") {
-        mem.initialize = "this." + name.text + " = false";
-      } else if (type == "JSON.Raw") {
-        mem.initialize = "this." + name.text + ' = ""';
-      } else if (type == "u8" || type == "u16" || type == "u32" || type == "u64" || type == "i8" || type == "i16" || type == "i32" || type == "i64") {
-        mem.initialize = "this." + name.text + " = 0";
-      } else if (type == "f32" || type == "f64") {
-        mem.initialize = "this." + name.text + " = 0.0";
+    let SERIALIZE_RAW = "__SERIALIZE(ptr: usize = changetype<usize>(this)): string \n  let out = `{";
+    let SERIALIZE_BS = "__SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n";
+    let INITIALIZE = "__INITIALIZE(): this {\n";
+    let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
+
+    indent = "  ";
+
+    if (this.schema.static == false) {
+      if (this.schema.members.some(v => v.flags.has(PropertyFlags.OmitNull))) {
+        SERIALIZE_BS += indent + "let block: usize = 0;\n";
+      }
+      SERIALIZE_BS += indent + "store<u16>(bs.offset, 123, 0); // {\n";
+      SERIALIZE_BS += indent + "bs.offset += 2;\n";
+    }
+
+    let isPure = this.schema.static;
+    let isRegular = isPure;
+    let isFirst = true;
+
+    console.log(this.schema.static)
+
+    for (let i = 0; i < this.schema.members.length; i++) {
+      const member = this.schema.members[i];
+      const isLast = i == this.schema.members.length - 1;
+
+      if (!isRegular && !member.flags.has(PropertyFlags.OmitIf) && !member.flags.has(PropertyFlags.OmitNull)) isRegular = true;
+      if (isRegular && isPure) {
+        SERIALIZE_BS += strToStores((isFirst ? "{" : ",") + JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
+        SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+        if (isFirst) isFirst = false;
+      } else if (isRegular && !isPure) {
+        SERIALIZE_BS += strToStores((isFirst ? "" : ",") + JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
+        SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+        if (isFirst) isFirst = false;
+      } else {
+        if (member.flags.has(PropertyFlags.OmitNull)) {
+          SERIALIZE_BS += indent + `if ((block = load<usize>(ptr, offsetof<this>("${member.name}"))) !== 0) {\n`;
+          indentInc();
+          SERIALIZE_BS += strToStores(JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
+          SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+
+          if (!isLast) {
+            SERIALIZE_BS += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
+            SERIALIZE_BS += indent + `bs.offset += 2;\n`;
+          }
+
+          indentDec();
+          SERIALIZE_BS += indent + `}\n`;
+        }
       }
     }
 
-    let SERIALIZE_RAW = "__SERIALIZE(ptr: usize = 0): string {\n  if (ptr == 0) ptr = changetype<usize>(this);\n  let out = `{";
-    let SERIALIZE_PRETTY = "__SERIALIZE_PRETTY(): string {\n  let out = `{";
+    SERIALIZE_BS += indent + "store<u16>(bs.offset, 125, 0); // }\n";
+    SERIALIZE_BS += indent + "bs.offset += 2;\n";
+    SERIALIZE_BS += "}";
 
-    let INITIALIZE = "__INITIALIZE(): this {\n";
+    if (process.env["JSON_DEBUG"]) {
+      // console.log(SERIALIZE_RAW);
+      console.log(SERIALIZE_BS);
+      // console.log(INITIALIZE);
+      // console.log(DESERIALIZE);
+    }
 
-    let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
-    let indent = "  ";
+    // const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
+    const SERIALIZE_BS_METHOD = SimpleParser.parseClassMember(SERIALIZE_BS, node);
+    // const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
+    // const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
 
-    found = false;
+    // if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD);
+    if (!node.members.find((v) => v.name.text == "__SERIALIZE_BS")) node.members.push(SERIALIZE_BS_METHOD);
+    // if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
+    // if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
+    super.visitClassDeclaration(node);
+  }
+  generateEmptyMethods(node: ClassDeclaration): void {
+    let SERIALIZE_RAW_EMPTY = '__SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n  return "{}";\n}';
+    let SERIALIZE_BS_EMPTY = "__SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n  bs.ensureSize(4);\n  store<u32>(bs.offset, 8192123);\n}";
+    let INITIALIZE_EMPTY = "__INITIALIZE(): this {\n  return this;\n}";
+    let DESERIALIZE_EMPTY = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  return false;\n}";
 
+    if (process.env["JSON_DEBUG"]) {
+      console.log(SERIALIZE_RAW_EMPTY);
+      console.log(SERIALIZE_BS_EMPTY);
+      console.log(INITIALIZE_EMPTY);
+      console.log(DESERIALIZE_EMPTY);
+    }
+
+    const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
+    const SERIALIZE_BS_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_BS_EMPTY, node);
+    const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
+    const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
+
+    if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
+    if (!node.members.find((v) => v.name.text == "__SERIALIZE_BS")) node.members.push(SERIALIZE_BS_METHOD_EMPTY);
+    if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD_EMPTY);
+    if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD_EMPTY);
+  }
+  // visitCallExpression(node: CallExpression, ref: Node): void {
+  //   super.visitCallExpression(node, ref);
+  //   if (!(node.expression.kind == NodeKind.PropertyAccess && (node.expression as PropertyAccessExpression).property.text == "stringifyTo") && !(node.expression.kind == NodeKind.Identifier && (node.expression as IdentifierExpression).text == "stringifyTo")) return;
+
+  //   const source = node.range.source;
+
+  //   if (ref.kind == NodeKind.Call) {
+  //     const newNode = Node.createBinaryExpression(Token.Equals, node.args[1], node, node.range);
+
+  //     (<CallExpression>ref).args[(<CallExpression>ref).args.indexOf(node)] = newNode;
+  //   } else {
+  //     const newNode = Node.createExpressionStatement(Node.createBinaryExpression(Token.Equals, node.args[1], node, node.range));
+
+  //     const nodeIndex = source.statements.findIndex((n: Node) => {
+  //       if (n == node) return true;
+  //       if (n.kind == NodeKind.Expression && (<ExpressionStatement>n).expression == node) return true;
+  //       return false;
+  //     });
+
+  //     if (nodeIndex > 0) source.statements[nodeIndex] = newNode;
+  //   }
+  // }
+  // visitBinaryExpression(node: BinaryExpression, ref?: Node | null): void {
+  //   // if (node.right.kind == NodeKind.Call && (<CallExpression>node).)
+  // }
+  visitImportStatement(node: ImportStatement): void {
+    super.visitImportStatement(node);
+    const source = this.parser.sources.find((src) => src.internalPath == node.internalPath);
+    if (!source) return;
+
+    if (source.statements.some(stmt =>
+      stmt.kind === NodeKind.NamespaceDeclaration &&
+      (stmt as NamespaceDeclaration).name.text === "JSON")
+    ) this.imports.push(node);
+  }
+  visitSource(node: Source): void {
+    this.imports = [];
+    super.visitSource(node);
+  }
+  addRequiredImports(node: ClassDeclaration): void {
     if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "JSON"))) {
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = path.dirname(__filename);
@@ -204,175 +285,6 @@ class JSONTransform extends Visitor {
         if (process.env["JSON_DEBUG"]) console.log(txt + "\n");
       }
     }
-
-    if (this.schema.members[0]?.flags.has(PropertyFlags.OmitNull) || this.schema.members[0]?.flags.has(PropertyFlags.OmitIf)) {
-      SERIALIZE_RAW += this.schema.members[0]?.serialize;
-      SERIALIZE_PRETTY += "\\n" + this.schema.members[0]?.serialize;
-    } else {
-      SERIALIZE_RAW += this.schema.members[0]?.serialize + ",";
-      SERIALIZE_PRETTY += "\\n" + this.schema.members[0]?.serialize + ",\\n";
-      found = true;
-    }
-
-    if (this.schema.members[0]?.initialize) INITIALIZE += "  " + this.schema.members[0]?.initialize + ";\n";
-
-    for (let i = 1; i < this.schema.members.length; i++) {
-      const member = this.schema.members[i]!;
-      if (member.initialize) INITIALIZE += "  " + member.initialize + ";\n";
-      if (member.flags.has(PropertyFlags.OmitNull) || member.flags.has(PropertyFlags.OmitIf)) {
-        SERIALIZE_RAW += member.serialize;
-        SERIALIZE_PRETTY += member.serialize;
-      } else {
-        SERIALIZE_RAW += member.serialize + ",";
-        SERIALIZE_PRETTY += indent + member.serialize + ",\\n";
-        found = true;
-      }
-    }
-
-    if (found) {
-      SERIALIZE_RAW += "`;\n  store<u16>(changetype<usize>(out) + ((out.length - 1) << 1), 125);\n  return out;\n}";
-      SERIALIZE_PRETTY += "`;\n  store<u32>(changetype<usize>(out) + ((out.length - 2) << 1), 8192010);\n  return out;\n}";
-    } else {
-      SERIALIZE_RAW += "}`;\n  return out;\n}";
-      SERIALIZE_PRETTY += "}`;\n  return out;\n}";
-    }
-
-    INITIALIZE += "  return this;\n}";
-
-    const sortedMembers: Property[][] = [];
-    const _sorted = this.schema.members.sort((a, b) => (a.alias?.length! || a.name.length) - (b.alias?.length! || b.name.length));
-    let len = -1;
-    let offset = -1;
-    for (let i = 0; i < _sorted.length; i++) {
-      const member = _sorted[i]!;
-      const _name = member.alias || member.name;
-      if (_name.length == len) {
-        sortedMembers[offset]?.push(member);
-      } else {
-        sortedMembers.push([member]);
-        len = _name.length;
-        offset++;
-      }
-    }
-
-    let first = true;
-    for (const memberSet of sortedMembers) {
-      const firstMember = memberSet[0]!;
-      const _name = encodeKey(firstMember.alias || firstMember.name);
-      if (_name.length == 1) {
-        if (first) {
-          DESERIALIZE += "  if (1 == len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
-          first = false;
-        } else {
-          DESERIALIZE += "else if (1 == len) {\n    switch (load<u16>(changetype<usize>(data) + (key_start << 1))) {\n";
-        }
-      } else if (_name.length == 2) {
-        if (first) {
-          DESERIALIZE += "  if (2 == len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
-          first = false;
-        } else {
-          DESERIALIZE += "else if (2 == len) {\n    switch (load<u32>(changetype<usize>(data) + (key_start << 1))) {\n";
-        }
-      } else if (_name.length == 4) {
-        if (first) {
-          DESERIALIZE += "  if (4 == len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
-          first = false;
-        } else {
-          DESERIALIZE += "else if (4 == len) {\n    const code = load<u64>(changetype<usize>(data) + (key_start << 1));\n";
-        }
-      } else {
-        if (first) {
-          DESERIALIZE += "  if (" + _name.length + " == len) {\n";
-          first = false;
-        } else {
-          DESERIALIZE += "else if (" + _name.length + " == len) {\n";
-        }
-      }
-      let f = true;
-      for (let i = 0; i < memberSet.length; i++) {
-        const member = memberSet[i]!;
-        if (!member.deserialize) continue;
-        const _name = encodeKey(member.alias || member.name);
-        if (_name.length == 1) {
-          DESERIALIZE += `      case ${_name.charCodeAt(0)}: { /* ${_name} */\n        ${member.deserialize}\n        return true;\n      }\n`;
-        } else if (_name.length == 2) {
-          DESERIALIZE += `      case ${charCodeAt32(_name, 0)}: { /* ${_name} */\n        ${member.deserialize}\n        return true;\n      }\n`;
-        } else if (_name.length == 4) {
-          if (f) {
-            f = false;
-            DESERIALIZE += `    if (${charCodeAt64(_name, 0)} == code) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
-          } else {
-            DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + `else if (${charCodeAt64(_name, 0)} == code) {\n      ${member.deserialize}\n      return true;\n    }\n`;
-          }
-        } else {
-          if (f) {
-            f = false;
-            DESERIALIZE += `    if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
-          } else {
-            DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else if (0 == memory.compare(changetype<usize>("${escapeQuote(escapeSlash(_name))}"), changetype<usize>(data) + (key_start << 1), ${_name.length << 1})) { /* ${_name} */\n      ${member.deserialize}\n      return true;\n    }\n`;
-          }
-        }
-      }
-      if (_name.length < 3) {
-        DESERIALIZE += `      default: {\n        return false;\n      }\n    }\n`;
-      } else if (_name.length == 4) {
-        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`;
-      } else {
-        DESERIALIZE = DESERIALIZE.slice(0, DESERIALIZE.length - 1) + ` else {\n      return false;\n    }\n`;
-      }
-      DESERIALIZE += "  } ";
-    }
-
-    DESERIALIZE += "\n  return false;\n}";
-
-    //console.log(sortedMembers);
-
-    if (process.env["JSON_DEBUG"]) {
-      console.log(SERIALIZE_RAW);
-      //console.log(SERIALIZE_PRETTY);
-      console.log(INITIALIZE);
-      console.log(DESERIALIZE);
-    }
-
-    const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
-
-    //const SERIALIZE_PRETTY_METHOD = SimpleParser.parseClassMember(SERIALIZE_PRETTY, node);
-    const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
-    const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
-
-    if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD);
-    if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
-    if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
-    super.visitClassDeclaration(node);
-  }
-  visitCallExpression(node: CallExpression, ref: Node): void {
-    super.visitCallExpression(node, ref);
-    if (!(node.expression.kind == NodeKind.PropertyAccess && (node.expression as PropertyAccessExpression).property.text == "stringifyTo") && !(node.expression.kind == NodeKind.Identifier && (node.expression as IdentifierExpression).text == "stringifyTo")) return;
-
-    const source = node.range.source;
-
-    if (ref.kind == NodeKind.Call) {
-      const newNode = Node.createBinaryExpression(Token.Equals, node.args[1], node, node.range);
-
-      (<CallExpression>ref).args[(<CallExpression>ref).args.indexOf(node)] = newNode;
-    } else {
-      const newNode = Node.createExpressionStatement(Node.createBinaryExpression(Token.Equals, node.args[1], node, node.range));
-
-      const nodeIndex = source.statements.findIndex((n: Node) => {
-        if (n == node) return true;
-        if (n.kind == NodeKind.Expression && (<ExpressionStatement>n).expression == node) return true;
-        return false;
-      });
-
-      if (nodeIndex > 0) source.statements[nodeIndex] = newNode;
-    }
-  }
-  visitBinaryExpression(node: BinaryExpression, ref?: Node | null): void {
-    // if (node.right.kind == NodeKind.Call && (<CallExpression>node).)
-  }
-  visitSource(node: Source): void {
-    this.imports = [];
-    super.visitSource(node);
   }
 }
 
@@ -412,80 +324,29 @@ export default class Transformer extends Transform {
       }
     }
     // Check that every parent and child class is hooked up correctly
-    const schemas = transformer.schemasList;
+    const schemas = transformer.schemas;
     for (const schema of schemas) {
       if (schema.parent) {
         const parent = schemas.find((v) => v.name == schema.parent?.name);
-        if (!parent) throw new Error(`Class ${schema.name} extends its parent class ${schema.parent}, but ${schema.parent} does not include a @json or @serializable decorator! Add the decorator and rebuild.`);
+        if (!parent) throwError(`Class ${schema.name} extends its parent class ${schema.parent}, but ${schema.parent} does not include a @json or @serializable decorator!`, schema.parent.node.range);
       }
     }
   }
 }
 
-enum PropertyFlags {
-  Null,
-  Omit,
-  OmitNull,
-  OmitIf,
-  Alias,
-  JSON_Raw,
-}
+function sortMembers(members: Property[]): Property[] {
+  return members.sort((a, b) => {
+    const aMove = a.flags.has(PropertyFlags.OmitIf) || a.flags.has(PropertyFlags.OmitNull);
+    const bMove = b.flags.has(PropertyFlags.OmitIf) || b.flags.has(PropertyFlags.OmitNull);
 
-class Property {
-  public name: string = "";
-  public alias: string | null = null;
-  public type: string = "";
-  public value: string | null = null;
-  public flags: Map<PropertyFlags, string[]> = new Map<PropertyFlags, string[]>();
-
-  public serialize: string | null = null;
-  public deserialize: string | null = null;
-  public initialize: string | null = null;
-
-  public node!: FieldDeclaration;
-
-  private right_s: string = "";
-  private right_d: string = "";
-
-  public generate(): void {
-    const name = this.name;
-    const escapedName = escapeString(JSON.stringify(this.alias || this.name));
-    const type = this.type;
-    if (this.flags.has(PropertyFlags.Omit)) return;
-
-    if (this.flags.has(PropertyFlags.JSON_Raw)) {
-      if (this.flags.has(PropertyFlags.Null)) {
-        this.right_s = "(load<" + type + '>(ptr, offsetof<this>("' + name + '")) || "null")';
-        this.right_d = "value_start == value_end - 4 && 30399761348886638 == load<u64>(changetype<usize>(data) + (value_start << 1)) ? null : data.substring(value_start, value_end)";
-      } else {
-        this.right_s = "load<" + type + '>(ptr, offsetof<this>("' + name + '"))';
-        this.right_d = "data.substring(value_start, value_end)";
-      }
+    if (aMove && !bMove) {
+      return -1;
+    } else if (!aMove && bMove) {
+      return 1;
     } else {
-      this.right_s = "JSON.stringify<" + type + ">(load<" + type + '>(ptr, offsetof<this>("' + name + '")))';
-      this.right_d = "JSON.parse<" + type + ">(data.substring(value_start, value_end))";
+      return 0;
     }
-
-    if (this.flags.has(PropertyFlags.OmitIf)) {
-      const condition = this.flags.get(PropertyFlags.OmitIf)![0];
-      if (!condition) throw new Error("Could not find condition when using decorator @omitif! Provide at least one condition");
-      this.serialize = "${" + condition + ' ? "" : \'' + escapedName + ":' + " + this.right_s + ' + ","}';
-      this.deserialize = "this." + name + " = " + this.right_d + ";";
-    } else if (this.flags.has(PropertyFlags.OmitNull)) {
-      this.serialize = "${changetype<usize>(this." + name + ") == <usize>0" + ' ? "" : \'' + escapedName + ":' + " + this.right_s + ' + ","}';
-      this.deserialize = "this." + name + " = " + this.right_d + ";";
-    } else {
-      this.serialize = escapedName + ":${" + this.right_s + "}";
-      this.deserialize = "this." + name + " = " + this.right_d + ";";
-    }
-  }
-}
-
-class SchemaData {
-  public name: string = "";
-  public members: Property[] = [];
-  public parent: SchemaData | null = null;
-  public node!: ClassDeclaration;
+  });
 }
 
 function charCodeAt32(data: string, offset: number): number {
@@ -545,4 +406,102 @@ function getArgs(args: Expression[] | null): string[] {
     }
   }
   return out;
+}
+
+function strToNum(data: string, simd: boolean = false, offset: number = 0): string[][] {
+  const out: string[][] = [];
+  let n = data.length;
+
+  while (n >= 8 && simd) {
+    out.push(["v128", "i16x8("
+      + data.charCodeAt(offset + 0) + ", "
+      + data.charCodeAt(offset + 1) + ", "
+      + data.charCodeAt(offset + 2) + ", "
+      + data.charCodeAt(offset + 3) + ", "
+      + data.charCodeAt(offset + 4) + ", "
+      + data.charCodeAt(offset + 5) + ", "
+      + data.charCodeAt(offset + 6) + ", "
+      + data.charCodeAt(offset + 7)
+      + ")"]);
+
+    offset += 8;
+    n -= 8;
+  }
+
+  while (n >= 4) {
+    const value = (
+      (BigInt(data.charCodeAt(offset + 3)) << 48n) |
+      (BigInt(data.charCodeAt(offset + 2)) << 32n) |
+      (BigInt(data.charCodeAt(offset + 1)) << 16n) |
+      BigInt(data.charCodeAt(offset + 0))
+    );
+    out.push(["u64", value.toString()]);
+    offset += 4;
+    n -= 4;
+  }
+
+  while (n >= 2) {
+    const value = (
+      (data.charCodeAt(offset + 1) << 16) |
+      data.charCodeAt(offset + 0)
+    );
+    out.push(["u32", value.toString()]);
+    offset += 2;
+    n -= 2;
+  }
+
+  if (n === 1) {
+    const value = data.charCodeAt(offset + 0);
+    out.push(["u16", value.toString()]);
+  }
+
+  return out;
+}
+
+function strToStores(data: string, simd: boolean = false): string[] {
+  console.log(data);
+  const out: string[] = [];
+  const nums = strToNum(data, simd);
+  let offset = 0;
+  for (const [size, num] of nums) {
+    if (size == "v128") {
+      out.push("store<v128>(" + num + ");");
+    }
+    if (size == "u64") {
+      out.push("store<u64>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 4));
+      offset += 8;
+    } else if (size == "u32") {
+      out.push("store<u32>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 2));
+      offset += 4;
+    } else if (size == "u16") {
+      out.push("store<u16>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 1));
+      offset += 2;
+    }
+  }
+  out.push("bs.offset += " + offset + ";");
+  return out;
+}
+
+function isPrimitive(type: string): boolean {
+  const primitiveTypes = [
+    "u8", "u16", "u32", "u64",
+    "i8", "i16", "i32", "i64",
+    "f32", "f64",
+    "bool", "boolean"
+  ];
+  return primitiveTypes.some(v => type.includes(v));
+}
+
+function throwError(message: string, range: Range): never {
+  const err = new Error();
+  err.stack = `${message}\n  at ${range.source.normalizedPath}:${range.source.lineAt(range.start)}:${range.source.columnAt()}\n`;
+  throw err;
+}
+
+function indentInc(): void {
+  indent += "  ";
+}
+
+function indentDec(): void {
+  indent = indent.slice(0, Math.max(0, indent.length - 2));
 }

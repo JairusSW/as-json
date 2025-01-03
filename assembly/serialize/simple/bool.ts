@@ -6,13 +6,13 @@ import { bs } from "../../custom/bs";
  * @returns void
  */
 // @ts-ignore: Decorator valid here
-@inline export function serializeBool(data: bool): void {
+@inline export function serializeBool(data: bool, staticSize: bool = false): void {
   if (data == true) {
-    bs.ensureSize(8);
+    if (!staticSize) bs.ensureSize(8);
     store<u64>(bs.offset, 28429475166421108);
     bs.offset += 8;
   } else {
-    bs.ensureSize(10);
+    if (!staticSize) bs.ensureSize(10);
     store<u64>(bs.offset, 32370086184550502);
     store<u64>(bs.offset, 101, 8);
     bs.offset += 10;
