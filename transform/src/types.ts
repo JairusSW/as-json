@@ -1,4 +1,4 @@
-import { ClassDeclaration, FieldDeclaration } from "assemblyscript/dist/assemblyscript";
+import { ClassDeclaration, Expression, FieldDeclaration } from "assemblyscript/dist/assemblyscript";
 
 export enum PropertyFlags {
     OmitNull,
@@ -11,7 +11,7 @@ export class Property {
     public alias: string | null = null;
     public type: string = "";
     public value: string | null = null;
-    public flags: Map<PropertyFlags, string[]> = new Map<PropertyFlags, string[]>();
+    public flags: Map<PropertyFlags, Expression | null> = new Map<PropertyFlags, Expression | null>();
     public node!: FieldDeclaration;
 }
 

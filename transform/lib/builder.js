@@ -1102,6 +1102,15 @@ export class ASTBuilder extends Visitor {
             this.sb.push("return");
         }
     }
+    visitTrueExpression(node) {
+        this.sb.push("true");
+    }
+    visitFalseExpression(node) {
+        this.sb.push("false");
+    }
+    visitNullExpression(node) {
+        this.sb.push("null");
+    }
     visitSwitchCase(node) {
         var sb = this.sb;
         var label = node.label;

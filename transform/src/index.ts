@@ -1,4 +1,4 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement, BinaryExpression, NamedTypeNode, Range, FEATURE_SIMD } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement, BinaryExpression, NamedTypeNode, Range, FEATURE_SIMD, FunctionExpression } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -95,23 +95,22 @@ class JSONTransform extends Visitor {
       mem.value = value;
       mem.node = member;
 
-      if (type.includes("JSON.Raw")) mem.flags.set(PropertyFlags.Raw, []);
+      if (type.includes("JSON.Raw")) mem.flags.set(PropertyFlags.Raw, null);
 
       if (member.decorators) {
         for (const decorator of member.decorators) {
           const decoratorName = (decorator.name as IdentifierExpression).text.toLowerCase().trim();
-
-          const args = getArgs(decorator.args);
-
           switch (decoratorName) {
             case "alias": {
-              if (!args.length) throwError("@alias must have an argument of type string", member.range);
+              const args = getArgs(decorator.args);
+              if (!args.length) throwError("@alias must have an argument of type string or number", member.range);
               mem.alias = args[0]!;
               break;
             }
             case "omitif": {
-              if (!decorator.args?.length) throwError("@omitif must have an argument that resolves to type bool", member.range);
-              mem.flags.set(PropertyFlags.OmitIf, args);
+              const arg = decorator.args[0];
+              if (!decorator.args?.length) throwError("@omitif must have an argument or callback that resolves to type bool", member.range);
+              mem.flags.set(PropertyFlags.OmitIf, arg);
               this.schema.static = false;
               break;
             }
@@ -121,7 +120,7 @@ class JSONTransform extends Visitor {
               } else if (!member.type.isNullable) {
                 throwError("@omitnull cannot be used on non-nullable types!", member.range);
               }
-              mem.flags.set(PropertyFlags.OmitNull, args);
+              mem.flags.set(PropertyFlags.OmitNull, null);
               this.schema.static = false;
               break;
             }
@@ -156,23 +155,38 @@ class JSONTransform extends Visitor {
 
     for (let i = 0; i < this.schema.members.length; i++) {
       const member = this.schema.members[i];
+      const aliasName = JSON.stringify(member.alias || member.name);
+      const realName = member.name;
       const isLast = i == this.schema.members.length - 1;
 
       if (!isRegular && !member.flags.has(PropertyFlags.OmitIf) && !member.flags.has(PropertyFlags.OmitNull)) isRegular = true;
       if (isRegular && isPure) {
-        SERIALIZE_BS += strToStores((isFirst ? "{" : ",") + JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
-        SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+        SERIALIZE_BS += strToStores((isFirst ? "{" : ",") + aliasName + ":").map(v => indent + v + "\n").join("");
+        SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
         if (isFirst) isFirst = false;
       } else if (isRegular && !isPure) {
-        SERIALIZE_BS += strToStores((isFirst ? "" : ",") + JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
-        SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+        SERIALIZE_BS += strToStores((isFirst ? "" : ",") + aliasName + ":").map(v => indent + v + "\n").join("");
+        SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
         if (isFirst) isFirst = false;
       } else {
         if (member.flags.has(PropertyFlags.OmitNull)) {
-          SERIALIZE_BS += indent + `if ((block = load<usize>(ptr, offsetof<this>("${member.name}"))) !== 0) {\n`;
+          SERIALIZE_BS += indent + `if ((block = load<usize>(ptr, offsetof<this>("${realName}"))) !== 0) {\n`;
           indentInc();
-          SERIALIZE_BS += strToStores(JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
-          SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+          SERIALIZE_BS += strToStores(aliasName + ":").map(v => indent + v + "\n").join("");
+          SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
+
+          if (!isLast) {
+            SERIALIZE_BS += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
+            SERIALIZE_BS += indent + `bs.offset += 2;\n`;
+          }
+
+          indentDec();
+          SERIALIZE_BS += indent + `}\n`;
+        } else if (member.flags.has(PropertyFlags.OmitIf)) {
+          SERIALIZE_BS += indent + `if (${toString}) !== 0) {\n`;
+          indentInc();
+          SERIALIZE_BS += strToStores(aliasName + ":").map(v => indent + v + "\n").join("");
+          SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
 
           if (!isLast) {
             SERIALIZE_BS += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;

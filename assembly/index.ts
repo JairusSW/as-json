@@ -17,6 +17,8 @@ import { NULL_WORD, QUOTE } from "./custom/chars";
 import { bs } from "as-bs";
 import { dtoa_buffered, itoa_buffered } from "util/number";
 import { serializeBool } from "./serialize/simple/bool";
+import { serializeInteger } from "./serialize/simple/integer";
+import { serializeFloat } from "./serialize/simple/float";
 
 class Nullable { }
 
@@ -88,6 +90,13 @@ export namespace JSON {
     } else if (isDefined(data.__SERIALIZE)) {
       // @ts-ignore
       return data.__SERIALIZE(changetype<usize>(data));
+      // @ts-ignore: Supplied by transform
+    } else if (isDefined(data.__SERIALIZE_BS) && isDefined(data.__ALLOCATE)) {
+      // @ts-ignore
+      data.__ALLOCATE();
+      // @ts-ignore
+      data.__SERIALIZE_BS(changetype<usize>(data), false);
+      return bs.out<string>();
     } else if (data instanceof Date) {
       out = out
         ? changetype<string>(__renew(changetype<usize>(out), 52))
@@ -322,7 +331,7 @@ export namespace JSON {
   }
 
   // @ts-ignore: Decorator valid here
-  @inline export function serialize_simple<T>(src: T, staticSize: bool = false): void {
+  @inline function serialize_simple<T>(src: T, staticSize: bool = false): void {
     if (isBoolean<T>()) {
       serializeBool(src as bool, staticSize);
     } else if (isInteger<T>()) {

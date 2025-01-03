@@ -1,4 +1,4 @@
-import { IdentifierExpression, Source, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, Tokenizer, FEATURE_SIMD } from "assemblyscript/dist/assemblyscript.js";
+import { IdentifierExpression, Source, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, Tokenizer } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -7,14 +7,14 @@ import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
 let indent = "  ";
-console.log("SIMD: " + FEATURE_SIMD.toString());
 class JSONTransform extends Visitor {
     parser;
     schemas = [];
     schema;
     sources = new Set();
     imports = [];
-    requiredImport = null;
+    jsonImport = null;
+    bsImport = null;
     visitClassDeclaration(node) {
         if (!node.decorators?.length)
             return;
@@ -80,22 +80,28 @@ class JSONTransform extends Visitor {
             mem.value = value;
             mem.node = member;
             if (type.includes("JSON.Raw"))
-                mem.flags.set(PropertyFlags.Raw, []);
+                mem.flags.set(PropertyFlags.Raw, null);
             if (member.decorators) {
                 for (const decorator of member.decorators) {
                     const decoratorName = decorator.name.text.toLowerCase().trim();
-                    const args = getArgs(decorator.args);
                     switch (decoratorName) {
                         case "alias": {
+                            const args = getArgs(decorator.args);
                             if (!args.length)
-                                throwError("@alias must have an argument of type string", member.range);
+                                throwError("@alias must have an argument of type string or number", member.range);
                             mem.alias = args[0];
                             break;
                         }
                         case "omitif": {
+                            const arg = decorator.args[0];
                             if (!decorator.args?.length)
-                                throwError("@omitif must have an argument that resolves to type bool", member.range);
-                            mem.flags.set(PropertyFlags.OmitIf, args);
+                                throwError("@omitif must have an argument or callback that resolves to type bool", member.range);
+                            if (arg.kind == 14) {
+                                const fn = arg;
+                                const returnType = fn.declaration.signature.returnType;
+                                console.log("returnType: " + toString(fn));
+                            }
+                            mem.flags.set(PropertyFlags.OmitIf, arg);
                             this.schema.static = false;
                             break;
                         }
@@ -106,7 +112,7 @@ class JSONTransform extends Visitor {
                             else if (!member.type.isNullable) {
                                 throwError("@omitnull cannot be used on non-nullable types!", member.range);
                             }
-                            mem.flags.set(PropertyFlags.OmitNull, args);
+                            mem.flags.set(PropertyFlags.OmitNull, null);
                             this.schema.static = false;
                             break;
                         }
@@ -140,13 +146,13 @@ class JSONTransform extends Visitor {
                 isRegular = true;
             if (isRegular && isPure) {
                 SERIALIZE_BS += strToStores((isFirst ? "{" : ",") + JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
-                SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+                SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
                 if (isFirst)
                     isFirst = false;
             }
             else if (isRegular && !isPure) {
                 SERIALIZE_BS += strToStores((isFirst ? "" : ",") + JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
-                SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+                SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
                 if (isFirst)
                     isFirst = false;
             }
@@ -155,7 +161,19 @@ class JSONTransform extends Visitor {
                     SERIALIZE_BS += indent + `if ((block = load<usize>(ptr, offsetof<this>("${member.name}"))) !== 0) {\n`;
                     indentInc();
                     SERIALIZE_BS += strToStores(JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
-                    SERIALIZE_BS += indent + `serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+                    SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
+                    if (!isLast) {
+                        SERIALIZE_BS += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
+                        SERIALIZE_BS += indent + `bs.offset += 2;\n`;
+                    }
+                    indentDec();
+                    SERIALIZE_BS += indent + `}\n`;
+                }
+                else if (member.flags.has(PropertyFlags.OmitIf) && member.flags.get(PropertyFlags.OmitIf)) {
+                    SERIALIZE_BS += indent + `if ((block = load<usize>(ptr, offsetof<this>("${member.name}"))) !== 0) {\n`;
+                    indentInc();
+                    SERIALIZE_BS += strToStores(JSON.stringify(member.name) + ":").map(v => indent + v + "\n").join("");
+                    SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${member.name}")), staticSize);\n`;
                     if (!isLast) {
                         SERIALIZE_BS += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
                         SERIALIZE_BS += indent + `bs.offset += 2;\n`;
@@ -214,17 +232,24 @@ class JSONTransform extends Visitor {
         super.visitSource(node);
     }
     addRequiredImports(node) {
+        if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
+            if (!this.bsImport) {
+                this.bsImport = "import { bs } from \"as-bs\"";
+                if (process.env["JSON_DEBUG"])
+                    console.log("Added as-bs import: " + this.bsImport + "\n");
+            }
+        }
         if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "JSON"))) {
             const __filename = fileURLToPath(import.meta.url);
             const __dirname = path.dirname(__filename);
             let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../assembly/index.ts"));
             if (!relativePath.startsWith(".") && !relativePath.startsWith("/"))
                 relativePath = "./" + relativePath;
-            const txt = 'import { JSON } from "' + relativePath + '";';
-            if (!this.requiredImport) {
-                this.requiredImport = txt;
+            const txt = `import { JSON } from "${relativePath}";`;
+            if (!this.jsonImport) {
+                this.jsonImport = txt;
                 if (process.env["JSON_DEBUG"])
-                    console.log(txt + "\n");
+                    console.log("Added json-as import: " + txt + "\n");
             }
         }
     }
@@ -250,12 +275,19 @@ export default class Transformer extends Transform {
             transformer.imports = [];
             transformer.currentSource = source;
             transformer.visit(source);
-            if (transformer.requiredImport) {
-                const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.requiredImport));
+            if (transformer.jsonImport) {
+                const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.jsonImport));
                 parser.currentSource = tokenizer.source;
                 source.statements.unshift(parser.parseTopLevelStatement(tokenizer));
                 parser.currentSource = source;
-                transformer.requiredImport = null;
+                transformer.jsonImport = null;
+            }
+            if (transformer.bsImport) {
+                const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.bsImport));
+                parser.currentSource = tokenizer.source;
+                source.statements.unshift(parser.parseTopLevelStatement(tokenizer));
+                parser.currentSource = source;
+                transformer.bsImport = null;
             }
         }
         const schemas = transformer.schemas;

@@ -1,6 +1,6 @@
-import { serialize_simple } from ".";
 import { bs } from "as-bs";
 import { COMMA, BRACKET_RIGHT, BRACKET_LEFT } from "../../custom/chars";
+import { JSON } from "../..";
 
 export function serializeArray<T extends any[]>(src: T, staticSize: bool = false): void {
   const srcSize = load<u32>(changetype<usize>(src), offsetof<T>("byteLength"));
@@ -23,7 +23,7 @@ export function serializeArray<T extends any[]>(src: T, staticSize: bool = false
 
   while (srcPtr < srcEnd) {
     const block = load<valueof<T>>(srcPtr);
-    serialize_simple<valueof<T>>(block);
+    JSON.serialize_simple<valueof<T>>(block);
     if (!staticSize) bs.ensureSize(2);
     store<u16>(bs.offset, COMMA);
     bs.offset += 2;
@@ -31,7 +31,7 @@ export function serializeArray<T extends any[]>(src: T, staticSize: bool = false
   }
 
   const lastBlock = load<valueof<T>>(srcPtr);
-  serialize_simple<valueof<T>>(lastBlock);
+  JSON.serialize_simple<valueof<T>>(lastBlock);
   if (!staticSize) bs.ensureSize(2);
   store<u16>(bs.offset, BRACKET_RIGHT);
   bs.offset += 2;

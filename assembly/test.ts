@@ -1,32 +1,33 @@
-import { bs } from "as-bs";
-import { serialize_simple } from "./serialize/simple";
 import { VecBase } from "./types";
 import { bytes } from "./util/bytes";
+import { JSON } from ".";
 
 @json
 class Vec3 {
-    @omit
     base: VecBase = new VecBase();
     x: i32 = 1;
+    @omitif((v: i32) => {
+        if (v == 1) return true;
+        return false;
+    })
     y: i32 = 2;
     z: i32 = 3;
-    __SERIALIZE_BS(ptr: usize, staticSize: bool): void {
-        store<u64>(bs.offset, 27303493649956987, 0); // {"ba
-        store<u64>(bs.offset, 16325694684725363, 8); // se":
-        bs.offset += 16;
-        serialize_simple<VecBase>(load<VecBase>(ptr, offsetof<this>("base")), staticSize);
-        store<u64>(bs.offset, 9570664606466092, 0); // ,"x"
+    @inline __ALLOCATE(): void {
+        bs.ensureSize(1024);
+    }
+    @inline __SERIALIZE_BS(ptr: usize, staticSize: bool): void {
+        store<u64>(bs.offset, 9570664606466171, 0); // {"x"
         store<u16>(bs.offset, 58, 8); // :
         bs.offset += 10;
-        serialize_simple<i32>(load<i32>(ptr, offsetof<this>("x")), staticSize);
+        JSON.serialize_simple<i32>(load<i32>(ptr, offsetof<this>("x")), staticSize);
         store<u64>(bs.offset, 9570668901433388, 0); // ,"y"
         store<u16>(bs.offset, 58, 8); // :
         bs.offset += 10;
-        serialize_simple<i32>(load<i32>(ptr, offsetof<this>("y")), staticSize);
+        JSON.serialize_simple<i32>(load<i32>(ptr, offsetof<this>("y")), staticSize);
         store<u64>(bs.offset, 9570673196400684, 0); // ,"z"
         store<u16>(bs.offset, 58, 8); // :
         bs.offset += 10;
-        serialize_simple<i32>(load<i32>(ptr, offsetof<this>("z")), staticSize);
+        JSON.serialize_simple<i32>(load<i32>(ptr, offsetof<this>("z")), staticSize);
         store<u16>(bs.offset, 125, 0); // }
         bs.offset += 2;
     }
@@ -66,10 +67,10 @@ const vec: Vec3 = {
 }
 
 bs.ensureSize(1024);
-vec.__SERIALIZE_BS(changetype<usize>(vec), true);
+// vec.__SERIALIZE_BS(changetype<usize>(vec), true);
 let out = __new(bs.offset - bs.buffer, idof<string>())
 const serialized = bs.shrinkTo<string>();
-console.log("Serialized: " + serialized);
+console.log("Serialized: " + JSON.stringify(vec));
 
 bench("Serialize Object (New)", () => {
     vec.__SERIALIZE_BS(changetype<usize>(vec), true);

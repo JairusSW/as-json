@@ -1,41 +1,36 @@
 import { JSON } from "../..";
-import { Sink } from "../../custom/sink";
+import { serializeArray } from "./array";
+import { serializeBool } from "./bool";
+import { serializeInteger } from "./integer";
+import { serializeString } from "./string";
 
-export function serializeArbitrary(data: JSON.Value): string {
-  switch (data.type) {
+export function serializeArbitrary(src: JSON.Value, staticSize: bool = false): void {
+  switch (src.type) {
     case JSON.Types.U8:
-      return data.get<u8>().toString();
+      serializeInteger<u8>(src.get<u8>(), staticSize);
+      break;
     case JSON.Types.U16:
-      return data.get<u16>().toString();
+      serializeInteger<u16>(src.get<u16>(), staticSize);
+      break;
     case JSON.Types.U32:
-      return data.get<u32>().toString();
+      serializeInteger<u32>(src.get<u32>(), staticSize);
+      break;
     case JSON.Types.U64:
-      return data.get<u64>().toString();
+      serializeInteger<u64>(src.get<u64>(), staticSize);
+      break;
     case JSON.Types.String:
-      return JSON.stringify(data.get<string>());
+      serializeString(src.get<string>(), staticSize);
+      break;
     case JSON.Types.Bool:
-      return data.get<boolean>() ? "true" : "false";
+      serializeBool(src.get<bool>(), staticSize);
     case JSON.Types.Array: {
-      const arr = data.get<JSON.Value[]>();
-      if (!arr.length) return "[]";
-      const out = Sink.fromStringLiteral("[");
-      const end = arr.length - 1;
-      for (let i = 0; i < end; i++) {
-        const element = unchecked(arr[i]);
-        out.write(element.toString());
-        out.write(",");
-      }
-
-      const element = unchecked(arr[end]);
-      out.write(element.toString());
-
-      out.write("]");
-      return out.toString();
+      serializeArray(src.get<JSON.Value[]>(), staticSize);
+      break;
     }
     default: {
-      const fn = JSON.Value.METHODS.get(data.type - JSON.Types.Struct);
-      const value = data.get<usize>();
-      return call_indirect<string>(fn, 0, value);
+      const fn = JSON.Value.METHODS.get(src.type - JSON.Types.Struct);
+      const value = src.get<usize>();
+      call_indirect<string>(fn, 0, value);
     }
   }
 }
