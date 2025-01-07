@@ -11,6 +11,7 @@ export class Property {
     value = null;
     flags = new Map();
     node;
+    byteSize = 0;
 }
 export class Schema {
     static = true;
@@ -19,5 +20,6 @@ export class Schema {
     parent = null;
     node;
     needsLink = null;
+    byteSize = 0;
 }
 //# sourceMappingURL=types.js.map

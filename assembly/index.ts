@@ -19,6 +19,7 @@ import { dtoa_buffered, itoa_buffered } from "util/number";
 import { serializeBool } from "./serialize/simple/bool";
 import { serializeInteger } from "./serialize/simple/integer";
 import { serializeFloat } from "./serialize/simple/float";
+import { serializeObject } from "./serialize/simple/object";
 
 class Nullable { }
 

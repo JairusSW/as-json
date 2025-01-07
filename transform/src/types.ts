@@ -1,4 +1,4 @@
-import { ClassDeclaration, Expression, FieldDeclaration } from "assemblyscript/dist/assemblyscript";
+import { ClassDeclaration, Expression, FieldDeclaration } from "assemblyscript/dist/assemblyscript.js";
 
 export enum PropertyFlags {
     OmitNull,
@@ -13,6 +13,7 @@ export class Property {
     public value: string | null = null;
     public flags: Map<PropertyFlags, Expression | null> = new Map<PropertyFlags, Expression | null>();
     public node!: FieldDeclaration;
+    public byteSize: number = 0;
 }
 
 export class Schema {
@@ -22,4 +23,5 @@ export class Schema {
     public parent: Schema | null = null;
     public node!: ClassDeclaration;
     public needsLink: string | null = null;
+    public byteSize: number = 0;
 }

@@ -1,5 +1,4 @@
-import { Visitor } from "./visitor";
-import { ClassDeclaration, ImportStatement, NodeKind, Parser, Source } from "assemblyscript/dist/assemblyscript";
+import { ClassDeclaration, ImportStatement, NodeKind, Parser, Source } from "assemblyscript/dist/assemblyscript.js";
 
 export function getImports(source: Source): ImportStatement[] {
     return source.statements.filter(v => v.kind === NodeKind.Import) as ImportStatement[];
