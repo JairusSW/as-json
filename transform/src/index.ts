@@ -18,7 +18,9 @@ class JSONTransform extends Visitor {
 
   public jsonImport: string | null = null;
   public bsImport: string | null = null;
-  public newStmts: Statement[] = [];
+  public newStmts: {
+    simd: string[]
+  } = { simd: [] };
 
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
@@ -168,13 +170,13 @@ class JSONTransform extends Visitor {
       if (isRegular && isPure) {
         const keyPart = (isFirst ? "{" : ",") + aliasName + ":";
         this.schema.byteSize += keyPart.length << 1;
-        SERIALIZE_BS += strToStores(keyPart).map(v => indent + v + "\n").join("");
+        SERIALIZE_BS += this.getStores(keyPart).map(v => indent + v + "\n").join("");
         SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), ${isPrimitive(member.type)});\n`;
         if (isFirst) isFirst = false;
       } else if (isRegular && !isPure) {
         const keyPart = (isFirst ? "" : ",") + aliasName + ":";
         this.schema.byteSize += keyPart.length << 1;
-        SERIALIZE_BS += strToStores(keyPart).map(v => indent + v + "\n").join("");
+        SERIALIZE_BS += this.getStores(keyPart).map(v => indent + v + "\n").join("");
         SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
         if (isFirst) isFirst = false;
       } else {
@@ -183,7 +185,7 @@ class JSONTransform extends Visitor {
           indentInc();
           const keyPart = aliasName + ":";
           this.schema.byteSize += keyPart.length << 1;
-          SERIALIZE_BS += strToStores(keyPart).map(v => indent + v + "\n").join("");
+          SERIALIZE_BS += this.getStores(keyPart).map(v => indent + v + "\n").join("");
           SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
 
           if (!isLast) {
@@ -198,7 +200,7 @@ class JSONTransform extends Visitor {
         } else if (member.flags.has(PropertyFlags.OmitIf)) {
           SERIALIZE_BS += indent + `if (${toString}) !== 0) {\n`;
           indentInc();
-          SERIALIZE_BS += strToStores(aliasName + ":").map(v => indent + v + "\n").join("");
+          SERIALIZE_BS += this.getStores(aliasName + ":").map(v => indent + v + "\n").join("");
           SERIALIZE_BS += indent + `JSON.serialize_simple<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
 
           if (!isLast) {
@@ -335,6 +337,34 @@ class JSONTransform extends Visitor {
       }
     }
   }
+
+  getStores(data: string, simd: boolean = true): string[] {
+    const out: string[] = [];
+    const sizes = strToNum(data, simd);
+    let offset = 0;
+    for (const [size, num] of sizes) {
+      if (size == "v128") {
+        // This could be put in its own file
+        let index = this.newStmts.simd.findIndex(v => v.includes(num));
+        let name = "SIMD_" + (index == -1 ? this.newStmts.simd.length : index);
+        if (index) this.newStmts.simd.push(`const ${name} = ${num};`);
+        out.push("store<v128>(bs.offset, " + name + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 8));
+        offset += 16;
+      }
+      if (size == "u64") {
+        out.push("store<u64>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 4));
+        offset += 8;
+      } else if (size == "u32") {
+        out.push("store<u32>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 2));
+        offset += 4;
+      } else if (size == "u16") {
+        out.push("store<u16>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 1));
+        offset += 2;
+      }
+    }
+    out.push("bs.offset += " + offset + ";");
+    return out;
+  }
 }
 
 export default class Transformer extends Transform {
@@ -363,6 +393,14 @@ export default class Transformer extends Transform {
       transformer.currentSource = source;
       // Ignore all lib and std. Visit everything else.
       transformer.visit(source);
+
+      if (transformer.newStmts.simd) {
+        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.newStmts.simd.join("\n")));
+        parser.currentSource = tokenizer.source;
+        for (let i = 0; i < transformer.newStmts.simd.length; i++) source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
+        parser.currentSource = source;
+        transformer.newStmts.simd = [];
+      }
 
       if (transformer.jsonImport) {
         const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.jsonImport));
@@ -476,31 +514,6 @@ function strToNum(data: string, simd: boolean = false, offset: number = 0): stri
     out.push(["u16", value.toString()]);
   }
 
-  return out;
-}
-
-function strToStores(data: string, simd: boolean = true): string[] {
-  // console.log(data);
-  const out: string[] = [];
-  const nums = strToNum(data, simd);
-  let offset = 0;
-  for (const [size, num] of nums) {
-    if (size == "v128") {
-      out.push("store<v128>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 8));
-      offset += 16;
-    }
-    if (size == "u64") {
-      out.push("store<u64>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 4));
-      offset += 8;
-    } else if (size == "u32") {
-      out.push("store<u32>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 2));
-      offset += 4;
-    } else if (size == "u16") {
-      out.push("store<u16>(bs.offset, " + num + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 1));
-      offset += 2;
-    }
-  }
-  out.push("bs.offset += " + offset + ";");
   return out;
 }
 

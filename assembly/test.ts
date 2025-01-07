@@ -47,7 +47,7 @@ const item: Item = {
     }
 };
 
-bs.ensureSize(2048);
+// bs.ensureSize(2048);
 console.log(JSON.stringify(vec));
-bs.ensureSize(2048);
+// bs.ensureSize(2048);
 console.log(JSON.stringify(item));
