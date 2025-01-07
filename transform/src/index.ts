@@ -139,7 +139,7 @@ class JSONTransform extends Visitor {
 
     if (!this.schema.static) this.schema.members = sortMembers(this.schema.members);
 
-    let SERIALIZE_RAW = "__SERIALIZE(ptr: usize = changetype<usize>(this)): string \n  let out = `{";
+    let SERIALIZE = "@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n";
     let SERIALIZE_BS = "__SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n";
     let INITIALIZE = "@inline __INITIALIZE(): this {\n";
     let DESERIALIZE = "__DESERIALIZE(data: string, key_start: i32, key_end: i32, value_start: i32, value_end: i32): boolean {\n  const len = key_end - key_start;\n";
@@ -219,6 +219,11 @@ class JSONTransform extends Visitor {
     SERIALIZE_BS += indent + "store<u16>(bs.offset, 125, 0); // }\n";
     SERIALIZE_BS += indent + "bs.offset += 2;\n";
     SERIALIZE_BS += "}";
+
+    SERIALIZE += indent + `this.__ALLOCATE();\n`;
+    SERIALIZE += indent + `this.__SERIALIZE_BS(ptr, true);\n`;
+    SERIALIZE += indent + `return bs.out<string>();\n`;
+    SERIALIZE += "}";
     indentDec();
 
     indentInc();
@@ -226,20 +231,20 @@ class JSONTransform extends Visitor {
     ALLOCATE += "}";
 
     if (process.env["JSON_DEBUG"]) {
-      // console.log(SERIALIZE_RAW);
+      console.log(SERIALIZE);
       console.log(SERIALIZE_BS);
       // console.log(INITIALIZE);
       // console.log(DESERIALIZE);
       console.log(ALLOCATE);
     }
 
-    // const SERIALIZE_RAW_METHOD = SimpleParser.parseClassMember(SERIALIZE_RAW, node);
+    const SERIALIZE_METHOD = SimpleParser.parseClassMember(SERIALIZE, node);
     const SERIALIZE_BS_METHOD = SimpleParser.parseClassMember(SERIALIZE_BS, node);
     // const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     // const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
     const ALLOCATE_METHOD = SimpleParser.parseClassMember(ALLOCATE, node);
 
-    // if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD);
+    if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__SERIALIZE_BS")) node.members.push(SERIALIZE_BS_METHOD);
     // if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
     // if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);

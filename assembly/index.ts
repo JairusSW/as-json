@@ -98,6 +98,10 @@ export namespace JSON {
       // @ts-ignore
       data.__SERIALIZE_BS(changetype<usize>(data), false);
       return bs.out<string>();
+      // @ts-ignore: Supplied by transform
+    } else if (isDefined(data.__SERIALIZE)) {
+      // @ts-ignore
+      return data.__SERIALIZE(changetype<usize>(data));
     } else if (data instanceof Date) {
       out = out
         ? changetype<string>(__renew(changetype<usize>(out), 52))

@@ -25,13 +25,13 @@ class Item {
 
 @json
 class Vec3 {
-    vxyz: i8 = 1;
+    x: i8 = 1;
     y: i8 = 2;
     z: i8 = 3;
 }
 
 const vec: Vec3 = {
-    vxyz: 1,
+    x: 1,
     y: 2,
     z: 3
 }
@@ -46,6 +46,8 @@ const item: Item = {
         }
     }
 };
+
+function foo(): void {}
 
 // bs.ensureSize(2048);
 console.log(JSON.stringify(vec));
