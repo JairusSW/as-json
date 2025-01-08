@@ -43,7 +43,7 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  export function stringify<T extends Nullable | null>(data: T, out: string | null = null): string {
+  export function stringify<T>(data: T, out: string | null = null): string {
     if (isBoolean<T>(data)) {
       if (out) {
         if (<bool>data == true) {
@@ -57,6 +57,13 @@ export namespace JSON {
         return out;
       }
       return out ? "true" : "false";
+    } else if (isInteger<T>() && nameof<T>() == "usize" && data == 0) {
+      if (out) {
+        out = changetype<string>(__renew(changetype<usize>(out), 8));
+        store<u64>(changetype<usize>(out), 30399761348886638);
+        return out;
+      }
+      return NULL_WORD;
     } else if (isInteger<T>(data)) {
       if (out) {
         out = changetype<string>(__renew(changetype<usize>(out), sizeof<T>() << 3));
