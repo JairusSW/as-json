@@ -1,4 +1,3 @@
-import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
 import { BACK_SLASH } from "../../custom/chars";
 import { DESERIALIZE_ESCAPE_TABLE, ESCAPE_HEX_TABLE } from "../../globals/tables";
 
@@ -12,11 +11,11 @@ const SPLAT_92 = i16x8.splat(92); /* \ */
  */
 // todo: optimize and stuff. it works, its not pretty. ideally, i'd like this to be (nearly) branchless
 // @ts-ignore: Decorator
-@inline export function deserializeString_SIMD(src: string, dst: usize): usize {
-  let src_ptr = changetype<usize>(src) + 2;
+@inline export function deserializeString_SIMD(src: string, srcStart: usize, srcEnd: usize, dst: usize): usize {
+  let src_ptr = srcStart + 2;
   let dst_ptr = changetype<usize>(dst);
 
-  const src_end = src_ptr + changetype<OBJECT>(changetype<usize>(src) - TOTAL_OVERHEAD).rtSize - 4;
+  const src_end = srcEnd - 2;
   const src_end_15 = src_end - 15;
 
   while (src_ptr < src_end_15) {

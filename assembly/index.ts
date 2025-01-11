@@ -2,14 +2,14 @@
 import { serializeString } from "./serialize/simple/string";
 import { serializeArray } from "./serialize/simple/array";
 import { serializeMap } from "./serialize/simple/map";
-import { deserializeBoolean } from "./deserialize/simple/bool";
+import { deserializeBoolean, deserializeBoolean_NEW } from "./deserialize/simple/bool";
 import { deserializeArray } from "./deserialize/simple/array";
-import { deserializeFloat } from "./deserialize/simple/float";
+import { deserializeFloat, deserializeFloat_NEW } from "./deserialize/simple/float";
 import { deserializeObject } from "./deserialize/simple/object";
 import { deserializeMap } from "./deserialize/simple/map";
 import { deserializeDate } from "./deserialize/simple/date";
-import { deserializeInteger } from "./deserialize/simple/integer";
-import { deserializeString } from "./deserialize/simple/string";
+import { deserializeInteger, deserializeInteger_NEW } from "./deserialize/simple/integer";
+import { deserializeString, deserializeString_NEW } from "./deserialize/simple/string";
 import { serializeArbitrary } from "./serialize/simple/arbitrary";
 
 import { Sink } from "./custom/sink";
@@ -94,10 +94,6 @@ export namespace JSON {
     } else if (isString<nonnull<T>>()) {
       serializeString(changetype<string>(data));
       return bs.shrinkTo<string>();
-      // @ts-ignore: Supplied by transform
-    } else if (isDefined(data.__SERIALIZE)) {
-      // @ts-ignore
-      return data.__SERIALIZE(changetype<usize>(data));
       // @ts-ignore: Supplied by transform
     } else if (isDefined(data.__SERIALIZE_BS) && isDefined(data.__ALLOCATE)) {
       // @ts-ignore
@@ -342,8 +338,7 @@ export namespace JSON {
     }
   }
 
-  // @ts-ignore: Decorator valid here
-  @inline function serialize_simple<T>(src: T, staticSize: bool = false): void {
+  function __serialize<T>(src: T, staticSize: bool = false): void {
     if (isBoolean<T>()) {
       serializeBool(src as bool, staticSize);
     } else if (isInteger<T>()) {
@@ -376,6 +371,21 @@ export namespace JSON {
       serializeArbitrary(src);
     } else {
       ERROR(`Could not serialize src of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
+    }
+  }
+  export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
+    if (isBoolean<T>()) {
+      // @ts-ignore: type
+      return deserializeBoolean_NEW<T>(srcStart, srcEnd);
+    } else if (isInteger<T>()) {
+      return deserializeInteger_NEW<T>(srcStart, srcEnd);
+    } else if (isFloat<T>()) {
+      return deserializeFloat_NEW<T>(srcStart, srcEnd);
+    } else if (isString<T>()) {
+      // @ts-ignore: type
+      return deserializeString_NEW(srcStart, srcEnd, dst);
+    } else {
+      ERROR("lol")
     }
   }
 }

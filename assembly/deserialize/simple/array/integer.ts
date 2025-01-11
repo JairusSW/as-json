@@ -1,4 +1,4 @@
-import { isSpace } from "util/string";
+import { isSpace } from "../../../util";
 import { unsafeCharCodeAt } from "../../../custom/util";
 import { COMMA, BRACKET_RIGHT } from "../../../custom/chars";
 import { deserializeInteger } from "../integer";

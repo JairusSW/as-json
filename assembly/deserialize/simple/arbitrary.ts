@@ -15,6 +15,7 @@ import { deserializeString } from "./string";
   if (firstChar > 47 && firstChar < 58) return JSON.Value.from(data.includes(".") ? deserializeInteger<u64>(data) : deserializeFloat<f64>(data));
   if (firstChar == 45) return JSON.Value.from(data.includes(".") ? deserializeInteger<i64>(data) : deserializeFloat<f64>(data));
   if (firstChar == 91) {
+    
     // array
   }
   if (firstChar == 116 || firstChar == 102) return JSON.Value.from(deserializeBoolean(data));

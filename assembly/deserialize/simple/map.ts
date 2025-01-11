@@ -4,7 +4,7 @@ import { CHAR_A, BACK_SLASH, COLON, COMMA, CHAR_E, CHAR_F, CHAR_L, BRACE_LEFT, B
 import { deserializeBoolean } from "./bool";
 import { JSON } from "../..";
 import { deserializeString } from "./string";
-import { isSpace } from "util/string";
+import { isSpace } from "../../util";
 import { deserializeInteger } from "./integer";
 import { deserializeFloat } from "./float";
 

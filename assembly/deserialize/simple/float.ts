@@ -7,3 +7,9 @@
   // @ts-ignore
   return f32.parse(data);
 }
+
+// @ts-ignore: Decorator valid here
+@inline export function deserializeFloat_NEW<T>(srcStart: usize, srcEnd: usize): T {
+  // todo: actually implement this
+  return 3.14
+}

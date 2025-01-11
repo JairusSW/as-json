@@ -23,7 +23,7 @@ export function serializeArray<T extends any[]>(src: T, staticSize: bool = false
 
   while (srcPtr < srcEnd) {
     const block = load<valueof<T>>(srcPtr);
-    JSON.serialize_simple<valueof<T>>(block);
+    JSON.__serialize<valueof<T>>(block);
     if (!staticSize) bs.ensureSize(2);
     store<u16>(bs.offset, COMMA);
     bs.offset += 2;
@@ -31,7 +31,7 @@ export function serializeArray<T extends any[]>(src: T, staticSize: bool = false
   }
 
   const lastBlock = load<valueof<T>>(srcPtr);
-  JSON.serialize_simple<valueof<T>>(lastBlock);
+  JSON.__serialize<valueof<T>>(lastBlock);
   if (!staticSize) bs.ensureSize(2);
   store<u16>(bs.offset, BRACKET_RIGHT);
   bs.offset += 2;

@@ -21,21 +21,21 @@ export function serializeMap<T extends Map<any, any>>(src: T, staticSize: bool =
   bs.offset += 2;
 
   for (let i = 0; i < srcEnd; i++) {
-    serialize_simple(unchecked(keys[i]));
+    __serialize(unchecked(keys[i]));
     if (!staticSize)  bs.ensureSize(2);
     store<u16>(bs.offset, COLON);
     bs.offset += 2;
-    serialize_simple(unchecked(values[i]));
+    __serialize(unchecked(values[i]));
     if (!staticSize) bs.ensureSize(2);
     store<u16>(bs.offset, COMMA);
     bs.offset += 2;
   }
 
-  serialize_simple(unchecked(keys[srcEnd]));
+  __serialize(unchecked(keys[srcEnd]));
   if (!staticSize) bs.ensureSize(2);
   store<u16>(bs.offset, COLON);
   bs.offset += 2;
-  serialize_simple(unchecked(values[srcEnd]));
+  __serialize(unchecked(values[srcEnd]));
   if (!staticSize) bs.ensureSize(2);
   store<u16>(bs.offset, BRACE_RIGHT);
   bs.offset += 2;
