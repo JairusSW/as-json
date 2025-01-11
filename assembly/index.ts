@@ -21,7 +21,7 @@ import { serializeInteger } from "./serialize/simple/integer";
 import { serializeFloat } from "./serialize/simple/float";
 import { serializeObject } from "./serialize/simple/object";
 
-class Nullable { }
+class Nullable {}
 
 export type Raw = string;
 
@@ -106,9 +106,7 @@ export namespace JSON {
       // @ts-ignore
       return data.__SERIALIZE(changetype<usize>(data));
     } else if (data instanceof Date) {
-      out = out
-        ? changetype<string>(__renew(changetype<usize>(out), 52))
-        : changetype<string>(__new(52, idof<string>()));
+      out = out ? changetype<string>(__renew(changetype<usize>(out), 52)) : changetype<string>(__new(52, idof<string>()));
 
       store<u16>(changetype<usize>(out), QUOTE);
       memory.copy(changetype<usize>(out) + 2, changetype<usize>(data.toISOString()), 48);
@@ -322,7 +320,7 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) { }
+    constructor(public value: T) {}
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive
@@ -385,7 +383,7 @@ export namespace JSON {
       // @ts-ignore: type
       return deserializeString_NEW(srcStart, srcEnd, dst);
     } else {
-      ERROR("lol")
+      ERROR("lol");
     }
   }
 }

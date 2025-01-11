@@ -9,11 +9,11 @@ const srcStart = changetype<usize>(str);
 const srcEnd = srcStart + bytes(str);
 bs.ensureSize(2048);
 bench("Deserialize String (Simple)", () => {
-    deserializeString(str2);
+  deserializeString(str2);
 });
 // bench("Deserialize String (SIMD)", () => {
 //   (str2, bs.buffer);
 // });
 bench("Deserialize String (SIMD)", () => {
-    deserializeString_SIMD(str2, srcStart, srcEnd, __new(158, idof<string>()));
+  deserializeString_SIMD(str2, srcStart, srcEnd, __new(158, idof<string>()));
 });

@@ -22,7 +22,7 @@ export function serializeMap<T extends Map<any, any>>(src: T, staticSize: bool =
 
   for (let i = 0; i < srcEnd; i++) {
     __serialize(unchecked(keys[i]));
-    if (!staticSize)  bs.ensureSize(2);
+    if (!staticSize) bs.ensureSize(2);
     store<u16>(bs.offset, COLON);
     bs.offset += 2;
     __serialize(unchecked(values[i]));

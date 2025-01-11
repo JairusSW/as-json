@@ -120,18 +120,17 @@ export function deserializeObject_NEW<T>(srcStart: usize, srcEnd: usize): T {
   // while (srcEnd > srcStart && isSpace(load<u16>(srcEnd))) srcEnd -= 2;
 
   while (srcStart < srcEnd) {
-    let code = load<u16>(srcStart);// while (isSpace(code)) code = load<u16>(srcStart += 2);
+    let code = load<u16>(srcStart); // while (isSpace(code)) code = load<u16>(srcStart += 2);
     if (keyStart == 0) {
       if (code == QUOTE && load<u16>(srcStart - 2) !== BACK_SLASH) {
         if (isKey) {
           keyStart = lastIndex;
           keyEnd = srcStart;
           console.log("Key: " + str(lastIndex, srcStart));
-          while (isSpace(code = load<u16>(srcStart += 2))) { /* empty */ }
-          if (code !== COLON)
-            throw new Error(
-              "Expected ':' after key at position " + (srcStart - srcPtr).toString(),
-            );
+          while (isSpace((code = load<u16>((srcStart += 2))))) {
+            /* empty */
+          }
+          if (code !== COLON) throw new Error("Expected ':' after key at position " + (srcStart - srcPtr).toString());
           isKey = false;
         } else {
           isKey = true; // i don't like this
@@ -147,7 +146,9 @@ export function deserializeObject_NEW<T>(srcStart: usize, srcEnd: usize): T {
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
           if (code == QUOTE && load<u16>(srcStart - 2) !== BACK_SLASH) {
-            while (isSpace(load<u16>(srcStart += 2))) { /* empty */ }
+            while (isSpace(load<u16>((srcStart += 2)))) {
+              /* empty */
+            }
             console.log("Value (string): " + str(lastIndex, srcStart));
             // @ts-ignore: exists
             schema.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart);
@@ -165,7 +166,9 @@ export function deserializeObject_NEW<T>(srcStart: usize, srcEnd: usize): T {
             // @ts-ignore: exists
             schema.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart);
             console.log("Value (number): " + str(lastIndex, srcStart));
-            while (isSpace(load<u16>(srcStart += 2))) { /* empty */ }
+            while (isSpace(load<u16>((srcStart += 2)))) {
+              /* empty */
+            }
             keyStart = 0;
             break;
           }
@@ -183,7 +186,9 @@ export function deserializeObject_NEW<T>(srcStart: usize, srcEnd: usize): T {
               schema.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart);
               console.log("Value (object): " + str(lastIndex, srcStart));
               keyStart = 0;
-              while (isSpace(load<u16>(srcStart += 2))) { /* empty */ }
+              while (isSpace(load<u16>((srcStart += 2)))) {
+                /* empty */
+              }
               break;
             }
           } else if (((code ^ BRACE_LEFT) | (code ^ BRACKET_LEFT)) == 220) depth++;
@@ -192,25 +197,31 @@ export function deserializeObject_NEW<T>(srcStart: usize, srcEnd: usize): T {
       } else if (code == CHAR_T) {
         if (load<u64>(srcStart) == 28429475166421108) {
           // @ts-ignore: exists
-          schema.__DESERIALIZE(keyStart, keyEnd, srcStart, srcStart += 8);
+          schema.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8));
           console.log("Value (bool): " + str(srcStart - 8, srcStart));
-          while (isSpace(load<u16>(srcStart += 2))) { /* empty */ }
+          while (isSpace(load<u16>((srcStart += 2)))) {
+            /* empty */
+          }
           keyStart = 0;
         }
       } else if (code == CHAR_F) {
         if (load<u64>(srcStart, 2) == 28429466576093281) {
           // @ts-ignore: exists
-          schema.__DESERIALIZE(keyStart, keyEnd, srcStart, srcStart += 10);
+          schema.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 10));
           console.log("Value (bool): " + str(srcStart - 10, srcStart));
-          while (isSpace(load<u16>(srcStart += 2))) { /* empty */ }
+          while (isSpace(load<u16>((srcStart += 2)))) {
+            /* empty */
+          }
           keyStart = 0;
         }
       } else if (code == CHAR_N) {
         if (load<u64>(srcStart) == 30399761348886638) {
           // @ts-ignore: exists
-          schema.__DESERIALIZE(keyStart, keyEnd, srcStart, srcStart += 8);
+          schema.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8));
           console.log("Value (null): " + str(srcStart - 8, srcStart));
-          while (isSpace(load<u16>(srcStart += 2))) { /* empty */ }
+          while (isSpace(load<u16>((srcStart += 2)))) {
+            /* empty */
+          }
         }
       }
     }

@@ -1,7 +1,7 @@
 /**
  * Strtol optimized for JSON integers
- * @param str 
- * @returns 
+ * @param str
+ * @returns
  */
 // @ts-ignore: Decorator valid here
 @inline export function strToInt<T>(srcStart: usize, srcEnd: usize): T {

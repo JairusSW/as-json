@@ -284,12 +284,12 @@ class JSONTransform extends Visitor {
           indentDec();
           DESERIALIZE += indent + "}\n"
         }
-      } else if (firstMemberLen == 6) {
+      } else if (firstMemberLen == 8) {
         if (groups != 1) {
-          DESERIALIZE += indent + "case 6: {\n";
+          DESERIALIZE += indent + "case 8: {\n";
           indentInc();
         }
-        DESERIALIZE += indent + "switch ((<u32>load<u16>(keyStart, 2) << 3) | load<u32>(keyStart)) {\n";
+        DESERIALIZE += indent + "switch ((load<u64>(keyStart)) {\n";
         for (const member of memberGroup) {
           const memberName = member.alias || member.name;
           DESERIALIZE += indent + `  case ${}: { // ${memberName}\n`;

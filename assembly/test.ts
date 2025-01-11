@@ -2,19 +2,20 @@ import { JSON } from ".";
 import { bytes } from "./util/bytes";
 import { deserializeObject_NEW } from "./deserialize/simple/object";
 
+
 @json
 class Vec3 {
-    x: i8 = 1;
-    y: i8 = 2;
-    z: i8 = 3;
-    xyx: i8 = 0
+  x: i8 = 1;
+  y: i8 = 2;
+  z: i8 = 3;
+  xyx: i8 = 0;
 }
 
 const vec: Vec3 = {
-    x: 1,
-    y: 2,
-    z: 3
-}
+  x: 1,
+  y: 2,
+  z: 3,
+};
 // const serialized = JSON.stringify<Vec3>(vec);
 // const ss = '{ "x":1,"y":2,"z":3}'
 // const s = changetype<usize>(ss);

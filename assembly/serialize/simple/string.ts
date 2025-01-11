@@ -16,7 +16,7 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
 
   let srcPtr = changetype<usize>(src);
   const srcEnd = srcPtr + srcSize;
-  
+
   store<u16>(bs.offset, QUOTE);
 
   bs.offset += 2;
