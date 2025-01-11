@@ -336,7 +336,7 @@ export namespace JSON {
     }
   }
 
-  function __serialize<T>(src: T, staticSize: bool = false): void {
+  export function __serialize<T>(src: T, staticSize: bool = false): void {
     if (isBoolean<T>()) {
       serializeBool(src as bool, staticSize);
     } else if (isInteger<T>()) {

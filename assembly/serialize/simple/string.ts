@@ -35,7 +35,7 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        if (!staticSize) bs.ensureSize(4);
+        if (!staticSize) bs.ensureSize(2);
         store<u32>(bs.offset, escaped, 0);
         bs.offset += 4;
       }
