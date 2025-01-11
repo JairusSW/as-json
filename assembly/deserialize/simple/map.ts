@@ -37,7 +37,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
       // isKey = !isKey;
       srcStart += 2;
     } else {
-      if (code == QUOTE) {
+      if (isString<valueof<T>>() && code == QUOTE) {
         lastIndex = srcStart;
         srcStart += 2;
         while (srcStart < srcEnd) {
@@ -53,7 +53,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
           }
           srcStart += 2;
         }
-      } else if (code - 48 <= 9 || code == 45) {
+      } else if (!isBoolean<valueof<T>>() && isInteger<valueof<T>>() && code - 48 <= 9 || code == 45) {
         lastIndex = srcStart;
         srcStart += 2;
         while (srcStart < srcEnd) {
@@ -69,7 +69,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
           }
           srcStart += 2;
         }
-      } else if (code == BRACE_LEFT) {
+      } else if (isArray<valueof<T>>() && code == BRACKET_LEFT) {
         lastIndex = srcStart;
         depth++;
         srcStart += 2;
@@ -84,10 +84,28 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
               key = null;
               break;
             }
-          } else if (((code ^ BRACE_LEFT) | (code ^ BRACKET_LEFT)) == 220) depth++;
+          } else if (code == BRACKET_LEFT) depth++;
           srcStart += 2;
         }
-      } else if (code == CHAR_T) {
+      } else if (isDefined(changetype<nonnull<valueof<T>>>(0).__DESERIALIZE) && code == BRACE_LEFT) {
+        lastIndex = srcStart;
+        depth++;
+        srcStart += 2;
+        while (srcStart < srcEnd) {
+          const code = load<u16>(srcStart);
+          if (code == BRACE_RIGHT) {
+            if (--depth == 0) {
+              dst.set(key, JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
+              while (isSpace(load<u16>((srcStart += 2)))) {
+                /* empty */
+              }
+              key = null;
+              break;
+            }
+          } else if (code == BRACE_LEFT) depth++;
+          srcStart += 2;
+        }
+      } else if (isBoolean<valueof<T>>() && code == CHAR_T) {
         if (load<u64>(srcStart) == 28429475166421108) {
           dst.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 8));
           console.log("Value (bool): " + str(srcStart - 8, srcStart));
@@ -96,7 +114,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
           }
           key = null;
         }
-      } else if (code == CHAR_F) {
+      } else if (isBoolean<valueof<T>>() && code == CHAR_F) {
         if (load<u64>(srcStart, 2) == 28429466576093281) {
           dst.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 10));
           console.log("Value (bool): " + str(srcStart - 10, srcStart));
@@ -105,7 +123,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
           }
           key = null;
         }
-      } else if (code == CHAR_N) {
+      } else if ((isNullable<T>() || nameof<T>() == "usize") && code == CHAR_N) {
         if (load<u64>(srcStart) == 30399761348886638) {
           dst.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 8));
           console.log("Value (null): " + str(srcStart - 8, srcStart));
