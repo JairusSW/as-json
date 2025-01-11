@@ -1,132 +1,135 @@
-import { Virtual } from "as-virtual/assembly";
-import { containsCodePoint, unsafeCharCodeAt } from "../../custom/util";
-import { CHAR_A, BACK_SLASH, COLON, COMMA, CHAR_E, CHAR_F, CHAR_L, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, CHAR_R, BRACE_RIGHT, BRACKET_RIGHT, CHAR_S, CHAR_T, CHAR_U } from "../../custom/chars";
-import { deserializeBoolean } from "./bool";
 import { JSON } from "../..";
-import { deserializeString } from "./string";
+import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T, COLON } from "../../custom/chars";
 import { isSpace } from "../../util";
-import { deserializeInteger } from "./integer";
-import { deserializeFloat } from "./float";
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeMap<T extends Map>(data: string): T {
-  const map: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
+export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd: usize, dst: T | null = null): T {
+  // @ts-ignore: type
+  if (!isString<indexof<T>>() && !isInteger<indexof<T>>()) ERROR("Map key must be of type string | number!");
+  dst = dst || changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()));
+  console.log("Data: " + str(srcStart, srcEnd));
 
-  const key = Virtual.createEmpty<string>();
+  const srcPtr = srcStart;
+  let key: string | null = null;
   let isKey = false;
   let depth = 0;
-  let outerLoopIndex = 1;
-  for (; outerLoopIndex < data.length - 1; outerLoopIndex++) {
-    const char = unsafeCharCodeAt(data, outerLoopIndex);
-    if (char == BRACKET_LEFT) {
-      for (let arrayValueIndex = outerLoopIndex; arrayValueIndex < data.length - 1; arrayValueIndex++) {
-        const char = unsafeCharCodeAt(data, arrayValueIndex);
-        if (char == BRACKET_LEFT) {
-          depth++;
-        } else if (char == BRACKET_RIGHT) {
-          depth--;
-          if (depth == 0) {
-            ++arrayValueIndex;
-            map.set(deserializeMapKey<indexof<T>>(key), JSON.parse<valueof<T>>(data.slice(outerLoopIndex, arrayValueIndex)));
-            outerLoopIndex = arrayValueIndex;
-            isKey = false;
-            break;
+  let lastIndex = 0;
+
+  // while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
+  // while (srcEnd > srcStart && isSpace(load<u16>(srcEnd))) srcEnd -= 2;
+
+  while (srcStart < srcEnd) {
+    let code = load<u16>(srcStart); // while (isSpace(code)) code = load<u16>(srcStart += 2);
+    if (key == null) {
+      if (code == QUOTE && load<u16>(srcStart - 2) !== BACK_SLASH) {
+        if (isKey) {
+          key = sliceTo(lastIndex, srcStart);
+          console.log("Key: " + key);
+          while (isSpace((code = load<u16>((srcStart += 2))))) {
+            /* empty */
           }
-        }
-      }
-    } else if (char == BRACE_LEFT) {
-      for (let objectValueIndex = outerLoopIndex; objectValueIndex < data.length - 1; objectValueIndex++) {
-        const char = unsafeCharCodeAt(data, objectValueIndex);
-        if (char == BRACE_LEFT) {
-          depth++;
-        } else if (char == BRACE_RIGHT) {
-          depth--;
-          if (depth == 0) {
-            ++objectValueIndex;
-            map.set(deserializeMapKey<indexof<T>>(key), JSON.parse<valueof<T>>(data.slice(outerLoopIndex, objectValueIndex)));
-            outerLoopIndex = objectValueIndex;
-            isKey = false;
-            break;
-          }
-        }
-      }
-    } else if (char == QUOTE) {
-      let escaping = false;
-      for (let stringValueIndex = ++outerLoopIndex; stringValueIndex < data.length - 1; stringValueIndex++) {
-        const char = unsafeCharCodeAt(data, stringValueIndex);
-        if (char == BACK_SLASH && !escaping) {
-          escaping = true;
-        } else {
-          if (char == QUOTE && !escaping) {
-            if (isKey == false) {
-              // perf: we can avoid creating a new string here if the key doesn't contain any escape sequences
-              if (containsCodePoint(data, BACK_SLASH, outerLoopIndex, stringValueIndex)) {
-                key.reinst(deserializeString(data, outerLoopIndex - 1, stringValueIndex));
-              } else {
-                key.reinst(data, outerLoopIndex, stringValueIndex);
-              }
-              isKey = true;
-            } else {
-              if (isString<valueof<T>>()) {
-                const value = deserializeString(data, outerLoopIndex - 1, stringValueIndex);
-                map.set(deserializeMapKey<indexof<T>>(key), value);
-              }
-              isKey = false;
-            }
-            outerLoopIndex = ++stringValueIndex;
-            break;
-          }
-          escaping = false;
-        }
-      }
-    } else if (char == CHAR_N && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_U && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_L && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_L) {
-      if (isNullable<valueof<T>>()) {
-        map.set(deserializeMapKey<indexof<T>>(key), null);
-      }
-      isKey = false;
-    } else if (char == CHAR_T && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_R && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_U && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_E) {
-      if (isBoolean<valueof<T>>()) {
-        map.set(deserializeMapKey<indexof<T>>(key), true);
-      }
-      isKey = false;
-    } else if (char == CHAR_F && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_A && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_L && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_S && unsafeCharCodeAt(data, ++outerLoopIndex) == CHAR_E) {
-      if (isBoolean<valueof<T>>()) {
-        map.set(deserializeMapKey<indexof<T>>(key), false);
-      }
-      isKey = false;
-    } else if ((char >= 48 && char <= 57) || char == 45) {
-      let numberValueIndex = ++outerLoopIndex;
-      for (; numberValueIndex < data.length; numberValueIndex++) {
-        const char = unsafeCharCodeAt(data, numberValueIndex);
-        if (char == COLON || char == COMMA || char == BRACE_RIGHT || isSpace(char)) {
-          if (isInteger<valueof<T>>()) {
-            map.set(deserializeMapKey<indexof<T>>(key), deserializeInteger<valueof<T>>(data.slice(outerLoopIndex - 1, numberValueIndex)));
-          } else if (isFloat<valueof<T>>()) {
-            map.set(deserializeMapKey<indexof<T>>(key), deserializeFloat<valueof<T>>(data.slice(outerLoopIndex - 1, numberValueIndex)));
-          }
-          outerLoopIndex = numberValueIndex;
+          if (code !== COLON) throw new Error("Expected ':' after key at position " + (srcStart - srcPtr).toString());
           isKey = false;
-          break;
+        } else {
+          isKey = true; // i don't like this
+          lastIndex = srcStart + 2;
+        }
+      }
+      // isKey = !isKey;
+      srcStart += 2;
+    } else {
+      if (code == QUOTE) {
+        lastIndex = srcStart;
+        srcStart += 2;
+        while (srcStart < srcEnd) {
+          const code = load<u16>(srcStart);
+          if (code == QUOTE && load<u16>(srcStart - 2) !== BACK_SLASH) {
+            while (isSpace(load<u16>((srcStart += 2)))) {
+              /* empty */
+            }
+            console.log("Value (string): " + str(lastIndex, srcStart));
+            dst.set(key, JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
+            key = null;
+            break;
+          }
+          srcStart += 2;
+        }
+      } else if (code - 48 <= 9 || code == 45) {
+        lastIndex = srcStart;
+        srcStart += 2;
+        while (srcStart < srcEnd) {
+          const code = load<u16>(srcStart);
+          if (code == COMMA || isSpace(code) || code == BRACE_RIGHT) {
+            dst.set(key, JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
+            console.log("Value (number): " + str(lastIndex, srcStart));
+            while (isSpace(load<u16>((srcStart += 2)))) {
+              /* empty */
+            }
+            key = null;
+            break;
+          }
+          srcStart += 2;
+        }
+      } else if (code == BRACE_LEFT) {
+        lastIndex = srcStart;
+        depth++;
+        srcStart += 2;
+        while (srcStart < srcEnd) {
+          const code = load<u16>(srcStart);
+          if (((code ^ BRACE_RIGHT) | (code ^ BRACKET_RIGHT)) == 32) {
+            if (--depth == 0) {
+              dst.set(key, JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
+              while (isSpace(load<u16>((srcStart += 2)))) {
+                /* empty */
+              }
+              key = null;
+              break;
+            }
+          } else if (((code ^ BRACE_LEFT) | (code ^ BRACKET_LEFT)) == 220) depth++;
+          srcStart += 2;
+        }
+      } else if (code == CHAR_T) {
+        if (load<u64>(srcStart) == 28429475166421108) {
+          dst.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 8));
+          console.log("Value (bool): " + str(srcStart - 8, srcStart));
+          while (isSpace(load<u16>((srcStart += 2)))) {
+            /* empty */
+          }
+          key = null;
+        }
+      } else if (code == CHAR_F) {
+        if (load<u64>(srcStart, 2) == 28429466576093281) {
+          dst.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 10));
+          console.log("Value (bool): " + str(srcStart - 10, srcStart));
+          while (isSpace(load<u16>((srcStart += 2)))) {
+            /* empty */
+          }
+          key = null;
+        }
+      } else if (code == CHAR_N) {
+        if (load<u64>(srcStart) == 30399761348886638) {
+          dst.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 8));
+          console.log("Value (null): " + str(srcStart - 8, srcStart));
+          while (isSpace(load<u16>((srcStart += 2)))) {
+            /* empty */
+          }
         }
       }
     }
   }
-
-  return map;
+  return dst;
 }
 
-//@ts-ignore: Decorator
-function deserializeMapKey<T>(key: Virtual<string>): T {
-  const k = key.copyOut();
-  if (isString<T>()) {
-    return k as T;
-  } else if (isBoolean<T>()) {
-    return deserializeBoolean(k) as T;
-  } else if (isInteger<T>()) {
-    return deserializeInteger<T>(k);
-  } else if (isFloat<T>()) {
-    return deserializeFloat<T>(k);
-  }
+function str(start: usize, end: usize): string {
+  const size = end - start;
+  const out = __new(size, idof<string>());
+  memory.copy(out, start, size);
+  return changetype<string>(out);
+}
 
-  throw new Error(`JSON: Cannot parse JSON object to a Map with a key of type ${nameof<T>()}`);
+// @ts-ignore: Decorator valid here
+@inline function sliceTo(srcStart: usize, srcEnd: usize): string {
+  const dstSize = srcEnd - srcStart;
+  const dst = __new(dstSize, idof<string>());
+  memory.copy(dst, srcStart, dstSize);
+  return changetype<string>(dst);
 }

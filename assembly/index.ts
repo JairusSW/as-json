@@ -9,7 +9,7 @@ import { deserializeObject } from "./deserialize/simple/object";
 import { deserializeMap } from "./deserialize/simple/map";
 import { deserializeDate } from "./deserialize/simple/date";
 import { deserializeInteger, deserializeInteger_NEW } from "./deserialize/simple/integer";
-import { deserializeString, deserializeString_NEW } from "./deserialize/simple/string";
+import { deserializeString, deserializeString } from "./deserialize/simple/string";
 import { serializeArbitrary } from "./serialize/simple/arbitrary";
 
 import { Sink } from "./custom/sink";
@@ -381,9 +381,13 @@ export namespace JSON {
       return deserializeFloat_NEW<T>(srcStart, srcEnd);
     } else if (isString<T>()) {
       // @ts-ignore: type
-      return deserializeString_NEW(srcStart, srcEnd, dst);
+      return deserializeString(srcStart, srcEnd, dst);
     } else {
-      ERROR("lol");
+      let type: nonnull<T> = changetype<nonnull<T>>(0);
+      if (type instanceof Map) {
+        // @ts-ignore: type
+        return deserializeMap<T>(srcStart, srcEnd, dst)
+      }
     }
   }
 }

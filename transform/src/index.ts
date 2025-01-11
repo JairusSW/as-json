@@ -6,7 +6,6 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
-import { deserialize } from "v8";
 
 let indent = "  ";
 
