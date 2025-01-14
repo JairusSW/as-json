@@ -29,8 +29,8 @@
     }
   },
   "options": {
-    "transform": [],
-    "disableWarning": []
+    "transform": ["./transform", "as-test/transform"],
+    "disableWarning": [226]
   },
   "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json"
 }

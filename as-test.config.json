@@ -6,7 +6,7 @@
     "coverage": false
   },
   "buildOptions": {
-    "args": ["--enable simd", "--runtime stub"],
+    "args": ["--transform ./transform"],
     "target": "wasi"
   },
   "runOptions": {

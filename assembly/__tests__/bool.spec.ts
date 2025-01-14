@@ -1,4 +1,4 @@
-import { JSON } from "../";
+import { JSON } from "json-as";
 import { describe, expect, run } from "as-test/assembly";
 
 describe("Should serialize booleans", () => {

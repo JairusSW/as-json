@@ -3,7 +3,6 @@
   "version": "0.9.26",
   "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
   "types": "assembly/index.ts",
-  "main": "transform/lib/index.js",
   "author": "Jairus Tanaka",
   "contributors": [
     "DogWhich",
@@ -17,30 +16,34 @@
   ],
   "license": "MIT",
   "scripts": {
-    "test": "rm -rf ./build/ && ast test",
-    "build:bench": "rm -rf ./build/ && asc assembly/__benches__/misc.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime incremental --enable simd --enable bulk-memory",
-    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --enable simd --runtime stub",
+    "test": "ast test && rm -rf ./build/",
+    "pretest": "rm -rf ./build/ && ast build",
+    "bench": "astral --enable simd --runtime stub",
+    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm",
     "build:transform": "tsc -p ./transform",
     "test:wasmtime": "wasmtime ./build/test.wasm",
-    "test:wasmer": "wasmer ./build/test.wasm",
-    "bench:wasmer": "wasmer ./build/bench.wasm --llvm",
+    "test:wavm": "wavm run ./build/test.wasm",
+    "test:lunatic": "lunatic ./build/test.wasm",
+    "test:wasm3": "wasm3 ./build/test.wasm",
     "prettier": "prettier -w ."
   },
   "devDependencies": {
     "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
-    "@types/node": "latest",
+    "@types/node": "^20.14.12",
     "as-bench": "^0.0.0-alpha",
     "as-console": "^7.0.0",
-    "assemblyscript": "^0.27.31",
+    "as-test": "0.3.1",
+    "assemblyscript": "^0.27.29",
     "assemblyscript-prettier": "^3.0.1",
-    "minimatch": "^10.0.1",
-    "prettier": "^3.4.2",
-    "typescript": "latest"
+    "benchmark": "^2.1.4",
+    "microtime": "^3.1.1",
+    "prettier": "^3.3.3",
+    "tinybench": "^2.8.0",
+    "typescript": "^5.5.4",
+    "visitor-as": "^0.11.4"
   },
   "dependencies": {
-    "as-bs": "JairusSW/as-bs#a8d6deb",
-    "as-container": "^0.8.0",
     "as-virtual": "^0.2.0"
   },
   "overrides": {

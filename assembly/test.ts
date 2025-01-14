@@ -1,18 +1,34 @@
-import { JSON } from ".";
-import { deserializeMap } from "./deserialize/simple/map";
-import { deserializeObject } from "./deserialize/simple/object";
-import { bytes } from "./util";
+import { JSON } from "."
 
 @json
 class Vec3 {
-  a: i16 = 1
-  ab: i16 = 2;
-  abc: i16 = 3;
-  abcd: i16 = 4;
-  abcde: i16 = 5;
+  public x: i32 = 0;
+  public y: i32 = 0;
+  public z: i32 = 0;
 }
+
+// @json
+// class Base {
+//   public bam: string = "harekogkeorgke"
+// }
+
+// @json
+// class Foo extends Base {
+//   public bar: JSON.Raw = "\"this is ok\'"
+//   public baz: i32 = 0;
+//   public pos: Vec3<Vec3<i32>> = {
+//     x: 1,
+//     y: 2,
+//     z: {
+//       x: 1,
+//       y: 2,
+//       z: 3
+//     }
+//   }
+//   // ^ this is not okay
+// }
 
 const serialized = JSON.stringify(new Vec3());
 console.log("Serialized: " + serialized);
-const deserialized = deserializeObject<Vec3>(changetype<usize>(serialized), changetype<usize>(serialized) + bytes(serialized));
+const deserialized = JSON.parseSafe<Vec3>(`{"x":1,"y":true,"z":3}`);
 console.log("Deserialized: " + JSON.stringify(deserialized));

@@ -1,10 +1,13 @@
+# Package Manager
 node_modules
 *.lock
 pnpm-lock.yaml
 package-lock.json
-.vscode
-logs
-as-tral
 *.lockb
+
+# IDE Files
 .vscode/
+
+# Build Artifacts
+as-tral/
 build/
