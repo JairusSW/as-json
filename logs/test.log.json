@@ -1,0 +1,1049 @@
+[
+  [
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 2.422076,
+        "end": 2.505775
+      },
+      "description": "Should serialize class inheritance",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "{\"a\":\"1\",\"b\":\"2\"}",
+          "_right": 5424,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 2.527318,
+        "end": 2.537277
+      },
+      "description": "Should serialize nulls",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "null",
+          "_right": 2032,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 4,
+      "time": {
+        "start": 2.551104,
+        "end": 2.6646
+      },
+      "description": "Should serialize integer arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[0,100,101]",
+          "_right": 6544,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[0,100,101]",
+          "_right": 6544,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[0,100,101,-100,-101]",
+          "_right": 6688,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[0,100,101,-100,-101]",
+          "_right": 6688,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 2,
+      "time": {
+        "start": 2.781211,
+        "end": 3.01479
+      },
+      "description": "Should serialize float arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[7.23,1000.0,1000.0,1.23456,1.23456,0.0,7.23]",
+          "_right": 8144,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[1e+21,1e+22,1e-7,1e-8,1e-9]",
+          "_right": 8320,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 2,
+      "time": {
+        "start": 3.171788,
+        "end": 3.363089
+      },
+      "description": "Should serialize boolean arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[true,false]",
+          "_right": 8560,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[true,false]",
+          "_right": 8560,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 3.453728,
+        "end": 3.489774
+      },
+      "description": "Should serialize string arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[\"string \\\"with random spa\\nces and \\nnewlines\\n\\n\\n\"]",
+          "_right": 8896,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 3.525718,
+        "end": 3.560356
+      },
+      "description": "Should serialize nested integer arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[[100,101],[-100,-101],[0]]",
+          "_right": 9280,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 3.590926,
+        "end": 3.649408
+      },
+      "description": "Should serialize nested float arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[[7.23],[1000.0],[1000.0],[1.23456],[1.23456],[0.0],[7.23]]",
+          "_right": 9712,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 2,
+      "time": {
+        "start": 3.683391,
+        "end": 4.305789
+      },
+      "description": "Should serialize nested boolean arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[[true],[false]]",
+          "_right": 10048,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[[true],[false]]",
+          "_right": 10048,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 4.457726,
+        "end": 4.523956
+      },
+      "description": "Should serialize object arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[{\"x\":3.4,\"y\":1.2,\"z\":8.3},{\"x\":3.4,\"y\":-2.1,\"z\":9.3}]",
+          "_right": 10432,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 8,
+      "time": {
+        "start": 4.587136,
+        "end": 4.67263
+      },
+      "description": "Should serialize objects",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "{\"x\":3.4,\"y\":1.2,\"z\":8.3}",
+          "_right": 10672,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"firstName\":\"Emmet\",\"lastName\":\"West\",\"lastActive\":[8,27,2022],\"age\":23,\"pos\":{\"x\":3.4,\"y\":1.2,\"z\":8.3},\"isVerified\":true}",
+          "_right": 11216,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"f\":7.23}",
+          "_right": 11552,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"f\":0.000001}",
+          "_right": 11600,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"f\":1e-7}",
+          "_right": 11648,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"f\":100000000000000000000.0}",
+          "_right": 11696,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"f\":1e+21}",
+          "_right": 11776,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"a\\\\\\t\\\"\\u0002b`c\":\"foo\"}",
+          "_right": 11952,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 4.921727,
+        "end": 4.987323
+      },
+      "description": "Should serialize @omit'ed objects",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "{\"x\":1,\"y\":1,\"z\":1}",
+          "_right": 12320,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 3,
+      "time": {
+        "start": 5.027487,
+        "end": 5.064593
+      },
+      "description": "Should deserialize class inheritance",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": true,
+          "_right": 1,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "1",
+          "_right": 2864,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "2",
+          "_right": 2896,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 5.098623,
+        "end": 5.117553
+      },
+      "description": "Should deserialize nulls",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "null",
+          "_right": 2032,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 2,
+      "time": {
+        "start": 5.173811,
+        "end": 5.35768
+      },
+      "description": "Should deserialize integer arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[0,100,101]",
+          "_right": 69360,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[0,100,101,-100,-101]",
+          "_right": 69888,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 2,
+      "time": {
+        "start": 5.38901,
+        "end": 5.443273
+      },
+      "description": "Should deserialize float arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[7.23,1000.0,1000.0,1.23456,1.23456,0.0,7.23]",
+          "_right": 85568,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "[1e+21,1e+22,1e-7,1e-8,1e-9]",
+          "_right": 71472,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 5.472564,
+        "end": 5.499495
+      },
+      "description": "Should deserialize boolean arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[true,false]",
+          "_right": 84304,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 5.533943,
+        "end": 5.574916
+      },
+      "description": "Should deserialize string arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[\"string \\\"with random spa\\nces and \\nnewlines\\n\\n\\n\"]",
+          "_right": 81008,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 5.604141,
+        "end": 5.778483
+      },
+      "description": "Should deserialize nested integer arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[[100,101],[-100,-101],[0]]",
+          "_right": 74912,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 5.814182,
+        "end": 5.895128
+      },
+      "description": "Should deserialize nested float arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[[7.23],[1000.0],[1000.0],[1.23456],[1.23456],[0.0],[7.23]]",
+          "_right": 89264,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 5.928267,
+        "end": 5.966731
+      },
+      "description": "Should deserialize nested boolean arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[[true],[false]]",
+          "_right": 76352,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 1,
+      "time": {
+        "start": 5.997331,
+        "end": 6.053426
+      },
+      "description": "Should deserialize object arrays",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "[{\"x\":3.4,\"y\":1.2,\"z\":8.3},{\"x\":3.4,\"y\":-2.1,\"z\":9.3}]",
+          "_right": 79024,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "test.spec.ts",
+      "order": 5,
+      "time": {
+        "start": 6.087986,
+        "end": 6.532848
+      },
+      "description": "Should deserialize Objects",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "{\"x\":3.4,\"y\":1.2,\"z\":8.3}",
+          "_right": 92000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"firstName\":\"Emmet\",\"lastName\":\"West\",\"lastActive\":[8,27,2022],\"age\":23,\"pos\":{\"x\":3.4,\"y\":1.2,\"z\":8.3},\"isVerified\":true}",
+          "_right": 80720,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"f\":7.23}",
+          "_right": 69312,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"f\":0.000001}",
+          "_right": 80000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "{\"a\\\\\\t\\\"\\u0002b`c\":\"foo\"}",
+          "_right": 91264,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    }
+  ],
+  [
+    {
+      "file": "string.spec.ts",
+      "order": 4,
+      "time": {
+        "start": 2.224829,
+        "end": 2.270118
+      },
+      "description": "Should serialize strings",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "\"abcdefg\"",
+          "_right": 4016,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "\"st\\\"ring\\\" w\\\"\\\"ith quotes\\\"\"",
+          "_right": 4240,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "\"string \\\"with random spa\\nces and \\nnewlines\\n\\n\\n\"",
+          "_right": 4432,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "\"string with colon : comma , brace [ ] bracket { } and quote \\\" and other quote \\\\\\\"\"",
+          "_right": 4752,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "string.spec.ts",
+      "order": 4,
+      "time": {
+        "start": 2.288672,
+        "end": 2.307505
+      },
+      "description": "Should deserialize strings",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "abcdefg",
+          "_right": 1584,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "\"st\\\"ring\\\" w\\\"\\\"ith quotes\\\"\"",
+          "_right": 4240,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "\"string \\\"with random spa\\nces and \\nnewlines\\n\\n\\n\"",
+          "_right": 4432,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "\"string with colon : comma , brace [ ] bracket { } and quote \\\" and other quote \\\\\"\"",
+          "_right": 6336,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    }
+  ],
+  [],
+  [
+    {
+      "file": "integer.spec.ts",
+      "order": 5,
+      "time": {
+        "start": 4.95457,
+        "end": 5.030457
+      },
+      "description": "Should serialize integers",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "0",
+          "_right": 1792,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "100",
+          "_right": 3760,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "101",
+          "_right": 3792,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "-100",
+          "_right": 3824,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "-101",
+          "_right": 3856,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "integer.spec.ts",
+      "order": 5,
+      "time": {
+        "start": 5.11372,
+        "end": 5.161068
+      },
+      "description": "Should deserialize integers",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": 0,
+          "_right": 0,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 100,
+          "_right": 100,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 101,
+          "_right": 101,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": -100,
+          "_right": 4294967196,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": -101,
+          "_right": 18446744073709552000,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    }
+  ],
+  [
+    {
+      "file": "float.spec.ts",
+      "order": 13,
+      "time": {
+        "start": 1.927763,
+        "end": 1.960894
+      },
+      "description": "Should serialize floats",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "7.23",
+          "_right": 3408,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "1000.0",
+          "_right": 3536,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "1.23456",
+          "_right": 3568,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "0.0",
+          "_right": 1584,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "-7.23",
+          "_right": 3616,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "0.000001",
+          "_right": 3648,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "1e-7",
+          "_right": 3696,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1e-7,
+          "_right": 4502148214488346600,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "100000000000000000000.0",
+          "_right": 3952,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "1e+21",
+          "_right": 4032,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1e+21,
+          "_right": 4921056587992461000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1e+21,
+          "_right": 4921056587992461000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1e+21,
+          "_right": 4921056587992461000,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "float.spec.ts",
+      "order": 9,
+      "time": {
+        "start": 1.97298,
+        "end": 1.989046
+      },
+      "description": "Should deserialize floats",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": 7.23,
+          "_right": 4619826274753860000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1000,
+          "_right": 4652007308841189000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1.23456,
+          "_right": 4608238783128613400,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 0,
+          "_right": 0,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": -7.23,
+          "_right": 13843198311608635000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 0.000001,
+          "_right": 4517329193108107000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1e-7,
+          "_right": 4502148214488346600,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 100000000000000000000,
+          "_right": 4906019910204100000,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": 1e+21,
+          "_right": 4921056587992461000,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    }
+  ],
+  [
+    {
+      "file": "bool.spec.ts",
+      "order": 4,
+      "time": {
+        "start": 1.531165,
+        "end": 1.544641
+      },
+      "description": "Should serialize booleans",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": "true",
+          "_right": 960,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "false",
+          "_right": 992,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "true",
+          "_right": 960,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": "false",
+          "_right": 992,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    },
+    {
+      "file": "bool.spec.ts",
+      "order": 2,
+      "time": {
+        "start": 1.568174,
+        "end": 1.57639
+      },
+      "description": "Should deserialize booleans",
+      "depth": 0,
+      "suites": [],
+      "tests": [
+        {
+          "verdict": "ok",
+          "_left": true,
+          "_right": 1,
+          "_not": false
+        },
+        {
+          "verdict": "ok",
+          "_left": false,
+          "_right": 0,
+          "_not": false
+        }
+      ],
+      "logs": [],
+      "kind": "describe",
+      "verdict": "ok"
+    }
+  ]
+]
