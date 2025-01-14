@@ -1,29 +1,23 @@
+import { JSON } from "../../..";
 import { BACK_SLASH, QUOTE } from "../../../custom/chars";
-import { unsafeCharCodeAt } from "../../../custom/util";
-import { deserializeString } from "../string";
 
 // @ts-ignore: Decorator valid here
-@inline export function deserializeStringArray(data: string): string[] {
-  const result: string[] = [];
-  let lastPos = 0;
-  let instr = false;
-  let escaping = false;
-  for (let i = 1; i < data.length - 1; i++) {
-    const char = unsafeCharCodeAt(data, i);
-    if (char == BACK_SLASH && !escaping) {
-      escaping = true;
-    } else {
-      if (char == QUOTE && !escaping) {
-        if (instr == false) {
-          instr = true;
-          lastPos = i;
-        } else {
-          instr = false;
-          result.push(deserializeString(data, lastPos, i));
-        }
+@inline export function deserializeStringArray(srcStart: usize, srcEnd: usize, dst: usize): string[] {
+  const out = changetype<string[]>(dst);
+  let lastPos = 2;
+  let inString = false;
+  while (srcStart < srcEnd) {
+    const code = load<u16>(srcStart);
+    if (code == QUOTE) {
+      if (!inString) {
+        inString = true;
+        lastPos = srcStart;
+      } else if (load<u16>(srcStart - 2) != BACK_SLASH) {
+        out.push(JSON.__deserialize<string>(lastPos, srcStart));
+        inString = false;
       }
-      escaping = false;
     }
+    srcStart += 2;
   }
-  return result;
+  return out;
 }

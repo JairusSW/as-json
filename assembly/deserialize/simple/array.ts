@@ -9,28 +9,28 @@ import { deserializeObjectArray } from "./array/object";
 import { deserializeStringArray } from "./array/string";
 
 // @ts-ignore: Decorator valid here
-export function deserializeArray<T extends unknown[]>(data: string): T {
+export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
   if (isString<valueof<T>>()) {
-    return <T>deserializeStringArray(data);
+    return <T>deserializeStringArray(srcStart, srcEnd, dst);
   } else if (isBoolean<valueof<T>>()) {
     // @ts-ignore
-    return deserializeBooleanArray<T>(data);
+    return deserializeBooleanArray<T>(srcStart, srcEnd, dst);
   } else if (isInteger<valueof<T>>()) {
     // @ts-ignore
-    return deserializeIntegerArray<T>(data);
+    return deserializeIntegerArray<T>(srcStart, srcEnd, dst);
   } else if (isFloat<valueof<T>>()) {
     // @ts-ignore
-    return deserializeFloatArray<T>(data);
+    return deserializeFloatArray<T>(srcStart, srcEnd, dst);
   } else if (isArrayLike<valueof<T>>()) {
     // @ts-ignore
-    return deserializeArrayArray<T>(data);
+    return deserializeArrayArray<T>(srcStart, srcEnd, dst);
   } else if (isMap<valueof<T>>()) {
-    return deserializeMapArray<T>(data);
+    return deserializeMapArray<T>(srcStart, srcEnd, dst);
   } else if (isManaged<valueof<T>>() || isReference<valueof<T>>()) {
     const type = changetype<nonnull<valueof<T>>>(0);
     // @ts-ignore
     if (isDefined(type.__DESERIALIZE)) {
-      return deserializeObjectArray<T>(data);
+      return deserializeObjectArray<T>(srcStart, srcEnd, dst);
     }
     throw new Error("Could not parse array of type " + nameof<T>() + "! Make sure to add the @json decorator over classes!");
   } else {

@@ -6,6 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
+import { deserialize } from "v8";
 
 let indent = "  ";
 
@@ -142,7 +143,7 @@ class JSONTransform extends Visitor {
     let SERIALIZE = "@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n";
     let SERIALIZE_BS = "__SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n";
     let INITIALIZE = "@inline __INITIALIZE(): this {\n";
-    let DESERIALIZE = "__DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize): void {\n";
+    let DESERIALIZE = "__DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize): void {\n  const keySize = keyEnd - keyStart;";
     let ALLOCATE = "@inline __ALLOCATE(): void {\n";
 
     indent = "  ";
@@ -165,6 +166,11 @@ class JSONTransform extends Visitor {
       const aliasName = JSON.stringify(member.alias || member.name);
       const realName = member.name;
       const isLast = i == this.schema.members.length - 1;
+
+      DESERIALIZE += "  if (keySize == " + ((aliasName.length - 2) << 1) + " && memory.compare(keyStart, changetype<usize>(" + aliasName + "), " + ((aliasName.length - 2) << 1) + ") == 0) {\n";
+      DESERIALIZE += "    this." + realName + " = JSON.__deserialize<" + member.type + ">(valStart, valEnd);\n";
+      DESERIALIZE += "    return;\n";
+      DESERIALIZE += "  }\n";
 
       if (!isRegular && !member.flags.has(PropertyFlags.OmitIf) && !member.flags.has(PropertyFlags.OmitNull)) isRegular = true;
       if (isRegular && isPure) {
@@ -232,101 +238,103 @@ class JSONTransform extends Visitor {
       });
 
     const groups = sortedMembers.length;
-    if (groups != 1) {
-      DESERIALIZE += "  switch (keyEnd - keyStart) {\n";
-      indent = "    ";
-    } else {
-      indent = "  ";
-    }
+    // if (groups != 1) {
+    //   DESERIALIZE += "  switch (keyEnd - keyStart) {\n";
+    //   indent = "    ";
+    // } else {
+    //   indent = "  ";
+    // }
     for (const memberGroup of sortedMembers) {
-      const firstMemberLen = (memberGroup[0].alias || memberGroup[0].name).length << 1;
-      if (firstMemberLen == 2) {
-        if (groups != 1) {
-          DESERIALIZE += indent + "case 2: {\n";
-          indentInc();
-        }
-        if (memberGroup.length == 1) {
-          const member = memberGroup[0];
-          const memberName = member.alias || member.name;
-          DESERIALIZE += indent + `if (load<u16>(keyStart) == ${memberName.charCodeAt(0)}) this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-          if (groups != 1) DESERIALIZE += indent + "break;\n";
-          break;
-        }
-        DESERIALIZE += indent + "switch (load<u16>(keyStart)) {\n";
-        for (const member of memberGroup) {
-          const memberName = member.alias || member.name;
-          DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
-          DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-          DESERIALIZE += indent + "    break;\n";
-          DESERIALIZE += indent + "  }\n";
-        }
-        DESERIALIZE += indent + "}\n"
-        if (groups != 1) {
-          indentDec();
-          DESERIALIZE += indent + "}\n"
-        }
-      } else if (firstMemberLen == 4) {
-        if (groups != 1) {
-          DESERIALIZE += indent + "case 4: {\n";
-          indentInc();
-        }
-        DESERIALIZE += indent + "switch (load<u32>(keyStart)) {\n";
-        for (const member of memberGroup) {
-          const memberName = member.alias || member.name;
-          DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
-          DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-          DESERIALIZE += indent + "    break;\n";
-          DESERIALIZE += indent + "  }\n";
-        }
-        DESERIALIZE += indent + "}\n"
-        if (groups != 1) {
-          indentDec();
-          DESERIALIZE += indent + "}\n"
-        }
-      } else if (firstMemberLen == 8) {
-        if (groups != 1) {
-          DESERIALIZE += indent + "case 8: {\n";
-          indentInc();
-        }
-        DESERIALIZE += indent + "switch ((load<u64>(keyStart)) {\n";
-        for (const member of memberGroup) {
-          const memberName = member.alias || member.name;
-          DESERIALIZE += indent + `  case ${}: { // ${memberName}\n`;
-          DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-          DESERIALIZE += indent + "    break;\n";
-          DESERIALIZE += indent + "  }\n";
-        }
-        DESERIALIZE += indent + "}\n"
-        if (groups != 1) {
-          indentDec();
-          DESERIALIZE += indent + "}\n"
-        }
-      } else if (memberGroup.length > 1) {
-        if (groups != 1) {
-          DESERIALIZE += indent + "case " + firstMemberLen + ": {\n";
-          indentInc();
-        }
-        DESERIALIZE += indent + "switch (load<u16>(keyStart)) {\n";
-        for (const member of memberGroup) {
-          const memberName = member.alias || member.name;
-          DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
-          DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-          DESERIALIZE += indent + "    break;\n";
-          DESERIALIZE += indent + "  }\n";
-        }
-        DESERIALIZE += indent + "}\n"
-        if (groups != 1) {
-          indentDec();
-          DESERIALIZE += indent + "}\n"
-        }
-      }
+
+      // const firstMemberLen = (memberGroup[0].alias || memberGroup[0].name).length << 1;
+      // if (firstMemberLen == 2) {
+      //   if (groups != 1) {
+      //     DESERIALIZE += indent + "case 2: {\n";
+      //     indentInc();
+      //   }
+      //   if (memberGroup.length == 1) {
+      //     const member = memberGroup[0];
+      //     const memberName = member.alias || member.name;
+      //     DESERIALIZE += indent + `if (load<u16>(keyStart) == ${memberName.charCodeAt(0)}) this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
+      //     if (groups != 1) DESERIALIZE += indent + "break;\n";
+      //     break;
+      //   }
+      //   DESERIALIZE += indent + "switch (load<u16>(keyStart)) {\n";
+      //   for (const member of memberGroup) {
+      //     const memberName = member.alias || member.name;
+      //     DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
+      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
+      //     DESERIALIZE += indent + "    break;\n";
+      //     DESERIALIZE += indent + "  }\n";
+      //   }
+      //   DESERIALIZE += indent + "}\n"
+      //   if (groups != 1) {
+      //     indentDec();
+      //     DESERIALIZE += indent + "}\n"
+      //   }
+      // } else if (firstMemberLen == 4) {
+      //   if (groups != 1) {
+      //     DESERIALIZE += indent + "case 4: {\n";
+      //     indentInc();
+      //   }
+      //   DESERIALIZE += indent + "switch (load<u32>(keyStart)) {\n";
+      //   for (const member of memberGroup) {
+      //     const memberName = member.alias || member.name;
+      //     DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
+      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
+      //     DESERIALIZE += indent + "    break;\n";
+      //     DESERIALIZE += indent + "  }\n";
+      //   }
+      //   DESERIALIZE += indent + "}\n"
+      //   if (groups != 1) {
+      //     indentDec();
+      //     DESERIALIZE += indent + "}\n"
+      //   }
+      // } /*else if (firstMemberLen == 8) {
+      //   if (groups != 1) {
+      //     DESERIALIZE += indent + "case 8: {\n";
+      //     indentInc();
+      //   }
+      //   DESERIALIZE += indent + "switch ((load<u64>(keyStart)) {\n";
+      //   for (const member of memberGroup) {
+      //     const memberName = member.alias || member.name;
+      //     DESERIALIZE += indent + `  case ${}: { // ${memberName}\n`;
+      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
+      //     DESERIALIZE += indent + "    break;\n";
+      //     DESERIALIZE += indent + "  }\n";
+      //   }
+      //   DESERIALIZE += indent + "}\n"
+      //   if (groups != 1) {
+      //     indentDec();
+      //     DESERIALIZE += indent + "}\n"
+      //   }
+      // } */else if (memberGroup.length > 1) {
+      //   if (groups != 1) {
+      //     DESERIALIZE += indent + "case " + firstMemberLen + ": {\n";
+      //     indentInc();
+      //   }
+      //   DESERIALIZE += indent + "switch (load<u16>(keyStart)) {\n";
+      //   for (const member of memberGroup) {
+      //     const memberName = member.alias || member.name;
+      //     DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
+      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
+      //     DESERIALIZE += indent + "    break;\n";
+      //     DESERIALIZE += indent + "  }\n";
+      //   }
+      //   DESERIALIZE += indent + "}\n"
+      //   if (groups != 1) {
+      //     indentDec();
+      //     DESERIALIZE += indent + "}\n"
+      //   }
+      // }
     }
-    if (groups != 1) {
-      DESERIALIZE += "  }  \n";
-      DESERIALIZE += "}  ";
-    } else {
-      DESERIALIZE += "}  ";
-    }
+    // if (groups != 1) {
+    //   DESERIALIZE += "  }  \n";
+    //   DESERIALIZE += "}  ";
+    // } else {
+    //   DESERIALIZE += "}  ";
+    // }
+    DESERIALIZE += "}"
 
     indent = "  ";
 
@@ -356,13 +364,13 @@ class JSONTransform extends Visitor {
     const SERIALIZE_METHOD = SimpleParser.parseClassMember(SERIALIZE, node);
     const SERIALIZE_BS_METHOD = SimpleParser.parseClassMember(SERIALIZE_BS, node);
     // const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
-    // const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
+    const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
     const ALLOCATE_METHOD = SimpleParser.parseClassMember(ALLOCATE, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__SERIALIZE_BS")) node.members.push(SERIALIZE_BS_METHOD);
     // if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
-    // if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
+    if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__ALLOCATE")) node.members.push(ALLOCATE_METHOD);
     super.visitClassDeclaration(node);
   }

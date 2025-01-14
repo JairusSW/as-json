@@ -27,7 +27,7 @@
   } else {
     while (srcStart < srcEnd) {
       // @ts-ignore: type
-      val = (val * 10 + (load<u16>(changetype<usize>(str) + <usize>start) - 48)) as T;
+      val = (val * 10 + (load<u16>(srcStart) - 48)) as T;
       srcStart += 2;
     }
     return val as T;

@@ -131,6 +131,8 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
             /* empty */
           }
         }
+      } else {
+        throw new Error("Unexpected character " + String.fromCharCode(code) +" or type " + nameof<valueof<T>>() + " does not match found type!")
       }
     }
   }

@@ -1,19 +1,18 @@
 import { CHAR_E, CHAR_F, CHAR_T } from "../../../custom/chars";
-import { unsafeCharCodeAt } from "../../../custom/util";
-import { deserializeBoolean } from "../bool";
 
 // @ts-ignore: Decorator valid here
-@inline export function deserializeBooleanArray<T extends boolean[]>(data: string): T {
-  const result = instantiate<T>();
-  let lastPos = 1;
-  for (let i = 1; i < data.length - 1; i++) {
-    const char = unsafeCharCodeAt(data, i);
-    if (char == CHAR_T || char == CHAR_F) {
-      lastPos = i;
-    } else if (char == CHAR_E) {
-      i++;
-      result.push(deserializeBoolean(data.slice(lastPos, i)));
+@inline export function deserializeBooleanArray<T extends boolean[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
+  const out = changetype<T>(dst);
+  while (srcStart < srcEnd) {
+    const code = load<u16>(srcStart);
+    if (code == CHAR_T && load<u16>(srcStart, 8) == CHAR_E) {
+      out.push(true);
+      srcStart += 10;
+    } else if (code == CHAR_F && load<u16>(srcStart, 10) == CHAR_E) {
+      out.push(false);
+      srcStart += 12;
     }
+    srcStart += 2;
   }
-  return result;
+  return out;
 }

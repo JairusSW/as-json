@@ -1,24 +1,29 @@
 import { isSpace } from "../../../util";
-import { unsafeCharCodeAt } from "../../../custom/util";
-import { COMMA, BRACKET_RIGHT } from "../../../custom/chars";
-import { deserializeInteger } from "../integer";
+import { COMMA, BRACE_RIGHT } from "../../../custom/chars";
+import { JSON } from "../../..";
 
 // @ts-ignore: Decorator valid here
-@inline export function deserializeIntegerArray<T extends number[]>(data: string): T {
-  const result = instantiate<T>();
-  let lastPos = 0;
-  let i = 1;
-  let awaitingParse = false;
-  for (; i < data.length; i++) {
-    const char = unsafeCharCodeAt(data, i);
-    if (lastPos == 0 && ((char >= 48 && char <= 57) || char == 45)) {
-      awaitingParse = true;
-      lastPos = i;
-    } else if (awaitingParse && (isSpace(char) || char == COMMA || char == BRACKET_RIGHT) && lastPos > 0) {
-      awaitingParse = false;
-      result.push(deserializeInteger<valueof<T>>(data.slice(lastPos, i)));
-      lastPos = 0;
+@inline export function deserializeIntegerArray<T extends number[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
+  const out = changetype<T>(dst);
+  let lastIndex: usize = 0;
+  while (srcStart < srcEnd) {
+    const code = load<u16>(srcStart);
+    if (code - 48 <= 9 || code == 45) {
+      lastIndex = srcStart;
+      srcStart += 2;
+      while (srcStart < srcEnd) {
+        const code = load<u16>(srcStart);
+        if (code == COMMA || code == BRACE_RIGHT || isSpace(code)) {
+          out.push(JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
+          // while (isSpace(load<u16>((srcStart += 2)))) {
+          //   /* empty */
+          // }
+          break;
+        }
+        srcStart += 2;
+      }
     }
+    srcStart += 2;
   }
-  return result;
+  return out;
 }
