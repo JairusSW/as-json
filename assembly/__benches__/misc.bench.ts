@@ -9,7 +9,7 @@ const srcStart = changetype<usize>(str);
 const srcEnd = srcStart + bytes(str);
 bs.ensureSize(2048);
 bench("Deserialize String (Simple)", () => {
-  deserializeString(str2);
+  deserializeStrin(str2);
 });
 // bench("Deserialize String (SIMD)", () => {
 //   (str2, bs.buffer);

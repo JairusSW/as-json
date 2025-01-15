@@ -10,7 +10,7 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
  * @returns void
  */
 // @ts-ignore: Decorator
-@inline export function serializeString(src: string, staticSize: bool = false): void {
+@inline export function serializeString(src: string, staticSize: bool): void {
   const srcSize = bytes(src);
   if (!staticSize) bs.ensureSize(srcSize + 4);
 

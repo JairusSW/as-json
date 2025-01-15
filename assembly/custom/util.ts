@@ -2,34 +2,6 @@ import { isSpace } from "util/string";
 import { BACK_SLASH, QUOTE } from "./chars";
 import { Sink } from "./sink";
 
-// @ts-ignore: Decorator
-export function isMap<T>(): bool {
-  let type = changetype<T>(0);
-  return type instanceof Map;
-}
-
-// @ts-ignore: Decorator
-@inline export function unsafeCharCodeAt(data: string, pos: i32): i32 {
-  return load<u16>(changetype<usize>(data) + ((<usize>pos) << 1));
-}
-
-/**
- * A terrible function which finds the depth of a certain array.
- * Suffers no overhead besides function calling and a if/else.
- * @returns depth of array
- */
-
-// @ts-ignore: Decorator
-export function getArrayDepth<T extends ArrayLike>(depth: i32 = 1): i32 {
-  if (!isArray<T>()) {
-    return 0;
-  } else if (isArray<valueof<T>>()) {
-    depth++;
-    return getArrayDepth<valueof<T>>(depth);
-  } else {
-    return depth;
-  }
-}
 
 /** Scientific Notation Integer Parsing - SNIP
  * This is absolutely the fastest algorithm I could think of while adding full support for Scientific Notation

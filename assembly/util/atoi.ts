@@ -1,10 +1,10 @@
 /**
- * Strtol optimized for JSON integers
+ * ATOI optimized for non-exponential integers
  * @param str
  * @returns
  */
 // @ts-ignore: Decorator valid here
-@inline export function strToInt<T>(srcStart: usize, srcEnd: usize): T {
+@inline export function atoi<T>(srcStart: usize, srcEnd: usize): T {
   // @ts-ignore: type
   let val: T = 0;
   if (isSigned<T>()) {

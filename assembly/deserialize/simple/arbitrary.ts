@@ -7,7 +7,7 @@ import { deserializeObject } from "./object";
 import { deserializeString } from "./string";
 
 // @ts-ignore
-@inline export function deserializeArbitrary(data: string): JSON.Value {
+@inline export function deserializeArbitrary(srcStart: usize, srcEnd: usize, dst: usize = 0): JSON.Value {
   const firstChar = unsafeCharCodeAt(data, 0);
 
   if (firstChar == 34) return JSON.Value.from(deserializeString(data));

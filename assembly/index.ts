@@ -1,4 +1,6 @@
 /// <reference path="./index.d.ts" />
+import { bs } from "as-bs";
+
 import { serializeString } from "./serialize/simple/string";
 import { serializeArray } from "./serialize/simple/array";
 import { serializeMap } from "./serialize/simple/map";
@@ -9,19 +11,19 @@ import { deserializeObject } from "./deserialize/simple/object";
 import { deserializeMap } from "./deserialize/simple/map";
 import { deserializeDate } from "./deserialize/simple/date";
 import { deserializeInteger, deserializeInteger_NEW } from "./deserialize/simple/integer";
-import { deserializeString, deserializeString } from "./deserialize/simple/string";
+import { deserializeString} from "./deserialize/simple/string";
 import { serializeArbitrary } from "./serialize/simple/arbitrary";
 
 import { Sink } from "./custom/sink";
 import { NULL_WORD, QUOTE } from "./custom/chars";
-import { bs } from "as-bs";
 import { dtoa_buffered, itoa_buffered } from "util/number";
 import { serializeBool } from "./serialize/simple/bool";
 import { serializeInteger } from "./serialize/simple/integer";
 import { serializeFloat } from "./serialize/simple/float";
 import { serializeObject } from "./serialize/simple/object";
+import { ptrToStr } from "./util/ptrToStr";
 
-class Nullable {}
+class Nullable { }
 
 export type Raw = string;
 
@@ -320,7 +322,7 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) {}
+    constructor(public value: T) { }
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive
@@ -368,7 +370,7 @@ export namespace JSON {
     } else if (src instanceof JSON.Value) {
       serializeArbitrary(src);
     } else {
-      ERROR(`Could not serialize src of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
+      ERROR(`Could not serialize provided data. Make sure to add the correct decorators to classes.`);
     }
   }
   export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
@@ -384,9 +386,17 @@ export namespace JSON {
       return deserializeString(srcStart, srcEnd, dst);
     } else {
       let type: nonnull<T> = changetype<nonnull<T>>(0);
-      if (type instanceof Map) {
+      // @ts-ignore: declared by transform
+      if (isDefined(type.__DESERIALIZE)) {
+        return deserializeObject<T>(srcStart, srcEnd);
+      } else if (type instanceof Map) {
         // @ts-ignore: type
-        return deserializeMap<T>(srcStart, srcEnd, dst)
+        return deserializeMap<T>(srcStart, srcEnd, dst);
+      } else if (type instanceof Date) {
+        // @ts-ignore: type
+        return deserializeDate(srcStart, srcEnd);
+      } else {
+        ERROR(`Could not deserialize data '${ptrToStr(srcStart, srcEnd).slice(0, 100)}' to type. Make sure to add the correct decorators to classes.`);
       }
     }
   }

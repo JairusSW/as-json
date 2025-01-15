@@ -1,9 +1,7 @@
 import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T, COLON } from "../../custom/chars";
 import { isSpace } from "../../util";
 
-export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: nonnull<T> = changetype<nonnull<T>>(__new(offsetof<nonnull<T>>(), idof<nonnull<T>>()))): T {
-  console.log("Data: " + str(srcStart, srcEnd));
-
+export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const srcPtr = srcStart;
 
   let keyStart: usize = 0;
