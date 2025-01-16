@@ -140,21 +140,20 @@ class JSONTransform extends Visitor {
 
     if (!this.schema.static) this.schema.members = sortMembers(this.schema.members);
 
-    let SERIALIZE = "@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n";
-    let SERIALIZE_BS = "__SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n";
+    let SERIALIZE = "__SERIALIZE(ptr: usize): void {\n";
     let INITIALIZE = "@inline __INITIALIZE(): this {\n";
-    let DESERIALIZE = "__DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize): void {\n  const keySize = keyEnd - keyStart;";
+    let DESERIALIZE = "__DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize, ptr: usize): void {\n  switch (keyEnd - keyStart) {\n";
     let ALLOCATE = "@inline __ALLOCATE(): void {\n";
 
     indent = "  ";
 
     if (this.schema.static == false) {
       if (this.schema.members.some(v => v.flags.has(PropertyFlags.OmitNull))) {
-        SERIALIZE_BS += indent + "let block: usize = 0;\n";
+        SERIALIZE += indent + "let block: usize = 0;\n";
       }
       this.schema.byteSize += 2;
-      SERIALIZE_BS += indent + "store<u16>(bs.offset, 123, 0); // {\n";
-      SERIALIZE_BS += indent + "bs.offset += 2;\n";
+      SERIALIZE += indent + "store<u16>(bs.offset, 123, 0); // {\n";
+      SERIALIZE += indent + "bs.offset += 2;\n";
     }
 
     let isPure = this.schema.static;
@@ -167,61 +166,56 @@ class JSONTransform extends Visitor {
       const realName = member.name;
       const isLast = i == this.schema.members.length - 1;
 
-      DESERIALIZE += "  if (keySize == " + ((aliasName.length - 2) << 1) + " && memory.compare(keyStart, changetype<usize>(" + aliasName + "), " + ((aliasName.length - 2) << 1) + ") == 0) {\n";
-      DESERIALIZE += "    this." + realName + " = JSON.__deserialize<" + member.type + ">(valStart, valEnd);\n";
-      DESERIALIZE += "    return;\n";
-      DESERIALIZE += "  }\n";
-
       if (!isRegular && !member.flags.has(PropertyFlags.OmitIf) && !member.flags.has(PropertyFlags.OmitNull)) isRegular = true;
       if (isRegular && isPure) {
         const keyPart = (isFirst ? "{" : ",") + aliasName + ":";
         this.schema.byteSize += keyPart.length << 1;
-        SERIALIZE_BS += this.getStores(keyPart).map(v => indent + v + "\n").join("");
-        SERIALIZE_BS += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), ${isPrimitive(member.type)});\n`;
+        SERIALIZE += this.getStores(keyPart).map(v => indent + v + "\n").join("");
+        SERIALIZE += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>(${JSON.stringify(realName)})));\n`;
         if (isFirst) isFirst = false;
       } else if (isRegular && !isPure) {
         const keyPart = (isFirst ? "" : ",") + aliasName + ":";
         this.schema.byteSize += keyPart.length << 1;
-        SERIALIZE_BS += this.getStores(keyPart).map(v => indent + v + "\n").join("");
-        SERIALIZE_BS += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
+        SERIALIZE += this.getStores(keyPart).map(v => indent + v + "\n").join("");
+        SERIALIZE += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>(${JSON.stringify(realName)})));\n`;
         if (isFirst) isFirst = false;
       } else {
         if (member.flags.has(PropertyFlags.OmitNull)) {
-          SERIALIZE_BS += indent + `if ((block = load<usize>(ptr, offsetof<this>("${realName}"))) !== 0) {\n`;
+          SERIALIZE += indent + `if ((block = load<usize>(ptr, offsetof<this>(${JSON.stringify(realName)}))) !== 0) {\n`;
           indentInc();
           const keyPart = aliasName + ":";
           this.schema.byteSize += keyPart.length << 1;
-          SERIALIZE_BS += this.getStores(keyPart).map(v => indent + v + "\n").join("");
-          SERIALIZE_BS += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
+          SERIALIZE += this.getStores(keyPart).map(v => indent + v + "\n").join("");
+          SERIALIZE += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>(${JSON.stringify(realName)})));\n`;
 
           if (!isLast) {
             this.schema.byteSize += 2;
-            SERIALIZE_BS += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
-            SERIALIZE_BS += indent + `bs.offset += 2;\n`;
+            SERIALIZE += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
+            SERIALIZE += indent + `bs.offset += 2;\n`;
           }
 
           indentDec();
           this.schema.byteSize += 2;
-          SERIALIZE_BS += indent + `}\n`;
+          SERIALIZE += indent + `}\n`;
         } else if (member.flags.has(PropertyFlags.OmitIf)) {
-          SERIALIZE_BS += indent + `if (${toString}) !== 0) {\n`;
+          SERIALIZE += indent + `if (${toString}) !== 0) {\n`;
           indentInc();
-          SERIALIZE_BS += this.getStores(aliasName + ":").map(v => indent + v + "\n").join("");
-          SERIALIZE_BS += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>("${realName}")), staticSize);\n`;
+          SERIALIZE += this.getStores(aliasName + ":").map(v => indent + v + "\n").join("");
+          SERIALIZE += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>(${JSON.stringify(realName)})));\n`;
 
           if (!isLast) {
             this.schema.byteSize += 2;
-            SERIALIZE_BS += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
-            SERIALIZE_BS += indent + `bs.offset += 2;\n`;
+            SERIALIZE += indent + `store<u16>(bs.offset, 44, 0); // ,\n`;
+            SERIALIZE += indent + `bs.offset += 2;\n`;
           }
 
           indentDec();
-          SERIALIZE_BS += indent + `}\n`;
+          SERIALIZE += indent + `}\n`;
         }
       }
     }
 
-    const sortedMembers: Property[][] = [];
+    let sortedMembers: Property[][] = [];
 
     let len = -1;
     this.schema.members
@@ -237,138 +231,67 @@ class JSONTransform extends Visitor {
         }
       });
 
-    const groups = sortedMembers.length;
-    // if (groups != 1) {
-    //   DESERIALIZE += "  switch (keyEnd - keyStart) {\n";
-    //   indent = "    ";
-    // } else {
-    //   indent = "  ";
-    // }
-    for (const memberGroup of sortedMembers) {
+    sortedMembers = sortedMembers.sort((a, b) => b.length - a.length);
 
-      // const firstMemberLen = (memberGroup[0].alias || memberGroup[0].name).length << 1;
-      // if (firstMemberLen == 2) {
-      //   if (groups != 1) {
-      //     DESERIALIZE += indent + "case 2: {\n";
-      //     indentInc();
-      //   }
-      //   if (memberGroup.length == 1) {
-      //     const member = memberGroup[0];
-      //     const memberName = member.alias || member.name;
-      //     DESERIALIZE += indent + `if (load<u16>(keyStart) == ${memberName.charCodeAt(0)}) this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-      //     if (groups != 1) DESERIALIZE += indent + "break;\n";
-      //     break;
-      //   }
-      //   DESERIALIZE += indent + "switch (load<u16>(keyStart)) {\n";
-      //   for (const member of memberGroup) {
-      //     const memberName = member.alias || member.name;
-      //     DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
-      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-      //     DESERIALIZE += indent + "    break;\n";
-      //     DESERIALIZE += indent + "  }\n";
-      //   }
-      //   DESERIALIZE += indent + "}\n"
-      //   if (groups != 1) {
-      //     indentDec();
-      //     DESERIALIZE += indent + "}\n"
-      //   }
-      // } else if (firstMemberLen == 4) {
-      //   if (groups != 1) {
-      //     DESERIALIZE += indent + "case 4: {\n";
-      //     indentInc();
-      //   }
-      //   DESERIALIZE += indent + "switch (load<u32>(keyStart)) {\n";
-      //   for (const member of memberGroup) {
-      //     const memberName = member.alias || member.name;
-      //     DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
-      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-      //     DESERIALIZE += indent + "    break;\n";
-      //     DESERIALIZE += indent + "  }\n";
-      //   }
-      //   DESERIALIZE += indent + "}\n"
-      //   if (groups != 1) {
-      //     indentDec();
-      //     DESERIALIZE += indent + "}\n"
-      //   }
-      // } /*else if (firstMemberLen == 8) {
-      //   if (groups != 1) {
-      //     DESERIALIZE += indent + "case 8: {\n";
-      //     indentInc();
-      //   }
-      //   DESERIALIZE += indent + "switch ((load<u64>(keyStart)) {\n";
-      //   for (const member of memberGroup) {
-      //     const memberName = member.alias || member.name;
-      //     DESERIALIZE += indent + `  case ${}: { // ${memberName}\n`;
-      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-      //     DESERIALIZE += indent + "    break;\n";
-      //     DESERIALIZE += indent + "  }\n";
-      //   }
-      //   DESERIALIZE += indent + "}\n"
-      //   if (groups != 1) {
-      //     indentDec();
-      //     DESERIALIZE += indent + "}\n"
-      //   }
-      // } */else if (memberGroup.length > 1) {
-      //   if (groups != 1) {
-      //     DESERIALIZE += indent + "case " + firstMemberLen + ": {\n";
-      //     indentInc();
-      //   }
-      //   DESERIALIZE += indent + "switch (load<u16>(keyStart)) {\n";
-      //   for (const member of memberGroup) {
-      //     const memberName = member.alias || member.name;
-      //     DESERIALIZE += indent + `  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
-      //     DESERIALIZE += indent + `    this.${member.name} = JSON.__deserialize<${member.type}>(valStart, valEnd);\n`;
-      //     DESERIALIZE += indent + "    break;\n";
-      //     DESERIALIZE += indent + "  }\n";
-      //   }
-      //   DESERIALIZE += indent + "}\n"
-      //   if (groups != 1) {
-      //     indentDec();
-      //     DESERIALIZE += indent + "}\n"
-      //   }
-      // }
+    indentInc();
+    for (const memberGroup of sortedMembers) {
+      const memberLen = (memberGroup[0].alias || memberGroup[0].name).length << 1
+      DESERIALIZE += `${indent}case ${memberLen}: {\n`; indentInc();
+      if (memberLen == 2) DESERIALIZE += `${indent}switch (load<u16>(keyStart)) {\n`;
+      if (memberLen == 4) DESERIALIZE += `${indent}switch (load<u32>(keyStart)) {\n`;
+      if (memberLen == 8) DESERIALIZE += `${indent}switch (load<u64>(keyStart)) {\n`;
+      for (let i = 0; i < memberGroup.length; i++) {
+        const member = memberGroup[i];
+        const memberName = member.alias || member.name;
+        if (memberLen == 2) {
+          DESERIALIZE += `${indent}  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
+          DESERIALIZE += `${indent}    store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
+          DESERIALIZE += `${indent}    return;\n`;
+          DESERIALIZE += `${indent}  }\n`;
+        } else if (memberLen == 4) {
+          DESERIALIZE += `${indent}  case ${strToNum(memberName)[1]}: { // ${memberName}\n`;
+          DESERIALIZE += `${indent}    store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
+          DESERIALIZE += `${indent}    return;\n`;
+          DESERIALIZE += `${indent}  }\n`;
+        } else if (memberLen == 8) {
+          DESERIALIZE += `${indent}  case ${strToNum(memberName)[1]}: { // ${memberName}\n`;
+          DESERIALIZE += `${indent}    store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
+          DESERIALIZE += `${indent}    return;\n`;
+          DESERIALIZE += `${indent}  }\n`;
+        }
+      }
+      DESERIALIZE += `${indent}}\n`;
+      indentDec();
     }
-    // if (groups != 1) {
-    //   DESERIALIZE += "  }  \n";
-    //   DESERIALIZE += "}  ";
-    // } else {
-    //   DESERIALIZE += "}  ";
-    // }
-    DESERIALIZE += "}"
+    DESERIALIZE += `${indent}}\n`
+    indentDec();
+    DESERIALIZE += `${indent}}\n`
+    indentDec();
+    DESERIALIZE += `${indent}}\n`
 
     indent = "  ";
 
     this.schema.byteSize += 2;
-    SERIALIZE_BS += indent + "store<u16>(bs.offset, 125, 0); // }\n";
-    SERIALIZE_BS += indent + "bs.offset += 2;\n";
-    SERIALIZE_BS += "}";
-
-    SERIALIZE += indent + `this.__ALLOCATE();\n`;
-    SERIALIZE += indent + `this.__SERIALIZE_BS(ptr, true);\n`;
-    SERIALIZE += indent + `return bs.out<string>();\n`;
+    SERIALIZE += indent + "store<u16>(bs.offset, 125, 0); // }\n";
+    SERIALIZE += indent + "bs.offset += 2;\n";
     SERIALIZE += "}";
-    indentDec();
 
-    indentInc();
     ALLOCATE += indent + "bs.ensureSize(" + this.schema.byteSize + ");\n";
     ALLOCATE += "}";
 
     if (process.env["JSON_DEBUG"]) {
       console.log(SERIALIZE);
-      console.log(SERIALIZE_BS);
       // console.log(INITIALIZE);
       console.log(DESERIALIZE);
       console.log(ALLOCATE);
     }
 
     const SERIALIZE_METHOD = SimpleParser.parseClassMember(SERIALIZE, node);
-    const SERIALIZE_BS_METHOD = SimpleParser.parseClassMember(SERIALIZE_BS, node);
     // const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
     const ALLOCATE_METHOD = SimpleParser.parseClassMember(ALLOCATE, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_METHOD);
-    if (!node.members.find((v) => v.name.text == "__SERIALIZE_BS")) node.members.push(SERIALIZE_BS_METHOD);
     // if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__ALLOCATE")) node.members.push(ALLOCATE_METHOD);
@@ -376,9 +299,9 @@ class JSONTransform extends Visitor {
   }
   generateEmptyMethods(node: ClassDeclaration): void {
     let SERIALIZE_RAW_EMPTY = '@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n  return "{}";\n}';
-    let SERIALIZE_BS_EMPTY = "@inline __SERIALIZE_BS(ptr: usize, staticSize: bool): void {\n  store<u32>(bs.offset, 8192123);\n  bs.offset += 4;\n}";
+    let SERIALIZE_BS_EMPTY = "@inline __SERIALIZE(ptr: usize: bool): void {\n  store<u32>(bs.offset, 8192123);\n  bs.offset += 4;\n}";
     let INITIALIZE_EMPTY = "@inline __INITIALIZE(): this {\n  return this;\n}";
-    let DESERIALIZE_EMPTY = "@inline __DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize): void {\n  return false;\n}";
+    let DESERIALIZE_EMPTY = "@inline __DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize, ptr: usize): void {\n  return false;\n}";
     let ALLOCATE_EMPTY = "@inline __ALLOCATE(): void {\n  bs.ensureSize(4);\n}";
 
     if (process.env["JSON_DEBUG"]) {
@@ -396,7 +319,7 @@ class JSONTransform extends Visitor {
     const ALLOCATE_METHOD_EMPTY = SimpleParser.parseClassMember(ALLOCATE_EMPTY, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
-    if (!node.members.find((v) => v.name.text == "__SERIALIZE_BS")) node.members.push(SERIALIZE_BS_METHOD_EMPTY);
+    if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_BS_METHOD_EMPTY);
     if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD_EMPTY);
     if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD_EMPTY);
     if (!node.members.find((v) => v.name.text == "__ALLOCATE")) node.members.push(ALLOCATE_METHOD_EMPTY);

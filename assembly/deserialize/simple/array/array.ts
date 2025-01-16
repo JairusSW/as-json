@@ -1,30 +1,18 @@
 import { BRACKET_LEFT, BRACKET_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../../";
-import { unsafeCharCodeAt } from "../../../custom/util";
 
-export function deserializeArrayArray<T extends unknown[][]>(data: string): T {
-  const result = instantiate<T>();
-  let lastPos = 0;
-  let depth = 0;
-  let i = 1;
-  // Find start of bracket
-  //for (; unsafeCharCodeAt(data, i) !== leftBracketCode; i++) {}
-  //i++;
-  for (; i < data.length - 1; i++) {
-    const char = unsafeCharCodeAt(data, i);
-    if (char == BRACKET_LEFT) {
-      if (depth == 0) {
-        lastPos = i;
-      }
-      // Shifting is 6% faster than incrementing
-      depth++;
-    } else if (char == BRACKET_RIGHT) {
-      depth--;
-      if (depth == 0) {
-        i++;
-        result.push(JSON.parse<valueof<T>>(data.slice(lastPos, i)));
-      }
+export function deserializeArrayArray<T extends unknown[][]>(srcStart: usize, srcEnd: usize, dst: usize): T {
+  const out = changetype<T>(dst);
+  let lastIndex: usize = 0;
+  let depth: u32 = 0;
+  while (srcStart < srcEnd) {
+    const code = load<u16>(srcStart);
+    if (code == BRACKET_LEFT && depth++ == 0) {
+      lastIndex = srcStart;
+    } else if (code == BRACKET_RIGHT && --depth == 0) {
+      out.push(JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
     }
+    srcStart += 2;
   }
-  return result;
+  return out;
 }

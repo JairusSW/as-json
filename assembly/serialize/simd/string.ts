@@ -1,6 +1,7 @@
 import { bs } from "as-bs";
 import { BACK_SLASH } from "../../custom/chars";
 import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
+import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
 
 const SPLAT_34 = i16x8.splat(34); /* " */
 const SPLAT_92 = i16x8.splat(92); /* \ */
@@ -12,12 +13,13 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
  * Serializes strings into their JSON counterparts using SIMD operations
  * @param srcStart pointer to begin serializing at
  * @param srcEnd pointer to end serialization at
- * @param bs.offset pointer to write to
  */
 // @ts-ignore: Decorator valid here
-@inline export function serializeString_SIMD(srcStart: usize, srcEnd: usize, staticSize: bool): void {
-  const srcSize = srcEnd - srcStart;
-  if (!staticSize) bs.ensureSize(srcSize + 4);
+@inline export function serializeString_SIMD(src: string): void {
+  const srcSize = changetype<OBJECT>(changetype<usize>(src) - TOTAL_OVERHEAD).rtSize;
+  let srcStart = changetype<usize>(src);
+  const srcEnd = srcStart + srcSize;
+  bs.ensureSize(srcSize + 4);
   const srcEnd16 = srcEnd - 15;
 
   store<u8>(changetype<usize>(bs.offset), 34); /* " */
@@ -44,11 +46,13 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
       mask &= mask - 1;
 
       if ((escaped & 0xffff) != BACK_SLASH) {
+        bs.ensureSize(10);
         store<u64>(dst_offset, 13511005048209500);
         store<u32>(dst_offset, escaped, 8);
         v128.store(dst_offset, v128.load(src_offset, 2), 12);
         bs.offset += 10;
       } else {
+        bs.ensureSize(2);
         store<u32>(dst_offset, escaped);
         v128.store(dst_offset, v128.load(src_offset, 2), 4);
         bs.offset += 2;
@@ -81,6 +85,7 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
       mask &= mask - 1;
 
       if ((escaped & 0xffff) != BACK_SLASH) {
+        bs.ensureSize(10);
         store<u64>(dst_offset, 13511005048209500);
         store<u32>(dst_offset, escaped, 8);
         while (lane_index < 6) {
@@ -89,6 +94,7 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
         }
         bs.offset += 10;
       } else {
+        bs.ensureSize(2);
         store<u32>(dst_offset, escaped);
 
         while (lane_index < 6) {
@@ -111,10 +117,12 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (codeA << 2));
 
       if ((escaped & 0xffff) != BACK_SLASH) {
+        bs.ensureSize(10);
         store<u64>(bs.offset, 13511005048209500);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
+        bs.ensureSize(2);
         store<u32>(bs.offset, escaped);
         bs.offset += 4;
       }
@@ -127,10 +135,12 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (codeB << 2));
 
       if ((escaped & 0xffff) != BACK_SLASH) {
+        bs.ensureSize(10);
         store<u64>(bs.offset, 13511005048209500);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
+        bs.ensureSize(2);
         store<u32>(bs.offset, escaped);
         bs.offset += 4;
       }
@@ -147,10 +157,12 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
 
       if ((escaped & 0xffff) != BACK_SLASH) {
+        bs.ensureSize(10);
         store<u64>(bs.offset, 13511005048209500);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
+        bs.ensureSize(2);
         store<u32>(bs.offset, escaped);
         bs.offset += 4;
       }

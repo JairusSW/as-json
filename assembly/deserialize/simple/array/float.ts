@@ -1,7 +1,5 @@
 import { isSpace } from "../../../util";
-import { unsafeCharCodeAt } from "../../../custom/util";
-import { COMMA, BRACKET_RIGHT, BRACE_RIGHT } from "../../../custom/chars";
-import { deserializeFloat } from "../float";
+import { COMMA, BRACE_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../..";
 
 // @ts-ignore: Decorator valid here

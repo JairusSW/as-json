@@ -1,7 +1,9 @@
 import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T, COLON } from "../../custom/chars";
 import { isSpace } from "../../util";
+import { ptrToStr } from "../../util/ptrToStr";
 
 export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
+  const out = changetype<T>(dst);
   const srcPtr = srcStart;
 
   let keyStart: usize = 0;
@@ -20,7 +22,7 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
         if (isKey) {
           keyStart = lastIndex;
           keyEnd = srcStart;
-          console.log("Key: " + str(lastIndex, srcStart));
+          console.log("Key: " + ptrToStr(lastIndex, srcStart));
           while (isSpace((code = load<u16>((srcStart += 2))))) {
             /* empty */
           }
@@ -43,9 +45,9 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
             while (isSpace(load<u16>((srcStart += 2)))) {
               /* empty */
             }
-            console.log("Value (string): " + str(lastIndex, srcStart));
+            console.log("Value (string): " + ptrToStr(lastIndex, srcStart));
             // @ts-ignore: exists
-            dst.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart);
+            out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
             keyStart = 0;
             break;
           }
@@ -58,8 +60,8 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           const code = load<u16>(srcStart);
           if (code == COMMA || code == BRACE_RIGHT || isSpace(code)) {
             // @ts-ignore: exists
-            dst.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart);
-            console.log("Value (number): " + str(lastIndex, srcStart));
+            out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
+            console.log("Value (number): " + ptrToStr(lastIndex, srcStart));
             while (isSpace(load<u16>((srcStart += 2)))) {
               /* empty */
             }
@@ -77,8 +79,8 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           if (((code ^ BRACE_RIGHT) | (code ^ BRACKET_RIGHT)) == 32) {
             if (--depth == 0) {
               // @ts-ignore: exists
-              dst.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart);
-              console.log("Value (object): " + str(lastIndex, srcStart));
+              out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
+              console.log("Value (object): " + ptrToStr(lastIndex, srcStart));
               keyStart = 0;
               while (isSpace(load<u16>((srcStart += 2)))) {
                 /* empty */
@@ -91,8 +93,8 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
       } else if (code == CHAR_T) {
         if (load<u64>(srcStart) == 28429475166421108) {
           // @ts-ignore: exists
-          dst.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8));
-          console.log("Value (bool): " + str(srcStart - 8, srcStart));
+          out.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8), dst);
+          console.log("Value (bool): " + ptrToStr(srcStart - 8, srcStart));
           while (isSpace(load<u16>((srcStart += 2)))) {
             /* empty */
           }
@@ -101,8 +103,8 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
       } else if (code == CHAR_F) {
         if (load<u64>(srcStart, 2) == 28429466576093281) {
           // @ts-ignore: exists
-          dst.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 10));
-          console.log("Value (bool): " + str(srcStart - 10, srcStart));
+          out.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 10), dst);
+          console.log("Value (bool): " + ptrToStr(srcStart - 10, srcStart));
           while (isSpace(load<u16>((srcStart += 2)))) {
             /* empty */
           }
@@ -111,8 +113,8 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
       } else if (code == CHAR_N) {
         if (load<u64>(srcStart) == 30399761348886638) {
           // @ts-ignore: exists
-          dst.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8));
-          console.log("Value (null): " + str(srcStart - 8, srcStart));
+          out.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8), dst);
+          console.log("Value (null): " + ptrToStr(srcStart - 8, srcStart));
           while (isSpace(load<u16>((srcStart += 2)))) {
             /* empty */
           }
@@ -120,12 +122,5 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
       }
     }
   }
-  return dst;
-}
-
-function str(start: usize, end: usize): string {
-  const size = end - start;
-  const out = __new(size, idof<string>());
-  memory.copy(out, start, size);
-  return changetype<string>(out);
+  return out;
 }

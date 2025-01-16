@@ -1,5 +1,3 @@
-import { BRACKET_LEFT } from "../../custom/chars";
-import { isMap } from "../../custom/util";
 import { deserializeArrayArray } from "./array/array";
 import { deserializeBooleanArray } from "./array/bool";
 import { deserializeFloatArray } from "./array/float";
@@ -36,4 +34,9 @@ export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: u
   } else {
     throw new Error("Could not parse array of type " + nameof<T>() + "!");
   }
+}
+
+function isMap<T>(): boolean {
+  let type: T = changetype<T>(0);
+  return type instanceof Map;
 }

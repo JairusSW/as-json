@@ -7,7 +7,7 @@ export class VecBase {
     bs.ensureSize(4);
   }
 
-  @inline __SERIALIZE_BS(ptr: usize, staticSize: bool): void {
+  @inline __SERIALIZE(ptr: usize, staticSize: bool): void {
     store<u32>(bs.offset, 8192123);
     bs.offset += 4;
   }

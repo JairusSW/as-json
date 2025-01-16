@@ -10,10 +10,9 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
  * @returns void
  */
 // @ts-ignore: Decorator
-@inline export function serializeString(src: string, staticSize: bool): void {
+@inline export function serializeString(src: string): void {
   const srcSize = bytes(src);
-  if (!staticSize) bs.ensureSize(srcSize + 4);
-
+  bs.ensureSize(srcSize + 4);
   let srcPtr = changetype<usize>(src);
   const srcEnd = srcPtr + srcSize;
 
@@ -30,12 +29,12 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
       bs.offset += remBytes;
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
       if ((escaped & 0xffff) != BACK_SLASH) {
-        if (!staticSize) bs.ensureSize(12);
+        bs.ensureSize(10);
         store<u64>(bs.offset, 13511005048209500, 0);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        if (!staticSize) bs.ensureSize(2);
+        bs.ensureSize(2);
         store<u32>(bs.offset, escaped, 0);
         bs.offset += 4;
       }
