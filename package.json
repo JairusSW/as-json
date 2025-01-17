@@ -41,9 +41,7 @@
     "visitor-as": "^0.11.4"
   },
   "dependencies": {
-    "as-bs": "JairusSW/as-bs#a8d6deb",
-    "as-container": "^0.8.0",
-    "as-virtual": "^0.2.0"
+    "as-bs": "^1.0.1"
   },
   "overrides": {
     "assemblyscript": "$assemblyscript",
