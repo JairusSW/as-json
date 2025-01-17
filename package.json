@@ -44,8 +44,7 @@
     "as-bs": "^1.0.1"
   },
   "overrides": {
-    "assemblyscript": "$assemblyscript",
-    "json-as": "github:JairusSW/as-json"
+    "assemblyscript": "$assemblyscript"
   },
   "repository": {
     "type": "git",
