@@ -174,7 +174,7 @@ export namespace JSON {
     // @ts-ignore: Defined by transform
     if (isDefined(type.__DESERIALIZE)) {
       // @ts-ignore
-      return deserializeObject<nonnull<T>>(dataPtr, dataPtr + dataSize);
+      return deserializeObject<nonnull<T>>(dataPtr, dataPtr + dataSize, __new(offsetof<T>(), idof<T>()));
     } else if (type instanceof Map) {
       // @ts-ignore
       return deserializeMap<nonnull<T>>(dataPtr, dataPtr + dataSize);
