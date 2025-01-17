@@ -46,7 +46,8 @@
     "as-virtual": "^0.2.0"
   },
   "overrides": {
-    "assemblyscript": "$assemblyscript"
+    "assemblyscript": "$assemblyscript",
+    "json-as": "github:JairusSW/as-json"
   },
   "repository": {
     "type": "git",
