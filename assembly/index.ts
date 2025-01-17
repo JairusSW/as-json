@@ -48,7 +48,7 @@ export namespace JSON {
    * @returns string
    */
   export function stringify<T>(data: T, out: string | null = null): string {
-    if (isBoolean<T>(data)) {
+    if (isBoolean<T>()) {
       if (out) {
         if (<bool>data == true) {
           out = changetype<string>(__renew(changetype<usize>(out), 8));
@@ -60,7 +60,7 @@ export namespace JSON {
         }
         return out;
       }
-      return out ? "true" : "false";
+      return data ? "true" : "false";
     } else if (isInteger<T>() && nameof<T>() == "usize" && data == 0) {
       if (out) {
         out = changetype<string>(__renew(changetype<usize>(out), 8));
