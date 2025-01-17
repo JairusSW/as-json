@@ -37,7 +37,8 @@
     "assemblyscript-prettier": "^3.0.1",
     "minimatch": "^10.0.1",
     "prettier": "^3.4.2",
-    "typescript": "latest"
+    "typescript": "latest",
+    "visitor-as": "^0.11.4"
   },
   "dependencies": {
     "as-bs": "JairusSW/as-bs#a8d6deb",
