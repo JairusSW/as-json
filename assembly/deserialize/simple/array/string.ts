@@ -1,8 +1,7 @@
 import { JSON } from "../../..";
 import { BACK_SLASH, QUOTE } from "../../../custom/chars";
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeStringArray(srcStart: usize, srcEnd: usize, dst: usize): string[] {
+export function deserializeStringArray(srcStart: usize, srcEnd: usize, dst: usize): string[] {
   const out = changetype<string[]>(dst);
   let lastPos = 2;
   let inString = false;

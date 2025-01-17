@@ -2,8 +2,7 @@ import { isSpace } from "../../../util";
 import { COMMA, BRACE_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../..";
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeIntegerArray<T extends number[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
+export function deserializeIntegerArray<T extends number[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<T>(dst);
   let lastIndex: usize = 0;
   while (srcStart < srcEnd) {

@@ -9,8 +9,7 @@ import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
  * @param src string
  * @returns void
  */
-// @ts-ignore: Decorator
-@inline export function serializeString(src: string): void {
+export function serializeString(src: string): void {
   const srcSize = bytes(src);
   bs.ensureSize(srcSize + 4);
   let srcPtr = changetype<usize>(src);

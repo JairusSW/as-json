@@ -152,18 +152,20 @@ export namespace JSON {
    * @returns T
    */
   export function parse<T>(data: string): T {
+    const dataSize = bytes(data);
+    const dataPtr = changetype<usize>(data);
     if (isBoolean<T>()) {
-      return deserializeBoolean(data) as T;
+      return deserializeBoolean(dataPtr, dataPtr + dataSize) as T;
     } else if (isInteger<T>()) {
-      return deserializeInteger<T>(data);
+      return deserializeInteger<T>(dataPtr, dataPtr + dataSize);
     } else if (isFloat<T>()) {
-      return deserializeFloat<T>(data);
+      return deserializeFloat<T>(dataPtr, dataPtr + dataSize);
     } else if (isNullable<T>() && data.length == 4 && data == "null") {
       // @ts-ignore
       return null;
     } else if (isString<T>()) {
       // @ts-ignore
-      return deserializeString(data);
+      return deserializeString(dataPtr, dataPtr + dataSize);
     } else if (isArray<T>()) {
       // @ts-ignore
       return deserializeArray<nonnull<T>>(data);
@@ -172,13 +174,13 @@ export namespace JSON {
     // @ts-ignore: Defined by transform
     if (isDefined(type.__DESERIALIZE)) {
       // @ts-ignore
-      return deserializeObject<nonnull<T>>(data.trimStart());
+      return deserializeObject<nonnull<T>>(dataPtr, dataPtr + dataSize);
     } else if (type instanceof Map) {
       // @ts-ignore
-      return deserializeMap<nonnull<T>>(data.trimStart());
+      return deserializeMap<nonnull<T>>(dataPtr, dataPtr + dataSize);
     } else if (type instanceof Date) {
       // @ts-ignore
-      return deserializeDate(data);
+      return deserializeDate(dataPtr, dataPtr + dataSize);
     } else {
       ERROR(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }

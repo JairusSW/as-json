@@ -5,8 +5,7 @@ import { deserializeFloat } from "./float";
 import { deserializeObject } from "./object";
 import { deserializeString } from "./string";
 
-// @ts-ignore
-@inline export function deserializeArbitrary(srcStart: usize, srcEnd: usize, dst: usize): JSON.Value {
+export function deserializeArbitrary(srcStart: usize, srcEnd: usize, dst: usize): JSON.Value {
   const firstChar = load<u16>(srcStart);
   if (firstChar == 34) return JSON.Value.from(deserializeString(srcStart, srcEnd, dst));
   else if (firstChar == 123) return JSON.Value.from(deserializeObject(srcStart, srcEnd, dst));

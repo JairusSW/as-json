@@ -1,7 +1,6 @@
 import { ptrToStr } from "../../util/ptrToStr";
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeFloat<T>(srcStart: usize, srcEnd: usize): T {
+export function deserializeFloat<T>(srcStart: usize, srcEnd: usize): T {
    // @ts-ignore
    const type: T = 0;
    // @ts-ignore

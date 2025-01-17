@@ -1,7 +1,6 @@
 import { CHAR_E, CHAR_F, CHAR_T } from "../../../custom/chars";
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeBooleanArray<T extends boolean[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
+export function deserializeBooleanArray<T extends boolean[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<T>(dst);
   while (srcStart < srcEnd) {
     const code = load<u16>(srcStart);

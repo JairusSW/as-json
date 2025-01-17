@@ -146,8 +146,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
   return out;
 }
 
-// @ts-ignore: Decorator valid here
-@inline function sliceTo(srcStart: usize, srcEnd: usize): string {
+function sliceTo(srcStart: usize, srcEnd: usize): string {
   const dstSize = srcEnd - srcStart;
   const dst = __new(dstSize, idof<string>());
   memory.copy(dst, srcStart, dstSize);

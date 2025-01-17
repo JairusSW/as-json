@@ -1,8 +1,7 @@
 import { BACK_SLASH } from "../../custom/chars";
 import { DESERIALIZE_ESCAPE_TABLE, ESCAPE_HEX_TABLE } from "../../globals/tables";
 
-// @ts-ignore: Decorator valid here
-@inline export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): string {
+export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): string {
   let dstPtr = dst;
   let lastPtr = srcStart;
   while (srcStart < srcEnd) {

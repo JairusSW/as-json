@@ -14,8 +14,7 @@ const SPLAT_0 = i16x8.splat(0); /* 0 */
  * @param srcStart pointer to begin serializing at
  * @param srcEnd pointer to end serialization at
  */
-// @ts-ignore: Decorator valid here
-@inline export function serializeString_SIMD(src: string): void {
+export function serializeString_SIMD(src: string): void {
   const srcSize = changetype<OBJECT>(changetype<usize>(src) - TOTAL_OVERHEAD).rtSize;
   let srcStart = changetype<usize>(src);
   const srcEnd = srcStart + srcSize;

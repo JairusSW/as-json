@@ -5,8 +5,7 @@ import { bs } from "as-bs";
  * @param data data to serialize
  * @returns void
  */
-// @ts-ignore: Decorator valid here
-@inline export function serializeBool(data: bool, staticSize: bool = false): void {
+export function serializeBool(data: bool, staticSize: bool = false): void {
   if (data == true) {
     if (!staticSize) bs.ensureSize(8);
     store<u64>(bs.offset, 28429475166421108);
