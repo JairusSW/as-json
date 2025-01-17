@@ -1,36 +1,3 @@
 {
-  "name": "@json-as/transform",
-  "version": "0.9.26",
-  "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
-  "main": "./lib/index.js",
-  "author": "Jairus Tanaka",
-  "contributors": [
-    "DogWhich",
-    "Romdotdog",
-    "Derek Barrera",
-    "Frankk Taylor",
-    "lekiano"
-  ],
-  "license": "MIT",
-  "devDependencies": {},
-  "dependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JairusSW/as-json.git"
-  },
-  "keywords": [
-    "assemblyscript",
-    "json",
-    "serialize",
-    "deserialize",
-    "stringify",
-    "data",
-    "serde"
-  ],
-  "bugs": {
-    "url": "https://github.com/JairusSW/as-json/issues"
-  },
-  "homepage": "https://github.com/JairusSW/as-json#readme",
-  "type": "module",
-  "exports": "./lib/index.js"
+  "main": "./lib/index.js"
 }
