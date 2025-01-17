@@ -76,7 +76,7 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
         srcStart += 2;
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
-          if (((code ^ BRACE_RIGHT) | (code ^ BRACKET_RIGHT)) == 32) {
+          if (code == BRACE_RIGHT) {
             if (--depth == 0) {
               // @ts-ignore: exists
               out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
@@ -87,7 +87,27 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
               }
               break;
             }
-          } else if (((code ^ BRACE_LEFT) | (code ^ BRACKET_LEFT)) == 220) depth++;
+          } else if (code == BRACE_LEFT) depth++;
+          srcStart += 2;
+        }
+      } else if (code == BRACKET_LEFT) {
+        lastIndex = srcStart;
+        depth++;
+        srcStart += 2;
+        while (srcStart < srcEnd) {
+          const code = load<u16>(srcStart);
+          if (code == BRACKET_RIGHT) {
+            if (--depth == 0) {
+              // @ts-ignore: exists
+              out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
+              console.log("Value (array): " + ptrToStr(lastIndex, srcStart));
+              keyStart = 0;
+              while (isSpace(load<u16>((srcStart += 2)))) {
+                /* empty */
+              }
+              break;
+            }
+          } else if (code == BRACKET_LEFT) depth++;
           srcStart += 2;
         }
       } else if (code == CHAR_T) {

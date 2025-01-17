@@ -215,10 +215,12 @@ class JSONTransform extends Visitor {
             indentInc();
             if (memberLen == 2)
                 DESERIALIZE += `${indent}switch (load<u16>(keyStart)) {\n`;
-            if (memberLen == 4)
+            else if (memberLen == 4)
                 DESERIALIZE += `${indent}switch (load<u32>(keyStart)) {\n`;
-            if (memberLen == 8)
-                DESERIALIZE += `${indent}switch (load<u64>(keyStart)) {\n`;
+            else if (memberLen == 6)
+                DESERIALIZE += `${indent}let code = (<u64>load<u32>(keyStart) << 16) | <u64>load<u16>(keyStart, 4);\n`;
+            else
+                DESERIALIZE += toMemCDecl(memberLen, indent);
             for (let i = 0; i < memberGroup.length; i++) {
                 const member = memberGroup[i];
                 const memberName = member.alias || member.name;
@@ -229,22 +231,33 @@ class JSONTransform extends Visitor {
                     DESERIALIZE += `${indent}  }\n`;
                 }
                 else if (memberLen == 4) {
-                    DESERIALIZE += `${indent}  case ${strToNum(memberName)[1]}: { // ${memberName}\n`;
+                    DESERIALIZE += `${indent}  case ${toU32(memberName)}: { // ${memberName}\n`;
                     DESERIALIZE += `${indent}    store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
                     DESERIALIZE += `${indent}    return;\n`;
                     DESERIALIZE += `${indent}  }\n`;
                 }
-                else if (memberLen == 8) {
-                    DESERIALIZE += `${indent}  case ${strToNum(memberName)[1]}: { // ${memberName}\n`;
-                    DESERIALIZE += `${indent}    store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
-                    DESERIALIZE += `${indent}    return;\n`;
-                    DESERIALIZE += `${indent}  }\n`;
+                else if (memberLen == 6) {
+                    DESERIALIZE += i == 0 ? indent : "";
+                    DESERIALIZE += `if (code == ${toU48(memberName)}) { // ${memberName}\n`;
+                    DESERIALIZE += `${indent}  store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
+                    DESERIALIZE += `${indent}  return;\n`;
+                    DESERIALIZE += `${indent}}${i < memberGroup.length - 1 ? " else " : "\n"}`;
+                }
+                else {
+                    DESERIALIZE += i == 0 ? indent : "";
+                    DESERIALIZE += `if (${toMemCCheck(memberName)}) { // ${memberName}\n`;
+                    DESERIALIZE += `${indent}  store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
+                    DESERIALIZE += `${indent}  return;\n`;
+                    DESERIALIZE += `${indent}}${i < memberGroup.length - 1 ? " else " : "\n"}`;
                 }
             }
-            DESERIALIZE += `${indent}}\n`;
+            if (memberLen < 6) {
+                DESERIALIZE += `${indent}}\n`;
+            }
             indentDec();
+            DESERIALIZE += `${indent}  return;\n`;
+            DESERIALIZE += `${indent}}\n`;
         }
-        DESERIALIZE += `${indent}}\n`;
         indentDec();
         DESERIALIZE += `${indent}}\n`;
         indentDec();
@@ -344,7 +357,7 @@ class JSONTransform extends Visitor {
             if (size == "v128") {
                 let index = this.newStmts.simd.findIndex(v => v.includes(num));
                 let name = "SIMD_" + (index == -1 ? this.newStmts.simd.length : index);
-                if (index)
+                if (index && !this.newStmts.simd.includes(`const ${name} = ${num};`))
                     this.newStmts.simd.push(`const ${name} = ${num};`);
                 out.push("store<v128>(bs.offset, " + name + ", " + offset + "); // " + data.slice((offset >> 1), (offset >> 1) + 8));
                 offset += 16;
@@ -463,6 +476,61 @@ function getArgs(args) {
         }
     }
     return out;
+}
+function toU16(data, offset = 0) {
+    return (data.charCodeAt(offset + 0)).toString();
+}
+function toU32(data, offset = 0) {
+    return ((data.charCodeAt(offset + 1) << 16) |
+        data.charCodeAt(offset + 0)).toString();
+}
+function toU48(data, offset = 0) {
+    return ((BigInt(data.charCodeAt(offset + 2)) << 32n) |
+        (BigInt(data.charCodeAt(offset + 1)) << 16n) |
+        BigInt(data.charCodeAt(offset + 0))).toString();
+}
+function toU64(data, offset = 0) {
+    return ((BigInt(data.charCodeAt(offset + 3)) << 48n) |
+        (BigInt(data.charCodeAt(offset + 2)) << 32n) |
+        (BigInt(data.charCodeAt(offset + 1)) << 16n) |
+        BigInt(data.charCodeAt(offset + 0))).toString();
+}
+function toMemCDecl(n, indent) {
+    let out = "";
+    let offset = 0;
+    let index = 0;
+    while (n >= 8) {
+        out += `${indent}const code${index++} = load<u64>(keyStart, ${offset});\n`;
+        offset += 8;
+        n -= 8;
+    }
+    while (n >= 4) {
+        out += `${indent}const code${index++} = load<u32>(keyStart, ${offset});\n`;
+        offset += 4;
+        n -= 4;
+    }
+    if (n == 1)
+        out += `${indent}const code${index++} = load<u16>(keyStart, ${offset});\n`;
+    return out;
+}
+function toMemCCheck(data) {
+    let n = data.length << 1;
+    let out = "";
+    let offset = 0;
+    let index = 0;
+    while (n >= 8) {
+        out += ` && code${index++} == ${toU64(data, offset >> 1)}`;
+        offset += 8;
+        n -= 8;
+    }
+    while (n >= 4) {
+        out += ` && code${index++} == ${toU32(data, offset >> 1)}`;
+        offset += 4;
+        n -= 4;
+    }
+    if (n == 1)
+        out += ` && code${index++} == ${toU16(data, offset >> 1)}`;
+    return out.slice(4);
 }
 function strToNum(data, simd = false, offset = 0) {
     const out = [];

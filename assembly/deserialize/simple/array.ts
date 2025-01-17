@@ -1,3 +1,5 @@
+import { JSON } from "../..";
+import { deserializeArbitraryArray } from "./array/arbitrary";
 import { deserializeArrayArray } from "./array/array";
 import { deserializeBooleanArray } from "./array/bool";
 import { deserializeFloatArray } from "./array/float";
@@ -20,17 +22,21 @@ export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: u
     // @ts-ignore
     return deserializeFloatArray<T>(srcStart, srcEnd, dst);
   } else if (isArrayLike<valueof<T>>()) {
-    // @ts-ignore
+    // @ts-ignore: type
     return deserializeArrayArray<T>(srcStart, srcEnd, dst);
-  } else if (isMap<valueof<T>>()) {
-    return deserializeMapArray<T>(srcStart, srcEnd, dst);
   } else if (isManaged<valueof<T>>() || isReference<valueof<T>>()) {
     const type = changetype<nonnull<valueof<T>>>(0);
-    // @ts-ignore
-    if (isDefined(type.__DESERIALIZE)) {
+    if (type instanceof JSON.Value) {
+      // @ts-ignore: type
+      return deserializeArbitraryArray(srcStart, srcEnd, dst);
+    } else if (type instanceof Map) {
+      // @ts-ignore: type
+      return deserializeMapArray<T>(srcStart, srcEnd, dst);
+      // @ts-ignore: defined by transform
+    } else if (isDefined(type.__DESERIALIZE)) {
       return deserializeObjectArray<T>(srcStart, srcEnd, dst);
     }
-    throw new Error("Could not parse array of type " + nameof<T>() + "! Make sure to add the @json decorator over classes!");
+    throw new Error("Could not parse array of type " + nameof<T>() + "!");
   } else {
     throw new Error("Could not parse array of type " + nameof<T>() + "!");
   }
