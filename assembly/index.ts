@@ -395,7 +395,7 @@ export namespace JSON {
   export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
     if (isBoolean<T>()) {
       // @ts-ignore: type
-      return deserializeBoolean<T>(srcStart, srcEnd);
+      return deserializeBoolean(srcStart, srcEnd);
     } else if (isInteger<T>()) {
       return deserializeInteger<T>(srcStart, srcEnd);
     } else if (isFloat<T>()) {
@@ -414,9 +414,8 @@ export namespace JSON {
       } else if (type instanceof Date) {
         // @ts-ignore: type
         return deserializeDate(srcStart, srcEnd);
-      } else {
-        ERROR(`Could not deserialize data '${ptrToStr(srcStart, srcEnd).slice(0, 100)}' to type. Make sure to add the correct decorators to classes.`);
       }
     }
+    throw new Error(`Could not deserialize data '${ptrToStr(srcStart, srcEnd).slice(0, 100)}' to type. Make sure to add the correct decorators to classes.`);
   }
 }

@@ -171,6 +171,6 @@ export function serializeString_SIMD(src: string): void {
     }
   }
 
-  bs.offset += 2;
   store<u8>(bs.offset, 34); /* " */
+  bs.offset += 2;
 }

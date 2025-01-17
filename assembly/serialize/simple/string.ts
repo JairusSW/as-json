@@ -16,7 +16,6 @@ export function serializeString(src: string): void {
   const srcEnd = srcPtr + srcSize;
 
   store<u16>(bs.offset, QUOTE);
-
   bs.offset += 2;
 
   let lastPtr: i32 = srcPtr;

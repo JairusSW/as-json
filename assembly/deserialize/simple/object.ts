@@ -79,12 +79,12 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           if (code == BRACE_RIGHT) {
             if (--depth == 0) {
               // @ts-ignore: exists
-              out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
+              out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart += 2, dst);
               console.log("Value (object): " + ptrToStr(lastIndex, srcStart));
               keyStart = 0;
-              while (isSpace(load<u16>((srcStart += 2)))) {
-                /* empty */
-              }
+              // while (isSpace(load<u16>(srcStart))) {
+              //   /* empty */
+              // }
               break;
             }
           } else if (code == BRACE_LEFT) depth++;

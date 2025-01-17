@@ -1,20 +1,41 @@
 import { JSON } from ".";
-import { deserializeObject } from "./deserialize/simple/object";
-import { bytes } from "./util";
+
+// @json or @serializable work here
 @json
 class Vec3 {
-    x: i16 = 1;
-    yy: i16 = 2;
-    zzz: i16 = 3;
-    xxxx: i16 = 4;
-    yyyyy: i16 = 5;
-    zzzzzz: i16 = 6;
-    xxxxxxx: i16 = 7;
-    yyyyyyyy: i16 = 8;
-    zzzzzzzzz: i16 = 9;
+  x: f32 = 0.0;
+  y: f32 = 0.0;
+  z: f32 = 0.0;
 }
 
-let serialized = JSON.stringify(new Vec3());
-console.log("Serialized: " + serialized);
-let deserialized = deserializeObject<Vec3>(changetype<usize>(serialized), changetype<usize>(serialized) + bytes(serialized), changetype<usize>(new Vec3()));
-console.log("Deserialized: " + JSON.stringify(deserialized));
+@json
+class Player {
+  @alias("first name")
+  firstName!: string;
+  lastName!: string;
+  lastActive!: i32[];
+  // Drop in a code block, function, or expression that evaluates to a boolean
+  @omitif((age) => age < 18)
+  age!: i32;
+  @omitnull()
+  pos!: Vec3 | null;
+  isVerified!: boolean;
+}
+
+const player: Player = {
+  firstName: "Emmet",
+  lastName: "West",
+  lastActive: [8, 27, 2022],
+  age: 23,
+  pos: {
+    x: 3.4,
+    y: 1.2,
+    z: 8.3
+  },
+  isVerified: true
+};
+
+const stringified = JSON.stringify<Player>(player);
+console.log("Serialized: " + stringified);
+const parsed = JSON.parse<Player>(stringified);
+console.log("Deserialized: " + JSON.stringify<Player>(parsed));
