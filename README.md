@@ -6,14 +6,14 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0
+    AssemblyScript - v1.0.0-alpha.1
   </pre>
 </h5>
 
 ## Installation
 
 ```bash
-npm install json-as
+npm install json-as@1.0.0-alpha.1
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
@@ -38,7 +38,7 @@ If you'd like to see the code that the transform generates, run with `JSON_DEBUG
 ## Usage
 
 ```js
-import { JSON } from "json-as/assembly";
+import { JSON } from "json-as";
 
 // @json or @serializable work here
 @json
@@ -55,7 +55,7 @@ class Player {
   lastName!: string;
   lastActive!: i32[];
   // Drop in a code block, function, or expression that evaluates to a boolean
-  @omitif("this.age < 18")
+  @omitif((age) => age < 18)
   age!: i32;
   @omitnull()
   pos!: Vec3 | null;
