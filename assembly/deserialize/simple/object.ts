@@ -4,7 +4,6 @@ import { ptrToStr } from "../../util/ptrToStr";
 
 export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<T>(dst);
-  const srcPtr = srcStart;
 
   let keyStart: usize = 0;
   let keyEnd: usize = 0;
@@ -14,7 +13,7 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
 
   // while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
   // while (srcEnd > srcStart && isSpace(load<u16>(srcEnd))) srcEnd -= 2;
-
+  srcStart += 2;
   while (srcStart < srcEnd) {
     let code = load<u16>(srcStart); // while (isSpace(code)) code = load<u16>(srcStart += 2);
     if (keyStart == 0) {
@@ -23,12 +22,14 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           keyStart = lastIndex;
           keyEnd = srcStart;
           console.log("Key: " + ptrToStr(lastIndex, srcStart));
-          while (isSpace((code = load<u16>((srcStart += 2))))) {
-            /* empty */
-          }
-          if (code !== COLON) throw new Error("Expected ':' after key at position " + (srcStart - srcPtr).toString());
+          srcStart += 2;
+          // while (isSpace((code = load<u16>((srcStart += 2))))) {
+          //   /* empty */
+          // }
+          // if (code !== COLON) throw new Error("Expected ':' after key at position " + (srcStart - srcPtr).toString());
           isKey = false;
         } else {
+          console.log("Got key start");
           isKey = true; // i don't like this
           lastIndex = srcStart + 2;
         }
@@ -42,13 +43,13 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
           if (code == QUOTE && load<u16>(srcStart - 2) !== BACK_SLASH) {
-            while (isSpace(load<u16>((srcStart += 2)))) {
-              /* empty */
-            }
-            console.log("Value (string): " + ptrToStr(lastIndex, srcStart));
+            console.log("Value (string): " + ptrToStr(lastIndex, srcStart + 2));
+            console.log("Next: " + String.fromCharCode(load<u16>(srcStart + 4)));
             // @ts-ignore: exists
-            out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
+            out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart + 2, dst);
+            // while (isSpace(load<u16>(srcStart))) srcStart += 2;
             keyStart = 0;
+            srcStart += 4;
             break;
           }
           srcStart += 2;

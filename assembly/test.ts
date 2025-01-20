@@ -15,8 +15,8 @@ class Player {
   lastName!: string;
   lastActive!: i32[];
   // Drop in a code block, function, or expression that evaluates to a boolean
-  @omitif((age) => age < 18)
-  age!: i32;
+  // @omitif((self: Player) => i32(self.age < 18)
+  age: JSON.Box<i32> | null = null;
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
@@ -26,7 +26,7 @@ const player: Player = {
   firstName: "Emmet",
   lastName: "West",
   lastActive: [8, 27, 2022],
-  age: 23,
+  age: null,
   pos: {
     x: 3.4,
     y: 1.2,
@@ -37,5 +37,5 @@ const player: Player = {
 
 const stringified = JSON.stringify<Player>(player);
 console.log("Serialized: " + stringified);
-const parsed = JSON.parse<Player>(stringified);
-console.log("Deserialized: " + JSON.stringify<Player>(parsed));
+// const parsed = JSON.parse<Player>(stringified);
+// console.log("Deserialized: " + JSON.stringify<Player>(parsed));

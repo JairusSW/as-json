@@ -115,7 +115,7 @@ class JSONTransform extends Visitor {
               break;
             }
             case "omitif": {
-              const arg = decorator.args[0];
+              let arg = decorator.args[0];
               if (!decorator.args?.length) throwError("@omitif must have an argument or callback that resolves to type bool", member.range);
               mem.flags.set(PropertyFlags.OmitIf, arg);
               this.schema.static = false;
@@ -198,7 +198,14 @@ class JSONTransform extends Visitor {
           this.schema.byteSize += 2;
           SERIALIZE += indent + `}\n`;
         } else if (member.flags.has(PropertyFlags.OmitIf)) {
-          SERIALIZE += indent + `if (${toString}) !== 0) {\n`;
+          if (member.flags.get(PropertyFlags.OmitIf).kind == NodeKind.Function) {
+            const arg = member.flags.get(PropertyFlags.OmitIf) as FunctionExpression;
+            // @ts-ignore: type
+            arg.declaration.signature.returnType.name = Node.createSimpleTypeName("boolean", arg.declaration.signature.returnType.name.range);
+            SERIALIZE += indent + `if ((${toString(member.flags.get(PropertyFlags.OmitIf))})(this)) {\n`;
+          } else {
+            SERIALIZE += indent + `if (${toString(member.flags.get(PropertyFlags.OmitIf))}) {\n`;
+          }
           indentInc();
           SERIALIZE += this.getStores(aliasName + ":").map(v => indent + v + "\n").join("");
           SERIALIZE += indent + `JSON.__serialize<${member.type}>(load<${member.type}>(ptr, offsetof<this>(${JSON.stringify(realName)})));\n`;
