@@ -2,6 +2,8 @@ import { BACK_SLASH } from "../../custom/chars";
 import { DESERIALIZE_ESCAPE_TABLE, ESCAPE_HEX_TABLE } from "../../globals/tables";
 
 export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): string {
+  srcStart += 2; srcEnd -= 2;
+  if (dst == 0) dst = __new(srcEnd - srcStart, idof<string>());
   let dstPtr = dst;
   let lastPtr = srcStart;
   while (srcStart < srcEnd) {

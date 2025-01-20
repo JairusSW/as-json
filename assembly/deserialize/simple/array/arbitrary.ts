@@ -3,8 +3,8 @@ import { JSON } from "../../../";
 import { isSpace } from "util/string";
 import { ptrToStr } from "../../../util/ptrToStr";
 
-export function deserializeArbitraryArray(srcStart: usize, srcEnd: usize, dst: usize): JSON.Value[] {
-    const out: JSON.Value[] = [];
+export function deserializeArbitraryArray<T extends JSON.Value>(srcStart: usize, srcEnd: usize, dst: usize): JSON.Value[] {
+    const out = dst ? changetype<T>(dst) : instantiate<T>();
     let lastIndex: usize = 0;
     let depth: u32 = 0;
     while (srcStart < srcEnd) {

@@ -3,7 +3,7 @@ import { COMMA, BRACE_RIGHT, BRACKET_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../..";
 
 export function deserializeFloatArray<T extends number[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
-  const out = changetype<T>(dst || __new(offsetof<T>(), idof<T>()));
+  const out = dst ? changetype<T>(dst) : instantiate<T>();
   let lastIndex: usize = 0;
   while (srcStart < srcEnd) {
     const code = load<u16>(srcStart);

@@ -1,7 +1,7 @@
 import { CHAR_E, CHAR_F, CHAR_T } from "../../../custom/chars";
 
 export function deserializeBooleanArray<T extends boolean[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
-  const out = changetype<T>(dst);
+  const out = dst ? changetype<T>(dst) : instantiate<T>();
   while (srcStart < srcEnd) {
     const code = load<u16>(srcStart);
     if (code == CHAR_T && load<u16>(srcStart, 8) == CHAR_E) {

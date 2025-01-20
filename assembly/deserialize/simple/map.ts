@@ -3,7 +3,7 @@ import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRA
 import { isSpace } from "../../util";
 
 export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd: usize, dst: usize): T {
-  const out = changetype<T>(dst);
+  const out = changetype<T>(dst || __new(offsetof<T>(), idof<T>()));
   // @ts-ignore: type
   if (!isString<indexof<T>>() && !isInteger<indexof<T>>() && !isFloat<indexof<T>>()) ERROR("Map key must also be a valid JSON key!");
 

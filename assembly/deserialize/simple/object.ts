@@ -3,7 +3,7 @@ import { isSpace } from "../../util";
 import { ptrToStr } from "../../util/ptrToStr";
 
 export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
-  const out = changetype<T>(dst);
+  const out = changetype<nonnull<T>>(dst || __new(offsetof<T>(), idof<T>()));
 
   let keyStart: usize = 0;
   let keyEnd: usize = 0;
@@ -22,6 +22,7 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           keyStart = lastIndex;
           keyEnd = srcStart;
           console.log("Key: " + ptrToStr(lastIndex, srcStart));
+          console.log("Next: " + String.fromCharCode(load<u16>(srcStart + 2)));
           srcStart += 2;
           // while (isSpace((code = load<u16>((srcStart += 2))))) {
           //   /* empty */
@@ -44,12 +45,12 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           const code = load<u16>(srcStart);
           if (code == QUOTE && load<u16>(srcStart - 2) !== BACK_SLASH) {
             console.log("Value (string): " + ptrToStr(lastIndex, srcStart + 2));
-            console.log("Next: " + String.fromCharCode(load<u16>(srcStart + 4)));
             // @ts-ignore: exists
             out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart + 2, dst);
             // while (isSpace(load<u16>(srcStart))) srcStart += 2;
-            keyStart = 0;
             srcStart += 4;
+            console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
+            keyStart = 0;
             break;
           }
           srcStart += 2;
@@ -63,9 +64,11 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
             // @ts-ignore: exists
             out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
             console.log("Value (number): " + ptrToStr(lastIndex, srcStart));
-            while (isSpace(load<u16>((srcStart += 2)))) {
-              /* empty */
-            }
+            // while (isSpace(load<u16>((srcStart += 2)))) {
+            //   /* empty */
+            // }
+            srcStart += 2;
+            console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
             keyStart = 0;
             break;
           }
@@ -79,9 +82,10 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           const code = load<u16>(srcStart);
           if (code == BRACE_RIGHT) {
             if (--depth == 0) {
+              console.log("Value (object): " + ptrToStr(lastIndex, srcStart + 2));
               // @ts-ignore: exists
               out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart += 2, dst);
-              console.log("Value (object): " + ptrToStr(lastIndex, srcStart));
+              console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
               keyStart = 0;
               // while (isSpace(load<u16>(srcStart))) {
               //   /* empty */
@@ -99,13 +103,14 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           const code = load<u16>(srcStart);
           if (code == BRACKET_RIGHT) {
             if (--depth == 0) {
+              console.log("Value (array): " + ptrToStr(lastIndex, srcStart + 2));
               // @ts-ignore: exists
-              out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
-              console.log("Value (array): " + ptrToStr(lastIndex, srcStart));
+              out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart += 2, dst);
+              console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
               keyStart = 0;
-              while (isSpace(load<u16>((srcStart += 2)))) {
-                /* empty */
-              }
+              // while (isSpace(load<u16>((srcStart += 2)))) {
+              //   /* empty */
+              // }
               break;
             }
           } else if (code == BRACKET_LEFT) depth++;
@@ -113,32 +118,39 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
         }
       } else if (code == CHAR_T) {
         if (load<u64>(srcStart) == 28429475166421108) {
+          console.log("Value (bool): " + ptrToStr(srcStart, srcStart + 8));
           // @ts-ignore: exists
           out.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8), dst);
-          console.log("Value (bool): " + ptrToStr(srcStart - 8, srcStart));
-          while (isSpace(load<u16>((srcStart += 2)))) {
-            /* empty */
-          }
+          // while (isSpace(load<u16>((srcStart += 2)))) {
+          //   /* empty */
+          // }
+          srcStart += 2;
+          console.log("Next: " + String.fromCharCode(load<u16>(srcStart)) + "  " + (srcStart < srcEnd).toString());
           keyStart = 0;
         }
       } else if (code == CHAR_F) {
         if (load<u64>(srcStart, 2) == 28429466576093281) {
+          console.log("Value (bool): " + ptrToStr(srcStart, srcStart + 10));
           // @ts-ignore: exists
           out.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 10), dst);
-          console.log("Value (bool): " + ptrToStr(srcStart - 10, srcStart));
-          while (isSpace(load<u16>((srcStart += 2)))) {
-            /* empty */
-          }
+          // while (isSpace(load<u16>((srcStart += 2)))) {
+          //   /* empty */
+          // }
+          srcStart += 2;
+          console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
           keyStart = 0;
         }
       } else if (code == CHAR_N) {
         if (load<u64>(srcStart) == 30399761348886638) {
+          console.log("Value (null): " + ptrToStr(srcStart, srcStart + 8));
           // @ts-ignore: exists
           out.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8), dst);
-          console.log("Value (null): " + ptrToStr(srcStart - 8, srcStart));
-          while (isSpace(load<u16>((srcStart += 2)))) {
-            /* empty */
-          }
+          // while (isSpace(load<u16>((srcStart += 2)))) {
+          /* empty */
+          // }
+          srcStart += 2;
+          console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
+          keyStart = 0;
         }
       }
     }

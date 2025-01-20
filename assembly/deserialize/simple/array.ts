@@ -9,7 +9,7 @@ import { deserializeObjectArray } from "./array/object";
 import { deserializeStringArray } from "./array/string";
 
 // @ts-ignore: Decorator valid here
-export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
+export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
   if (isString<valueof<T>>()) {
     return <T>deserializeStringArray(srcStart, srcEnd, dst);
   } else if (isBoolean<valueof<T>>()) {
@@ -28,7 +28,7 @@ export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: u
     const type = changetype<nonnull<valueof<T>>>(0);
     if (type instanceof JSON.Value) {
       // @ts-ignore: type
-      return deserializeArbitraryArray(srcStart, srcEnd, dst);
+      return deserializeArbitraryArray<T>(srcStart, srcEnd, dst);
     } else if (type instanceof Map) {
       // @ts-ignore: type
       return deserializeMapArray<T>(srcStart, srcEnd, dst);
