@@ -1,9 +1,10 @@
 import { isSpace } from "../../../util";
-import { COMMA, BRACE_RIGHT } from "../../../custom/chars";
+import { COMMA, BRACE_RIGHT, BRACKET_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../..";
+import { ptrToStr } from "../../../util/ptrToStr";
 
 export function deserializeIntegerArray<T extends number[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
-  const out = changetype<T>(dst);
+  const out = changetype<T>(dst || __new(offsetof<T>(), idof<T>()));
   let lastIndex: usize = 0;
   while (srcStart < srcEnd) {
     const code = load<u16>(srcStart);
@@ -12,8 +13,9 @@ export function deserializeIntegerArray<T extends number[]>(srcStart: usize, src
       srcStart += 2;
       while (srcStart < srcEnd) {
         const code = load<u16>(srcStart);
-        if (code == COMMA || code == BRACE_RIGHT || isSpace(code)) {
-          out.push(JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
+        if (code == COMMA || code == BRACKET_RIGHT || isSpace(code)) {
+          console.log("element: " + ptrToStr(lastIndex, srcStart))
+          // out.push(JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
           // while (isSpace(load<u16>((srcStart += 2)))) {
           //   /* empty */
           // }
