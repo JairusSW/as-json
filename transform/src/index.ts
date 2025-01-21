@@ -154,7 +154,7 @@ class JSONTransform extends Visitor {
     for (const member of this.schema.members) {
       const nonNullType = member.type.replace(" | null", "");
       if (!isPrimitive(nonNullType)) {
-        const schema = this.schemas.find(v => v.name == nonNullType);
+        const schema = this.schemas.find((v) => v.name == nonNullType);
         if (schema && !this.schema.deps.includes(schema)) {
           this.schema.deps.push(schema);
           this.schema.byteSize += schema.byteSize;
@@ -165,7 +165,6 @@ class JSONTransform extends Visitor {
     let isPure = this.schema.static;
     let isRegular = isPure;
     let isFirst = true;
-
 
     for (let i = 0; i < this.schema.members.length; i++) {
       const member = this.schema.members[i];

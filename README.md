@@ -6,14 +6,14 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-alpha.1
+    AssemblyScript - v1.0.0-alpha.2
   </pre>
 </h5>
 
 ## Installation
 
 ```bash
-npm install json-as@1.0.0-alpha.1
+npm install json-as@1.0.0-alpha.2
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
@@ -56,6 +56,7 @@ class Player {
   lastActive!: i32[];
   // Drop in a code block, function, or expression that evaluates to a boolean
   @omitif((age) => age < 18)
+  @omitif('this.age <= 0')
   age!: i32;
   @omitnull()
   pos!: Vec3 | null;

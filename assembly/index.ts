@@ -339,7 +339,7 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) { }
+    constructor(public value: T) {}
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive

@@ -54,7 +54,7 @@ export namespace bs {
     if (newSize > maxOffset) {
       byteLength += size;
       const newPtr = __renew(buffer, byteLength);
-      offset = (offset - buffer) + newPtr;
+      offset = offset - buffer + newPtr;
       maxOffset = newPtr + byteLength;
       buffer = newPtr;
     }
@@ -101,7 +101,7 @@ export namespace bs {
   @inline export function shrink(): void {
     byteLength = offset - buffer;
     buffer = __renew(buffer, byteLength);
-    maxOffset = byteLength + buffer; 
+    maxOffset = byteLength + buffer;
   }
 
   /**

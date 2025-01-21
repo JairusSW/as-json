@@ -11,6 +11,7 @@ class Vec3 {
 
 @json
 class Player {
+
   @alias("first name")
   firstName!: string;
   lastName!: string;
@@ -18,6 +19,7 @@ class Player {
   // Drop in a code block, function, or expression that evaluates to a boolean
   // @omitif((self: Player): boolean => self.age <= 18)
   age!: i32;
+
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
