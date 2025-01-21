@@ -226,7 +226,7 @@ class JSONTransform extends Visitor {
             const arg = member.flags.get(PropertyFlags.OmitIf) as FunctionExpression;
             // @ts-ignore: type
             arg.declaration.signature.returnType.name = Node.createSimpleTypeName("boolean", arg.declaration.signature.returnType.name.range);
-            SERIALIZE += indent + `if ((${toString(member.flags.get(PropertyFlags.OmitIf))})(this)) {\n`;
+            SERIALIZE += indent + `if (!(${toString(member.flags.get(PropertyFlags.OmitIf))})(this)) {\n`;
           } else {
             SERIALIZE += indent + `if (${toString(member.flags.get(PropertyFlags.OmitIf))}) {\n`;
           }
