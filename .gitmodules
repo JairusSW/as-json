@@ -1,0 +1,3 @@
+[submodule "modules/as-bs"]
+	path = modules/as-bs
+	url = https://github.com/JairusSW/as-bs
