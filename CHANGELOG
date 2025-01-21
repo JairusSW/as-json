@@ -1,45 +1,13 @@
-v0.8.2 - Properties starting with `static` or `private` would be ignored
-v0.8.3 - Dirty fix to issue #68. Add __JSON_Stringify callable to global scope.
-v0.8.4 - Fix #71. Classes with the extending class overriding a property cause the property to be serialized twice.
-v0.8.5 - Fix #73. Support for nullable primatives with Box<T> from as-container
-v0.8.6 - Fix. Forgot to stash before publishing. Stash and push what should have been v0.8.5
+# Change Log
 
-v0.9.0 - BREAKING CHANGE - API changed from JSON.parse(data, defaultValues) to JSON.parse(data). Default Values defaults to true. Large update. Refactor all the code, nullable primitives, rewrite the transform, allow extensibility with @omit keywords, and fix a plethora of bugs
-v0.9.1 - Fix #71
-v0.9.2 - Fix #75 + Build sizes significantly reduced
-v0.9.3 - Fix #76
-v0.9.4 - Fix #77
-v0.9.5 - Fix #46
-v0.9.6 - Fix bugs
-v0.9.7 - Update testing framework and readme logo
-v0.9.8 - Update dependencies
-v0.9.8a - Fix #80 - Empty Maps were not serialized to {}, instead, threw memory out of bounds
-v0.9.8b - Fix #81 - Revert transform
-v0.9.9 - Fix #82 - Initialize maps
-v0.9.9a - Remove extraneous logs from transform
-v0.9.10 - Fix transform type checks. switch to nodekind checks
-v0.9.11 - Remove MpZ--implement custom serializers and deserializers in the works
-v0.9.12 - Add compat with aspect
-v0.9.13 - Fix empty strings not indexing correctly
-v0.9.14 - Ignore properties of type Function
-v0.9.15 - Support JSON.Raw blocks
-v0.9.16 - JSON.Raw should be completely untouched
-v0.9.17 - A schema's parent's fields should be included properly
-v0.9.18 - Should be able to use @alias and @omit*** or JSON.Raw
-v0.9.19 - Fix arguments in @omitif declarations not working properly
-v0.9.20 - Strings were being received with quotes attached via the toString functionality. Removed that.
-v0.9.22 - Fix #89 and #93. Several bug fixes some severe such as ",null" being prepended when using @omit. Properly warn when a schema has fields that are not compatible with json
-v0.9.23 - Comment out SIMD-related code for now
-v0.9.24 - Remove transform changes from previous release
-v0.9.25 - Implement JSON.parseSafe
-v0.9.26 - Remove unnecessary dependencies
+## UNRELEASED
 
-[UNRELEASED] v1.0.0
- - Allow nullable primitives
- - Port over JSON.Value
- - Performance improvements
- - Add SIMD support
- - Introduce options
- - Custom serializers
- - Support arbitrary-length integers (@hypercubed/as-mpz)
- - Remove as-container (Box<T>)
+## 2025-01-20 - 1.0.0-alpha.1
+
+- feat: finish implementation of arbitrary data serialization and deserialization using JSON.Value
+- feat: reinstate usage of `JSON.Box<T>()` to support nullable primitive types
+- feat: eliminate the need to import the `JSON` namespace when defining a schema
+- feat: reduce memory usage so that it is viable for low-memory environments
+- feat: write to a central buffer and reduce memory overhead
+- feat: rewrite the transform to properly resolve schemas and link them together
+- feat: pre-allocate and compute the minimum size of a schema to avoid memory out of range errors
