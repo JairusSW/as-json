@@ -17,7 +17,7 @@ class Player {
   lastName!: string;
   lastActive!: i32[];
   // Drop in a code block, function, or expression that evaluates to a boolean
-  // @omitif((self: Player): boolean => self.age <= 18)
+  @omitif((self: Player): boolean => self.age <= 18)
   age!: i32;
 
   @omitnull()
@@ -41,9 +41,4 @@ const player: Player = {
 const stringified = JSON.stringify<Player>(player);
 console.log("Serialized: " + stringified);
 // const parsed = JSON.parse<Player>('{"pos":{"x":3.4,"y":1.2,"z":8.3},"first name":"Jairus","lastName":"Tanaka","lastActive":[1,20,2025],"age":18,"isVerified":true}');
-console.log("Deserialized: " + JSON.stringify<Player>(JSON.parse<Player>('{"pos":{"x":3.4,"y":1.2,"z":8.3},"first name":"Jairus","lastName":"Tanaka","lastActive":[1,20,2025],"age":18,"isVerified":true}')));
-console.log("Deserialized: " + JSON.stringify<Player>(JSON.parse<Player>('{"pos":{"x":3.4,"y":1.2,"z":8.3},"first name":"Jairus","lastName":"Tanaka","lastActive":[1,20,2025],"age":18,"isVerified":true}')));
-console.log("Deserialized: " + JSON.stringify<Player>(JSON.parse<Player>('{"pos":{"x":3.4,"y":1.2,"z":8.3},"first name":"Jairus","lastName":"Tanaka","lastActive":[1,20,2025],"age":18,"isVerified":true}')));
-console.log("Deserialized: " + JSON.stringify<Player>(JSON.parse<Player>('{"pos":{"x":3.4,"y":1.2,"z":8.3},"first name":"Jairus","lastName":"Tanaka","lastActive":[1,20,2025],"age":18,"isVerified":true}')));
-console.log("Deserialized: " + JSON.stringify<Player>(JSON.parse<Player>('{"pos":{"x":3.4,"y":1.2,"z":8.3},"first name":"Jairus","lastName":"Tanaka","lastActive":[1,20,2025],"age":18,"isVerified":true}')));
 console.log("Deserialized: " + JSON.stringify<Player>(JSON.parse<Player>('{"pos":{"x":3.4,"y":1.2,"z":8.3},"first name":"Jairus","lastName":"Tanaka","lastActive":[1,20,2025],"age":18,"isVerified":true}')));
