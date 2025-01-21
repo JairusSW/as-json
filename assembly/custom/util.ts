@@ -2,7 +2,6 @@ import { isSpace } from "util/string";
 import { BACK_SLASH, QUOTE } from "./chars";
 import { Sink } from "./sink";
 
-
 /** Scientific Notation Integer Parsing - SNIP
  * This is absolutely the fastest algorithm I could think of while adding full support for Scientific Notation
  * Loads 32 bits and retrieves the high/low bits.

@@ -1,5 +1,5 @@
 /// <reference path="./index.d.ts" />
-import { bs } from "as-bs";
+import { bs } from "../modules/bs";
 
 import { serializeString } from "./serialize/simple/string";
 import { serializeArray } from "./serialize/simple/array";
@@ -24,8 +24,6 @@ import { serializeObject } from "./serialize/simple/object";
 import { ptrToStr } from "./util/ptrToStr";
 import { bytes } from "./util";
 import { serializeString_SIMD } from "./serialize/simd/string";
-
-class Nullable { }
 
 export type Raw = string;
 
@@ -108,7 +106,7 @@ export namespace JSON {
         return changetype<string>(newBuf);
       }
       serializeString(changetype<string>(data));
-      return bs.shrinkTo<string>();
+      return bs.out<string>();
       // @ts-ignore: Supplied by transform
     } else if (isDefined(data.__SERIALIZE) && isDefined(data.__ALLOCATE)) {
       // @ts-ignore
@@ -117,9 +115,6 @@ export namespace JSON {
       data.__SERIALIZE(changetype<usize>(data));
       return bs.out<string>();
       // @ts-ignore: Supplied by transform
-    } else if (isDefined(data.__SERIALIZE)) {
-      // @ts-ignore
-      return data.__SERIALIZE(changetype<usize>(data));
     } else if (data instanceof Date) {
       out = out ? changetype<string>(__renew(changetype<usize>(out), 52)) : changetype<string>(__new(52, idof<string>()));
 
@@ -130,14 +125,14 @@ export namespace JSON {
     } else if (data instanceof Array) {
       // @ts-ignore
       serializeArray(changetype<nonnull<T>>(data));
-      return bs.shrinkTo<string>();
+      return bs.out<string>();
     } else if (data instanceof Map) {
       // @ts-ignore
       serializeMap(changetype<nonnull<T>>(data));
-      return bs.shrinkTo<string>();
+      return bs.out<string>();
     } else if (data instanceof JSON.Value) {
       serializeArbitrary(data);
-      return bs.shrinkTo<string>();
+      return bs.out<string>();
     } else if (data instanceof JSON.Box) {
       return JSON.stringify(data.value);
     } else {
@@ -170,11 +165,11 @@ export namespace JSON {
       return deserializeString(dataPtr, dataPtr + dataSize);
     } else if (isArray<T>()) {
       // @ts-ignore
-      return deserializeArray<nonnull<T>>(data);
+      return deserializeArray<nonnull<T>>(dataPtr, dataPtr + dataSize, changetype<usize>(instantiate<T>()));
     }
     let type: nonnull<T> = changetype<nonnull<T>>(0);
     // @ts-ignore: Defined by transform
-    if (isDefined(type.__DESERIALIZE)) {
+    if (isDefined(type.__DESERIALIZE) && isDefined(type.__INITIALIZE)) {
       const out = __new(offsetof<nonnull<T>>(), idof<nonnull<T>>());
       // @ts-ignore
       changetype<nonnull<T>>(out).__INITIALIZE();
@@ -345,7 +340,7 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) { }
+    constructor(public value: T) {}
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive

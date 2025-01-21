@@ -1,32 +1,12 @@
 {
   "name": "json-as",
   "version": "1.0.0-alpha.1",
-  "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
-  "types": "assembly/index.ts",
-  "main": "transform/lib/index.js",
   "author": "Jairus Tanaka",
-  "contributors": [
-    "DogWhich",
-    "Romdotdog",
-    "Derek Barrera",
-    "Frankk Taylor",
-    "lekiano",
-    "Florian Guitton",
-    "Matt Johnson-Pint",
-    "Tomáš Hromada"
-  ],
-  "license": "MIT",
-  "scripts": {
-    "test": "rm -rf ./build/ && ast test",
-    "build:bench": "rm -rf ./build/ && asc assembly/__benches__/misc.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime incremental --enable simd --enable bulk-memory",
-    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --enable simd --runtime stub",
-    "build:test:simd": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --enable simd --runtime stub",
-    "test:wasmtime": "wasmtime ./build/test.wasm",
-    "test:wasmer": "wasmer ./build/test.wasm",
-    "build:transform": "tsc -p ./transform",
-    "bench:wasmer": "wasmer ./build/bench.wasm --llvm",
-    "prettier": "prettier -w ."
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JairusSW/as-json.git"
   },
+  "main": "transform/lib/index.js",
   "devDependencies": {
     "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
@@ -41,16 +21,21 @@
     "typescript": "latest",
     "visitor-as": "^0.11.4"
   },
-  "dependencies": {
-    "as-bs": "^1.0.1"
+  "bugs": {
+    "url": "https://github.com/JairusSW/as-json/issues"
   },
-  "overrides": {
-    "assemblyscript": "$assemblyscript"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JairusSW/as-json.git"
-  },
+  "contributors": [
+    "DogWhich",
+    "Romdotdog",
+    "Derek Barrera",
+    "Frankk Taylor",
+    "lekiano",
+    "Florian Guitton",
+    "Matt Johnson-Pint",
+    "Tomáš Hromada"
+  ],
+  "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
+  "homepage": "https://github.com/JairusSW/as-json#readme",
   "keywords": [
     "assemblyscript",
     "json",
@@ -63,12 +48,24 @@
     "fast",
     "algorithm"
   ],
-  "bugs": {
-    "url": "https://github.com/JairusSW/as-json/issues"
+  "license": "MIT",
+  "overrides": {
+    "assemblyscript": "$assemblyscript"
   },
-  "homepage": "https://github.com/JairusSW/as-json#readme",
-  "type": "module",
   "publishConfig": {
     "@JairusSW:registry": "https://npm.pkg.github.com"
-  }
+  },
+  "scripts": {
+    "test": "rm -rf ./build/ && ast test",
+    "build:bench": "rm -rf ./build/ && asc assembly/__benches__/misc.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime incremental --enable simd --enable bulk-memory",
+    "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --enable simd --runtime stub",
+    "build:test:simd": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --enable simd --runtime stub",
+    "test:wasmtime": "wasmtime ./build/test.wasm",
+    "test:wasmer": "wasmer ./build/test.wasm",
+    "build:transform": "tsc -p ./transform",
+    "bench:wasmer": "wasmer ./build/bench.wasm --llvm",
+    "prettier": "prettier -w ."
+  },
+  "type": "module",
+  "types": "assembly/index.ts"
 }

@@ -1,6 +1,6 @@
 import { JSON } from "../..";
 import { BRACE_LEFT, BRACE_RIGHT, COLON, COMMA } from "../../custom/chars";
-import { bs } from "as-bs";
+import { bs } from "../../../modules/bs";
 
 export function serializeMap<T extends Map<any, any>>(src: T): void {
   const srcSize = src.size;

@@ -53,7 +53,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
           srcStart += 2;
         }
         // @ts-ignore: type
-      } else if (!isBoolean<valueof<T>>() && isInteger<valueof<T>>() && code - 48 <= 9 || code == 45) {
+      } else if ((!isBoolean<valueof<T>>() && isInteger<valueof<T>>() && code - 48 <= 9) || code == 45) {
         lastIndex = srcStart;
         srcStart += 2;
         while (srcStart < srcEnd) {
@@ -113,7 +113,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
       } else if (isBoolean<valueof<T>>() && code == CHAR_T) {
         if (load<u64>(srcStart) == 28429475166421108) {
           // @ts-ignore: type
-          out.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 8));
+          out.set(key, JSON.__deserialize<valueof<T>>(srcStart, (srcStart += 8)));
           while (isSpace(load<u16>((srcStart += 2)))) {
             /* empty */
           }
@@ -123,7 +123,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
       } else if (isBoolean<valueof<T>>() && code == CHAR_F) {
         if (load<u64>(srcStart, 2) == 28429466576093281) {
           // @ts-ignore: type
-          out.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 10));
+          out.set(key, JSON.__deserialize<valueof<T>>(srcStart, (srcStart += 10)));
           while (isSpace(load<u16>((srcStart += 2)))) {
             /* empty */
           }
@@ -132,14 +132,14 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
       } else if ((isNullable<T>() || nameof<T>() == "usize") && code == CHAR_N) {
         if (load<u64>(srcStart) == 30399761348886638) {
           // @ts-ignore: type
-          out.set(key, JSON.__deserialize<valueof<T>>(srcStart, srcStart += 8));
+          out.set(key, JSON.__deserialize<valueof<T>>(srcStart, (srcStart += 8)));
           while (isSpace(load<u16>((srcStart += 2)))) {
             /* empty */
           }
         }
       } else {
         // @ts-ignore: type
-        throw new Error("Unexpected character " + String.fromCharCode(code) + " or type " + nameof<valueof<T>>() + " does not match found type!")
+        throw new Error("Unexpected character " + String.fromCharCode(code) + " or type " + nameof<valueof<T>>() + " does not match found type!");
       }
     }
   }
