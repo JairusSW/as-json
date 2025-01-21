@@ -133,6 +133,16 @@ class JSONTransform extends Visitor {
             SERIALIZE += indent + "store<u16>(bs.offset, 123, 0); // {\n";
             SERIALIZE += indent + "bs.offset += 2;\n";
         }
+        for (const member of this.schema.members) {
+            const nonNullType = member.type.replace(" | null", "");
+            if (!isPrimitive(nonNullType)) {
+                const schema = this.schemas.find(v => v.name == nonNullType);
+                if (schema && !this.schema.deps.includes(schema)) {
+                    this.schema.deps.push(schema);
+                    this.schema.byteSize += schema.byteSize;
+                }
+            }
+        }
         let isPure = this.schema.static;
         let isRegular = isPure;
         let isFirst = true;

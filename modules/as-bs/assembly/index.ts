@@ -34,8 +34,8 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function ensureCapacity(size: u32): void {
-    const newSize = offset + size;
-    if (newSize > maxOffset) {
+    const newSize: usize = offset + size;
+    if (newSize > byteLength) {
       const newPtr = __renew(buffer, (byteLength = nextPowerOf2(newSize - buffer)));
       offset = offset - buffer + newPtr;
       maxOffset = newPtr + byteLength;
@@ -50,10 +50,11 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function ensureSize(size: u32): void {
-    const newSize = offset + size;
-    if (newSize > maxOffset) {
-      const newPtr = __renew(buffer, (byteLength = newSize - buffer));
-      offset = offset - buffer + newPtr;
+    const newSize: usize = offset + size;
+    if (newSize > byteLength) {
+      byteLength += size;
+      const newPtr = __renew(buffer, byteLength);
+      offset = (offset - buffer) + newPtr;
       maxOffset = newPtr + byteLength;
       buffer = newPtr;
     }

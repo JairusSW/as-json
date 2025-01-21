@@ -9,6 +9,8 @@
 - fix: remove AS201 'conversion from type usize to i32' warning
 - fix: add as-bs to peer dependencies so only one version is installed
 - fix: point as-bs imports to submodule
+- fix: remove submodule in favor of static module
+- fix: bs.ensureSize would not grow and thus cause memory faults
 
 ## 2025-01-20 - 1.0.0-alpha.1
 
