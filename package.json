@@ -8,7 +8,7 @@
   },
   "main": "transform/lib/index.js",
   "devDependencies": {
-    "@as-tral/cli": "^3.0.2",
+    "as-bs": "./modules/as-bs/",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "@types/node": "latest",
     "as-bench": "^0.0.0-alpha",
@@ -16,13 +16,9 @@
     "as-test": "^0.3.5",
     "assemblyscript": "^0.27.31",
     "assemblyscript-prettier": "^3.0.1",
-    "minimatch": "^10.0.1",
     "prettier": "^3.4.2",
     "typescript": "latest",
     "visitor-as": "^0.11.4"
-  },
-  "peerDependencies": {
-    "as-bs": "latest"
   },
   "bugs": {
     "url": "https://github.com/JairusSW/as-json/issues"
