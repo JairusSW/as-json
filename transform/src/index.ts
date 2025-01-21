@@ -405,20 +405,9 @@ class JSONTransform extends Visitor {
     //   }
     // }
     if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-
-      let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../modules/bs/index.ts"));
-
-      if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
-      // if (!existsSync(relativePath)) {
-      //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
-      // }
-
-      const txt = `import { bs } from "${relativePath}";`;
-      if (!this.jsonImport) {
-        this.jsonImport = txt;
-        if (process.env["JSON_DEBUG"]) console.log("Added bs import: " + txt + "\n");
+      if (!this.bsImport) {
+        this.bsImport = "import { bs } from \"as-bs\"";
+        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + this.bsImport + "\n");
       }
     }
 

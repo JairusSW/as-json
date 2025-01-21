@@ -5,6 +5,7 @@
 ## 2025-01-20 - 1.0.0-alpha.2
 
 - fix: disable SIMD in generated transform code by default
+- fix: re-add as-bs dependency so that it will not break in non-local environments
 
 ## 2025-01-20 - 1.0.0-alpha.1
 

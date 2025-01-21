@@ -1,5 +1,5 @@
 import { bench } from "as-bench/assembly/bench";
-import { bs } from "../../modules/bs";
+import { bs } from "as-bs";
 import { deserializeString_SIMD } from "../deserialize/simd/string";
 import { deserializeString } from "../deserialize/simple/string";
 import { bytes } from "../util/bytes";

@@ -1,5 +1,5 @@
 /// <reference path="./index.d.ts" />
-import { bs } from "../modules/bs";
+import { bs } from "as-bs";
 
 import { serializeString } from "./serialize/simple/string";
 import { serializeArray } from "./serialize/simple/array";
@@ -23,7 +23,6 @@ import { serializeFloat } from "./serialize/simple/float";
 import { serializeObject } from "./serialize/simple/object";
 import { ptrToStr } from "./util/ptrToStr";
 import { bytes } from "./util";
-import { serializeString_SIMD } from "./serialize/simd/string";
 
 export type Raw = string;
 
@@ -340,7 +339,7 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) {}
+    constructor(public value: T) { }
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive
@@ -375,11 +374,7 @@ export namespace JSON {
       store<u64>(bs.offset, 30399761348886638);
       bs.offset += 8;
     } else if (isString<nonnull<T>>()) {
-      if (ASC_FEATURE_SIMD) {
-        serializeString_SIMD(src as string);
-      } else {
-        serializeString(src as string);
-      }
+      serializeString(src as string);
       // @ts-ignore: Supplied by transform
     } else if (isDefined(src.__SERIALIZE)) {
       // @ts-ignore
