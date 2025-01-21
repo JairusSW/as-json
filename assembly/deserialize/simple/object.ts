@@ -9,7 +9,7 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
   let keyEnd: usize = 0;
   let isKey = false;
   let depth = 0;
-  let lastIndex = 0;
+  let lastIndex: usize = 0;
 
   // while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
   // while (srcEnd > srcStart && isSpace(load<u16>(srcEnd))) srcEnd -= 2;

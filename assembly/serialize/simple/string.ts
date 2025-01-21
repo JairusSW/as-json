@@ -18,7 +18,7 @@ export function serializeString(src: string): void {
   store<u16>(bs.offset, QUOTE);
   bs.offset += 2;
 
-  let lastPtr: i32 = srcPtr;
+  let lastPtr: usize = srcPtr;
   while (srcPtr < srcEnd) {
     const code = load<u16>(srcPtr);
     if (code == 34 || code == 92 || code < 32) {
