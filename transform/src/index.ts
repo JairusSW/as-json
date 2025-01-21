@@ -398,12 +398,6 @@ class JSONTransform extends Visitor {
     super.visitSource(node);
   }
   addRequiredImports(node: ClassDeclaration): void {
-    // if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
-    //   if (!this.bsImport) {
-    //     this.bsImport = 'import { bs } from "as-bs"';
-    //     if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + this.bsImport + "\n");
-    //   }
-    // }
     if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
       if (!this.bsImport) {
         this.bsImport = "import { bs } from \"as-bs\"";
