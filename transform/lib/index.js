@@ -387,7 +387,7 @@ class JSONTransform extends Visitor {
             }
         }
     }
-    getStores(data, simd = true) {
+    getStores(data, simd = false) {
         const out = [];
         const sizes = strToNum(data, simd);
         let offset = 0;
