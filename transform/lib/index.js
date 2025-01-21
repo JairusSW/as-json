@@ -209,7 +209,7 @@ class JSONTransform extends Visitor {
                     if (member.flags.get(PropertyFlags.OmitIf).kind == 14) {
                         const arg = member.flags.get(PropertyFlags.OmitIf);
                         arg.declaration.signature.returnType.name = Node.createSimpleTypeName("boolean", arg.declaration.signature.returnType.name.range);
-                        SERIALIZE += indent + `if ((${toString(member.flags.get(PropertyFlags.OmitIf))})(this)) {\n`;
+                        SERIALIZE += indent + `if (!(${toString(member.flags.get(PropertyFlags.OmitIf))})(this)) {\n`;
                     }
                     else {
                         SERIALIZE += indent + `if (${toString(member.flags.get(PropertyFlags.OmitIf))}) {\n`;
