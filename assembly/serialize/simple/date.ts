@@ -1,4 +1,4 @@
-import { bs } from "as-bs";
+import { bs } from "../../../modules/as-bs";
 import { QUOTE } from "../../custom/chars";
 import { bytes } from "../../util/bytes";
 

@@ -398,10 +398,27 @@ class JSONTransform extends Visitor {
     super.visitSource(node);
   }
   addRequiredImports(node: ClassDeclaration): void {
+    // if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
+    //   if (!this.bsImport) {
+    //     this.bsImport = "import { bs } from \"as-bs\"";
+    //     if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + this.bsImport + "\n");
+    //   }
+    // }
     if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+
+      let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../modules/as-bs/"));
+
+      if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
+      // if (!existsSync(relativePath)) {
+      //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
+      // }
+
+      const txt = `import { bs } from "${relativePath}";`;
       if (!this.bsImport) {
-        this.bsImport = "import { bs } from \"as-bs\"";
-        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + this.bsImport + "\n");
+        this.bsImport = txt;
+        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
       }
     }
 

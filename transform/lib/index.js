@@ -361,10 +361,16 @@ class JSONTransform extends Visitor {
     }
     addRequiredImports(node) {
         if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = path.dirname(__filename);
+            let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../modules/as-bs/"));
+            if (!relativePath.startsWith(".") && !relativePath.startsWith("/"))
+                relativePath = "./" + relativePath;
+            const txt = `import { bs } from "${relativePath}";`;
             if (!this.bsImport) {
-                this.bsImport = "import { bs } from \"as-bs\"";
+                this.bsImport = txt;
                 if (process.env["JSON_DEBUG"])
-                    console.log("Added as-bs import: " + this.bsImport + "\n");
+                    console.log("Added as-bs import: " + txt + "\n");
             }
         }
         if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "JSON"))) {

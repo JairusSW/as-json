@@ -1,4 +1,4 @@
-import { bs } from "as-bs";
+import { bs } from "../../../modules/as-bs";
 import { BACK_SLASH } from "../../custom/chars";
 import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
 import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
