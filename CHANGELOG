@@ -11,6 +11,7 @@
 - fix: point as-bs imports to submodule
 - fix: remove submodule in favor of static module
 - fix: bs.ensureSize would not grow and thus cause memory faults
+- fix: bs.ensureSize triggering unintentionally
 
 ## 2025-01-20 - 1.0.0-alpha.1
 

@@ -51,7 +51,7 @@ export namespace bs {
   // @ts-ignore: Decorator valid here
   @inline export function ensureSize(size: u32): void {
     const newSize: usize = offset + size;
-    if (newSize > byteLength) {
+    if (newSize > maxOffset) {
       byteLength += size;
       const newPtr = __renew(buffer, byteLength);
       offset = (offset - buffer) + newPtr;
@@ -99,11 +99,9 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function shrink(): void {
-    if (offset > maxOffset) {
-      byteLength = offset - buffer;
-      buffer = __renew(buffer, byteLength);
-      maxOffset = byteLength + buffer;
-    }
+    byteLength = offset - buffer;
+    buffer = __renew(buffer, byteLength);
+    maxOffset = byteLength + buffer; 
   }
 
   /**
