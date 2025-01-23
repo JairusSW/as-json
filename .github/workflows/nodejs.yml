@@ -18,6 +18,9 @@ jobs:
 
       - name: Install Dependencies
         run: bun install
+      
+      - name: Link local package
+        run: bun link && bun link json-as
 
       - name: Build Tests
         run: bun run pretest
