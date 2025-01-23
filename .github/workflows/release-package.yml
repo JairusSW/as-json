@@ -23,9 +23,6 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: yarn
 
-      - name: Link local package
-        run: yarn link && yarn link json-as
-
       - name: Build tests
         run: yarn run tests:build
 
