@@ -6,7 +6,7 @@ import { QUOTE } from "../custom/chars";
   const d = Date.fromString(dateTimeString.slice(1, -1));
 
   // Return a new object instead of the one that the parser returned.
-  // This may seem redundant, but addreses the issue when Date
+  // This may seem redundant, but addresses the issue when Date
   // is globally aliased to wasi_Date (or some other superclass).
   return new Date(d.getTime());
 }
