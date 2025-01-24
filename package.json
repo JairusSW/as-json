@@ -37,6 +37,7 @@
     "assemblyscript": "^0.27.29",
     "assemblyscript-prettier": "^3.0.1",
     "benchmark": "^2.1.4",
+    "json-as": "file:.",
     "microtime": "^3.1.1",
     "prettier": "^3.3.3",
     "tinybench": "^2.8.0",
