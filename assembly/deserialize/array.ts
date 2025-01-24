@@ -41,6 +41,6 @@ export function deserializeArray<T extends unknown[]>(data: string): T {
 // @ts-ignore: Decorator valid here
 export function deserializeArray_Safe<T extends unknown[]>(data: string): T {
   const firstChar = load<u8>(changetype<usize>(data));
-  if (firstChar != BRACKET_LEFT) throw new Error("Mismatched Types! Expected " + nameof<T>() + " but got \"" + data.slice(0, 100) + "\" instead!");
+  if (firstChar != BRACKET_LEFT) throw new Error("Mismatched Types! Expected " + nameof<T>() + ' but got "' + data.slice(0, 100) + '" instead!');
   return deserializeArray<T>(data);
 }
