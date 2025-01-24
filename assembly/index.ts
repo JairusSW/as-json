@@ -162,6 +162,7 @@ export namespace JSON {
   export class Box<T> {
     constructor(public value: T) {}
 
+
     @inline static from<T>(value: T): Box<T> {
       return new Box(value);
     }

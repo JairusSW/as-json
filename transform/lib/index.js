@@ -62,6 +62,7 @@ class JSONTransform extends BaseVisitor {
       if (member.flags == 32) continue;
       if (member.flags === 512) continue;
       if (member.flags === 1024) continue;
+      if (member.decorators.some((v) => v.name.text == "omit")) continue;
       const mem = new Property();
       mem.name = name.text;
       mem.type = type;

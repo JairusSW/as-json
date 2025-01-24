@@ -12,6 +12,7 @@ export class ObjWithStrangeKey<T> {
   data!: T;
 }
 
+
 @json
 export class ObjectWithStringArray {
   sa!: string[];
@@ -86,9 +87,11 @@ export type Null = Nullable | null;
 export class OmitIf {
   x: i32 = 1;
 
+
   @omitif("this.y == -1")
   y: i32 = -1;
   z: i32 = 1;
+
 
   @omitnull()
   foo: string | null = null;

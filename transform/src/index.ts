@@ -82,6 +82,7 @@ class JSONTransform extends BaseVisitor {
       if (member.flags == CommonFlags.Static) continue;
       if (member.flags === CommonFlags.Private) continue;
       if (member.flags === CommonFlags.Protected) continue;
+      if (member.decorators.some((v) => (v.name as IdentifierExpression).text == "omit")) continue;
 
       const mem = new Property();
       mem.name = name.text;
