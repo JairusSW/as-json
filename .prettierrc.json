@@ -1,4 +1,6 @@
 {
   "singleQuote": false,
-  "printWidth": 65536
+  "printWidth": 65536,
+  "pluginSearchDirs": ["node_modules"],
+  "plugins": ["assemblyscript-prettier"]
 }
