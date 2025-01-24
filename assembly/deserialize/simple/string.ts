@@ -4,6 +4,7 @@ import { DESERIALIZE_ESCAPE_TABLE, ESCAPE_HEX_TABLE } from "../../globals/tables
 export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): string {
   srcStart += 2;
   srcEnd -= 2;
+  const startPtr = srcStart;
   if (dst == 0) dst = __new(srcEnd - srcStart, idof<string>());
   let dstPtr = dst;
   let lastPtr = srcStart;
@@ -43,6 +44,7 @@ export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): s
   memory.copy(dstPtr, lastPtr, remBytes);
   dstPtr += remBytes;
 
-  if (lastPtr != srcStart) dst = __renew(dst, dstPtr - dst);
+  console.log("Len: " + (dstPtr - dst).toString())
+  if (lastPtr != startPtr) dst = __renew(dst, dstPtr - dst);
   return changetype<string>(dst);
 }

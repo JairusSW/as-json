@@ -161,7 +161,7 @@ export namespace JSON {
       return null;
     } else if (isString<T>()) {
       // @ts-ignore
-      return deserializeString(dataPtr, dataPtr + dataSize);
+      return deserializeString(dataPtr, dataPtr + dataSize, __new(dataSize - 4, idof<string>()));
     } else if (isArray<T>()) {
       // @ts-ignore
       return deserializeArray<nonnull<T>>(dataPtr, dataPtr + dataSize, changetype<usize>(instantiate<T>()));
@@ -339,7 +339,7 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) {}
+    constructor(public value: T) { }
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive

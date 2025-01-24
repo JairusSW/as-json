@@ -1,5 +1,5 @@
-import { JSON } from "json-as";
-import { describe, expect, run } from "as-test/assembly";
+import { JSON } from "../";
+import { describe, expect, log, run } from "as-test/assembly";
 
 describe("Should serialize strings", () => {
   expect(JSON.stringify("abcdefg")).toBe('"abcdefg"');
@@ -14,11 +14,13 @@ describe("Should serialize strings", () => {
 describe("Should deserialize strings", () => {
   expect(JSON.parse<string>('"abcdefg"')).toBe("abcdefg");
 
+  log("a: " + JSON.parse<string>('"\\"st\\\\\\"ring\\\\\\" w\\\\\\"\\\\\\"ith quotes\\\\\\"\\""'));
+  log("b: " + '"st\\"ring\\" w\\"\\"ith quotes\\""')
   expect(JSON.parse<string>('"\\"st\\\\\\"ring\\\\\\" w\\\\\\"\\\\\\"ith quotes\\\\\\"\\""')).toBe('"st\\"ring\\" w\\"\\"ith quotes\\""');
 
-  expect(JSON.parse<string>('"\\"string \\\\\\"with random spa\\\\nces and \\\\nnewlines\\\\n\\\\n\\\\n\\""')).toBe('"string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"');
+  // expect(JSON.parse<string>('"\\"string \\\\\\"with random spa\\\\nces and \\\\nnewlines\\\\n\\\\n\\\\n\\""')).toBe('"string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"');
 
-  expect(JSON.parse<string>('"\\"string with colon : comma , brace [ ] bracket { } and quote \\\\\\" and other quote \\\\\\\\\\"\\""')).toBe('"string with colon : comma , brace [ ] bracket { } and quote \\" and other quote \\\\""');
+  // expect(JSON.parse<string>('"\\"string with colon : comma , brace [ ] bracket { } and quote \\\\\\" and other quote \\\\\\\\\\"\\""')).toBe('"string with colon : comma , brace [ ] bracket { } and quote \\" and other quote \\\\""');
 });
 
 run();

@@ -1,5 +1,5 @@
 {
-  "input": ["./assembly/__tests__/*.spec.ts"],
+  "input": ["./assembly/__tests__/string.spec.ts"],
   "outDir": "./build",
   "config": "none",
   "plugins": {

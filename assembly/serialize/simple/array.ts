@@ -19,7 +19,7 @@ export function serializeArray<T extends any[]>(src: T): void {
   while (i < end) {
     const block = unchecked(src[i++]);
     JSON.__serialize<valueof<T>>(block);
-    bs.ensureSize(2);
+    bs.addSize(2);
     store<u16>(bs.offset, COMMA);
     bs.offset += 2;
   }

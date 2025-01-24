@@ -45,13 +45,13 @@ export function serializeString_SIMD(src: string): void {
       mask &= mask - 1;
 
       if ((escaped & 0xffff) != BACK_SLASH) {
-        bs.ensureSize(10);
+        bs.addSize(10);
         store<u64>(dst_offset, 13511005048209500);
         store<u32>(dst_offset, escaped, 8);
         v128.store(dst_offset, v128.load(src_offset, 2), 12);
         bs.offset += 10;
       } else {
-        bs.ensureSize(2);
+        bs.addSize(2);
         store<u32>(dst_offset, escaped);
         v128.store(dst_offset, v128.load(src_offset, 2), 4);
         bs.offset += 2;
@@ -84,7 +84,7 @@ export function serializeString_SIMD(src: string): void {
       mask &= mask - 1;
 
       if ((escaped & 0xffff) != BACK_SLASH) {
-        bs.ensureSize(10);
+        bs.addSize(10);
         store<u64>(dst_offset, 13511005048209500);
         store<u32>(dst_offset, escaped, 8);
         while (lane_index < 6) {
@@ -93,7 +93,7 @@ export function serializeString_SIMD(src: string): void {
         }
         bs.offset += 10;
       } else {
-        bs.ensureSize(2);
+        bs.addSize(2);
         store<u32>(dst_offset, escaped);
 
         while (lane_index < 6) {
@@ -116,12 +116,12 @@ export function serializeString_SIMD(src: string): void {
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (codeA << 2));
 
       if ((escaped & 0xffff) != BACK_SLASH) {
-        bs.ensureSize(10);
+        bs.addSize(10);
         store<u64>(bs.offset, 13511005048209500);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        bs.ensureSize(2);
+        bs.addSize(2);
         store<u32>(bs.offset, escaped);
         bs.offset += 4;
       }
@@ -134,12 +134,12 @@ export function serializeString_SIMD(src: string): void {
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (codeB << 2));
 
       if ((escaped & 0xffff) != BACK_SLASH) {
-        bs.ensureSize(10);
+        bs.addSize(10);
         store<u64>(bs.offset, 13511005048209500);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        bs.ensureSize(2);
+        bs.addSize(2);
         store<u32>(bs.offset, escaped);
         bs.offset += 4;
       }
@@ -156,12 +156,12 @@ export function serializeString_SIMD(src: string): void {
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
 
       if ((escaped & 0xffff) != BACK_SLASH) {
-        bs.ensureSize(10);
+        bs.addSize(10);
         store<u64>(bs.offset, 13511005048209500);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        bs.ensureSize(2);
+        bs.addSize(2);
         store<u32>(bs.offset, escaped);
         bs.offset += 4;
       }

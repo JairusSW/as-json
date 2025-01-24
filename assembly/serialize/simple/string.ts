@@ -3,6 +3,7 @@ import { bytes } from "../../util/bytes";
 import { bs } from "../../../modules/as-bs";
 import { BACK_SLASH, QUOTE } from "../../custom/chars";
 import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
+import { ptrToStr } from "../../util/ptrToStr";
 
 /**
  * Serializes valid strings into their JSON counterpart
@@ -27,12 +28,12 @@ export function serializeString(src: string): void {
       bs.offset += remBytes;
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
       if ((escaped & 0xffff) != BACK_SLASH) {
-        bs.ensureSize(10);
+        bs.addSize(10);
         store<u64>(bs.offset, 13511005048209500, 0);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        bs.ensureSize(2);
+        bs.addSize(2);
         store<u32>(bs.offset, escaped, 0);
         bs.offset += 4;
       }

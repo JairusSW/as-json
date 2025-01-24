@@ -61,6 +61,23 @@ export namespace bs {
   }
 
   /**
+   * Adds length to the buffer size.
+   * If necessary, reallocates the buffer to the exact new size.
+   * @param size - The size to ensure.
+   */
+  // @ts-ignore: Decorator valid here
+  @inline export function addSize(size: u32): void {
+    const newSize: usize = offset + size;
+    if (newSize > maxOffset) {
+      byteLength += size;
+      const newPtr = __renew(buffer, byteLength);
+      offset = offset - buffer + newPtr;
+      maxOffset = newPtr + byteLength;
+      buffer = newPtr;
+    }
+  }
+
+  /**
    * Resizes the buffer to the specified size.
    * @param newSize - The new buffer size.
    */
