@@ -1,27 +1,34 @@
+
 @json
 export class ObjWithString {
   s!: string;
 }
 
+
 @json
 export class ObjWithStrangeKey<T> {
+
   @alias('a\\\t"\x02b`c')
   data!: T;
 }
+
 @json
 export class ObjectWithStringArray {
   sa!: string[];
 }
+
 
 @json
 export class ObjectWithFloat {
   f!: f64;
 }
 
+
 @json
 export class ObjectWithFloatArray {
   fa!: f64[];
 }
+
 
 @json
 export class BaseObject {
@@ -30,6 +37,7 @@ export class BaseObject {
     this.a = a;
   }
 }
+
 
 @json
 export class DerivedObject extends BaseObject {
@@ -40,6 +48,7 @@ export class DerivedObject extends BaseObject {
   }
 }
 
+
 @json
 export class Map4 {
   a: string;
@@ -47,6 +56,7 @@ export class Map4 {
   c: string;
   d: string;
 }
+
 
 @json
 export class Vec3 {
@@ -56,6 +66,7 @@ export class Vec3 {
 
   static shouldIgnore: string = "should not be serialized";
 }
+
 
 @json
 export class Player {
@@ -70,12 +81,15 @@ export class Player {
 export class Nullable {}
 export type Null = Nullable | null;
 
+
 @json
 export class OmitIf {
   x: i32 = 1;
+
   @omitif("this.y == -1")
   y: i32 = -1;
   z: i32 = 1;
+
   @omitnull()
   foo: string | null = null;
 }

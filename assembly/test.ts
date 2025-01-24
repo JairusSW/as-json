@@ -1,5 +1,6 @@
 import { JSON } from ".";
 
+
 @json
 class Vec3 {
   public x: i32 = 0;

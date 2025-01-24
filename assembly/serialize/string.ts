@@ -32,7 +32,7 @@ import { Sink } from "../custom/sink";
 
 // /**
 //  * A prototype SIMD implementation for string serialization which can only work in 128-byte (or 16 chars with wtf-16).
-//  * 
+//  *
 //  * A faster version could perhaps look like the following:
 //  */
 // // @ts-ignore: Decorator
@@ -77,7 +77,6 @@ import { Sink } from "../custom/sink";
 //     }
 // }
 
-
 // const back_slash_reg = i16x8.splat(92); // "\"
 // const quote_reg = i16x8.splat(34); // "\""
 
@@ -96,7 +95,6 @@ import { Sink } from "../custom/sink";
 //         const quote_mask = i16x8.eq(block, quote_reg);
 //         const is_quote_or_backslash = v128.or(quote_mask, backslash_mask);
 //         console.log("mask:  " + prt10(is_quote_or_backslash))
-        
 
 //         // store<v128>(dst_ptr, expanded);
 //         src_ptr += 8;
@@ -146,66 +144,66 @@ import { Sink } from "../custom/sink";
 
 // @ts-ignore: Decorator
 @inline export function serializeString(data: string): string {
-    // if (!needsEscaping(data)) {
-    //     return "\"" + data + "\"";
-    // }
+  // if (!needsEscaping(data)) {
+  //     return "\"" + data + "\"";
+  // }
 
-    if (data.length === 0) {
-        return "\"\"";
-    }
-    let result = Sink.fromString("\"");
+  if (data.length === 0) {
+    return '""';
+  }
+  let result = Sink.fromString('"');
 
-    let last: i32 = 0;
-    for (let i = 0; i < data.length; i++) {
-        const char = unsafeCharCodeAt(<string>data, i);
-        if (char === 34 || char === 92) {
-            result.write(<string>data, last, i);
-            result.writeCodePoint(92);
-            last = i;
-        } else if (char < 16) {
-            result.write(<string>data, last, i);
-            last = i + 1;
-            switch (char) {
-                case 8: {
-                    result.write("\\b");
-                    break;
-                }
-                case 9: {
-                    result.write("\\t");
-                    break;
-                }
-                case 10: {
-                    result.write("\\n");
-                    break;
-                }
-                case 12: {
-                    result.write("\\f");
-                    break;
-                }
-                case 13: {
-                    result.write("\\r");
-                    break;
-                }
-                default: {
-                    // all chars 0-31 must be encoded as a four digit unicode escape sequence
-                    // \u0000 to \u000f handled here
-                    result.write("\\u000");
-                    result.write(char.toString(16));
-                    break;
-                }
-            }
-        } else if (char < 32) {
-            result.write(<string>data, last, i);
-            last = i + 1;
-            // all chars 0-31 must be encoded as a four digit unicode escape sequence
-            // \u0010 to \u001f handled here
-            result.write("\\u00");
-            result.write(char.toString(16));
+  let last: i32 = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = unsafeCharCodeAt(<string>data, i);
+    if (char === 34 || char === 92) {
+      result.write(<string>data, last, i);
+      result.writeCodePoint(92);
+      last = i;
+    } else if (char < 16) {
+      result.write(<string>data, last, i);
+      last = i + 1;
+      switch (char) {
+        case 8: {
+          result.write("\\b");
+          break;
         }
+        case 9: {
+          result.write("\\t");
+          break;
+        }
+        case 10: {
+          result.write("\\n");
+          break;
+        }
+        case 12: {
+          result.write("\\f");
+          break;
+        }
+        case 13: {
+          result.write("\\r");
+          break;
+        }
+        default: {
+          // all chars 0-31 must be encoded as a four digit unicode escape sequence
+          // \u0000 to \u000f handled here
+          result.write("\\u000");
+          result.write(char.toString(16));
+          break;
+        }
+      }
+    } else if (char < 32) {
+      result.write(<string>data, last, i);
+      last = i + 1;
+      // all chars 0-31 must be encoded as a four digit unicode escape sequence
+      // \u0010 to \u001f handled here
+      result.write("\\u00");
+      result.write(char.toString(16));
     }
-    result.write(<string>data, last);
-    result.writeCodePoint(34);
-    return result.toString();
+  }
+  result.write(<string>data, last);
+  result.writeCodePoint(34);
+  return result.toString();
 }
 
 // // @ts-ignore: Decorator valid here
@@ -217,7 +215,6 @@ import { Sink } from "../custom/sink";
 //     }
 
 //     bs.write_16(QUOTE);
-
 
 //     let last: i32 = 0;
 //     for (let i = 0; i < len; i += 2) {

@@ -43,7 +43,7 @@ export namespace JSON {
     Bool = 7,
     String = 8,
     Obj = 8,
-    Array = 9
+    Array = 9,
   }
   export type Raw = string;
   export class Value {
@@ -52,7 +52,9 @@ export namespace JSON {
     // @ts-ignore
     private storage: u64;
 
-    private constructor() { unreachable(); }
+    private constructor() {
+      unreachable();
+    }
 
     /**
      * Creates an JSON.Value instance from a given value.
@@ -125,12 +127,18 @@ export namespace JSON {
      */
     toString(): string {
       switch (this.type) {
-        case JSON.Types.U8: return this.get<u8>().toString();
-        case JSON.Types.U16: return this.get<u16>().toString();
-        case JSON.Types.U32: return this.get<u32>().toString();
-        case JSON.Types.U64: return this.get<u64>().toString();
-        case JSON.Types.String: return "\"" + this.get<string>() + "\"";
-        case JSON.Types.Bool: return this.get<boolean>() ? "true" : "false";
+        case JSON.Types.U8:
+          return this.get<u8>().toString();
+        case JSON.Types.U16:
+          return this.get<u16>().toString();
+        case JSON.Types.U32:
+          return this.get<u32>().toString();
+        case JSON.Types.U64:
+          return this.get<u64>().toString();
+        case JSON.Types.String:
+          return '"' + this.get<string>() + '"';
+        case JSON.Types.Bool:
+          return this.get<boolean>() ? "true" : "false";
         default: {
           const arr = this.get<JSON.Value[]>();
           if (!arr.length) return "[]";
@@ -152,7 +160,8 @@ export namespace JSON {
     }
   }
   export class Box<T> {
-    constructor(public value: T) { }
+    constructor(public value: T) {}
+
     @inline static from<T>(value: T): Box<T> {
       return new Box(value);
     }
@@ -166,7 +175,7 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  export function stringify<T>(data: T/*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
+  export function stringify<T>(data: T /*, options: SerializeOptions = DEFAULT_SERIALIZE_OPTIONS*/): string {
     if (isBoolean<T>()) {
       return serializeBool(data as bool);
     } else if (isInteger<T>() && nameof<T>() == "usize" && data == 0) {
@@ -201,9 +210,7 @@ export namespace JSON {
       // @ts-ignore
       return serializeMap(changetype<nonnull<T>>(data));
     } else {
-      throw new Error(
-        `Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
+      throw new Error(`Could not serialize data of type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
   }
   /**
@@ -243,9 +250,7 @@ export namespace JSON {
       // @ts-ignore
       return deserializeDate(data);
     } else {
-      throw new Error(
-        `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
+      throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
   }
   /**
@@ -287,9 +292,7 @@ export namespace JSON {
       // @ts-ignore
       return deserializeDate_Safe(data);
     } else {
-      throw new Error(
-        `Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`
-      );
+      throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
   }
 }
