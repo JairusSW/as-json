@@ -1,19 +1,20 @@
 import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
 
-let maxOffset: usize = __new(0, idof<ArrayBuffer>());
-
 /**
  * Central buffer namespace for managing memory operations.
  */
 export namespace bs {
-  /** Current buffer pointer. */
-  export let buffer: usize = maxOffset;
+  /** Current buffer pointer. */ // @ts-ignore
+  export let buffer: usize = __new(32, idof<ArrayBuffer>());
 
   /** Current offset within the buffer. */
-  export let offset: usize = maxOffset;
+  export let offset: usize = buffer;
 
   /** Byte length of the buffer. */
   export let byteLength: usize = 0;
+
+  /** Maximum offset of the buffer. */
+  export let maxOffset: usize = buffer + 32;
 
   /** Proposed size of output */
   export let realSize: usize = offset;
@@ -25,9 +26,10 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function proposeSize(size: u32): void {
+    console.log("Propose: " + size.toString());
     realSize = offset + size;
     if (realSize > maxOffset) {
-      byteLength += size;
+      byteLength += nextPowerOf2(size);
       const newPtr = __renew(buffer, byteLength);
       offset = offset - buffer + newPtr;
       maxOffset = newPtr + byteLength;
@@ -36,12 +38,13 @@ export namespace bs {
   }
 
   /**
-   * Increases the proposed size by nextPowerOf2(n + 8).
+   * Increases the proposed size by nextPowerOf2(n + 8) if necessary.
    * If necessary, reallocates the buffer to the exact new size.
    * @param size - The size to grow by.
    */
   // @ts-ignore: Decorator valid here
   @inline export function growSize(size: u32): void {
+    console.log("Grow: " + size.toString());
     realSize += size;
     if (realSize > maxOffset) {
       byteLength += nextPowerOf2(size + 8);
@@ -61,29 +64,9 @@ export namespace bs {
     const newPtr = __renew(buffer, newSize);
     byteLength = newSize;
     buffer = newPtr;
-    offset = buffer + newSize;
+    offset = newPtr + newSize;
+    realSize = newPtr;
     maxOffset = buffer + byteLength;
-  }
-
-  /**
-   * Shrinks the buffer to fit the current offset.
-   */
-  // @ts-ignore: Decorator valid here
-  @inline export function shrink(): void {
-    byteLength = offset - buffer;
-    buffer = __renew(buffer, byteLength);
-    maxOffset = byteLength + buffer;
-  }
-
-  /**
-   * Shrinks the buffer and resets the offset, returning the buffer as a specified type.
-   * @returns The buffer cast to the specified type.
-   */
-  // @ts-ignore: Decorator valid here
-  @inline export function shrinkTo<T>(): T {
-    shrink();
-    offset = buffer;
-    return changetype<T>(buffer);
   }
 
   /**
@@ -111,6 +94,7 @@ export namespace bs {
   // @ts-ignore: Decorator valid here
   @inline export function outTo<T>(dst: usize): T {
     const len = offset - buffer;
+    // @ts-ignore
     if (len != changetype<OBJECT>(dst - TOTAL_OVERHEAD).rtSize) __renew(len, idof<T>());
     memory.copy(dst, buffer, len);
     

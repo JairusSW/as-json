@@ -3,7 +3,6 @@ import { bytes } from "../../util/bytes";
 import { bs } from "../../../modules/as-bs";
 import { BACK_SLASH, QUOTE } from "../../custom/chars";
 import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
-import { ptrToStr } from "../../util/ptrToStr";
 
 /**
  * Serializes valid strings into their JSON counterpart
@@ -12,7 +11,7 @@ import { ptrToStr } from "../../util/ptrToStr";
  */
 export function serializeString(src: string): void {
   const srcSize = bytes(src);
-  bs.ensureSize(srcSize + 4);
+  bs.proposeSize(srcSize + 4);
   let srcPtr = changetype<usize>(src);
   const srcEnd = srcPtr + srcSize;
 
@@ -28,12 +27,12 @@ export function serializeString(src: string): void {
       bs.offset += remBytes;
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
       if ((escaped & 0xffff) != BACK_SLASH) {
-        bs.addSize(10);
+        bs.growSize(10);
         store<u64>(bs.offset, 13511005048209500, 0);
         store<u32>(bs.offset, escaped, 8);
         bs.offset += 12;
       } else {
-        bs.addSize(2);
+        bs.growSize(2);
         store<u32>(bs.offset, escaped, 0);
         bs.offset += 4;
       }

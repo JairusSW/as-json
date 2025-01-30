@@ -6,12 +6,12 @@ export function serializeArray<T extends any[]>(src: T): void {
   const end = src.length - 1;
   let i = 0;
   if (end == -1) {
-    bs.ensureSize(4);
+    bs.proposeSize(4);
     store<u32>(bs.offset, 6094939);
     bs.offset += 4;
     return;
   }
-  bs.ensureSize(end << 3);
+  bs.proposeSize(end << 3);
 
   store<u16>(bs.offset, BRACKET_LEFT);
   bs.offset += 2;
@@ -19,14 +19,14 @@ export function serializeArray<T extends any[]>(src: T): void {
   while (i < end) {
     const block = unchecked(src[i++]);
     JSON.__serialize<valueof<T>>(block);
-    bs.addSize(2);
+    bs.growSize(2);
     store<u16>(bs.offset, COMMA);
     bs.offset += 2;
   }
 
   const lastBlock = unchecked(src[end]);
   JSON.__serialize<valueof<T>>(lastBlock);
-  bs.ensureSize(2);
+  bs.proposeSize(2);
   store<u16>(bs.offset, BRACKET_RIGHT);
   bs.offset += 2;
 }

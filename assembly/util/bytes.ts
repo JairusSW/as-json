@@ -7,6 +7,6 @@ import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
   } else if (isManaged<T>() || isReference<T>()) {
     return changetype<OBJECT>(changetype<usize>(o) - TOTAL_OVERHEAD).rtSize;
   } else {
-    ERROR("Cannot convert type " + nameof<T>() + " to bytes!");
+    throw new Error("Cannot convert type " + nameof<T>() + " to bytes!");
   }
 }

@@ -1,12 +1,12 @@
-// import { JSON } from "json-as";
-// import { describe, expect, run } from "as-test/assembly";
-// import { DerivedObject, Null, ObjWithStrangeKey, ObjectWithFloat, OmitIf, Player, Vec3 } from "./types";
+import { JSON } from "../";
+import { describe, expect } from "../../modules/test/assembly/index";
+import { DerivedObject, Null, ObjWithStrangeKey, ObjectWithFloat, OmitIf, Player, Vec3 } from "./types";
 
-// describe("Should serialize class inheritance", () => {
-//   const obj = new DerivedObject("1", "2");
+describe("Should serialize class inheritance", () => {
+  const obj = new DerivedObject("1", "2");
 
-//   expect(JSON.stringify(obj)).toBe('{"a":"1","b":"2"}');
-// });
+  expect(JSON.stringify(obj)).toBe('{"a":"1","b":"2"}');
+});
 
 // describe("Should serialize nulls", () => {
 //   expect(JSON.stringify<Null>(null)).toBe("null");
@@ -117,7 +117,7 @@
 //   const jsonStr = '{"a":"1","b":"2"}';
 //   const obj = JSON.parse<DerivedObject>(jsonStr);
 
-//   expect(obj instanceof DerivedObject).toBe(true);
+//   expect((obj instanceof DerivedObject).toString()).toBe("true");
 //   expect(obj.a).toBe("1");
 //   expect(obj.b).toBe("2");
 // });

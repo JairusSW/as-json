@@ -5,7 +5,7 @@ import { isSpace } from "../../util";
 export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<T>(dst || __new(offsetof<T>(), idof<T>()));
   // @ts-ignore: type
-  if (!isString<indexof<T>>() && !isInteger<indexof<T>>() && !isFloat<indexof<T>>()) ERROR("Map key must also be a valid JSON key!");
+  if (!isString<indexof<T>>() && !isInteger<indexof<T>>() && !isFloat<indexof<T>>()) throw new Error("Map key must also be a valid JSON key!");
 
   const srcPtr = srcStart;
   let key: string | null = null;

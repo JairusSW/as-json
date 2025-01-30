@@ -321,7 +321,7 @@ class JSONTransform extends Visitor {
     SERIALIZE += indent + "bs.offset += 2;\n";
     SERIALIZE += "}";
 
-    ALLOCATE += indent + "bs.ensureSize(" + this.schema.byteSize + ");\n";
+    ALLOCATE += indent + "bs.proposeSize(" + this.schema.byteSize + ");\n";
     ALLOCATE += "}";
 
     INITIALIZE += "  return this;\n";
