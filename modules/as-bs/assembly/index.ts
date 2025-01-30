@@ -15,43 +15,18 @@ export namespace bs {
   /** Byte length of the buffer. */
   export let byteLength: usize = 0;
 
-  /**
-   * Sets the buffer to a given data object and initializes related properties.
-   * @param data - The data object to set as the buffer.
-   */
-  // @ts-ignore: Decorator valid here
-  @inline export function setBuffer<T>(data: T): void {
-    buffer = changetype<usize>(data);
-    offset = changetype<usize>(data);
-    byteLength = bytes(data);
-    maxOffset = byteLength + buffer;
-  }
+  /** Proposed size of output */
+  export let realSize: usize = offset;
 
   /**
-   * Ensures the buffer has sufficient capacity for a given size.
-   * If necessary, reallocates the buffer to accommodate the new size.
-   * @param size - The size to ensure capacity for.
-   */
-  // @ts-ignore: Decorator valid here
-  @inline export function ensureCapacity(size: u32): void {
-    const newSize: usize = offset + size;
-    if (newSize > byteLength) {
-      const newPtr = __renew(buffer, (byteLength = nextPowerOf2(newSize - buffer)));
-      offset = offset - buffer + newPtr;
-      maxOffset = newPtr + byteLength;
-      buffer = newPtr;
-    }
-  }
-
-  /**
-   * Ensures the buffer size is sufficient for a given size.
+   * Proposes that the buffer size is should be greater than or equal to the proposed size.
    * If necessary, reallocates the buffer to the exact new size.
-   * @param size - The size to ensure.
+   * @param size - The size to propose.
    */
   // @ts-ignore: Decorator valid here
-  @inline export function ensureSize(size: u32): void {
-    const newSize: usize = offset + size;
-    if (newSize > maxOffset) {
+  @inline export function proposeSize(size: u32): void {
+    realSize = offset + size;
+    if (realSize > maxOffset) {
       byteLength += size;
       const newPtr = __renew(buffer, byteLength);
       offset = offset - buffer + newPtr;
@@ -61,15 +36,15 @@ export namespace bs {
   }
 
   /**
-   * Adds length to the buffer size.
+   * Increases the proposed size by nextPowerOf2(n + 8).
    * If necessary, reallocates the buffer to the exact new size.
-   * @param size - The size to ensure.
+   * @param size - The size to grow by.
    */
   // @ts-ignore: Decorator valid here
-  @inline export function addSize(size: u32): void {
-    const newSize: usize = offset + size;
-    if (newSize > maxOffset) {
-      byteLength += size;
+  @inline export function growSize(size: u32): void {
+    realSize += size;
+    if (realSize > maxOffset) {
+      byteLength += nextPowerOf2(size + 8);
       const newPtr = __renew(buffer, byteLength);
       offset = offset - buffer + newPtr;
       maxOffset = newPtr + byteLength;
@@ -88,27 +63,6 @@ export namespace bs {
     buffer = newPtr;
     offset = buffer + newSize;
     maxOffset = buffer + byteLength;
-  }
-
-  /**
-   * Gets the remaining space available in the buffer.
-   * @returns The number of bytes remaining.
-   */
-  // @ts-ignore: Decorator valid here
-  @inline export function getRemainingSize(): usize {
-    return maxOffset - offset;
-  }
-
-  /**
-   * Clears data from a specified offset onward.
-   * @param fromOffset - The starting offset to clear from.
-   */
-  // @ts-ignore: Decorator valid here
-  @inline export function clearFromOffset(fromOffset: usize): void {
-    if (fromOffset < offset) {
-      memory.fill(fromOffset, 0, offset - fromOffset);
-      offset = fromOffset;
-    }
   }
 
   /**
@@ -134,17 +88,16 @@ export namespace bs {
 
   /**
    * Copies the buffer's content to a new object of a specified type.
-   * Optionally shrinks the buffer after copying.
-   * @param s - Whether to shrink the buffer after copying.
    * @returns The new object containing the buffer's content.
    */
   // @ts-ignore: Decorator valid here
-  @inline export function out<T>(s: bool = false): T {
+  @inline export function out<T>(): T {
     const len = offset - buffer;
     const _out = __new(len, idof<T>());
     memory.copy(_out, buffer, len);
-    if (s) shrink();
+
     offset = buffer;
+    realSize = buffer;
     return changetype<T>(_out);
   }
 
@@ -156,12 +109,13 @@ export namespace bs {
    * @returns The destination pointer cast to the specified type.
    */
   // @ts-ignore: Decorator valid here
-  @inline export function outTo<T>(dst: usize, s: bool = false): T {
+  @inline export function outTo<T>(dst: usize): T {
     const len = offset - buffer;
     if (len != changetype<OBJECT>(dst - TOTAL_OVERHEAD).rtSize) __renew(len, idof<T>());
     memory.copy(dst, buffer, len);
-    if (s) shrink();
+    
     offset = buffer;
+    realSize = buffer;
     return changetype<T>(dst);
   }
 }
@@ -178,6 +132,6 @@ export namespace bs {
   } else if (isManaged<T>() || isReference<T>()) {
     return changetype<OBJECT>(changetype<usize>(o) - TOTAL_OVERHEAD).rtSize;
   } else {
-    ERROR("Cannot convert type " + nameof<T>() + " to bytes!");
+    throw new Error("Cannot convert type " + nameof<T>() + " to bytes!");
   }
 }
