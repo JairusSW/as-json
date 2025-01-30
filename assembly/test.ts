@@ -1,6 +1,7 @@
-import { JSON } from ".";
+import { JSON } from "../";
 
-const stringified = JSON.parse<string>('"\\"st\\\\\\"ring\\\\\\" w\\\\\\"\\\\\\"ith quotes\\\\\\"\\""');
+assert(JSON.stringify<bool>(true) == "true", `JSON.stringify<bool>(true) == 'true'`);
+assert(JSON.stringify<bool>(false) == "false", `JSON.stringify<bool>(false) == 'false'`);
 
-console.log(JSON.stringify(stringified));
-console.log(JSON.stringify(stringified));
+assert(JSON.parse<bool>("true") == true, `JSON.parse<bool>(\"false\") == 'false'`);
+assert(JSON.parse<bool>("false") == false, `JSON.parse<bool>(\"false\") == 'false'`);

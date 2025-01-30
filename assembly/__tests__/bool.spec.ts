@@ -1,20 +1,12 @@
 import { JSON } from "../";
-import { describe, expect, run } from "as-test/assembly";
+import { describe, expect } from "../../modules/test/assembly/index";
 
 describe("Should serialize booleans", () => {
-  expect(JSON.stringify<bool>(true)).toBe("true");
-
-  expect(JSON.stringify<bool>(false)).toBe("false");
-
-  expect(JSON.stringify<boolean>(true)).toBe("true");
-
-  expect(JSON.stringify<boolean>(false)).toBe("false");
+    expect(JSON.stringify<bool>(true)).toBe("true");
+    expect(JSON.stringify<bool>(false)).toBe("false");
 });
 
 describe("Should deserialize booleans", () => {
-  expect(JSON.parse<boolean>("true")).toBe(true);
-
-  expect(JSON.parse<boolean>("false")).toBe(false);
+    expect(JSON.parse<boolean>("true").toString()).toBe("true");
+    expect(JSON.parse<boolean>("false").toString()).toBe("false");
 });
-
-run();
