@@ -1,5 +1,5 @@
-import { JSON } from "../";
-import { describe, expect } from "../../modules/test/assembly/index";
+import { JSON } from "..";
+import { describe, expect } from "../../modules/test/assembly";
 
 describe("Should serialize integers", () => {
   expect(JSON.stringify(0)).toBe("0");

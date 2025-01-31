@@ -1,0 +1,6 @@
+# Build artifacts
+build/
+transform/lib
+
+# Tables
+assembly/globals/tables.ts

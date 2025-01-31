@@ -1,9 +1,5 @@
-import { bs } from "../modules/as-bs/assembly";
-import { serializeString } from "./serialize/simple/string";
-import { bytes } from "./util";
+import { JSON } from "./";
+import { describe, expect } from "../modules/test/assembly";
 
-serializeString("hello\"\"\"\" world");
-console.log("\n-------------------------\nWritten: " + (bs.offset - bs.buffer).toString())
-const serialized = bs.out<string>();
-console.log("Data: " + serialized);
-console.log("Bytes: " + bytes(serialized).toString());
+console.log(JSON.stringify(JSON.parse<string>('"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u000f\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f"')));
+console.log('"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u000f\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f"');

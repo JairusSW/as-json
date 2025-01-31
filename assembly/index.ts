@@ -93,17 +93,17 @@ export namespace JSON {
       return NULL_WORD;
       // @ts-ignore
     } else if (isString<nonnull<T>>()) {
-      if (out) {
-        out = changetype<string>(__renew(changetype<usize>(out), bytes(data) + 4));
-        // const oldSize = bs.byteLength;
-        const oldBuf = bs.buffer;
-        const newSize = bytes(data) + 4;
-        const newBuf = __new(newSize, idof<string>());
-        bs.setBuffer(newBuf);
-        serializeString(changetype<string>(data));
-        bs.setBuffer(oldBuf);
-        return changetype<string>(newBuf);
-      }
+      // if (out) {
+      //   out = changetype<string>(__renew(changetype<usize>(out), bytes(data) + 4));
+      //   // const oldSize = bs.byteLength;
+      //   const oldBuf = bs.buffer;
+      //   const newSize = bytes(data) + 4;
+      //   const newBuf = __new(newSize, idof<string>());
+      //   bs.setBuffer(newBuf);
+      //   serializeString(changetype<string>(data));
+      //   bs.setBuffer(oldBuf);
+      //   return changetype<string>(newBuf);
+      // }
       serializeString(changetype<string>(data));
       return bs.out<string>();
       // @ts-ignore: Supplied by transform
@@ -339,7 +339,7 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) { }
+    constructor(public value: T) {}
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive

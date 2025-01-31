@@ -1,4 +1,3 @@
-import { JSON } from "../..";
 import { BACK_SLASH } from "../../custom/chars";
 import { DESERIALIZE_ESCAPE_TABLE, ESCAPE_HEX_TABLE } from "../../globals/tables";
 
@@ -45,7 +44,6 @@ export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): s
   memory.copy(dstPtr, lastPtr, remBytes);
   dstPtr += remBytes;
 
-  console.log("Len: " + (dstPtr - dst).toString())
   if (lastPtr != startPtr) dst = __renew(dst, dstPtr - dst);
   return changetype<string>(dst);
 }

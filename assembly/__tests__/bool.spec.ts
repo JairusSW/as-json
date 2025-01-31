@@ -1,12 +1,12 @@
-import { JSON } from "../";
-import { describe, expect } from "../../modules/test/assembly/index";
+import { JSON } from "..";
+import { describe, expect } from "../../modules/test/assembly";
 
 describe("Should serialize booleans", () => {
-    expect(JSON.stringify<bool>(true)).toBe("true");
-    expect(JSON.stringify<bool>(false)).toBe("false");
+  expect(JSON.stringify<bool>(true)).toBe("true");
+  expect(JSON.stringify<bool>(false)).toBe("false");
 });
 
 describe("Should deserialize booleans", () => {
-    expect(JSON.parse<boolean>("true").toString()).toBe("true");
-    expect(JSON.parse<boolean>("false").toString()).toBe("false");
+  expect(JSON.parse<boolean>("true").toString()).toBe("true");
+  expect(JSON.parse<boolean>("false").toString()).toBe("false");
 });

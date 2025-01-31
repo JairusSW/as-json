@@ -92,7 +92,7 @@ export namespace bs {
     // @ts-ignore
     if (len != changetype<OBJECT>(dst - TOTAL_OVERHEAD).rtSize) __renew(len, idof<T>());
     memory.copy(dst, buffer, len);
-    
+
     offset = buffer;
     realSize = buffer;
     return changetype<T>(dst);
