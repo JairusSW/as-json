@@ -6,14 +6,14 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-alpha.2
+    AssemblyScript - v1.0.0-alpha.3
   </pre>
 </h5>
 
 ## Installation
 
 ```bash
-npm install json-as@1.0.0-alpha.2
+npm install json-as@1.0.0-alpha.3
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
@@ -28,7 +28,7 @@ Alternatively, add it to your `asconfig.json`
 {
   // ...
   "options": {
-    "transform": ["json-as"]
+    "transform": ["json-as/transform"]
   }
 }
 ```
