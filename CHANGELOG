@@ -1,6 +1,14 @@
 # Change Log
 
-## UNRELEASED
+## 2025-01-31 - 1.0.0-alpha.3
+
+- fix: write to proper offset when deserializing string with \u0000-type escapes
+- fix: simplify and fix memory offset issues with bs module
+- fix: properly predict minimum size of to-be-serialized schemas
+- fix: replace as-test with temporary framework to mitigate json-as versioning issues
+- fix: fix multiple memory leaks during serialization
+- feat: align memory allocations for better performance
+- feat: achieve a space complexity of O(n) for serialization operations, unless dealing with \u0000-type escapes
 
 ## 2025-01-20 - 1.0.0-alpha.2
 
