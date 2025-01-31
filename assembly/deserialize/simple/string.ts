@@ -1,3 +1,4 @@
+import { JSON } from "../..";
 import { BACK_SLASH } from "../../custom/chars";
 import { DESERIALIZE_ESCAPE_TABLE, ESCAPE_HEX_TABLE } from "../../globals/tables";
 
@@ -11,7 +12,7 @@ export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): s
   while (srcStart < srcEnd) {
     let code = load<u16>(srcStart);
     if (code == BACK_SLASH) {
-      code = load<u16>(DESERIALIZE_ESCAPE_TABLE + load<u8>(srcStart, 2));
+      code = <u16>load<u8>(DESERIALIZE_ESCAPE_TABLE + load<u8>(srcStart, 2));
       if (code == 117 && load<u32>(srcStart, 4) == 3145776) {
         const block = load<u32>(srcStart, 8);
         const codeA = block & 0xffff;
@@ -22,7 +23,7 @@ export function deserializeString(srcStart: usize, srcEnd: usize, dst: usize): s
         const remBytes = srcStart - lastPtr;
         memory.copy(dstPtr, lastPtr, remBytes);
         dstPtr += remBytes;
-        store<u16>(dst, escaped);
+        store<u16>(dstPtr, escaped);
         dstPtr += 2;
         srcStart += 12;
         lastPtr = srcStart;
