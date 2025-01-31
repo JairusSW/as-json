@@ -11,10 +11,7 @@ export namespace bs {
   export let offset: usize = buffer;
 
   /** Byte length of the buffer. */
-  export let byteLength: usize = 0;
-
-  /** Maximum offset of the buffer. */
-  export let maxOffset: usize = buffer + 32;
+  export let byteLength: usize = 32;
 
   /** Proposed size of output */
   export let realSize: usize = offset;
@@ -26,13 +23,11 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function proposeSize(size: u32): void {
-    console.log("Propose: " + size.toString());
-    realSize = offset + size;
-    if (realSize > maxOffset) {
-      byteLength += nextPowerOf2(size);
+    if ((realSize = size) > byteLength) {
+      byteLength = nextPowerOf2(size);
+      // @ts-ignore
       const newPtr = __renew(buffer, byteLength);
       offset = offset - buffer + newPtr;
-      maxOffset = newPtr + byteLength;
       buffer = newPtr;
     }
   }
@@ -44,13 +39,12 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function growSize(size: u32): void {
-    console.log("Grow: " + size.toString());
     realSize += size;
-    if (realSize > maxOffset) {
+    if (realSize > byteLength) {
       byteLength += nextPowerOf2(size + 8);
+      // @ts-ignore
       const newPtr = __renew(buffer, byteLength);
       offset = offset - buffer + newPtr;
-      maxOffset = newPtr + byteLength;
       buffer = newPtr;
     }
   }
@@ -61,12 +55,12 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function resize(newSize: u32): void {
+    // @ts-ignore
     const newPtr = __renew(buffer, newSize);
     byteLength = newSize;
     buffer = newPtr;
     offset = newPtr + newSize;
     realSize = newPtr;
-    maxOffset = buffer + byteLength;
   }
 
   /**
@@ -76,6 +70,7 @@ export namespace bs {
   // @ts-ignore: Decorator valid here
   @inline export function out<T>(): T {
     const len = offset - buffer;
+    // @ts-ignore
     const _out = __new(len, idof<T>());
     memory.copy(_out, buffer, len);
 
