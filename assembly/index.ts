@@ -119,8 +119,8 @@ export namespace JSON {
 
       store<u16>(changetype<usize>(out), QUOTE);
       memory.copy(changetype<usize>(out) + 2, changetype<usize>(data.toISOString()), 48);
-      store<u16>(changetype<usize>(out), 50);
-      return out;
+      store<u16>(changetype<usize>(out), QUOTE, 50);
+      return changetype<string>(out);
     } else if (data instanceof Array) {
       // @ts-ignore
       serializeArray(changetype<nonnull<T>>(data));
