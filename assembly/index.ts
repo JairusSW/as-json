@@ -156,7 +156,7 @@ export namespace JSON {
       return deserializeInteger<T>(dataPtr, dataPtr + dataSize);
     } else if (isFloat<T>()) {
       return deserializeFloat<T>(dataPtr, dataPtr + dataSize);
-    } else if (isNullable<T>() && data.length == 4 && data == "null") {
+    } else if (isNullable<T>() && dataSize == 8 && load<u64>(dataPtr) == 30399761348886638) {
       // @ts-ignore
       return null;
     } else if (isString<T>()) {
@@ -182,7 +182,7 @@ export namespace JSON {
       return deserializeDate(dataPtr, dataPtr + dataSize);
     } else if (type instanceof JSON.Box) {
       // @ts-ignore
-      return new JSON.Box(JSON.parse<indexof<T>>(data));
+      return new JSON.Box(parseBox(data, changetype<nonnull<T>>(0).value));
     } else {
       throw new Error(`Could not deserialize data ${data} to type ${nameof<T>()}. Make sure to add the correct decorators to classes.`);
     }
@@ -339,7 +339,9 @@ export namespace JSON {
    * Box for primitive types
    */
   export class Box<T> {
-    constructor(public value: T) {}
+    constructor(public value: T) {
+      if (!isInteger<T>() && !isFloat<T>()) ERROR("JSON.Box should only hold primitive types!");
+    }
     /**
      * Creates a reference to a primitive type
      * This means that it can create a nullable primitive
@@ -352,6 +354,12 @@ export namespace JSON {
      */
     @inline static from<T>(value: T): Box<T> {
       return new Box(value);
+    }
+    toString(): string {
+      if (isNullable<this>() && changetype<usize>(this) == null) return "null";
+      // @ts-ignore: type
+      if (isDefined(this.value.toString)) return this.value.toString();
+      return "null";
     }
   }
 
@@ -423,9 +431,18 @@ export namespace JSON {
         return deserializeDate(srcStart, srcEnd);
       } else if (type instanceof JSON.Box) {
         // @ts-ignore: type
-        return new JSON.Box(__deserialize<indexof<T>>(srcStart, srcEnd));
+        return new JSON.Box(deserializeBox(srcStart, srcEnd, dst, changetype<nonnull<T>>(0).value));
       }
     }
     throw new Error(`Could not deserialize data '${ptrToStr(srcStart, srcEnd).slice(0, 100)}' to type. Make sure to add the correct decorators to classes.`);
   }
+}
+
+// @ts-ignore: decorator
+@inline function parseBox<T>(data: string, ty: T): T {
+  return JSON.parse<T>(data);
+}
+
+function deserializeBox<T>(srcStart: usize, srcEnd: usize, dst: usize, ty: T): T {
+  return JSON.__deserialize<T>(srcStart, srcEnd, dst);
 }
