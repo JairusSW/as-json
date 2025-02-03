@@ -421,6 +421,9 @@ export namespace JSON {
       } else if (type instanceof Date) {
         // @ts-ignore: type
         return deserializeDate(srcStart, srcEnd);
+      } else if (type instanceof JSON.Box) {
+        // @ts-ignore: type
+        return new JSON.Box(__deserialize<indexof<T>>(srcStart, srcEnd));
       }
     }
     throw new Error(`Could not deserialize data '${ptrToStr(srcStart, srcEnd).slice(0, 100)}' to type. Make sure to add the correct decorators to classes.`);
