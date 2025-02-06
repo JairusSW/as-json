@@ -10,6 +10,17 @@
   </pre>
 </h5>
 
+## Contents
+ - [About](#about)
+ - [Installation](#installation)
+ - [Usage](#usage)
+ - [Examples](#examples)
+ - [Performance](#performance)
+ - [License](#license)
+ - [Contact](#contact)
+
+## About
+
 ## Installation
 
 ```bash
@@ -40,7 +51,6 @@ If you'd like to see the code that the transform generates, run with `JSON_DEBUG
 ```js
 import { JSON } from "json-as";
 
-// @json or @serializable work here
 @json
 class Vec3 {
   x: f32 = 0.0;
@@ -76,10 +86,14 @@ const player: Player = {
   isVerified: true
 };
 
-const stringified = JSON.stringify<Player>(player);
-
+const serialized = JSON.stringify<Player>(player);
 const parsed = JSON.parse<Player>(stringified);
+
+console.log("Serialized: " + stringified);
+console.log("Parsed: " + parsed);
 ```
+
+## Examples
 
 Classes can even have inheritance. Here's a nasty example
 
@@ -124,16 +138,15 @@ You can also add it to your `asconfig.json`
 
 If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
-## Notes
+## 📃 License
 
-If you want a feature, drop an issue (and again, maybe a star). I'll likely add it in less than 7 days.
+This project is distributed under an open source license. You can view the full license using the following link: [License](./LICENSE)
 
-## Contact
+## 📫 Contact
 
-- [Email](mailto:me@jairus.dev)
-- [GitHub](https://github.com/JairusSW)
-- [Discord](discord.com/users/600700584038760448)
+Please send all issues to [GitHub Issues](https://github.com/JairusSW/as-json/issues) and to converse, please send me an email at [me@jairus.dev](mailto:me@jairus.dev)
 
-## Issues
-
-Please submit an issue to https://github.com/JairusSW/as-json/issues if you find anything wrong with this library
+- **Email:** Send me inquiries, questions, or requests at [me@jairus.dev](mailto:me@jairus.dev)
+- **GitHub:** Visit the official GitHub repository [Here](https://github.com/JairusSW/as-json)
+- **Website:** Visit my official website at [jairus.dev](https://jairus.dev/)
+- **Discord:** Converse with me on [My Discord](discord.com/users/600700584038760448) or on the [AssemblyScript Discord Server](https://discord.gg/assemblyscript/)

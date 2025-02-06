@@ -1,5 +1,42 @@
+import { bs } from "../modules/as-bs/assembly";
 import { JSON } from "./";
-import { describe, expect } from "../modules/test/assembly";
+@json
+class Vec3 {
+  x: f32 = 0.0;
+  y: f32 = 0.0;
+  z: f32 = 0.0;
+}
 
-console.log(JSON.stringify(JSON.parse<string>('"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u000f\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f"')));
-console.log('"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u000f\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f"');
+@json
+class Player {
+  @alias("first name")
+  firstName: string = "";
+  lastName: string = "";
+  lastActive: i32[] = [];
+  // // Drop in a code block, function, or expression that evaluates to a boolean
+  // // @omitif((self) => self.age < 18)
+  // // @omitif('this.age <= 0')
+  // age: i32 = 0;
+  // // @omitnull()
+  // pos: Vec3 | null = new Vec3();
+  // isVerified: boolean = false;
+}
+
+const player: Player = {
+  firstName: "Emmet",
+  lastName: "West",
+  lastActive: [8, 27, 2022],
+  // age: 23,
+  // pos: {
+  //   x: 3.4,
+  //   y: 1.2,
+  //   z: 8.3
+  // },
+  // isVerified: true
+};
+
+// bs.proposeSize(1024);
+const serialized = JSON.stringify<Player>(player);
+console.log("Serialized: " + serialized);
+// const parsed = JSON.parse<Player>(serialized);
+// console.log("Parsed: " + JSON.stringify(parsed));

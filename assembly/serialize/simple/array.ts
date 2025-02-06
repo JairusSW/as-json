@@ -3,15 +3,16 @@ import { COMMA, BRACKET_RIGHT, BRACKET_LEFT } from "../../custom/chars";
 import { JSON } from "../..";
 
 export function serializeArray<T extends any[]>(src: T): void {
+  bs.proposeSize(4);
   const end = src.length - 1;
   let i = 0;
   if (end == -1) {
-    bs.proposeSize(4);
     store<u32>(bs.offset, 6094939);
     bs.offset += 4;
     return;
   }
-  bs.proposeSize(end << 3);
+  // {} = 4
+  // xi, = n << 1
 
   store<u16>(bs.offset, BRACKET_LEFT);
   bs.offset += 2;
@@ -26,7 +27,7 @@ export function serializeArray<T extends any[]>(src: T): void {
 
   const lastBlock = unchecked(src[end]);
   JSON.__serialize<valueof<T>>(lastBlock);
-  bs.proposeSize(2);
+  bs.growSize(2);
   store<u16>(bs.offset, BRACKET_RIGHT);
   bs.offset += 2;
 }

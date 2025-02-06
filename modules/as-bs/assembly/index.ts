@@ -11,25 +11,53 @@ export namespace bs {
   export let offset: usize = buffer;
 
   /** Byte length of the buffer. */
-  export let byteLength: usize = 32;
+  let bufferEnd: usize = buffer + 32;
 
   /** Proposed size of output */
-  export let realSize: usize = offset;
+  export let realSize: usize = buffer;
 
+  /**
+   * Byte length of the buffer
+   * @returns usize
+   */
+  // @ts-ignore: decorator
+  @inline export function byteLength(): usize {
+    return bufferEnd - buffer;
+  }
   /**
    * Proposes that the buffer size is should be greater than or equal to the proposed size.
    * If necessary, reallocates the buffer to the exact new size.
    * @param size - The size to propose.
    */
-  // @ts-ignore: Decorator valid here
-  @inline export function proposeSize(size: u32): void {
-    if ((realSize = size) > byteLength) {
-      byteLength = nextPowerOf2(size);
-      // @ts-ignore
-      const newPtr = __renew(buffer, byteLength);
-      offset = offset - buffer + newPtr;
-      buffer = newPtr;
+  // @ts-ignore: decorator
+  @inline export function ensureSize(size: u32): void {
+    if (offset + size > bufferEnd) {
+      bufferEnd += nextPowerOf2(size + 32);
+      // @ts-ignore: exists
+      const newPtr = __renew(buffer, bufferEnd - buffer);
+      // I don't know if this is even needed. I'll need to take a look at the runtime
+      // offset = offset - buffer + newPtr;
+      // buffer = newPtr;
     }
+    console.log("Ensure   " + (realSize - buffer).toString() + "  " + size.toString());
+  }
+  /**
+   * Proposes that the buffer size is should be greater than or equal to the proposed size.
+   * If necessary, reallocates the buffer to the exact new size.
+   * @param size - The size to propose.
+   */
+  // @ts-ignore: decorator
+  @inline export function proposeSize(size: u32): void {
+    realSize = offset + size;
+    if (realSize > bufferEnd) {
+      bufferEnd += nextPowerOf2(size);
+      // @ts-ignore: exists
+      const newPtr = __renew(buffer, bufferEnd - buffer);
+      // I don't know if this is even needed. I'll need to take a look at the runtime
+      // offset = offset - buffer + newPtr;
+      // buffer = newPtr;
+    }
+    console.log("Propose  " + (realSize - buffer).toString() + "  " + size.toString());
   }
 
   /**
@@ -37,16 +65,16 @@ export namespace bs {
    * If necessary, reallocates the buffer to the exact new size.
    * @param size - The size to grow by.
    */
-  // @ts-ignore: Decorator valid here
+  // @ts-ignore: decorator
   @inline export function growSize(size: u32): void {
-    realSize += size;
-    if (realSize > byteLength) {
-      byteLength += nextPowerOf2(size + 8);
+    if ((realSize += size) > bufferEnd) {
+      bufferEnd += nextPowerOf2(size + 32);
       // @ts-ignore
-      const newPtr = __renew(buffer, byteLength);
-      offset = offset - buffer + newPtr;
-      buffer = newPtr;
+      const newPtr = __renew(buffer, bufferEnd);
+      // offset = offset - buffer + newPtr;
+      // buffer = newPtr;
     }
+    console.log("Grow     " + (realSize - buffer).toString() + "  " + size.toString());
   }
 
   /**
@@ -55,9 +83,9 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function resize(newSize: u32): void {
-    // @ts-ignore
+    // @ts-ignore: exists
     const newPtr = __renew(buffer, newSize);
-    byteLength = newSize;
+    bufferEnd = newSize;
     buffer = newPtr;
     offset = newPtr + newSize;
     realSize = newPtr;
@@ -70,7 +98,7 @@ export namespace bs {
   // @ts-ignore: Decorator valid here
   @inline export function out<T>(): T {
     const len = offset - buffer;
-    // @ts-ignore
+    // @ts-ignore: exists
     const _out = __new(len, idof<T>());
     memory.copy(_out, buffer, len);
 
@@ -89,7 +117,7 @@ export namespace bs {
   // @ts-ignore: Decorator valid here
   @inline export function outTo<T>(dst: usize): T {
     const len = offset - buffer;
-    // @ts-ignore
+    // @ts-ignore: exists
     if (len != changetype<OBJECT>(dst - TOTAL_OVERHEAD).rtSize) __renew(len, idof<T>());
     memory.copy(dst, buffer, len);
 

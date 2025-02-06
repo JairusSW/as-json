@@ -304,7 +304,7 @@ class JSONTransform extends Visitor {
         SERIALIZE += indent + "store<u16>(bs.offset, 125, 0); // }\n";
         SERIALIZE += indent + "bs.offset += 2;\n";
         SERIALIZE += "}";
-        SERIALIZE = indent + "bs.proposeSize(" + this.schema.byteSize + ");\n" + SERIALIZE;
+        SERIALIZE = SERIALIZE.slice(0, 32) + indent + "bs.proposeSize(" + this.schema.byteSize + ");\n" + SERIALIZE.slice(32);
         INITIALIZE += "  return this;\n";
         INITIALIZE += "}";
         if (process.env["JSON_DEBUG"]) {
