@@ -107,9 +107,7 @@ export namespace JSON {
       serializeString(changetype<string>(data));
       return bs.out<string>();
       // @ts-ignore: Supplied by transform
-    } else if (isDefined(data.__SERIALIZE) && isDefined(data.__ALLOCATE)) {
-      // @ts-ignore
-      // data.__ALLOCATE();
+    } else if (isDefined(data.__SERIALIZE)) {
       // @ts-ignore
       data.__SERIALIZE(changetype<usize>(data));
       return bs.out<string>();

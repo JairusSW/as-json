@@ -138,7 +138,6 @@ class JSONTransform extends Visitor {
     let SERIALIZE = "__SERIALIZE(ptr: usize): void {\n";
     let INITIALIZE = "@inline __INITIALIZE(): this {\n";
     let DESERIALIZE = "__DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize, ptr: usize): void {\n  switch (<u32>keyEnd - <u32>keyStart) {\n";
-    let ALLOCATE = "@inline __ALLOCATE(): void {\n";
 
     indent = "  ";
 
@@ -223,6 +222,13 @@ class JSONTransform extends Visitor {
         } else if (member.flags.has(PropertyFlags.OmitIf)) {
           if (member.flags.get(PropertyFlags.OmitIf).kind == NodeKind.Function) {
             const arg = member.flags.get(PropertyFlags.OmitIf) as FunctionExpression;
+            // @ts-ignore: type
+            arg.declaration.signature.parameters[0].type = Node.createNamedType(
+              Node.createSimpleTypeName("this", node.range),
+              null,
+              false,
+              node.range
+            );
             // @ts-ignore: type
             arg.declaration.signature.returnType.name = Node.createSimpleTypeName("boolean", arg.declaration.signature.returnType.name.range);
             SERIALIZE += indent + `if (!(${toString(member.flags.get(PropertyFlags.OmitIf))})(this)) {\n`;
@@ -321,8 +327,7 @@ class JSONTransform extends Visitor {
     SERIALIZE += indent + "bs.offset += 2;\n";
     SERIALIZE += "}";
 
-    ALLOCATE += indent + "bs.proposeSize(" + this.schema.byteSize + ");\n";
-    ALLOCATE += "}";
+    SERIALIZE = indent + "bs.proposeSize(" + this.schema.byteSize + ");\n" + SERIALIZE;
 
     INITIALIZE += "  return this;\n";
     INITIALIZE += "}";
@@ -331,46 +336,39 @@ class JSONTransform extends Visitor {
       console.log(SERIALIZE);
       console.log(INITIALIZE);
       console.log(DESERIALIZE);
-      console.log(ALLOCATE);
     }
 
     const SERIALIZE_METHOD = SimpleParser.parseClassMember(SERIALIZE, node);
     const INITIALIZE_METHOD = SimpleParser.parseClassMember(INITIALIZE, node);
     const DESERIALIZE_METHOD = SimpleParser.parseClassMember(DESERIALIZE, node);
-    const ALLOCATE_METHOD = SimpleParser.parseClassMember(ALLOCATE, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD);
     if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD);
-    if (!node.members.find((v) => v.name.text == "__ALLOCATE")) node.members.push(ALLOCATE_METHOD);
     super.visitClassDeclaration(node);
   }
   generateEmptyMethods(node: ClassDeclaration): void {
     let SERIALIZE_RAW_EMPTY = '@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n  return "{}";\n}';
-    let SERIALIZE_BS_EMPTY = "@inline __SERIALIZE(ptr: usize: bool): void {\n  store<u32>(bs.offset, 8192123);\n  bs.offset += 4;\n}";
+    let SERIALIZE_BS_EMPTY = "@inline __SERIALIZE(ptr: usize: bool): void {\n  bs.proposeSize(4);\n  store<u32>(bs.offset, 8192123);\n  bs.offset += 4;\n}";
     let INITIALIZE_EMPTY = "@inline __INITIALIZE(): this {\n  return this;\n}";
     let DESERIALIZE_EMPTY = "@inline __DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize, ptr: usize): void {\n  return false;\n}";
-    let ALLOCATE_EMPTY = "@inline __ALLOCATE(): void {\n  bs.ensureSize(4);\n}";
 
     if (process.env["JSON_DEBUG"]) {
       console.log(SERIALIZE_RAW_EMPTY);
       console.log(SERIALIZE_BS_EMPTY);
       console.log(INITIALIZE_EMPTY);
       console.log(DESERIALIZE_EMPTY);
-      console.log(ALLOCATE_EMPTY);
     }
 
     const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
     const SERIALIZE_BS_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_BS_EMPTY, node);
     const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
     const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
-    const ALLOCATE_METHOD_EMPTY = SimpleParser.parseClassMember(ALLOCATE_EMPTY, node);
 
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
     if (!node.members.find((v) => v.name.text == "__SERIALIZE")) node.members.push(SERIALIZE_BS_METHOD_EMPTY);
     if (!node.members.find((v) => v.name.text == "__INITIALIZE")) node.members.push(INITIALIZE_METHOD_EMPTY);
     if (!node.members.find((v) => v.name.text == "__DESERIALIZE")) node.members.push(DESERIALIZE_METHOD_EMPTY);
-    if (!node.members.find((v) => v.name.text == "__ALLOCATE")) node.members.push(ALLOCATE_METHOD_EMPTY);
   }
   // visitCallExpression(node: CallExpression, ref: Node): void {
   //   super.visitCallExpression(node, ref);
