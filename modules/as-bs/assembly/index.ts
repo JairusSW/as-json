@@ -31,6 +31,7 @@ export namespace bs {
    */
   // @ts-ignore: decorator
   @inline export function ensureSize(size: u32): void {
+    let grew = ""
     if (offset + size > bufferEnd) {
       bufferEnd += nextPowerOf2(size + 32);
       // @ts-ignore: exists
@@ -38,8 +39,9 @@ export namespace bs {
       // I don't know if this is even needed. I'll need to take a look at the runtime
       // offset = offset - buffer + newPtr;
       // buffer = newPtr;
+      grew = "+";
     }
-    console.log("Ensure   " + (realSize - buffer).toString() + "  " + size.toString());
+    console.log("Ensure   " + (realSize - buffer).toString() + "  " + size.toString() + " " + grew);
   }
   /**
    * Proposes that the buffer size is should be greater than or equal to the proposed size.
@@ -48,6 +50,7 @@ export namespace bs {
    */
   // @ts-ignore: decorator
   @inline export function proposeSize(size: u32): void {
+    let grew = ""
     realSize = offset + size;
     if (realSize > bufferEnd) {
       bufferEnd += nextPowerOf2(size);
@@ -56,8 +59,9 @@ export namespace bs {
       // I don't know if this is even needed. I'll need to take a look at the runtime
       // offset = offset - buffer + newPtr;
       // buffer = newPtr;
+      grew = "+";
     }
-    console.log("Propose  " + (realSize - buffer).toString() + "  " + size.toString());
+    console.log("Propose  " + (realSize - buffer).toString() + "  " + size.toString() + " " + grew);
   }
 
   /**
@@ -67,14 +71,16 @@ export namespace bs {
    */
   // @ts-ignore: decorator
   @inline export function growSize(size: u32): void {
+    let grew = ""
     if ((realSize += size) > bufferEnd) {
       bufferEnd += nextPowerOf2(size + 32);
       // @ts-ignore
       const newPtr = __renew(buffer, bufferEnd);
       // offset = offset - buffer + newPtr;
       // buffer = newPtr;
+      grew = "+";
     }
-    console.log("Grow     " + (realSize - buffer).toString() + "  " + size.toString());
+    console.log("Grow     " + (realSize - buffer).toString() + "  " + size.toString() + " " + grew);
   }
 
   /**

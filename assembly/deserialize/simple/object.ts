@@ -1,5 +1,7 @@
+import { JSON } from "../..";
 import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T } from "../../custom/chars";
 import { isSpace } from "../../util";
+import { ptrToStr } from "../../util/ptrToStr";
 
 export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<nonnull<T>>(dst || __new(offsetof<T>(), idof<T>()));
@@ -60,9 +62,9 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
           if (code == COMMA || code == BRACE_RIGHT || isSpace(code)) {
+            console.log("Value (number): " + JSON.__deserialize<i32>(lastIndex, srcStart).toString());
             // @ts-ignore: exists
             out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
-            // console.log("Value (number): " + ptrToStr(lastIndex, srcStart));
             // while (isSpace(load<u16>((srcStart += 2)))) {
             //   /* empty */
             // }

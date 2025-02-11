@@ -255,7 +255,9 @@ class JSONTransform extends Visitor {
             else if (memberLen == 4)
                 DESERIALIZE += `${indent}switch (load<u32>(keyStart)) {\n`;
             else if (memberLen == 6)
-                DESERIALIZE += `${indent}let code = (<u64>load<u32>(keyStart) << 16) | <u64>load<u16>(keyStart, 4);\n`;
+                DESERIALIZE += `${indent}let code = load<u64>(keyStart) & 0x0000FFFFFFFFFFFF;\n`;
+            else if (memberLen == 6)
+                DESERIALIZE += `${indent}let code = load<u64>(keyStart);\n`;
             else
                 DESERIALIZE += toMemCDecl(memberLen, indent);
             for (let i = 0; i < memberGroup.length; i++) {
@@ -276,6 +278,13 @@ class JSONTransform extends Visitor {
                 else if (memberLen == 6) {
                     DESERIALIZE += i == 0 ? indent : "";
                     DESERIALIZE += `if (code == ${toU48(memberName)}) { // ${memberName}\n`;
+                    DESERIALIZE += `${indent}  store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
+                    DESERIALIZE += `${indent}  return;\n`;
+                    DESERIALIZE += `${indent}}${i < memberGroup.length - 1 ? " else " : "\n"}`;
+                }
+                else if (memberLen == 8) {
+                    DESERIALIZE += i == 0 ? indent : "";
+                    DESERIALIZE += `if (code == ${toU64(memberName)}) { // ${memberName}\n`;
                     DESERIALIZE += `${indent}  store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd), offsetof<this>(${JSON.stringify(member.name)}));\n`;
                     DESERIALIZE += `${indent}  return;\n`;
                     DESERIALIZE += `${indent}}${i < memberGroup.length - 1 ? " else " : "\n"}`;

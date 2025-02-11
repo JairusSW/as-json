@@ -74,10 +74,10 @@ class Player {
 }
 
 const player: Player = {
-  firstName: "Emmet",
-  lastName: "West",
-  lastActive: [8, 27, 2022],
-  age: 23,
+  firstName: "Jairus",
+  lastName: "Tanaka",
+  lastActive: [2, 7, 2025],
+  age: 18,
   pos: {
     x: 3.4,
     y: 1.2,
@@ -87,10 +87,10 @@ const player: Player = {
 };
 
 const serialized = JSON.stringify<Player>(player);
-const parsed = JSON.parse<Player>(stringified);
+const parsed = JSON.parse<Player>(serialized);
 
-console.log("Serialized: " + stringified);
-console.log("Parsed: " + parsed);
+console.log("Serialized: " + serialized);
+console.log("Parsed: " + JSON.stringify(parsed));
 ```
 
 ## Examples
