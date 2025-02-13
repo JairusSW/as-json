@@ -334,24 +334,19 @@ class JSONTransform extends Visitor {
         super.visitClassDeclaration(node);
     }
     generateEmptyMethods(node) {
-        let SERIALIZE_RAW_EMPTY = '@inline __SERIALIZE(ptr: usize = changetype<usize>(this)): string {\n  return "{}";\n}';
-        let SERIALIZE_BS_EMPTY = "@inline __SERIALIZE(ptr: usize: bool): void {\n  bs.proposeSize(4);\n  store<u32>(bs.offset, 8192123);\n  bs.offset += 4;\n}";
+        let SERIALIZE_EMPTY = "@inline __SERIALIZE(ptr: usize): void {\n  bs.proposeSize(4);\n  store<u32>(bs.offset, 8192123);\n  bs.offset += 4;\n}";
         let INITIALIZE_EMPTY = "@inline __INITIALIZE(): this {\n  return this;\n}";
         let DESERIALIZE_EMPTY = "@inline __DESERIALIZE(keyStart: usize, keyEnd: usize, valStart: usize, valEnd: usize, ptr: usize): void {\n  return false;\n}";
         if (process.env["JSON_DEBUG"]) {
-            console.log(SERIALIZE_RAW_EMPTY);
-            console.log(SERIALIZE_BS_EMPTY);
+            console.log(SERIALIZE_EMPTY);
             console.log(INITIALIZE_EMPTY);
             console.log(DESERIALIZE_EMPTY);
         }
-        const SERIALIZE_RAW_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_RAW_EMPTY, node);
-        const SERIALIZE_BS_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_BS_EMPTY, node);
+        const SERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(SERIALIZE_EMPTY, node);
         const INITIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(INITIALIZE_EMPTY, node);
         const DESERIALIZE_METHOD_EMPTY = SimpleParser.parseClassMember(DESERIALIZE_EMPTY, node);
         if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
-            node.members.push(SERIALIZE_RAW_METHOD_EMPTY);
-        if (!node.members.find((v) => v.name.text == "__SERIALIZE"))
-            node.members.push(SERIALIZE_BS_METHOD_EMPTY);
+            node.members.push(SERIALIZE_METHOD_EMPTY);
         if (!node.members.find((v) => v.name.text == "__INITIALIZE"))
             node.members.push(INITIALIZE_METHOD_EMPTY);
         if (!node.members.find((v) => v.name.text == "__DESERIALIZE"))
