@@ -6,7 +6,7 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-alpha.3
+    AssemblyScript - v1.0.0-alpha.4
   </pre>
 </h5>
 
@@ -65,8 +65,7 @@ class Player {
   lastName!: string;
   lastActive!: i32[];
   // Drop in a code block, function, or expression that evaluates to a boolean
-  @omitif((age) => age < 18)
-  @omitif('this.age <= 0')
+  @omitif((self: Player) => self.age < 18)
   age!: i32;
   @omitnull()
   pos!: Vec3 | null;
