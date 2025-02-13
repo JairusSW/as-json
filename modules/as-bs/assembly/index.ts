@@ -5,44 +5,17 @@ import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
  */
 export namespace bs {
   /** Current buffer pointer. */ // @ts-ignore
-  export let buffer: usize = __new(32, idof<ArrayBuffer>());
+  export let buffer: ArrayBuffer = new ArrayBuffer(32);//__new(32, idof<ArrayBuffer>());
 
   /** Current offset within the buffer. */
-  export let offset: usize = buffer;
+  export let offset: usize = changetype<usize>(buffer);
 
   /** Byte length of the buffer. */
-  let bufferEnd: usize = buffer + 32;
+  let bufferSize: usize = 32;
 
   /** Proposed size of output */
-  export let realSize: usize = buffer;
+  export let stackSize: usize = 0;
 
-  /**
-   * Byte length of the buffer
-   * @returns usize
-   */
-  // @ts-ignore: decorator
-  @inline export function byteLength(): usize {
-    return bufferEnd - buffer;
-  }
-  /**
-   * Proposes that the buffer size is should be greater than or equal to the proposed size.
-   * If necessary, reallocates the buffer to the exact new size.
-   * @param size - The size to propose.
-   */
-  // @ts-ignore: decorator
-  @inline export function ensureSize(size: u32): void {
-    let grew = ""
-    if (offset + size > bufferEnd) {
-      bufferEnd += nextPowerOf2(size + 32);
-      // @ts-ignore: exists
-      const newPtr = __renew(buffer, bufferEnd - buffer);
-      // I don't know if this is even needed. I'll need to take a look at the runtime
-      // offset = offset - buffer + newPtr;
-      // buffer = newPtr;
-      grew = "+";
-    }
-    console.log("Ensure   " + (realSize - buffer).toString() + "  " + size.toString() + " " + grew);
-  }
   /**
    * Proposes that the buffer size is should be greater than or equal to the proposed size.
    * If necessary, reallocates the buffer to the exact new size.
@@ -50,37 +23,40 @@ export namespace bs {
    */
   // @ts-ignore: decorator
   @inline export function proposeSize(size: u32): void {
-    let grew = ""
-    realSize = offset + size;
-    if (realSize > bufferEnd) {
-      bufferEnd += nextPowerOf2(size);
+    console.log("Propose  " + (stackSize).toString() + " -> " + (stackSize + size).toString() + " (" + size.toString() + ") " + (((stackSize + size) > bufferSize) ? "+" : ""));
+    if ((stackSize += size) > bufferSize) {
+      const deltaBytes = nextPowerOf2(size);
+      bufferSize += deltaBytes;
       // @ts-ignore: exists
-      const newPtr = __renew(buffer, bufferEnd - buffer);
-      // I don't know if this is even needed. I'll need to take a look at the runtime
-      // offset = offset - buffer + newPtr;
-      // buffer = newPtr;
-      grew = "+";
+      const newPtr = changetype<ArrayBuffer>(__renew(
+        changetype<usize>(buffer),
+        bufferSize
+      ));
+      offset = offset + changetype<usize>(newPtr) - changetype<usize>(buffer);
+      buffer = newPtr;
     }
-    console.log("Propose  " + (realSize - buffer).toString() + "  " + size.toString() + " " + grew);
   }
 
   /**
-   * Increases the proposed size by nextPowerOf2(n + 8) if necessary.
+   * Increases the proposed size by nextPowerOf2(n + 64) if necessary.
    * If necessary, reallocates the buffer to the exact new size.
    * @param size - The size to grow by.
    */
   // @ts-ignore: decorator
   @inline export function growSize(size: u32): void {
-    let grew = ""
-    if ((realSize += size) > bufferEnd) {
-      bufferEnd += nextPowerOf2(size + 32);
+    console.log("Grow     " + (stackSize).toString() + " -> " + (stackSize + size).toString() + " (" + size.toString() + ") " + (((stackSize + size) > bufferSize) ? "+" : ""));
+    if ((stackSize += size) > bufferSize) {
+      const deltaBytes = nextPowerOf2(size + 64);
+      bufferSize += deltaBytes;
       // @ts-ignore
-      const newPtr = __renew(buffer, bufferEnd);
-      // offset = offset - buffer + newPtr;
-      // buffer = newPtr;
-      grew = "+";
+      const newPtr = changetype<ArrayBuffer>(__renew(
+        changetype<usize>(buffer),
+        bufferSize
+      ));
+      if (buffer != newPtr) console.log("  Old: " + changetype<usize>(buffer).toString() + "\n  New: " + changetype<usize>(newPtr).toString());
+      offset = offset + changetype<usize>(newPtr) - changetype<usize>(buffer);
+      buffer = newPtr;
     }
-    console.log("Grow     " + (realSize - buffer).toString() + "  " + size.toString() + " " + grew);
   }
 
   /**
@@ -91,10 +67,10 @@ export namespace bs {
   @inline export function resize(newSize: u32): void {
     // @ts-ignore: exists
     const newPtr = __renew(buffer, newSize);
-    bufferEnd = newSize;
+    bufferSize = newSize;
     buffer = newPtr;
     offset = newPtr + newSize;
-    realSize = newPtr;
+    stackSize = newPtr;
   }
 
   /**
@@ -103,13 +79,13 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function out<T>(): T {
-    const len = offset - buffer;
+    const len = offset - changetype<usize>(buffer);
     // @ts-ignore: exists
     const _out = __new(len, idof<T>());
-    memory.copy(_out, buffer, len);
+    memory.copy(_out, changetype<usize>(buffer), len);
 
-    offset = buffer;
-    realSize = buffer;
+    offset = changetype<usize>(buffer);
+    stackSize = 0;
     return changetype<T>(_out);
   }
 
@@ -122,13 +98,13 @@ export namespace bs {
    */
   // @ts-ignore: Decorator valid here
   @inline export function outTo<T>(dst: usize): T {
-    const len = offset - buffer;
+    const len = offset - changetype<usize>(buffer);
     // @ts-ignore: exists
     if (len != changetype<OBJECT>(dst - TOTAL_OVERHEAD).rtSize) __renew(len, idof<T>());
-    memory.copy(dst, buffer, len);
+    memory.copy(dst, changetype<usize>(buffer), len);
 
-    offset = buffer;
-    realSize = buffer;
+    offset = changetype<usize>(buffer);
+    stackSize = 0;
     return changetype<T>(dst);
   }
 }

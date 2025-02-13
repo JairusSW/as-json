@@ -1,44 +1,8 @@
+import { JSON } from ".";
 import { bs } from "../modules/as-bs/assembly";
-import { JSON } from "./";
-import { ptrToStr } from "./util/ptrToStr";
+import { bytes } from "./util";
 
-@json
-class Vec3 {
-  x: f32 = 0.0;
-  y: f32 = 0.0;
-  z: f32 = 0.0;
-}
-
-@json
-class Player {
-  @alias("first name")
-  firstName!: string;
-  lastName!: string;
-  lastActive!: i32[];
-  // Drop in a code block, function, or expression that evaluates to a boolean
-  // @omitif((self: Player) => self.age < 18)
-  age!: i32;
-  // @omitnull()
-  // pos!: Vec3 | null;
-  // isVerified!: boolean;
-}
-
-const player: Player = {
-  firstName: "Jairus",
-  lastName: "Tanaka",
-  lastActive: [2, 7, 2025],
-  age: 18,
-  // pos: {
-  //   x: 3.4,
-  //   y: 1.2,
-  //   z: 8.3
-  // },
-  // isVerified: true
-};
-
-const serialized = JSON.stringify<Player>(player);
-
-console.log("Serialized: " + serialized);
-const parsed = JSON.parse<Player>(serialized);
-
-console.log("Parsed: " + JSON.stringify(parsed));
+// bs.ensureSize(1024);
+const a1 = JSON.stringify("\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u0009\u000a\u000b\u000c\u000d\u000e\u000f\u000f\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f");
+console.log("Bytes    " + bytes(a1).toString());
+console.log("a1: " + a1);

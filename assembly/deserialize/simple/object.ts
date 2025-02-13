@@ -62,7 +62,7 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
           if (code == COMMA || code == BRACE_RIGHT || isSpace(code)) {
-            console.log("Value (number): " + JSON.__deserialize<i32>(lastIndex, srcStart).toString());
+            console.log("Value (number): " + ptrToStr(lastIndex, srcStart));
             // @ts-ignore: exists
             out.__DESERIALIZE(keyStart, keyEnd, lastIndex, srcStart, dst);
             // while (isSpace(load<u16>((srcStart += 2)))) {
@@ -83,7 +83,7 @@ export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize)
           const code = load<u16>(srcStart);
           if (code == BRACE_RIGHT) {
             if (--depth == 0) {
-              // console.log("Value (object): " + ptrToStr(lastIndex, srcStart + 2));
+              console.log("Value (object): " + ptrToStr(lastIndex, srcStart + 2));
               // @ts-ignore: exists
               out.__DESERIALIZE(keyStart, keyEnd, lastIndex, (srcStart += 2), dst);
               // console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
