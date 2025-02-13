@@ -36,6 +36,11 @@ export type Raw = string;
  * JSON Encoder/Decoder for AssemblyScript
  */
 export namespace JSON {
+  export namespace Memory {
+    export function shrink(): void {
+      bs.resize(64);
+    }
+  }
   /**
    * Serializes valid JSON data
    * ```js

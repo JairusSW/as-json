@@ -22,8 +22,29 @@ export namespace bs {
    * @param size - The size to propose.
    */
   // @ts-ignore: decorator
+  @inline export function ensureSize(size: u32): void {
+    // console.log("Ensure   " + (stackSize).toString() + " -> " + (stackSize + size).toString() + " (" + size.toString() + ") " + (((stackSize + size) > bufferSize) ? "+" : ""));
+    if (offset + size > bufferSize + changetype<usize>(buffer)) {
+      const deltaBytes = nextPowerOf2(size + 64);
+      bufferSize += deltaBytes;
+      // @ts-ignore: exists
+      const newPtr = changetype<ArrayBuffer>(__renew(
+        changetype<usize>(buffer),
+        bufferSize
+      ));
+      offset = offset + changetype<usize>(newPtr) - changetype<usize>(buffer);
+      buffer = newPtr;
+    }
+  }
+
+  /**
+   * Proposes that the buffer size is should be greater than or equal to the proposed size.
+   * If necessary, reallocates the buffer to the exact new size.
+   * @param size - The size to propose.
+   */
+  // @ts-ignore: decorator
   @inline export function proposeSize(size: u32): void {
-    console.log("Propose  " + (stackSize).toString() + " -> " + (stackSize + size).toString() + " (" + size.toString() + ") " + (((stackSize + size) > bufferSize) ? "+" : ""));
+    // console.log("Propose  " + (stackSize).toString() + " -> " + (stackSize + size).toString() + " (" + size.toString() + ") " + (((stackSize + size) > bufferSize) ? "+" : ""));
     if ((stackSize += size) > bufferSize) {
       const deltaBytes = nextPowerOf2(size);
       bufferSize += deltaBytes;
@@ -44,7 +65,7 @@ export namespace bs {
    */
   // @ts-ignore: decorator
   @inline export function growSize(size: u32): void {
-    console.log("Grow     " + (stackSize).toString() + " -> " + (stackSize + size).toString() + " (" + size.toString() + ") " + (((stackSize + size) > bufferSize) ? "+" : ""));
+    // console.log("Grow     " + (stackSize).toString() + " -> " + (stackSize + size).toString() + " (" + size.toString() + ") " + (((stackSize + size) > bufferSize) ? "+" : ""));
     if ((stackSize += size) > bufferSize) {
       const deltaBytes = nextPowerOf2(size + 64);
       bufferSize += deltaBytes;
@@ -53,7 +74,7 @@ export namespace bs {
         changetype<usize>(buffer),
         bufferSize
       ));
-      if (buffer != newPtr) console.log("  Old: " + changetype<usize>(buffer).toString() + "\n  New: " + changetype<usize>(newPtr).toString());
+      // if (buffer != newPtr) console.log("  Old: " + changetype<usize>(buffer).toString() + "\n  New: " + changetype<usize>(newPtr).toString());
       offset = offset + changetype<usize>(newPtr) - changetype<usize>(buffer);
       buffer = newPtr;
     }

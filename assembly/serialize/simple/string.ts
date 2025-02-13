@@ -23,7 +23,7 @@ export function serializeString(src: string): void {
     const code = load<u16>(srcPtr);
     if (code == 34 || code == 92 || code < 32) {
       const remBytes = srcPtr - lastPtr;
-      // memory.copy(bs.offset, lastPtr, remBytes);
+      memory.copy(bs.offset, lastPtr, remBytes);
       bs.offset += remBytes;
       const escaped = load<u32>(SERIALIZE_ESCAPE_TABLE + (code << 2));
       if ((escaped & 0xffff) != BACK_SLASH) {
@@ -41,7 +41,7 @@ export function serializeString(src: string): void {
     srcPtr += 2;
   }
   const remBytes = srcEnd - lastPtr;
-  // memory.copy(bs.offset, lastPtr, remBytes);
+  memory.copy(bs.offset, lastPtr, remBytes);
   bs.offset += remBytes;
   store<u16>(bs.offset, QUOTE);
   bs.offset += 2;
