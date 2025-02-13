@@ -1,5 +1,19 @@
 # Change Log
 
+## 2025-02-13 - 1.0.0-alpha.4
+
+- feat: reintroduce support for `Box<T>`-wrapped primitive types
+- tests: add extensive tests to all supported types
+- fix: 6-byte keys being recognized on deserialize
+- perf: take advantage of aligned memory to use a single 64-bit load on 6-byte keys
+- fix: `bs.proposeSize()` should increment `stackSize` by `size` instead of setting it
+- fix: allow runtime to manage `bs.buffer`
+- fix: memory leaks in `bs` module
+- fix: add (possibly temporary) `JSON.Memory.shrink()` to shrink memory in `bs`
+- perf: prefer growing memory by `nextPowerOf2(size + 64)` for less reallocations
+- tests: add boolean tests to `Box<T>`
+- fix: serialization of non-growable data types should grow `bs.stackSize`
+
 ## 2025-01-31 - 1.0.0-alpha.3
 
 - fix: write to proper offset when deserializing string with \u0000-type escapes
