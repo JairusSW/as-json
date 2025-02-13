@@ -1,7 +1,7 @@
 <h5 align="center">
   <pre>
 <span style="font-size: 0.8em;">     ██ ███████  ██████  ███    ██        █████  ███████
-     ██ ██      ██    ██ ████   ██       ██   ██ ██     
+     ██ ██      ██    ██ ████   ██       ██   ██ ██
      ██ ███████ ██    ██ ██ ██  ██ █████ ███████ ███████
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
@@ -10,32 +10,35 @@
   </pre>
 </h5>
 
-## Contents
- - [About](#about)
- - [Installation](#installation)
- - [Usage](#usage)
- - [Examples](#examples)
- - [Performance](#performance)
- - [License](#license)
- - [Contact](#contact)
+## 📚 Contents
 
-## About
+- [About](#-about)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Examples](#examples)
+- [Performance](#-performance)
+- [License](#-license)
+- [Contact](#-contact)
 
-## Installation
+## 📝 About
+
+JSON is the de-facto serialization format of modern web applications, but its serialization and deserialization remain a significant performance bottleneck, especially at scale. Traditional parsing approaches are computationally expensive, adding unnecessary overhead to both clients and servers. This library is designed to mitigate this by leveraging SIMD acceleration and highly optimized transformations, enabling JSON processing at gigabyte-per-second speeds with minimal runtime overhead.
+
+## 💾 Installation
 
 ```bash
-npm install json-as@1.0.0-alpha.3
+npm install json-as@1.0.0-alpha.4
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
 
 ```bash
---transform json-as
+--transform json-as/transform
 ```
 
 Alternatively, add it to your `asconfig.json`
 
-```
+```json
 {
   // ...
   "options": {
@@ -46,7 +49,7 @@ Alternatively, add it to your `asconfig.json`
 
 If you'd like to see the code that the transform generates, run with `JSON_DEBUG=true`
 
-## Usage
+## 🪄 Usage
 
 ```js
 import { JSON } from "json-as";
@@ -75,7 +78,7 @@ class Player {
 const player: Player = {
   firstName: "Jairus",
   lastName: "Tanaka",
-  lastActive: [2, 7, 2025],
+  lastActive: [2, 13, 2025],
   age: 18,
   pos: {
     x: 3.4,
@@ -86,56 +89,34 @@ const player: Player = {
 };
 
 const serialized = JSON.stringify<Player>(player);
-const parsed = JSON.parse<Player>(serialized);
+const deserialized = JSON.parse<Player>(serialized);
 
-console.log("Serialized: " + serialized);
-console.log("Parsed: " + JSON.stringify(parsed));
+console.log("Serialized    " + serialized);
+console.log("Deserialized  " + JSON.stringify(deserialized));
 ```
 
 ## Examples
 
-Classes can even have inheritance. Here's a nasty example
+## ⚡ Performance
 
-```js
-@json
-class Base {}
+The `json-as` library has been optimized to achieve near-gigabyte-per-second JSON processing speeds through SIMD acceleration and highly efficient transformations. Below are some key performance benchmarks to give you an idea of how it performs.
 
-@json
-class Vec1 extends Base {
-  x: f32 = 1.0;
-}
-@json
-class Vec2 extends Vec1 {
-  y: f32 = 2.0;
-}
-@json
-class Vec3 extends Vec2 {
-  z: f32 = 3.0;
-}
+### Raw Serialization and Deserialization Performance
 
-const arr: Base[] = [
-  new Vec1(),
-  new Vec2(),
-  new Vec3()
-];
+| Test Case          | Serialization Time (ms) | Deserialization Time (ms) | Throughput (GB/s) |
+|--------------------|-------------------------|---------------------------|-------------------|
+| Small JSON Object  | [Fill Value]            | [Fill Value]              | [Fill Value]      |
+| Medium JSON Object | [Fill Value]            | [Fill Value]              | [Fill Value]      |
+| Large JSON Object  | [Fill Value]            | [Fill Value]              | [Fill Value]      |
 
-const serialized = JSON.stringify(arr);
-// [{"x":1.0},{"x":1.0,"y":2.0},{"y":2.0,"x":1.0,"z":3.0}]
-const parsed = JSON.parse<Base[]>(serialized);
-```
+### Real-World Usage
 
-You can also add it to your `asconfig.json`
+| Scenario           | JSON Size (kb) | Serialization Time (ms) | Deserialization Time (ms) | Throughput (GB/s) |
+|--------------------|----------------|-------------------------|---------------------------|-------------------|
+| Web API Response   | [Fill Value]    | [Fill Value]           | [Fill Value]              | [Fill Value]      |
+| Database Entry     | [Fill Value]    | [Fill Value]           | [Fill Value]              | [Fill Value]      |
+| File Parsing       | [Fill Value]    | [Fill Value]           | [Fill Value]              | [Fill Value]      |
 
-```json
-{
-  // ...
-  "options": {
-    "transform": ["json-as/transform"]
-  }
-}
-```
-
-If you use this project in your codebase, consider dropping a [star](https://github.com/JairusSW/as-json). I would really appreciate it!
 
 ## 📃 License
 
