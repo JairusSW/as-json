@@ -25,6 +25,7 @@ import { ptrToStr } from "./util/ptrToStr";
 import { bytes } from "./util";
 import { deserializeArbitrary } from "./deserialize/simple/arbitrary";
 import { SERIALIZE_ESCAPE_TABLE } from "./globals/tables";
+import { serializeObject } from "./serialize/simple/object";
 
 export type Raw = string;
 
@@ -136,6 +137,9 @@ export namespace JSON {
       return bs.out<string>();
     } else if (data instanceof JSON.Value) {
       serializeArbitrary(data);
+      return bs.out<string>();
+    } else if (data instanceof JSON.Obj) {
+      serializeObject(data);
       return bs.out<string>();
     } else if (data instanceof JSON.Box) {
       return JSON.stringify(data.value);

@@ -64,8 +64,4 @@ a4.set("z", 9.8);
 a4.set("obj", obj)
 a4.set<boolean>("bool", false);
 
-// const b = a4["x"];
-
-serializeObject(a4);
-
-console.log("a4: " + bs.out<string>());
+console.log("a4: " + JSON.stringify(a4));
