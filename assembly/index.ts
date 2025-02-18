@@ -7,7 +7,7 @@ import { serializeMap } from "./serialize/simple/map";
 import { deserializeBoolean } from "./deserialize/simple/bool";
 import { deserializeArray } from "./deserialize/simple/array";
 import { deserializeFloat } from "./deserialize/simple/float";
-import { deserializeObject } from "./deserialize/simple/object";
+import { deserializeStruct } from "./deserialize/simple/struct";
 import { deserializeMap } from "./deserialize/simple/map";
 import { deserializeDate } from "./deserialize/simple/date";
 import { deserializeInteger } from "./deserialize/simple/integer";
@@ -20,9 +20,11 @@ import { dtoa_buffered, itoa_buffered } from "util/number";
 import { serializeBool } from "./serialize/simple/bool";
 import { serializeInteger } from "./serialize/simple/integer";
 import { serializeFloat } from "./serialize/simple/float";
-import { serializeObject } from "./serialize/simple/object";
+import { serializeStruct } from "./serialize/simple/struct";
 import { ptrToStr } from "./util/ptrToStr";
 import { bytes } from "./util";
+import { deserializeArbitrary } from "./deserialize/simple/arbitrary";
+import { SERIALIZE_ESCAPE_TABLE } from "./globals/tables";
 
 export type Raw = string;
 
@@ -176,13 +178,16 @@ export namespace JSON {
       // @ts-ignore
       changetype<nonnull<T>>(out).__INITIALIZE();
       // @ts-ignore
-      return deserializeObject<nonnull<T>>(dataPtr, dataPtr + dataSize, out);
+      return deserializeStruct<nonnull<T>>(dataPtr, dataPtr + dataSize, out);
     } else if (type instanceof Map) {
       // @ts-ignore
       return deserializeMap<nonnull<T>>(dataPtr, dataPtr + dataSize);
     } else if (type instanceof Date) {
       // @ts-ignore
       return deserializeDate(dataPtr, dataPtr + dataSize);
+    } else if (type instanceof JSON.Value) {
+      // @ts-ignore
+      return deserializeArbitrary(dataPtr, dataPtr + dataSize, 0);
     } else if (type instanceof JSON.Box) {
       // @ts-ignore
       return new JSON.Box(parseBox(data, changetype<nonnull<T>>(0).value));
@@ -278,6 +283,9 @@ export namespace JSON {
         if (!JSON.Value.METHODS.has(idof<T>())) JSON.Value.METHODS.set(idof<T>(), value.__SERIALIZE.index);
         // @ts-ignore
         store<T>(changetype<usize>(this), value, STORAGE);
+      } else if (value instanceof JSON.Obj) {
+        this.type = JSON.Types.Object;
+        store<T>(changetype<usize>(this), value, STORAGE);
         // @ts-ignore
       } else if (isArray<T>() && idof<valueof<T>>() == idof<JSON.Value>()) {
         // @ts-ignore: T satisfies constraints of any[]
@@ -329,6 +337,9 @@ export namespace JSON {
           out.write("]");
           return out.toString();
         }
+        case JSON.Types.Object: {
+          return JSON.stringify(this.get<JSON.Obj>());
+        }
         default: {
           const fn = JSON.Value.METHODS.get(this.type - JSON.Types.Struct);
           const value = this.get<usize>();
@@ -338,6 +349,49 @@ export namespace JSON {
     }
   }
 
+  export class Obj {
+    private storage: Map<string, JSON.Value> = new Map<string, JSON.Value>();
+
+    private constructor() {
+      unreachable();
+    }
+
+    // @ts-ignore: decorator
+    @inline set<T>(key: string, value: T): void {
+      this.storage.set(key, Value.from<T>(value));
+    }
+
+    // @ts-ignore: decorator
+    @inline get(key: string): JSON.Value | null {
+      if (!this.storage.has(key)) return null;
+      return this.storage.get(key);
+    }
+
+    // @ts-ignore: decorator
+    @inline has(key: string): bool {
+      return this.storage.has(key);
+    }
+
+    // @ts-ignore: decorator
+    @inline delete(key: string): bool {
+      return this.storage.delete(key);
+    }
+
+    // @ts-ignore: decorator
+    @inline keys(): string[] {
+      return this.storage.keys();
+    }
+
+    // @ts-ignore: decorator
+    @inline values(): JSON.Value[] {
+      return this.storage.values();
+    }
+
+    // @ts-ignore: decorator
+    @inline toString(): string {
+      return JSON.stringify(this);
+    }
+  }
   /**
    * Box for primitive types
    */
@@ -389,7 +443,7 @@ export namespace JSON {
       // @ts-ignore: Supplied by transform
     } else if (isDefined(src.__SERIALIZE)) {
       // @ts-ignore
-      serializeObject(changetype<nonnull<T>>(src));
+      serializeStruct(changetype<nonnull<T>>(src));
     } else if (src instanceof Date) {
       // @ts-ignore
       serializeDate(changetype<nonnull<T>>(src));
@@ -425,7 +479,7 @@ export namespace JSON {
       let type: nonnull<T> = changetype<nonnull<T>>(0);
       // @ts-ignore: declared by transform
       if (isDefined(type.__DESERIALIZE)) {
-        return deserializeObject<T>(srcStart, srcEnd, dst);
+        return deserializeStruct<T>(srcStart, srcEnd, dst);
       } else if (type instanceof Map) {
         // @ts-ignore: type
         return deserializeMap<T>(srcStart, srcEnd, dst);
@@ -449,3 +503,7 @@ export namespace JSON {
 function deserializeBox<T>(srcStart: usize, srcEnd: usize, dst: usize, ty: T): T {
   return JSON.__deserialize<T>(srcStart, srcEnd, dst);
 }
+
+export import Value = JSON.Value;
+export import Obj = JSON.Obj;
+export import Box = JSON.Box;
