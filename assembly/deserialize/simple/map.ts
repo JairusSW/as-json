@@ -76,7 +76,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
         srcStart += 2;
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
-          if (((code ^ BRACE_RIGHT) | (code ^ BRACKET_RIGHT)) == 32) {
+          if (code == BRACKET_RIGHT) {
             if (--depth == 0) {
               // @ts-ignore: type
               out.set(key, JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
