@@ -65,3 +65,11 @@ a4.set("obj", obj)
 a4.set<boolean>("bool", false);
 
 console.log("a4: " + JSON.stringify(a4));
+
+const a5 = JSON.parse<JSON.Obj>('{"foo":"bar"}');
+
+console.log("a5: " + JSON.stringify(a5));
+
+const a6 = JSON.parse<JSON.Obj>('{"x":1.5,"y":5.4,"z":9.8,"obj":{"foo":"bar"}}');
+
+console.log("a6: " + JSON.stringify(a6));

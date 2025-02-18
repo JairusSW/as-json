@@ -26,6 +26,7 @@ import { bytes } from "./util";
 import { deserializeArbitrary } from "./deserialize/simple/arbitrary";
 import { SERIALIZE_ESCAPE_TABLE } from "./globals/tables";
 import { serializeObject } from "./serialize/simple/object";
+import { deserializeObject } from "./deserialize/simple/object";
 
 export type Raw = string;
 
@@ -192,6 +193,9 @@ export namespace JSON {
     } else if (type instanceof JSON.Value) {
       // @ts-ignore
       return deserializeArbitrary(dataPtr, dataPtr + dataSize, 0);
+    } else if (type instanceof JSON.Obj) {
+      // @ts-ignore
+      return deserializeObject(dataPtr, dataPtr + dataSize, 0);
     } else if (type instanceof JSON.Box) {
       // @ts-ignore
       return new JSON.Box(parseBox(data, changetype<nonnull<T>>(0).value));
@@ -483,6 +487,8 @@ export namespace JSON {
       serializeMap(changetype<nonnull<T>>(src));
     } else if (src instanceof JSON.Value) {
       serializeArbitrary(src);
+    } else if (src instanceof JSON.Obj) {
+      serializeObject(src);
     } else if (src instanceof JSON.Box) {
       __serialize(src.value);
     } else {
@@ -514,6 +520,9 @@ export namespace JSON {
       } else if (type instanceof Date) {
         // @ts-ignore: type
         return deserializeDate(srcStart, srcEnd);
+      } else if (type instanceof JSON.Value) {
+        // @ts-ignore: type
+        return deserializeArbitrary(srcStart, srcEnd, 0);
       } else if (type instanceof JSON.Box) {
         // @ts-ignore: type
         return new JSON.Box(deserializeBox(srcStart, srcEnd, dst, changetype<nonnull<T>>(0).value));

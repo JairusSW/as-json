@@ -3,6 +3,7 @@ import { serializeArray } from "./array";
 import { serializeBool } from "./bool";
 import { serializeFloat } from "./float";
 import { serializeInteger } from "./integer";
+import { serializeObject } from "./object";
 import { serializeString } from "./string";
 
 export function serializeArbitrary(src: JSON.Value): void {
@@ -33,6 +34,10 @@ export function serializeArbitrary(src: JSON.Value): void {
       break;
     case JSON.Types.Array: {
       serializeArray(src.get<JSON.Value[]>());
+      break;
+    }
+    case JSON.Types.Object: {
+      serializeObject(src.get<JSON.Obj>());
       break;
     }
     default: {
