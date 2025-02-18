@@ -5,7 +5,7 @@ import { deserializeBooleanArray } from "./array/bool";
 import { deserializeFloatArray } from "./array/float";
 import { deserializeIntegerArray } from "./array/integer";
 import { deserializeMapArray } from "./array/map";
-import { deserializeObjectArray } from "./array/object";
+import { deserializeStructArray } from "./array/struct";
 import { deserializeStringArray } from "./array/string";
 
 // @ts-ignore: Decorator valid here
@@ -34,7 +34,7 @@ export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: u
       return deserializeMapArray<T>(srcStart, srcEnd, dst);
       // @ts-ignore: defined by transform
     } else if (isDefined(type.__DESERIALIZE)) {
-      return deserializeObjectArray<T>(srcStart, srcEnd, dst);
+      return deserializeStructArray<T>(srcStart, srcEnd, dst);
     }
     throw new Error("Could not parse array of type " + nameof<T>() + "!");
   } else {

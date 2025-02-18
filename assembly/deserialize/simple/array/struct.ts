@@ -1,7 +1,7 @@
 import { BRACE_LEFT, BRACE_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../..";
 
-export function deserializeObjectArray<T extends unknown[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
+export function deserializeStructArray<T extends unknown[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = dst ? changetype<T>(dst) : instantiate<T>();
   let lastIndex: usize = 0;
   let depth: u32 = 0;

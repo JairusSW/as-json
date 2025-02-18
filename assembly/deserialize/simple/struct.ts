@@ -1,9 +1,7 @@
-import { JSON } from "../..";
 import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T } from "../../custom/chars";
 import { isSpace } from "../../util";
-import { ptrToStr } from "../../util/ptrToStr";
 
-export function deserializeObject<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
+export function deserializeStruct<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<nonnull<T>>(dst || __new(offsetof<T>(), idof<T>()));
 
   let keyStart: usize = 0;
