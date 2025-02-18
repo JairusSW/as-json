@@ -1,4 +1,6 @@
 import { JSON } from ".";
+import { bs } from "../modules/as-bs/assembly";
+import { serializeObject } from "./serialize/simple/object";
 
 @json
 class Obj {
@@ -21,8 +23,7 @@ class Player {
   lastName!: string;
   lastActive!: i32[];
   // Drop in a code block, function, or expression that evaluates to a boolean
-  @omitif((age) => age < 18)
-  @omitif('this.age <= 0')
+  @omitif((self: Player) => self.age < 18)
   age!: i32;
   @omitnull()
   pos!: Vec3 | null;
@@ -55,4 +56,16 @@ const a3 = JSON.stringify(player);
 // console.log("Bytes    " + bytes(a3).toString());
 console.log("a3: " + a3);
 
-JSON.Memory.shrink();
+const a4 = new JSON.Obj();
+
+a4.set("x", 1.5);
+a4.set("y", 5.4);
+a4.set("z", 9.8);
+a4.set("obj", obj)
+a4.set<boolean>("bool", false);
+
+// const b = a4["x"];
+
+serializeObject(a4);
+
+console.log("a4: " + bs.out<string>());

@@ -262,7 +262,7 @@ export namespace JSON {
         this.type = JSON.Types.U64;
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (value instanceof f32) {
-        this.type = JSON.Types.F64;
+        this.type = JSON.Types.F32;
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (value instanceof f64) {
         this.type = JSON.Types.F64;
@@ -282,7 +282,7 @@ export namespace JSON {
         // @ts-ignore
         if (!JSON.Value.METHODS.has(idof<T>())) JSON.Value.METHODS.set(idof<T>(), value.__SERIALIZE.index);
         // @ts-ignore
-        store<T>(changetype<usize>(this), value, STORAGE);
+        store<usize>(changetype<usize>(this), changetype<usize>(value), STORAGE);
       } else if (value instanceof JSON.Obj) {
         this.type = JSON.Types.Object;
         store<T>(changetype<usize>(this), value, STORAGE);
@@ -316,6 +316,10 @@ export namespace JSON {
           return this.get<u32>().toString();
         case JSON.Types.U64:
           return this.get<u64>().toString();
+        case JSON.Types.F32:
+          return this.get<f32>().toString();
+        case JSON.Types.F64:
+          return this.get<f64>().toString();
         case JSON.Types.String:
           return '"' + this.get<string>() + '"';
         case JSON.Types.Bool:
@@ -343,22 +347,31 @@ export namespace JSON {
         default: {
           const fn = JSON.Value.METHODS.get(this.type - JSON.Types.Struct);
           const value = this.get<usize>();
-          return call_indirect<string>(fn, 0, value);
+          call_indirect<void>(fn, 0, value);
+          return bs.out<string>();
         }
       }
     }
   }
 
   export class Obj {
+    // When accessing stackSize, subtract 2
+    // @ts-ignore: type
+    private stackSize: u32 = 6;
+    // @ts-ignore: type
     private storage: Map<string, JSON.Value> = new Map<string, JSON.Value>();
 
-    private constructor() {
-      unreachable();
+    constructor() { }
+
+    // @ts-ignore: decorator
+    @inline get size(): i32 {
+      return this.storage.size;
     }
 
     // @ts-ignore: decorator
     @inline set<T>(key: string, value: T): void {
-      this.storage.set(key, Value.from<T>(value));
+      if (!this.storage.has(key)) this.stackSize += bytes(key) + 8;
+      this.storage.set(key, JSON.Value.from<T>(value));
     }
 
     // @ts-ignore: decorator
@@ -390,6 +403,17 @@ export namespace JSON {
     // @ts-ignore: decorator
     @inline toString(): string {
       return JSON.stringify(this);
+    }
+
+    // @ts-ignore: decorator
+    @inline static from<T>(value: T): JSON.Obj {
+      if (value instanceof JSON.Obj) return value;
+      const out = changetype<JSON.Obj>(__new(offsetof<JSON.Obj>(), idof<JSON.Obj>()));
+
+      if (value instanceof Map) {
+
+      }
+      return out;
     }
   }
   /**
