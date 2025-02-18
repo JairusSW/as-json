@@ -503,7 +503,3 @@ export namespace JSON {
 function deserializeBox<T>(srcStart: usize, srcEnd: usize, dst: usize, ty: T): T {
   return JSON.__deserialize<T>(srcStart, srcEnd, dst);
 }
-
-export import Value = JSON.Value;
-export import Obj = JSON.Obj;
-export import Box = JSON.Box;

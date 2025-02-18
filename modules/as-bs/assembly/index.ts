@@ -87,11 +87,11 @@ export namespace bs {
   // @ts-ignore: Decorator valid here
   @inline export function resize(newSize: u32): void {
     // @ts-ignore: exists
-    const newPtr = __renew(buffer, newSize);
+    const newPtr = changetype<ArrayBuffer>(__renew(changetype<usize>(buffer), newSize));
     bufferSize = newSize;
+    offset = changetype<usize>(newPtr);
     buffer = newPtr;
-    offset = newPtr + newSize;
-    stackSize = newPtr;
+    stackSize = 0;
   }
 
   /**

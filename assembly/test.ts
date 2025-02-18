@@ -1,5 +1,4 @@
 import { JSON } from ".";
-import { bytes } from "./util";
 
 @json
 class Obj {
