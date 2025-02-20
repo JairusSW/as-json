@@ -6,8 +6,29 @@ export function deserializeArbitraryArray<T extends JSON.Value>(srcStart: usize,
   const out = dst ? changetype<T>(dst) : instantiate<T>();
   let lastIndex: usize = 0;
   let depth: u32 = 0;
+  let isStr = false;
   while (srcStart < srcEnd) {
     const code = load<u16>(srcStart);
+    if (code == BRACE_LEFT) {
+      lastIndex = srcStart;
+      depth++;
+      srcStart += 2;
+      while (srcStart < srcEnd) {
+        const code = load<u16>(srcStart);
+        if (code == BRACE_RIGHT) {
+          if (--depth == 0) {
+            // @ts-ignore: type
+            out.push(JSON.__deserialize<valueof<T>>(lastIndex, srcStart));
+            // console.log("Value (object): " + ptrToStr(lastIndex, srcStart));
+            while (isSpace(load<u16>((srcStart += 2)))) {
+              /* empty */
+            }
+            break;
+          }
+        } else if (code == BRACE_LEFT) depth++;
+        srcStart += 2;
+      }
+    }
     if (code == QUOTE) {
       lastIndex = srcStart;
       srcStart += 2;
