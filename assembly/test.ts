@@ -1,6 +1,8 @@
 import { JSON } from ".";
 import { bs } from "../modules/as-bs/assembly";
+import { deserializeArbitraryArray } from "./deserialize/simple/array/arbitrary";
 import { serializeObject } from "./serialize/simple/object";
+import { bytes } from "./util";
 
 @json
 class Obj {
@@ -73,3 +75,7 @@ console.log("a5: " + JSON.stringify(a5));
 const a6 = JSON.parse<JSON.Obj>('{"x":1.5,"y":5.4,"z":9.8,"obj":{"foo":"bar"}}');
 
 console.log("a6: " + JSON.stringify(a6));
+
+const a7 = JSON.parse<JSON.Value[]>('["string",true,3.14,{"x":1.0,"y":2.0,"z":3.0},[1,2,3,true]]');
+
+console.log("a7: " + JSON.stringify(a7));

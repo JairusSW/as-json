@@ -28,7 +28,7 @@ export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: u
     const type = changetype<nonnull<valueof<T>>>(0);
     if (type instanceof JSON.Value) {
       // @ts-ignore: type
-      return deserializeArbitraryArray<T>(srcStart, srcEnd, dst);
+      return deserializeArbitraryArray(srcStart, srcEnd, dst);
     } else if (type instanceof Map) {
       // @ts-ignore: type
       return deserializeMapArray<T>(srcStart, srcEnd, dst);
@@ -40,9 +40,4 @@ export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: u
   } else {
     throw new Error("Could not parse array of type " + nameof<T>() + "!");
   }
-}
-
-function isMap<T>(): boolean {
-  let type: T = changetype<T>(0);
-  return type instanceof Map;
 }
