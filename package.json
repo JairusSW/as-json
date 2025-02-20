@@ -1,6 +1,6 @@
 {
   "name": "json-as",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-beta.1",
   "author": "Jairus Tanaka",
   "repository": {
     "type": "git",
@@ -10,6 +10,7 @@
   "devDependencies": {
     "@assemblyscript/wasi-shim": "^0.1.0",
     "@types/node": "^22.13.1",
+    "as-bench": "JairusSW/as-bench",
     "as-console": "^7.0.0",
     "assemblyscript": "^0.27.34",
     "assemblyscript-prettier": "^3.0.1",
@@ -52,7 +53,7 @@
   },
   "scripts": {
     "test": "bash ./run-tests.sh",
-    "build:bench": "rm -rf ./build/ && asc assembly/__benches__/misc.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime incremental --enable simd --enable bulk-memory",
+    "build:bench": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/__benches__/misc.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub --enable simd --enable bulk-memory",
     "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0",
     "build:test:simd": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --enable simd",
     "test:wasmtime": "wasmtime ./build/test.wasm",

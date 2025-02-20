@@ -6,7 +6,7 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-alpha.4
+    AssemblyScript - v1.0.0-beta.1
   </pre>
 </h5>
 
@@ -22,12 +22,12 @@
 
 ## 📝 About
 
-JSON is the de-facto serialization format of modern web applications, but its serialization and deserialization remain a significant performance bottleneck, especially at scale. Traditional parsing approaches are computationally expensive, adding unnecessary overhead to both clients and servers. This library is designed to mitigate this by leveraging SIMD acceleration and highly optimized transformations, enabling JSON processing at gigabyte-per-second speeds with minimal runtime overhead.
+JSON is the de-facto serialization format of modern web applications, but its serialization and deserialization remain a significant performance bottleneck, especially at scale. Traditional parsing approaches are computationally expensive, adding unnecessary overhead to both clients and servers. This library is designed to mitigate this by leveraging SIMD acceleration and highly optimized transformations.
 
 ## 💾 Installation
 
 ```bash
-npm install json-as@1.0.0-alpha.4
+npm install json-as@1.0.0-beta.1
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
@@ -101,21 +101,22 @@ console.log("Deserialized  " + JSON.stringify(deserialized));
 
 The `json-as` library has been optimized to achieve near-gigabyte-per-second JSON processing speeds through SIMD acceleration and highly efficient transformations. Below are some key performance benchmarks to give you an idea of how it performs.
 
-### Raw Serialization and Deserialization Performance
+### Raw Performance
 
-| Test Case          | Serialization Time (ms) | Deserialization Time (ms) | Throughput (GB/s) |
-|--------------------|-------------------------|---------------------------|-------------------|
-| Small JSON Object  | [Fill Value]            | [Fill Value]              | [Fill Value]      |
-| Medium JSON Object | [Fill Value]            | [Fill Value]              | [Fill Value]      |
-| Large JSON Object  | [Fill Value]            | [Fill Value]              | [Fill Value]      |
+| Test Case          | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
+|--------------------|-----------------------|-------------------------|----------------------|------------------------|
+| Vector3 Object     | 32,642,320 ops/s      | 9,736,272 ops/s         | 1,240 MB/s           | 369 MB/s               |
+| Small JSON Object  | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
+| Medium JSON Object | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
+| Large JSON Object  | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
 
 ### Real-World Usage
 
-| Scenario           | JSON Size (kb) | Serialization Time (ms) | Deserialization Time (ms) | Throughput (GB/s) |
-|--------------------|----------------|-------------------------|---------------------------|-------------------|
-| Web API Response   | [Fill Value]    | [Fill Value]           | [Fill Value]              | [Fill Value]      |
-| Database Entry     | [Fill Value]    | [Fill Value]           | [Fill Value]              | [Fill Value]      |
-| File Parsing       | [Fill Value]    | [Fill Value]           | [Fill Value]              | [Fill Value]      |
+| Scenario           | JSON Size (kb) | Serialization Time (ops/s) | Deserialization Time (ops/s) | Throughput (GB/s) |
+|--------------------|----------------|----------------------------|------------------------------|-------------------|
+| Web API Response   | [Fill Value]   | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
+| Database Entry     | [Fill Value]   | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
+| File Parsing       | [Fill Value]   | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
 
 
 ## 📃 License

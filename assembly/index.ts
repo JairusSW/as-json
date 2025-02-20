@@ -22,7 +22,7 @@ import { serializeInteger } from "./serialize/simple/integer";
 import { serializeFloat } from "./serialize/simple/float";
 import { serializeStruct } from "./serialize/simple/struct";
 import { ptrToStr } from "./util/ptrToStr";
-import { bytes } from "./util";
+import { atoi, bytes } from "./util";
 import { deserializeArbitrary } from "./deserialize/simple/arbitrary";
 import { SERIALIZE_ESCAPE_TABLE } from "./globals/tables";
 import { serializeObject } from "./serialize/simple/object";
@@ -53,7 +53,8 @@ export namespace JSON {
    * @param data T
    * @returns string
    */
-  export function stringify<T>(data: T, out: string | null = null): string {
+  // @ts-ignore: inline
+  @inline export function stringify<T>(data: T, out: string | null = null): string {
     if (isBoolean<T>()) {
       if (out) {
         if (<bool>data == true) {
@@ -157,7 +158,8 @@ export namespace JSON {
    * @param data string
    * @returns T
    */
-  export function parse<T>(data: string): T {
+  // @ts-ignore: inline
+  @inline export function parse<T>(data: string): T {
     const dataSize = bytes(data);
     const dataPtr = changetype<usize>(data);
     if (isBoolean<T>()) {
@@ -178,10 +180,10 @@ export namespace JSON {
     }
     let type: nonnull<T> = changetype<nonnull<T>>(0);
     // @ts-ignore: Defined by transform
-    if (isDefined(type.__DESERIALIZE) && isDefined(type.__INITIALIZE)) {
+    if (isDefined(type.__DESERIALIZE)) {
       const out = __new(offsetof<nonnull<T>>(), idof<nonnull<T>>());
-      // @ts-ignore
-      changetype<nonnull<T>>(out).__INITIALIZE();
+      // @ts-ignore: Defined by transform
+      if (isDefined(type.__INITIALIZE)) changetype<nonnull<T>>(out).__INITIALIZE();
       // @ts-ignore
       return deserializeStruct<nonnull<T>>(dataPtr, dataPtr + dataSize, out);
     } else if (type instanceof Map) {
@@ -452,7 +454,8 @@ export namespace JSON {
     }
   }
 
-  export function __serialize<T>(src: T): void {
+  // @ts-ignore: inline
+  @inline export function __serialize<T>(src: T): void {
     if (isBoolean<T>()) {
       serializeBool(src as bool);
     } else if (isInteger<T>() && nameof<T>() == "usize" && src == 0) {
@@ -495,12 +498,14 @@ export namespace JSON {
       throw new Error(`Could not serialize provided data. Make sure to add the correct decorators to classes.`);
     }
   }
-  export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
+  
+  // @ts-ignore: inline
+  @inline export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
     if (isBoolean<T>()) {
       // @ts-ignore: type
       return deserializeBoolean(srcStart, srcEnd);
     } else if (isInteger<T>()) {
-      return deserializeInteger<T>(srcStart, srcEnd);
+      return atoi<T>(srcStart, srcEnd);
     } else if (isFloat<T>()) {
       return deserializeFloat<T>(srcStart, srcEnd);
     } else if (isString<T>()) {

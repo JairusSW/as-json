@@ -3,7 +3,7 @@
  * @param str
  * @returns
  */
-// @ts-ignore: Decorator valid here
+// @ts-ignore: inline
 @inline export function atoi<T>(srcStart: usize, srcEnd: usize): T {
   // @ts-ignore: type
   let val: T = 0;
