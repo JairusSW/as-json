@@ -79,3 +79,7 @@ console.log("a6: " + JSON.stringify(a6));
 const a7 = JSON.parse<JSON.Value[]>('["string",true,3.14,{"x":1.0,"y":2.0,"z":3.0},[1,2,3,true]]');
 
 console.log("a7: " + JSON.stringify(a7));
+
+const a8 = JSON.stringify(["hello", JSON.stringify("world"),"working?"]);
+
+console.log("a8: " + a8);
