@@ -22,7 +22,7 @@ export function deserializeArbitraryArray(srcStart: usize, srcEnd: usize, dst: u
           if (--depth == 0) {
             // @ts-ignore: type
             out.push(JSON.__deserialize<JSON.Value>(lastIndex, srcStart + 2));
-            console.log("Value (object): " + ptrToStr(lastIndex, srcStart + 2));
+            // console.log("Value (object): " + ptrToStr(lastIndex, srcStart + 2));
             break;
           }
         } else if (code == BRACE_LEFT) depth++;
