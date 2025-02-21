@@ -10,7 +10,7 @@ const SPLAT_92 = i16x8.splat(92); /* \ */
  * @returns number of bytes written
  */
 // todo: optimize and stuff. it works, its not pretty. ideally, i'd like this to be (nearly) branchless
-export function deserializeString_SIMD(src: string, srcStart: usize, srcEnd: usize, dst: usize): usize {
+export function deserializeString_SIMD(srcStart: usize, srcEnd: usize, dst: usize): usize {
   let src_ptr = srcStart + 2;
   let dst_ptr = changetype<usize>(dst);
 

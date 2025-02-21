@@ -103,12 +103,35 @@ The `json-as` library has been optimized to achieve near-gigabyte-per-second JSO
 
 ### Raw Performance
 
+Simple
+
 | Test Case          | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
 |--------------------|-----------------------|-------------------------|----------------------|------------------------|
 | Vector3 Object     | 32,642,320 ops/s      | 9,736,272 ops/s         | 1,240 MB/s           | 369 MB/s               |
-| Small JSON Object  | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
-| Medium JSON Object | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
-| Large JSON Object  | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
+| Alphabet String    | 4,928,856 ops/s       | 7,567,360 ops/s         | 975 MB/s             | 1,498 MB/s             |
+| Small JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+| Medium JSON Object | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+| Large JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+
+SIMD
+
+| Test Case          | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
+|--------------------|-----------------------|-------------------------|----------------------|------------------------|
+| Vector3 Object     | 32,642,320 ops/s      | 9,736,272 ops/s         | 1,240 MB/s           | 369 MB/s               |
+| Alphabet String    | 20,368,584 ops/s      | 28,467,424 ops/s        | 3,910 MB/s           | 5,636 MB/s             |
+| Small JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+| Medium JSON Object | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+| Large JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+
+JavaScript
+
+| Test Case          | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
+|--------------------|-----------------------|-------------------------|----------------------|------------------------|
+| Vector3 Object     | 2,548,013 ops/s       | 1,942,440 ops/s         | 97 MB/s              | 73 MB/s                |
+| Alphabet String    | 3,221,556 ops/s       | 2,716,617 ops/s         | 624 MB/s             | 537 MB/s               |
+| Small JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+| Medium JSON Object | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+| Large JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
 
 ### Real-World Usage
 

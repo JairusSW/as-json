@@ -34,8 +34,17 @@ const vec = {
 let data;
 
 const bench = new Bench({ time: 1000 })
-  .add("stringify float", () => {
-    data = JSON.stringify('h\\ello wor"ld');
+  .add("serialize vec3", () =>
+    data = JSON.stringify(vec)
+  )
+  .add("deserialize vec3", () => {
+    data = JSON.parse('{"x":3,"y":1,"z":8}');
+  })
+  .add("serialize alphabet string", () => {
+    data = JSON.stringify("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()-_=+{[}]|\\:;\"'?/>.<,'\"}");
+  })
+  .add("deserialize alphabet string", () => {
+    data = JSON.parse('"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()-_=+{[}]|\\\\:;\\"\'?/>.<,\'\\"}"')
   }) /*
     .add("parse float", () => {
         data = JSON.parse("1.2345")
