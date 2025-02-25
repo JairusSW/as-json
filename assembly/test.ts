@@ -41,20 +41,20 @@ class Point {
     this.y = y;
   }
   __SERIALIZE_CUSTOM(ptr: usize): void {
-    const s = this.serialize(changetype<Point>(ptr));
+    const s = this.serializer(changetype<Point>(ptr));
     const sSize = bytes(s);
     memory.copy(bs.offset, changetype<usize>(s), sSize);
     bs.offset += sSize;
   }
   __DESERIALIZE_CUSTOM(data: string): Point {
-    return this.deserialize(data);
+    return this.deserializer(data);
   }
-  @serialize
-  serialize(self: Point): string {
+  @serializer
+  serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
-  @deserialize
-  deserialize(data: string): Point {
+  @deserializer
+  deserializer(data: string): Point {
     const dataSize = bytes(data);
     if (dataSize <= 2) throw new Error("Could not deserialize provided data as type Point");
 

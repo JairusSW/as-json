@@ -36,10 +36,10 @@ declare function omitnull(..._): Function;
  * Method decorator that denotes a function to handle that schema's serialization.
  */
 // @ts-ignore: type
-declare function serialize(..._): any;
+declare function serializer(..._): any;
 
 /**
  * Method decorator that denotes a function to handle that schema's deserialization.
  */
 // @ts-ignore: type
-declare function deserialize(..._): any;
+declare function deserializer(..._): any;
