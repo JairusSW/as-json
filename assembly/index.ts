@@ -117,6 +117,11 @@ export namespace JSON {
       serializeString(changetype<string>(data));
       return bs.out<string>();
       // @ts-ignore: Supplied by transform
+    } else if (isDefined(data.__SERIALIZE_CUSTOM)) {
+      // @ts-ignore
+      data.__SERIALIZE_CUSTOM(changetype<usize>(data));
+      return bs.out<string>();
+      // @ts-ignore: Supplied by transform
     } else if (isDefined(data.__SERIALIZE)) {
       // @ts-ignore
       data.__SERIALIZE(changetype<usize>(data));
@@ -180,7 +185,14 @@ export namespace JSON {
     }
     let type: nonnull<T> = changetype<nonnull<T>>(0);
     // @ts-ignore: Defined by transform
-    if (isDefined(type.__DESERIALIZE)) {
+    if (isDefined(type.__DESERIALIZE_CUSTOM)) {
+      const out = changetype<nonnull<T>>(0);
+      // @ts-ignore: Defined by transform
+      if (isDefined(type.__INITIALIZE)) out.__INITIALIZE();
+      // @ts-ignore
+      return out.__DESERIALIZE_CUSTOM(ptrToStr(dataPtr, dataPtr + dataSize));
+      // @ts-ignore: Defined by transform
+    } else if (isDefined(type.__DESERIALIZE)) {
       const out = __new(offsetof<nonnull<T>>(), idof<nonnull<T>>());
       // @ts-ignore: Defined by transform
       if (isDefined(type.__INITIALIZE)) changetype<nonnull<T>>(out).__INITIALIZE();
@@ -286,7 +298,14 @@ export namespace JSON {
         }
         this.type = JSON.Types.Struct;
         store<T>(changetype<usize>(this), value, STORAGE);
+        // @ts-ignore: supplied by transform
+      }else if (isDefined(value.__SERIALIZE_CUSTOM)) {
+        this.type = idof<T>() + JSON.Types.Struct;
         // @ts-ignore
+        if (!JSON.Value.METHODS.has(idof<T>())) JSON.Value.METHODS.set(idof<T>(), value.__SERIALIZE_CUSTOM.index);
+        // @ts-ignore
+        store<usize>(changetype<usize>(this), changetype<usize>(value), STORAGE);
+        // @ts-ignore: supplied by transform
       } else if (isDefined(value.__SERIALIZE)) {
         this.type = idof<T>() + JSON.Types.Struct;
         // @ts-ignore
@@ -476,6 +495,10 @@ export namespace JSON {
     } else if (isString<nonnull<T>>()) {
       serializeString(src as string);
       // @ts-ignore: Supplied by transform
+    } else if (isDefined(src.__SERIALIZE_CUSTOM)) {
+      // @ts-ignore
+      return src.__SERIALIZE_CUSTOM(changetype<nonnull<T>>(src));
+      // @ts-ignore: Supplied by transform
     } else if (isDefined(src.__SERIALIZE)) {
       // @ts-ignore
       serializeStruct(changetype<nonnull<T>>(src));
@@ -498,7 +521,7 @@ export namespace JSON {
       throw new Error(`Could not serialize provided data. Make sure to add the correct decorators to classes.`);
     }
   }
-  
+
   // @ts-ignore: inline
   @inline export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
     if (isBoolean<T>()) {
@@ -516,8 +539,15 @@ export namespace JSON {
       return deserializeArray<T>(srcStart, srcEnd, dst);
     } else {
       let type: nonnull<T> = changetype<nonnull<T>>(0);
-      // @ts-ignore: declared by transform
-      if (isDefined(type.__DESERIALIZE)) {
+      // @ts-ignore: Defined by transform
+      if (isDefined(type.__DESERIALIZE_CUSTOM)) {
+        const out = __new(offsetof<nonnull<T>>(), idof<nonnull<T>>());
+        // @ts-ignore: Defined by transform
+        if (isDefined(type.__INITIALIZE)) changetype<nonnull<T>>(out).__INITIALIZE();
+        // @ts-ignore
+        return changetype<nonnull<T>>(out).__DESERIALIZE_CUSTOM(ptrToStr(dataPtr, dataPtr + dataSize));
+        // @ts-ignore: Defined by transform
+      } else if (isDefined(type.__DESERIALIZE)) {
         return deserializeStruct<T>(srcStart, srcEnd, dst);
       } else if (type instanceof Map) {
         // @ts-ignore: type
