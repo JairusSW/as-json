@@ -186,11 +186,11 @@ export namespace JSON {
     let type: nonnull<T> = changetype<nonnull<T>>(0);
     // @ts-ignore: Defined by transform
     if (isDefined(type.__DESERIALIZE_CUSTOM)) {
-      const out = __new(offsetof<nonnull<T>>(), idof<nonnull<T>>());
+      const out = changetype<nonnull<T>>(0);
       // @ts-ignore: Defined by transform
-      if (isDefined(type.__INITIALIZE)) changetype<nonnull<T>>(out).__INITIALIZE();
+      if (isDefined(type.__INITIALIZE)) out.__INITIALIZE();
       // @ts-ignore
-      return changetype<nonnull<T>>(out).__DESERIALIZE_CUSTOM(ptrToStr(dataPtr, dataPtr + dataSize));
+      return out.__DESERIALIZE_CUSTOM(ptrToStr(dataPtr, dataPtr + dataSize));
       // @ts-ignore: Defined by transform
     } else if (isDefined(type.__DESERIALIZE)) {
       const out = __new(offsetof<nonnull<T>>(), idof<nonnull<T>>());

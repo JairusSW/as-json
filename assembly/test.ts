@@ -51,7 +51,7 @@ class Point {
 
     const c = data.indexOf(",");
     const x = data.slice(1, c);
-    const y = data.slice(c, data.length - 1);
+    const y = data.slice(c + 1, data.length - 1);
 
     return new Point(
       f64.parse(x),
