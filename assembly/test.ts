@@ -40,15 +40,6 @@ class Point {
     this.x = x;
     this.y = y;
   }
-  __SERIALIZE_CUSTOM(ptr: usize): void {
-    const s = this.serializer(changetype<Point>(ptr));
-    const sSize = bytes(s);
-    memory.copy(bs.offset, changetype<usize>(s), sSize);
-    bs.offset += sSize;
-  }
-  __DESERIALIZE_CUSTOM(data: string): Point {
-    return this.deserializer(data);
-  }
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;

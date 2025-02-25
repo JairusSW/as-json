@@ -31,6 +31,45 @@ class JSONTransform extends Visitor {
         if (process.env["JSON_DEBUG"])
             console.log("Created schema: " + this.schema.name);
         const members = [...node.members.filter((v) => v.kind === 54 && v.flags !== 32 && v.flags !== 512 && v.flags !== 1024 && !v.decorators?.some((decorator) => decorator.name.text === "omit"))];
+        const serializers = [...(node.members.filter((v) => v.kind === 58 && v.decorators && v.decorators.some((e) => e.name.text.toLowerCase() === "serializer")))];
+        const deserializers = [...(node.members.filter((v) => v.kind === 58 && v.decorators && v.decorators.some((e) => e.name.text.toLowerCase() === "deserializer")))];
+        if (serializers.length > 1)
+            throwError("Multiple serializers detected for class " + node.name.text + " but schemas can only have one serializer!", serializers[1].range);
+        if (serializers.length > 1)
+            throwError("Multiple deserializers detected for class " + node.name.text + " but schemas can only have one deserializer!", deserializers[1].range);
+        if (serializers.length) {
+            const serializer = serializers[0];
+            if (!serializer.decorators.some((v) => v.name.text == "inline")) {
+                serializer.decorators.push(Node.createDecorator(Node.createIdentifierExpression("inline", serializer.range), null, serializer.range));
+            }
+            let SERIALIZER = "";
+            SERIALIZER += "  @inline __SERIALIZE_CUSTOM(ptr: usize): void {\n";
+            SERIALIZER += "    const data = this." + serializer.name.text + "(changetype<" + this.schema.name + ">(ptr));\n";
+            SERIALIZER += "    const dataSize = data.length << 1;\n";
+            SERIALIZER += "    memory.copy(bs.offset, changetype<usize>(data), dataSize);\n";
+            SERIALIZER += "    bs.offset += dataSize;\n";
+            SERIALIZER += "  }\n";
+            if (process.env["JSON_DEBUG"])
+                console.log(SERIALIZER);
+            const SERIALIZER_METHOD = SimpleParser.parseClassMember(SERIALIZER, node);
+            if (!node.members.find((v) => v.name.text == "__SERIALIZE_CUSTOM"))
+                node.members.push(SERIALIZER_METHOD);
+        }
+        if (deserializers.length) {
+            const deserializer = deserializers[0];
+            if (!deserializer.decorators.some((v) => v.name.text == "inline")) {
+                deserializer.decorators.push(Node.createDecorator(Node.createIdentifierExpression("inline", deserializer.range), null, deserializer.range));
+            }
+            let DESERIALIZER = "";
+            DESERIALIZER += "  @inline __DESERIALIZE_CUSTOM(data: string): " + this.schema.name + " {\n";
+            DESERIALIZER += "    return this." + deserializer.name.text + "(data);\n";
+            DESERIALIZER += "  }\n";
+            if (process.env["JSON_DEBUG"])
+                console.log(DESERIALIZER);
+            const SERIALIZER_METHOD = SimpleParser.parseClassMember(DESERIALIZER, node);
+            if (!node.members.find((v) => v.name.text == "__SERIALIZE_CUSTOM"))
+                node.members.push(SERIALIZER_METHOD);
+        }
         if (node.extendsType) {
             const extendsName = node.extendsType?.name.identifier.text;
             this.schema.parent = this.schemas.find((v) => v.name == extendsName);
