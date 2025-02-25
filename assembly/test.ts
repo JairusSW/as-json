@@ -32,6 +32,43 @@ class Player {
   isVerified!: boolean;
 }
 
+@json
+class Point {
+  x: f64 = 0.0;
+  y: f64 = 0.0;
+  constructor(x: f64, y: f64) {
+    this.x = x;
+    this.y = y;
+  }
+  __SERIALIZE_CUSTOM(ptr: usize): void {
+    const s = this.serialize(changetype<Point>(ptr));
+    const sSize = bytes(s);
+    memory.copy(bs.offset, changetype<usize>(s), sSize);
+    bs.offset += sSize;
+  }
+  __DESERIALIZE_CUSTOM(data: string): Point {
+    return this.deserialize(data);
+  }
+  @serialize
+  serialize(self: Point): string {
+    return `(${self.x},${self.y})`;
+  }
+  @deserialize
+  deserialize(data: string): Point {
+    const dataSize = bytes(data);
+    if (dataSize <= 2) throw new Error("Could not deserialize provided data as type Point");
+
+    const c = data.indexOf(",");
+    const x = data.slice(1, c);
+    const y = data.slice(c, data.length - 1);
+
+    return new Point(
+      f64.parse(x),
+      f64.parse(y)
+    );
+  }
+}
+
 const player: Player = {
   firstName: "Jairus",
   lastName: "Tanaka",
@@ -83,3 +120,7 @@ console.log("a7: " + JSON.stringify(a7));
 const a8 = JSON.stringify(["hello", JSON.stringify("world"),"working?"]);
 
 console.log("a8: " + a8);
+
+const a9 = JSON.stringify(new Point(1, 2));
+
+console.log("a9: " + a9);
