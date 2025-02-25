@@ -298,7 +298,14 @@ export namespace JSON {
         }
         this.type = JSON.Types.Struct;
         store<T>(changetype<usize>(this), value, STORAGE);
+        // @ts-ignore: supplied by transform
+      }else if (isDefined(value.__SERIALIZE_CUSTOM)) {
+        this.type = idof<T>() + JSON.Types.Struct;
         // @ts-ignore
+        if (!JSON.Value.METHODS.has(idof<T>())) JSON.Value.METHODS.set(idof<T>(), value.__SERIALIZE_CUSTOM.index);
+        // @ts-ignore
+        store<usize>(changetype<usize>(this), changetype<usize>(value), STORAGE);
+        // @ts-ignore: supplied by transform
       } else if (isDefined(value.__SERIALIZE)) {
         this.type = idof<T>() + JSON.Types.Struct;
         // @ts-ignore
