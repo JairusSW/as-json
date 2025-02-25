@@ -1,5 +1,24 @@
 # Change Log
 
+## 2025-02-22 - 1.0.0-beta.1
+
+- perf: add benchmarks for both AssemblyScript and JavaScript
+- docs: publish preliminary benchmark results
+- tests: ensure nested serialization works and add to tests
+- feat: finish arbitrary type implementation
+- feat: introduce `JSON.Obj` to handle objects effectively
+- feat: reimplement arbitrary array deserialization
+- fix: remove brace check on array deserialization
+- feat: introduce native support for `JSON.Obj` transformations
+- feat: implement arbitrary object serialization
+- fix: deserialization of booleans panics on `false`
+- fix: `bs.resize` should be type-safe
+- impl: add `JSON.Obj` type as prototype to handle arbitrary object structures
+- chore: rename static objects (schemas) to structs and name arbitrary objects as `obj`
+- tests: add proper tests for arbitrary types
+- fix: empty method generation using outdated function signature
+- docs: update readme to be more concise
+
 ## 2025-02-13 - 1.0.0-alpha.4
 
 - feat: reintroduce support for `Box<T>`-wrapped primitive types
