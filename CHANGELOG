@@ -1,6 +1,6 @@
 # Change Log
 
-## UNRELEASED
+## 2025-02-25 - 1.0.0-beta.2
 
 - feat: add support for custom serializers and deserializers [#110](https://github.com/JairusSW/as-json/pull/110)
 
