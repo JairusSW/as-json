@@ -35,10 +35,18 @@ class JSONTransform extends Visitor {
         const deserializers = [...(node.members.filter((v) => v.kind === 58 && v.decorators && v.decorators.some((e) => e.name.text.toLowerCase() === "deserializer")))];
         if (serializers.length > 1)
             throwError("Multiple serializers detected for class " + node.name.text + " but schemas can only have one serializer!", serializers[1].range);
-        if (serializers.length > 1)
+        if (deserializers.length > 1)
             throwError("Multiple deserializers detected for class " + node.name.text + " but schemas can only have one deserializer!", deserializers[1].range);
         if (serializers.length) {
             const serializer = serializers[0];
+            if (!serializer.signature.parameters.length)
+                throwError("Could not find any parameters in custom serializer for " + this.schema.name + ". Serializers must have one parameter like 'serializer(self: " + this.schema.name + "): string {}'", serializer.range);
+            if (serializer.signature.parameters.length > 1)
+                throwError("Found too many parameters in custom serializer for " + this.schema.name + ", but serializers can only accept one parameter of type '" + this.schema.name + "'!", serializer.signature.parameters[1].range);
+            if (serializer.signature.parameters[0].type.name.identifier.text != node.name.text && serializer.signature.parameters[0].type.name.identifier.text != "this")
+                throwError("Type of parameter for custom serializer does not match! It should be 'string'either be 'this' or '" + this.schema.name + "'", serializer.signature.parameters[0].type.range);
+            if (!serializer.signature.returnType || !serializer.signature.returnType.name.identifier.text.includes("string"))
+                throwError("Could not find valid return type for serializer in " + this.schema.name + "!. Set the return type to type 'string' and try again", serializer.signature.returnType.range);
             if (!serializer.decorators.some((v) => v.name.text == "inline")) {
                 serializer.decorators.push(Node.createDecorator(Node.createIdentifierExpression("inline", serializer.range), null, serializer.range));
             }
@@ -57,6 +65,14 @@ class JSONTransform extends Visitor {
         }
         if (deserializers.length) {
             const deserializer = deserializers[0];
+            if (!deserializer.signature.parameters.length)
+                throwError("Could not find any parameters in custom deserializer for " + this.schema.name + ". Deserializers must have one parameter like 'deserializer(data: string): " + this.schema.name + " {}'", deserializer.range);
+            if (deserializer.signature.parameters.length > 1)
+                throwError("Found too many parameters in custom deserializer for " + this.schema.name + ", but deserializers can only accept one parameter of type 'string'!", deserializer.signature.parameters[1].range);
+            if (deserializer.signature.parameters[0].type.name.identifier.text != "string")
+                throwError("Type of parameter for custom deserializer does not match! It must be 'string'", deserializer.signature.parameters[0].type.range);
+            if (!deserializer.signature.returnType || !(deserializer.signature.returnType.name.identifier.text.includes(this.schema.name) || deserializer.signature.returnType.name.identifier.text.includes("this")))
+                throwError("Could not find valid return type for deserializer in " + this.schema.name + "!. Set the return type to type '" + this.schema.name + "' or 'this' and try again", deserializer.signature.returnType.range);
             if (!deserializer.decorators.some((v) => v.name.text == "inline")) {
                 deserializer.decorators.push(Node.createDecorator(Node.createIdentifierExpression("inline", deserializer.range), null, deserializer.range));
             }
