@@ -63,5 +63,8 @@
     "prettier": "prettier -w ."
   },
   "type": "module",
-  "types": "assembly/index.ts"
+  "types": "assembly/index.ts",
+  "dependencies": {
+    "as-container": "^0.8.0"
+  }
 }
