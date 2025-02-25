@@ -107,9 +107,9 @@ class JSONTransform extends Visitor {
 
       if (process.env["JSON_DEBUG"]) console.log(DESERIALIZER);
 
-      const SERIALIZER_METHOD = SimpleParser.parseClassMember(DESERIALIZER, node);
+      const DESERIALIZER_METHOD = SimpleParser.parseClassMember(DESERIALIZER, node);
 
-      if (!node.members.find((v) => v.name.text == "__SERIALIZE_CUSTOM")) node.members.push(SERIALIZER_METHOD);
+      if (!node.members.find((v) => v.name.text == "__DESERIALIZE_CUSTOM")) node.members.push(DESERIALIZER_METHOD);
     }
 
     if (node.extendsType) {
