@@ -401,4 +401,4 @@ Please send all issues to [GitHub Issues](https://github.com/JairusSW/as-json/is
 - **Email:** Send me inquiries, questions, or requests at [me@jairus.dev](mailto:me@jairus.dev)
 - **GitHub:** Visit the official GitHub repository [Here](https://github.com/JairusSW/as-json)
 - **Website:** Visit my official website at [jairus.dev](https://jairus.dev/)
-- **Discord:** Converse with me on [My Discord](discord.com/users/600700584038760448) or on the [AssemblyScript Discord Server](https://discord.gg/assemblyscript/)
+- **Discord:** Contact me at [My Discord](https://discord.com/users/600700584038760448) or on the [AssemblyScript Discord Server](https://discord.gg/assemblyscript/)
