@@ -1,6 +1,6 @@
 # Change Log
 
-## UNRELEASED
+## 2025-02-25 - 1.0.0-beta.3
 
 - feat: change `JSON.Raw` to actual class to facilitate proper support without transformations
 - fix: remove old `JSON.Raw` logic from transform code
