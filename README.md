@@ -44,7 +44,6 @@ Alternatively, add it to your `asconfig.json`
 
 ```json
 {
-  // ...
   "options": {"transform": ["json-as/transform"]}
 }
 ```
