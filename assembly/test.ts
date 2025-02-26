@@ -46,9 +46,9 @@ class Point {
     return `(${self.x},${self.y})`;
   }
   @deserializer
-  deserializer(data: string): Point {
+  deserializer(data: string): Point | null {
     const dataSize = bytes(data);
-    if (dataSize <= 2) throw new Error("Could not deserialize provided data as type Point");
+    if (dataSize <= 2) return null;
 
     const c = data.indexOf(",");
     const x = data.slice(1, c);

@@ -69,6 +69,7 @@ class JSONTransform extends Visitor {
       let SERIALIZER = "";
       SERIALIZER += "  @inline __SERIALIZE_CUSTOM(ptr: usize): void {\n";
       SERIALIZER += "    const data = this." + serializer.name.text + "(changetype<" + this.schema.name + ">(ptr));\n";
+      SERIALIZER += "    if (isNullable(data) && changetype<usize>(data) == <usize>0) throw new Error(\"Could not serialize data using custom serializer!\");\n";
       SERIALIZER += "    const dataSize = data.length << 1;\n";
       SERIALIZER += "    memory.copy(bs.offset, changetype<usize>(data), dataSize);\n";
       SERIALIZER += "    bs.offset += dataSize;\n";
@@ -102,7 +103,9 @@ class JSONTransform extends Visitor {
       }
       let DESERIALIZER = "";
       DESERIALIZER += "  @inline __DESERIALIZE_CUSTOM(data: string): " + this.schema.name + " {\n";
-      DESERIALIZER += "    return this." + deserializer.name.text + "(data);\n";
+      DESERIALIZER += "    const d = this." + deserializer.name.text + "(data)";
+      DESERIALIZER += "    if (isNullable(d) && changetype<usize>(d) == <usize>0) throw new Error(\"Could not deserialize data using custom deserializer!\");\n";
+      DESERIALIZER += "    return d;\n";
       DESERIALIZER += "  }\n";
 
       if (process.env["JSON_DEBUG"]) console.log(DESERIALIZER);
