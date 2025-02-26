@@ -477,7 +477,6 @@ class JSONTransform extends Visitor {
         return out;
     }
     isValidType(type, node) {
-        console.log(type);
         const validTypes = [
             "string",
             "u8",
@@ -494,9 +493,8 @@ class JSONTransform extends Visitor {
             "boolean",
             ...this.schemas.map((v) => v.name)
         ];
-        if (node && node.isGeneric)
-            console.log(toString(node.typeParameters));
-        console.log(node.typeParameters.map((v) => toString(v)).join(" "));
+        if (node && node.isGeneric && node.typeParameters)
+            validTypes.push(...node.typeParameters.map((v) => v.name.text));
         if (type.endsWith("| null")) {
             if (isPrimitive(type.slice(0, type.indexOf("| null"))))
                 return false;
