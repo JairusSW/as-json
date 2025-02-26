@@ -4,7 +4,7 @@
   "author": "Jairus Tanaka",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JairusSW/as-json.git"
+    "url": "git+https://github.com/JairusSW/json-as.git"
   },
   "main": "transform/lib/index.js",
   "devDependencies": {
@@ -18,7 +18,7 @@
     "typescript": "^5.7.3"
   },
   "bugs": {
-    "url": "https://github.com/JairusSW/as-json/issues"
+    "url": "https://github.com/JairusSW/json-as/issues"
   },
   "contributors": [
     "DogWhich",
@@ -31,7 +31,7 @@
     "Tomáš Hromada"
   ],
   "description": "The only JSON library you'll need for AssemblyScript. SIMD enabled",
-  "homepage": "https://github.com/JairusSW/as-json#readme",
+  "homepage": "https://github.com/JairusSW/json-as#readme",
   "keywords": [
     "assemblyscript",
     "json",

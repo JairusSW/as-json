@@ -395,9 +395,9 @@ This project is distributed under an open source license. You can view the full 
 
 ## 📫 Contact
 
-Please send all issues to [GitHub Issues](https://github.com/JairusSW/as-json/issues) and to converse, please send me an email at [me@jairus.dev](mailto:me@jairus.dev)
+Please send all issues to [GitHub Issues](https://github.com/JairusSW/json-as/issues) and to converse, please send me an email at [me@jairus.dev](mailto:me@jairus.dev)
 
 - **Email:** Send me inquiries, questions, or requests at [me@jairus.dev](mailto:me@jairus.dev)
-- **GitHub:** Visit the official GitHub repository [Here](https://github.com/JairusSW/as-json)
+- **GitHub:** Visit the official GitHub repository [Here](https://github.com/JairusSW/json-as)
 - **Website:** Visit my official website at [jairus.dev](https://jairus.dev/)
 - **Discord:** Contact me at [My Discord](https://discord.com/users/600700584038760448) or on the [AssemblyScript Discord Server](https://discord.gg/assemblyscript/)

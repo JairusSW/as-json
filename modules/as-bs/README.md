@@ -14,9 +14,9 @@
 
 This library provides a centralized buffer for managing memory in AssemblyScript. It keeps track of a single buffer, the current offset, and handles allocations. Using a singular buffer essentially eliminates the need for any calls to `memory.copy()` as well as any `malloc()` or `realloc()`-type calls. Highly unsafe, but extremely useful for extraordinarily high-performance scenarios.
 
-[This library](https://github.com/JairusSW/as-bs) is what makes [as-json](https://github.com/JairusSW/as-json) operate in the multi-gigabyte-per-second ranges
+[This library](https://github.com/JairusSW/as-bs) is what makes [json-as](https://github.com/JairusSW/json-as) operate in the multi-gigabyte-per-second ranges
 
-To take a look at some practical uses of as-bs, check out the functions [here](https://github.com/JairusSW/as-json/tree/master/assembly/serialize/simple)
+To take a look at some practical uses of as-bs, check out the functions [here](https://github.com/JairusSW/json-as/tree/master/assembly/serialize/simple)
 
 ## Installation
 
@@ -38,7 +38,7 @@ Forgoing this will result in fragmentation and just a lot of problems.
 
 ## Usage
 
-Here's an example taken out of [as-json](https://github.com/JairusSW/as-json/tree/master/assembly/serialize/simple/string.ts)
+Here's an example taken out of [json-as](https://github.com/JairusSW/json-as/tree/master/assembly/serialize/simple/string.ts)
 
 This is an example of as-bs used right
 
