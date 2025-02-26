@@ -250,6 +250,14 @@ export namespace JSON {
     }
 
     /**
+     * Creates an JSON.Value instance with no set value.
+     * @returns An instance of JSON.Value.
+     */
+    @inline static empty(): JSON.Value {
+      return changetype<JSON.Value>(__new(offsetof<JSON.Value>(), idof<JSON.Value>()));
+    }
+
+    /**
      * Creates an JSON.Value instance from a given value.
      * @param value - The value to be encapsulated.
      * @returns An instance of JSON.Value.
@@ -299,7 +307,7 @@ export namespace JSON {
         this.type = JSON.Types.Struct;
         store<T>(changetype<usize>(this), value, STORAGE);
         // @ts-ignore: supplied by transform
-      }else if (isDefined(value.__SERIALIZE_CUSTOM)) {
+      } else if (isDefined(value.__SERIALIZE_CUSTOM)) {
         this.type = idof<T>() + JSON.Types.Struct;
         // @ts-ignore
         if (!JSON.Value.METHODS.has(idof<T>())) JSON.Value.METHODS.set(idof<T>(), value.__SERIALIZE_CUSTOM.index);
@@ -451,6 +459,15 @@ export namespace JSON {
   export class Box<T> {
     constructor(public value: T) {
       if (!isInteger<T>() && !isFloat<T>()) ERROR("JSON.Box should only hold primitive types!");
+    }
+    /**
+     * Set the internal value of Box to new value
+     * @param value T
+     * @returns this
+     */
+    @inline set(value: T): Box<T> {
+      this.value = value;
+      return this;
     }
     /**
      * Creates a reference to a primitive type
