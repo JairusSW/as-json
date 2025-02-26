@@ -32,6 +32,34 @@ class Player {
   isVerified!: boolean;
 }
 
+@json
+class Point {
+  x: f64 = 0.0;
+  y: f64 = 0.0;
+  constructor(x: f64, y: f64) {
+    this.x = x;
+    this.y = y;
+  }
+  @serializer
+  serializer(self: Point): string {
+    return `(${self.x},${self.y})`;
+  }
+  @deserializer
+  deserializer(data: string): Point {
+    const dataSize = bytes(data);
+    if (dataSize <= 2) throw new Error("Could not deserialize provided data as type Point");
+
+    const c = data.indexOf(",");
+    const x = data.slice(1, c);
+    const y = data.slice(c + 1, data.length - 1);
+
+    return new Point(
+      f64.parse(x),
+      f64.parse(y)
+    );
+  }
+}
+
 const player: Player = {
   firstName: "Jairus",
   lastName: "Tanaka",
