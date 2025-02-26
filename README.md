@@ -220,7 +220,11 @@ When dealing with an object with an unknown structure, use the `JSON.Obj` type
 const o1 = JSON.parse<JSON.Obj>('{"a":3.14,"b":true,"c":[1,2,3],"d":{"x":1,"y":2,"z":3}}');
 
 console.log(o1.keys().join(" ")); // a b c d
-console.log(o1.values().map<string>((v) => JSON.stringify(v)).join(" ")); // 3.14 true [1,2,3] {"x":1,"y":2,"z":3}
+console.log(
+  o1.values()
+  .map<string>((v) => JSON.stringify(v))
+  .join(" ")
+); // 3.14 true [1,2,3] {"x":1,"y":2,"z":3}
 
 const y = o1.get("d").get<JSON.Obj>().get<i32>();
 console.log('o1["d"]["y"] = ' + y.toString()); // o1["d"]["y"] = 2
