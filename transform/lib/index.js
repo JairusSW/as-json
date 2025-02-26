@@ -491,7 +491,21 @@ class JSONTransform extends Visitor {
             "f64",
             "bool",
             "boolean",
+            "Date",
+            "JSON.Value",
+            "JSON.Obj",
+            "JSON.Raw",
+            "Value",
+            "Obj",
+            "Raw",
             ...this.schemas.map((v) => v.name)
+        ];
+        const baseTypes = [
+            "Array",
+            "Map",
+            "Set",
+            "JSON.Box",
+            "Box"
         ];
         if (node && node.isGeneric && node.typeParameters)
             validTypes.push(...node.typeParameters.map((v) => v.name.text));
@@ -501,7 +515,7 @@ class JSONTransform extends Visitor {
             return this.isValidType(type.slice(0, type.length - 7), node);
         }
         if (type.includes("<"))
-            return this.isValidType(type.slice(type.indexOf("<") + 1, type.lastIndexOf(">")), node);
+            return baseTypes.includes(type.slice(0, type.indexOf("<"))) && this.isValidType(type.slice(type.indexOf("<") + 1, type.lastIndexOf(">")), node);
         if (validTypes.includes(type))
             return true;
         return false;
