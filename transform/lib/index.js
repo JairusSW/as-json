@@ -127,6 +127,8 @@ class JSONTransform extends Visitor {
             const type = toString(member.type);
             const name = member.name;
             const value = member.initializer ? toString(member.initializer) : null;
+            if (!this.isValidType(type, node))
+                throwError("Invalid Type. " + type + " is not a JSON-compatible type. Either decorate it with @omit, set it to private, or remove it.", member.type.range);
             if (type.startsWith("(") && type.includes("=>"))
                 continue;
             const mem = new Property();
@@ -473,6 +475,38 @@ class JSONTransform extends Visitor {
         }
         out.push("bs.offset += " + offset + ";");
         return out;
+    }
+    isValidType(type, node) {
+        console.log(type);
+        const validTypes = [
+            "string",
+            "u8",
+            "i8",
+            "u16",
+            "i16",
+            "u32",
+            "i32",
+            "u64",
+            "i64",
+            "f32",
+            "f64",
+            "bool",
+            "boolean",
+            ...this.schemas.map((v) => v.name)
+        ];
+        if (node && node.isGeneric)
+            console.log(toString(node.typeParameters));
+        console.log(node.typeParameters.map((v) => toString(v)).join(" "));
+        if (type.endsWith("| null")) {
+            if (isPrimitive(type.slice(0, type.indexOf("| null"))))
+                return false;
+            return this.isValidType(type.slice(0, type.length - 7), node);
+        }
+        if (type.includes("<"))
+            return this.isValidType(type.slice(type.indexOf("<") + 1, type.lastIndexOf(">")), node);
+        if (validTypes.includes(type))
+            return true;
+        return false;
     }
 }
 export default class Transformer extends Transform {

@@ -203,7 +203,7 @@ export namespace JSON {
       return deserializeStruct<nonnull<T>>(dataPtr, dataPtr + dataSize, out);
     } else if (type instanceof Map) {
       // @ts-ignore
-      return deserializeMap<nonnull<T>>(dataPtr, dataPtr + dataSize);
+      return deserializeMap<nonnull<T>>(dataPtr, dataPtr + dataSize, 0);
     } else if (type instanceof Date) {
       // @ts-ignore
       return deserializeDate(dataPtr, dataPtr + dataSize);
@@ -211,7 +211,7 @@ export namespace JSON {
       // @ts-ignore: type
       return deserializeRaw(dataPtr, dataPtr + dataSize);
     } else if (type instanceof JSON.Value) {
-      // @ts-ignore
+      // @ts-ignorew
       return deserializeArbitrary(dataPtr, dataPtr + dataSize, 0);
     } else if (type instanceof JSON.Obj) {
       // @ts-ignore
