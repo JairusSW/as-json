@@ -1,7 +1,7 @@
 import { JSON } from "..";
 import { describe, expect } from "../../modules/test/assembly";
 
-describe("Should serialize objects", () => {
+describe("Should serialize structs", () => {
   expect(
     JSON.stringify<Vec3>({
       x: 3.4,
@@ -38,7 +38,7 @@ describe("Should serialize objects", () => {
   expect(JSON.stringify<ObjWithStrangeKey<string>>({ data: "foo" })).toBe('{"a\\\\\\t\\"\\u0002b`c":"foo"}');
 });
 
-describe("Should serialize objects with inheritance", () => {
+describe("Should serialize structs with inheritance", () => {
   const obj = new DerivedObject("1", "2");
 
   expect(JSON.stringify(obj)).toBe('{"a":"1","b":"2"}');
@@ -52,6 +52,17 @@ describe("Should ignore properties decorated with @omit", () => {
   ).toBe('{"y":1,"x":1,"z":1}');
 });
 
+describe("Should deserialize structs", () => {
+  expect(
+    JSON.stringify(JSON.parse<Vec3>('{"x":3.4,"y":1.2,"z":8.3}')),
+  ).toBe('{"x":3.4,"y":1.2,"z":8.3}');
+});
+
+describe("Should deserialize structs with whitespace", () => {
+  expect(
+    JSON.stringify(JSON.parse<Vec3>('    {  "x"  :  3.4  ,  "y"  :  1.2    ,  "z"   :  8.3   }   ')),
+  ).toBe('{"x":3.4,"y":1.2,"z":8.3}');
+});
 
 @json
 class BaseObject {
