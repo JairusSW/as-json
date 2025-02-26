@@ -22,6 +22,7 @@ JSON is the de-facto serialization format of modern web applications, but its se
   - [Omitting Fields](#️-omitting-fields)
   - [Nullable Primitives](#️-using-nullable-primitives)
   - [Unknown or Dynamic Data](#-working-with-unknown-or-dynamic-data)
+  - [Using Raw JSON Strings](#️-using-raw-json-strings)
   - [Custom Serializers](#️-using-custom-serializers-or-deserializers)
 - [Performance](#-performance)
 - [License](#-license)
@@ -256,6 +257,34 @@ console.log(JSON.stringify(obj)); // {"id":1,"name":"Example","data":42}
 
 obj.data = JSON.Value.from("a string"); // Changing to a string
 console.log(JSON.stringify(obj)); // {"id":1,"name":"Example","data":"a string"}
+```
+
+### 🏗️ Using Raw JSON strings
+
+Sometimes its necessary to simply copy a string instead of serializing it.
+
+For example, the following data would typically be serialized as:
+
+```js
+const m1 = new Map<string, string>();
+m1.set('pos', '{"x":1.0,"y":2.0,"z":3.0}');
+
+const a1 = JSON.stringify(m1);
+console.log("a1: " + a1);
+// {"pos":"{\"x\":1.0,\"y\":2.0,\"z\":3.0}"}
+// pos's value (Vec3) is contained within a string... ideally, it should be left alone
+```
+
+If, instead, one wanted to insert Raw JSON into an existing schema/data structure, they could make use of the JSON.Raw type to do so:
+
+```js
+const m1 = new Map<string, JSON.Raw>();
+m1.set('pos', new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
+
+const a1 = JSON.stringify(m1);
+console.log("a1: " + a1);
+// {"pos":{"x":1.0,"y":2.0,"z":3.0}}
+// Now its properly formatted JSON where pos's value is of type Vec3 not string!
 ```
 
 ### ⚒️ Using custom serializers or deserializers
