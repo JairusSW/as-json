@@ -27,8 +27,8 @@ import { deserializeArbitrary } from "./deserialize/simple/arbitrary";
 import { SERIALIZE_ESCAPE_TABLE } from "./globals/tables";
 import { serializeObject } from "./serialize/simple/object";
 import { deserializeObject } from "./deserialize/simple/object";
-
-export type Raw = string;
+import { serializeRaw } from "./serialize/simple/raw";
+import { deserializeRaw } from "./deserialize/simple/raw";
 
 /**
  * Offset of the 'storage' property in the JSON.Value class.
@@ -142,6 +142,9 @@ export namespace JSON {
       // @ts-ignore
       serializeMap(changetype<nonnull<T>>(data));
       return bs.out<string>();
+    } else if (data instanceof JSON.Raw) {
+      serializeRaw(data);
+      return bs.out<string>();
     } else if (data instanceof JSON.Value) {
       serializeArbitrary(data);
       return bs.out<string>();
@@ -204,6 +207,9 @@ export namespace JSON {
     } else if (type instanceof Date) {
       // @ts-ignore
       return deserializeDate(dataPtr, dataPtr + dataSize);
+    } else if (type instanceof JSON.Raw) {
+      // @ts-ignore: type
+      return deserializeRaw(dataPtr, dataPtr + dataSize);
     } else if (type instanceof JSON.Value) {
       // @ts-ignore
       return deserializeArbitrary(dataPtr, dataPtr + dataSize, 0);
@@ -236,13 +242,27 @@ export namespace JSON {
     Struct = 11,
   }
 
-  export type Raw = string;
+  export class Raw {
+    public data: string;
+    constructor(data: string) {
+      this.data = data;
+    }
+    set(data: string): void {
+      this.data = data;
+    }
+    toString(): string {
+      return this.data;
+    }
+    // @ts-ignore: inline
+    @inline static from(data: string): JSON.Raw {
+      return new JSON.Raw(data);
+    }
+  }
 
   export class Value {
     static METHODS: Map<u32, u32> = new Map<u32, u32>();
     public type: i32;
 
-    // @ts-ignore
     private storage: u64;
 
     private constructor() {
@@ -299,6 +319,9 @@ export namespace JSON {
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (isString<T>()) {
         this.type = JSON.Types.String;
+        store<T>(changetype<usize>(this), value, STORAGE);
+      } else if (value instanceof JSON.Raw) {
+        this.type = JSON.Types.Raw;
         store<T>(changetype<usize>(this), value, STORAGE);
       } else if (value instanceof Map) {
         if (idof<T>() !== idof<Map<string, JSON.Value>>()) {
@@ -361,6 +384,9 @@ export namespace JSON {
           return '"' + this.get<string>() + '"';
         case JSON.Types.Bool:
           return this.get<boolean>() ? "true" : "false";
+        case JSON.Types.Raw: {
+          return this.get<JSON.Raw>().toString();
+        }
         case JSON.Types.Array: {
           const arr = this.get<JSON.Value[]>();
           if (!arr.length) return "[]";
@@ -528,6 +554,8 @@ export namespace JSON {
     } else if (src instanceof Map) {
       // @ts-ignore
       serializeMap(changetype<nonnull<T>>(src));
+    } else if (src instanceof JSON.Raw) {
+      serializeRaw(src);
     } else if (src instanceof JSON.Value) {
       serializeArbitrary(src);
     } else if (src instanceof JSON.Obj) {
@@ -572,6 +600,9 @@ export namespace JSON {
       } else if (type instanceof Date) {
         // @ts-ignore: type
         return deserializeDate(srcStart, srcEnd);
+      } else if (type instanceof JSON.Raw) {
+        // @ts-ignore: type
+        return deserializeRaw(srcStart, srcEnd);
       } else if (type instanceof JSON.Value) {
         // @ts-ignore: type
         return deserializeArbitrary(srcStart, srcEnd, 0);

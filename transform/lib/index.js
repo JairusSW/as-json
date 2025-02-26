@@ -136,8 +136,6 @@ class JSONTransform extends Visitor {
             mem.node = member;
             mem.byteSize = sizeof(mem.type);
             this.schema.byteSize += mem.byteSize;
-            if (type.includes("JSON.Raw"))
-                mem.flags.set(PropertyFlags.Raw, null);
             if (member.decorators) {
                 for (const decorator of member.decorators) {
                     const decoratorName = decorator.name.text.toLowerCase().trim();
@@ -215,7 +213,7 @@ class JSONTransform extends Visitor {
             else if (member.type.startsWith("Array<") || member.type.startsWith("Map<")) {
                 INITIALIZE += `  this.${member.name} = [];\n`;
             }
-            else if (member.type == "string" || member.type == "String" || member.type == "JSON.Raw") {
+            else if (member.type == "string" || member.type == "String") {
                 INITIALIZE += `  this.${member.name} = "";\n`;
             }
             if (!isRegular && !member.flags.has(PropertyFlags.OmitIf) && !member.flags.has(PropertyFlags.OmitNull))

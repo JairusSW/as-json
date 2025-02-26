@@ -112,6 +112,14 @@ const a8 = JSON.stringify(["hello", JSON.stringify("world"),"working?"]);
 
 console.log("a8: " + a8);
 
-const a9 = JSON.stringify(new Point(1, 2));
+const a9 = JSON.stringify<JSON.Raw>(JSON.Raw.from("\"hello world\""));
 
 console.log("a9: " + a9);
+
+const b10 = new Map<string, JSON.Raw>();
+b10.set("hello", new JSON.Raw("\"world\""));
+b10.set("pos", new JSON.Raw("{\"x\":1.0,\"y\":2.0,\"z\":3.0}"));
+
+const a10 = JSON.stringify(b10);
+
+console.log("a10: " + a10);
