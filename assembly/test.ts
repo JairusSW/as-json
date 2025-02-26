@@ -1,3 +1,4 @@
+import { CharCode } from "util/string";
 import { JSON } from ".";
 import { bs } from "../modules/as-bs/assembly";
 import { deserializeArbitraryArray } from "./deserialize/simple/array/arbitrary";
@@ -116,10 +117,10 @@ const a9 = JSON.stringify<JSON.Raw>(JSON.Raw.from("\"hello world\""));
 
 console.log("a9: " + a9);
 
-const b10 = new Map<string, JSON.Raw>();
-b10.set("hello", new JSON.Raw("\"world\""));
-b10.set("pos", new JSON.Raw("{\"x\":1.0,\"y\":2.0,\"z\":3.0}"));
+const m10 = new Map<string, JSON.Raw>();
+m10.set("hello", new JSON.Raw("\"world\""));
+m10.set("pos", new JSON.Raw("{\"x\":1.0,\"y\":2.0,\"z\":3.0}"));
 
-const a10 = JSON.stringify(b10);
+const a10 = JSON.stringify(m10);
 
 console.log("a10: " + a10);
