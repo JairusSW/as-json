@@ -24,7 +24,6 @@ import { serializeStruct } from "./serialize/simple/struct";
 import { ptrToStr } from "./util/ptrToStr";
 import { atoi, bytes } from "./util";
 import { deserializeArbitrary } from "./deserialize/simple/arbitrary";
-import { SERIALIZE_ESCAPE_TABLE } from "./globals/tables";
 import { serializeObject } from "./serialize/simple/object";
 import { deserializeObject } from "./deserialize/simple/object";
 import { serializeRaw } from "./serialize/simple/raw";
