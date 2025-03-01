@@ -1,5 +1,9 @@
 # Change Log
 
+## 2025-03-01 - 1.0.0-beta.6
+
+- fix: import from base directory index.ts
+
 ## 2025-03-01 - 1.0.0-beta.5
 
 - fix: revert pull request [#112](https://github.com/JairusSW/json-as/pull/112)
