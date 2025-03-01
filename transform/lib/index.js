@@ -130,8 +130,6 @@ class JSONTransform extends Visitor {
             const type = toString(member.type);
             const name = member.name;
             const value = member.initializer ? toString(member.initializer) : null;
-            if (!this.isValidType(type, node))
-                throwError("Invalid Type. " + type + " is not a JSON-compatible type. Either decorate it with @omit, set it to private, or remove it.", member.type.range);
             if (type.startsWith("(") && type.includes("=>"))
                 continue;
             const mem = new Property();
