@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { describe, expect } from "../../modules/test/assembly";
+import { describe, expect } from "./lib";
 
 describe("Should serialize Date", () => {
   expect(JSON.stringify<Date>(new Date(0)))

@@ -1,5 +1,4 @@
 import { JSON } from "../..";
-import { bs } from "../../../modules/as-bs/assembly";
 import { BRACE_LEFT, BRACE_RIGHT, QUOTE } from "../../custom/chars";
 import { bytes } from "../../util";
 

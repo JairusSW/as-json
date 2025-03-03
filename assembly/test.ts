@@ -1,8 +1,4 @@
-import { CharCode } from "util/string";
 import { JSON } from ".";
-import { bs } from "../modules/as-bs/assembly";
-import { deserializeArbitraryArray } from "./deserialize/simple/array/arbitrary";
-import { serializeObject } from "./serialize/simple/object";
 import { bytes } from "./util";
 
 @json

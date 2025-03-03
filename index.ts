@@ -1,1 +1,1 @@
-export * from "./assembly/index.ts";
+export * from "./assembly/index";

@@ -1,5 +1,4 @@
 /// <reference path="./index.d.ts" />
-import { bs } from "../modules/as-bs";
 
 import { serializeString } from "./serialize/simple/string";
 import { serializeArray } from "./serialize/simple/array";
@@ -622,3 +621,8 @@ export namespace JSON {
 function deserializeBox<T>(srcStart: usize, srcEnd: usize, dst: usize, ty: T): T {
   return JSON.__deserialize<T>(srcStart, srcEnd, dst);
 }
+
+export function toRaw(data: string): JSON.Raw { return new JSON.Raw(data) }
+export function fromRaw(data: JSON.Raw): string { return data.data }
+
+export function toBox<T>(data: T): JSON.Box<T> { return new JSON.Box<T>(data) }

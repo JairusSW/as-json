@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { describe, expect } from "../../modules/test/assembly";
+import { describe, expect } from "./lib";
 
 describe("Should serialize floats", () => {
   expect(JSON.stringify<f64>(7.23)).toBe("7.23");

@@ -6,7 +6,7 @@
     "coverage": false
   },
   "buildOptions": {
-    "args": ["--enable simd", "--runtime stub"],
+    "args": ["--enable simd", "--runtime stub", "--lib ./modules/as-bs/"],
     "target": "wasi"
   },
   "runOptions": {

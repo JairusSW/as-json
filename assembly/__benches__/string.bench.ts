@@ -1,6 +1,5 @@
 import {JSON} from "..";
 import {Vec3} from "./schemas";
-import {bs} from "../../modules/as-bs/assembly";
 import {bench} from "../custom/bench";
 import {serializeString_SIMD} from "../serialize/simd/string";
 import {deserializeString_SIMD} from "../deserialize/simd/string";

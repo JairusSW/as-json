@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { describe, expect } from "../../modules/test/assembly";
+import { describe, expect } from "./lib";
 
 describe("Should serialize strings", () => {
   expect(JSON.stringify("abcdefg")).toBe('"abcdefg"');

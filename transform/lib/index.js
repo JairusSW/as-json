@@ -123,7 +123,7 @@ class JSONTransform extends Visitor {
             this.generateEmptyMethods(node);
             return;
         }
-        this.addRequiredImports(node);
+        this.addRequiredImports(node.range.source);
         for (const member of members) {
             if (!member.type)
                 throwError("Fields must be strongly typed", node.range);
@@ -144,10 +144,10 @@ class JSONTransform extends Visitor {
                     const decoratorName = decorator.name.text.toLowerCase().trim();
                     switch (decoratorName) {
                         case "alias": {
-                            const args = getArgs(decorator.args);
-                            if (!args.length)
+                            const arg = decorator.args[0];
+                            if (!arg || arg.kind != 16)
                                 throwError("@alias must have an argument of type string or number", member.range);
-                            mem.alias = args[0];
+                            mem.alias = arg.value.toString();
                             break;
                         }
                         case "omitif": {
@@ -413,21 +413,24 @@ class JSONTransform extends Visitor {
         const source = this.parser.sources.find((src) => src.internalPath == node.internalPath);
         if (!source)
             return;
-        if (source.statements.some((stmt) => stmt.kind === 59 && stmt.name.text === "JSON"))
-            this.imports.push(node);
+        this.imports.push(node);
     }
     visitSource(node) {
         this.imports = [];
         super.visitSource(node);
     }
     addRequiredImports(node) {
-        if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
-            const __filename = fileURLToPath(import.meta.url);
-            const __dirname = path.dirname(__filename);
-            let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../modules/as-bs/"));
-            if (!relativePath.startsWith(".") && !relativePath.startsWith("/"))
-                relativePath = "./" + relativePath;
-            const txt = `import { bs } from "${relativePath}";`;
+        const bsImport = this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"));
+        if (bsImport) {
+            const txt = `import { bs } from "as-bs";`;
+            if (!this.bsImport) {
+                this.bsImport = txt;
+                if (process.env["JSON_DEBUG"])
+                    console.log("Added as-bs import: " + txt + "\n");
+            }
+        }
+        else {
+            const txt = `import { bs } from "as-bs";`;
             if (!this.bsImport) {
                 this.bsImport = txt;
                 if (process.env["JSON_DEBUG"])

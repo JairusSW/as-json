@@ -1,6 +1,5 @@
 import {JSON} from "..";
 import {Vec3} from "./schemas";
-import {bs} from "../../modules/as-bs/assembly";
 import {bench} from "./bench";
 
 const vec: Vec3 = {x: 1, y: 2, z: 3};

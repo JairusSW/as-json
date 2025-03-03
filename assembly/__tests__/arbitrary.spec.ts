@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { describe, expect } from "../../modules/test/assembly";
+import { describe, expect } from "./lib";
 import { Vec3 } from "./types";
 
 describe("Should serialize arbitrary types", () => {

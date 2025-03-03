@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { describe, expect } from "../../modules/test/assembly";
+import { describe, expect } from "./lib";
 
 describe("Should serialize structs", () => {
   expect(
@@ -64,6 +64,10 @@ describe("Should deserialize structs with whitespace", () => {
   ).toBe('{"x":3.4,"y":1.2,"z":8.3}');
 });
 
+describe("Should serialize Suite struct", () => {
+
+});
+
 @json
 class BaseObject {
   a: string;
@@ -110,7 +114,6 @@ class ObjWithString {
 
 @json
 class ObjWithStrangeKey<T> {
-
   @alias('a\\\t"\x02b`c')
   data!: T;
 }

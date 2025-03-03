@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { describe, expect } from "../../modules/test/assembly";
+import { describe, expect } from "./lib";
 
 describe("Should serialize integer arrays", () => {
   expect(JSON.stringify<u32[]>([0, 100, 101])).toBe("[0,100,101]");
@@ -57,7 +57,6 @@ describe("Should serialize object arrays", () => {
     ]),
   ).toBe('[{"x":3.4,"y":1.2,"z":8.3},{"x":3.4,"y":-2.1,"z":9.3}]');
 });
-
 
 @json
 class Vec3 {

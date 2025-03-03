@@ -6,7 +6,6 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
-import { fstat, readdirSync, readFileSync } from "fs";
 
 let indent = "  ";
 
@@ -484,10 +483,8 @@ class JSONTransform extends Visitor {
     super.visitSource(node);
   }
   addRequiredImports(node: Source): void {
-    console.log("Adding imports for " + node.normalizedPath)
     const bsImport = this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"));
     if (bsImport) {
-      console.log("bsImport.path -> " + bsImport.path.value);
       const txt = `import { bs } from "as-bs";`;
       if (!this.bsImport) {
         this.bsImport = txt;

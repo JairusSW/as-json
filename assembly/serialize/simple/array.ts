@@ -1,4 +1,3 @@
-import { bs } from "../../../modules/as-bs";
 import { COMMA, BRACKET_RIGHT, BRACKET_LEFT } from "../../custom/chars";
 import { JSON } from "../..";
 

@@ -1,6 +1,5 @@
 import { _intTo16 } from "../../custom/util";
 import { bytes } from "../../util/bytes";
-import { bs } from "../../../modules/as-bs";
 import { BACK_SLASH, QUOTE } from "../../custom/chars";
 import { SERIALIZE_ESCAPE_TABLE } from "../../globals/tables";
 
