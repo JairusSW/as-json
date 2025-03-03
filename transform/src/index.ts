@@ -6,6 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
+import { fstat, readdirSync, readFileSync } from "fs";
 
 let indent = "  ";
 
@@ -150,14 +151,14 @@ class JSONTransform extends Visitor {
       return;
     }
 
-    this.addRequiredImports(node);
+    this.addRequiredImports(node.range.source);
 
     for (const member of members) {
       if (!member.type) throwError("Fields must be strongly typed", node.range);
       const type = toString(member.type!);
       const name = member.name;
       const value = member.initializer ? toString(member.initializer!) : null;
-      
+
       // if (!this.isValidType(type, node)) throwError("Invalid Type. " + type + " is not a JSON-compatible type. Either decorate it with @omit, set it to private, or remove it.", member.type.range);
 
       if (type.startsWith("(") && type.includes("=>")) continue;
@@ -176,9 +177,10 @@ class JSONTransform extends Visitor {
           const decoratorName = (decorator.name as IdentifierExpression).text.toLowerCase().trim();
           switch (decoratorName) {
             case "alias": {
-              const args = getArgs(decorator.args);
-              if (!args.length) throwError("@alias must have an argument of type string or number", member.range);
-              mem.alias = args[0]!;
+              const arg = decorator.args[0];
+              if (!arg || arg.kind != NodeKind.Literal) throwError("@alias must have an argument of type string or number", member.range);
+              // @ts-ignore: exists
+              mem.alias = arg.value.toString();
               break;
             }
             case "omitif": {
@@ -475,32 +477,24 @@ class JSONTransform extends Visitor {
     super.visitImportStatement(node);
     const source = this.parser.sources.find((src) => src.internalPath == node.internalPath);
     if (!source) return;
-
-    if (source.statements.some((stmt) => stmt.kind === NodeKind.NamespaceDeclaration && (stmt as NamespaceDeclaration).name.text === "JSON")) this.imports.push(node);
+    this.imports.push(node);
   }
   visitSource(node: Source): void {
     this.imports = [];
     super.visitSource(node);
   }
-  addRequiredImports(node: ClassDeclaration): void {
-    // if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
-    //   if (!this.bsImport) {
-    //     this.bsImport = "import { bs } from \"as-bs\"";
-    //     if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + this.bsImport + "\n");
-    //   }
-    // }
-    if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"))) {
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-
-      let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../modules/as-bs/"));
-
-      if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
-      // if (!existsSync(relativePath)) {
-      //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
-      // }
-
-      const txt = `import { bs } from "${relativePath}";`;
+  addRequiredImports(node: Source): void {
+    console.log("Adding imports for " + node.normalizedPath)
+    const bsImport = this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"));
+    if (bsImport) {
+      console.log("bsImport.path -> " + bsImport.path.value);
+      const txt = `import { bs } from "as-bs";`;
+      if (!this.bsImport) {
+        this.bsImport = txt;
+        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
+      }
+    } else {
+      const txt = `import { bs } from "as-bs";`;
       if (!this.bsImport) {
         this.bsImport = txt;
         if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
@@ -585,7 +579,7 @@ class JSONTransform extends Visitor {
       "JSON.Box",
       "Box"
     ]
-    
+
     if (node && node.isGeneric && node.typeParameters) validTypes.push(...node.typeParameters.map((v) => v.name.text));
     if (type.endsWith("| null")) {
       if (isPrimitive(type.slice(0, type.indexOf("| null")))) return false;
@@ -619,6 +613,7 @@ export default class Transformer extends Transform {
     transformer.parser = parser;
     // Loop over every source
     for (const source of sources) {
+      // console.log("Source: " + source.normalizedPath);
       transformer.imports = [];
       transformer.currentSource = source;
       // Ignore all lib and std. Visit everything else.
