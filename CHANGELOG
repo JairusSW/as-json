@@ -1,5 +1,9 @@
 # Change Log
 
+## 2025-03-03 - 1.0.0-beta.9
+
+- rename: change libs folder to lib
+
 ## 2025-03-03 - 1.0.0-beta.8
 
 - docs: add instructions for using `--lib` in README
