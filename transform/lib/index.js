@@ -1,4 +1,4 @@
-import { IdentifierExpression, Source, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, Node, Tokenizer } from "assemblyscript/dist/assemblyscript.js";
+import { Source, Node, Tokenizer } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -593,35 +593,6 @@ function sortMembers(members) {
             return 0;
         }
     });
-}
-function getArgs(args) {
-    if (!args)
-        return [];
-    let out = [];
-    for (const arg of args) {
-        if (arg instanceof StringLiteralExpression) {
-            out.push(arg.value);
-        }
-        else if (arg instanceof IntegerLiteralExpression) {
-            out.push(i64_to_string(arg.value));
-        }
-        else if (arg instanceof FloatLiteralExpression) {
-            out.push(arg.value.toString());
-        }
-        else if (arg instanceof NullExpression) {
-            out.push(arg.text);
-        }
-        else if (arg instanceof TrueExpression) {
-            out.push(arg.text);
-        }
-        else if (arg instanceof FalseExpression) {
-            out.push(arg.text);
-        }
-        else if (arg instanceof IdentifierExpression) {
-            out.push(arg.text);
-        }
-    }
-    return out;
 }
 function toU16(data, offset = 0) {
     return data.charCodeAt(offset + 0).toString();

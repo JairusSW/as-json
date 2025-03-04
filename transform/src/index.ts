@@ -1,4 +1,4 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, Expression, CommonFlags, StringLiteralExpression, IntegerLiteralExpression, FloatLiteralExpression, NullExpression, TrueExpression, FalseExpression, CallExpression, ImportStatement, NamespaceDeclaration, Node, Statement, Tokenizer, SourceKind, PropertyAccessExpression, Token, CommentHandler, ExpressionStatement, BinaryExpression, NamedTypeNode, Range, FEATURE_SIMD, FunctionExpression, MethodDeclaration } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, CommonFlags, ImportStatement, Node, Tokenizer, SourceKind, NamedTypeNode, Range, FEATURE_SIMD, FunctionExpression, MethodDeclaration } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -664,29 +664,6 @@ function sortMembers(members: Property[]): Property[] {
       return 0;
     }
   });
-}
-
-function getArgs(args: Expression[] | null): string[] {
-  if (!args) return [];
-  let out: string[] = [];
-  for (const arg of args) {
-    if (arg instanceof StringLiteralExpression) {
-      out.push(arg.value);
-    } else if (arg instanceof IntegerLiteralExpression) {
-      out.push(i64_to_string(arg.value));
-    } else if (arg instanceof FloatLiteralExpression) {
-      out.push(arg.value.toString());
-    } else if (arg instanceof NullExpression) {
-      out.push(arg.text);
-    } else if (arg instanceof TrueExpression) {
-      out.push(arg.text);
-    } else if (arg instanceof FalseExpression) {
-      out.push(arg.text);
-    } else if (arg instanceof IdentifierExpression) {
-      out.push(arg.text);
-    }
-  }
-  return out;
 }
 
 function toU16(data: string, offset: number = 0): string {
