@@ -1,5 +1,11 @@
 # Change Log
 
+## 2025-03-03 - 1.0.0-beta.7
+
+- fix: add as-bs to `--lib` section
+- chore: clean up transform
+- refactor: transform should import `~lib/as-bs.ts` instead of relative path
+
 ## 2025-03-01 - 1.0.0-beta.6
 
 - fix: import from base directory index.ts
