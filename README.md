@@ -6,7 +6,7 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-beta.7
+    AssemblyScript - v1.0.0-beta.8
   </pre>
 </h5>
 
@@ -31,20 +31,23 @@ JSON is the de-facto serialization format of modern web applications, but its se
 ## 💾 Installation
 
 ```bash
-npm install json-as@1.0.0-beta.7
+npm install json-as@1.0.0-beta.8
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
 
 ```bash
---transform json-as/transform
+--transform json-as/transform --lib json-as/lib
 ```
 
 Alternatively, add it to your `asconfig.json`
 
 ```json
 {
-  "options": {"transform": ["json-as/transform"]}
+  "options": {
+    "transform": ["json-as/transform"],
+    "lib": ["json-as/lib"]
+  }
 }
 ```
 
