@@ -3,7 +3,7 @@ import { BACK_SLASH, QUOTE } from "../../../custom/chars";
 
 export function deserializeStringArray(srcStart: usize, srcEnd: usize, dst: usize): string[] {
   const out = dst ? changetype<string[]>(dst) : new Array<string>();
-  let lastPos = 2;
+  let lastPos: usize = 2;
   let inString = false;
   while (srcStart < srcEnd) {
     const code = load<u16>(srcStart);
