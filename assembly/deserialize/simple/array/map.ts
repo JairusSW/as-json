@@ -2,7 +2,7 @@ import { BRACE_LEFT, BRACE_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../..";
 
 export function deserializeMapArray<T extends Map<any, any>[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
-  const out = dst ? changetype<T>(dst) : instantiate<T>();
+  const out = changetype<nonnull<T>>(dst || changetype<usize>(instantiate<T>()));
   let lastIndex: usize = 0;
   let depth: u32 = 0;
   while (srcStart < srcEnd) {
