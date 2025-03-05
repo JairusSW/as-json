@@ -33,6 +33,9 @@ export function deserializeArray<T extends unknown[]>(srcStart: usize, srcEnd: u
       // @ts-ignore: type
       return deserializeMapArray<T>(srcStart, srcEnd, dst);
       // @ts-ignore: defined by transform
+    } else if (isDefined(type.__DESERIALIZE_CUSTOM)) {
+      return deserializeStructArray<T>(srcStart, srcEnd, dst);
+      // @ts-ignore: defined by transform
     } else if (isDefined(type.__DESERIALIZE)) {
       return deserializeStructArray<T>(srcStart, srcEnd, dst);
     }
