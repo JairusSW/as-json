@@ -1,5 +1,9 @@
 # Change Log
 
+## 2025-03-04 - 1.0.0-beta.16
+
+- fix: isPrimitive should only trigger on actual primitives
+
 ## 2025-03-04 - 1.0.0-beta.15
 
 - fix: deserialize custom should take in string
