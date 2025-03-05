@@ -671,7 +671,7 @@ function strToNum(data, simd = false, offset = 0) {
 }
 function isPrimitive(type) {
     const primitiveTypes = ["u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64", "f32", "f64", "bool", "boolean"];
-    return primitiveTypes.some((v) => type.includes(v));
+    return primitiveTypes.some((v) => type.startsWith(v));
 }
 function throwError(message, range) {
     const err = new Error();
