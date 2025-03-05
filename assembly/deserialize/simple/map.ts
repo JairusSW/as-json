@@ -4,7 +4,7 @@ import { isSpace } from "../../util";
 import { ptrToStr } from "../../util/ptrToStr";
 
 export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd: usize, dst: usize): T {
-  const out = changetype<nonnull<T>>(dst || __new(offsetof<T>(), idof<T>()));
+  const out = changetype<nonnull<T>>(dst || changetype<usize>(instantiate<T>()));
   // @ts-ignore: type
   if (!isString<indexof<T>>() && !isInteger<indexof<T>>() && !isFloat<indexof<T>>()) throw new Error("Map key must also be a valid JSON key!");
 
@@ -129,7 +129,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
         if (load<u64>(srcStart) == 28429475166421108) {
           // console.log("Value (bool): " + ptrToStr(srcStart, srcStart + 8));
           // @ts-ignore: type
-          out.set(ptrToStr(keyStart, keyEnd), JSON.__deserialize<valueof<T>>(lastIndex, (srcStart += 8)));
+          out.set(ptrToStr(keyStart, keyEnd), JSON.__deserialize<valueof<T>>(srcStart, (srcStart += 8)));
           // while (isSpace(load<u16>((srcStart += 2)))) {
           //   /* empty */
           // }
@@ -141,7 +141,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
         if (load<u64>(srcStart, 2) == 28429466576093281) {
           // console.log("Value (bool): " + ptrToStr(srcStart, srcStart + 10));
           // @ts-ignore: type
-          out.set(ptrToStr(keyStart, keyEnd), JSON.__deserialize<valueof<T>>(lastIndex, (srcStart += 10)));
+          out.set(ptrToStr(keyStart, keyEnd), JSON.__deserialize<valueof<T>>(srcStart, (srcStart += 10)));
           // while (isSpace(load<u16>((srcStart += 2)))) {
           //   /* empty */
           // }
@@ -153,7 +153,7 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
         if (load<u64>(srcStart) == 30399761348886638) {
           // console.log("Value (null): " + ptrToStr(srcStart, srcStart + 8));
           // @ts-ignore: type
-          out.set(ptrToStr(keyStart, keyEnd), JSON.__deserialize<valueof<T>>(lastIndex, (srcStart += 8)));
+          out.set(ptrToStr(keyStart, keyEnd), JSON.__deserialize<valueof<T>>(srcStart, (srcStart += 8)));
           // while (isSpace(load<u16>((srcStart += 2)))) {
           /* empty */
           // }
@@ -169,11 +169,4 @@ export function deserializeMap<T extends Map<any, any>>(srcStart: usize, srcEnd:
     }
   }
   return out;
-}
-
-function sliceTo(srcStart: usize, srcEnd: usize): string {
-  const dstSize = srcEnd - srcStart;
-  const dst = __new(dstSize, idof<string>());
-  memory.copy(dst, srcStart, dstSize);
-  return changetype<string>(dst);
 }

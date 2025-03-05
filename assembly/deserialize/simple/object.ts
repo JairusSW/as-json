@@ -1,11 +1,11 @@
 import { JSON } from "../..";
-import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T } from "../../custom/chars";
+import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T, COLON } from "../../custom/chars";
 import { isSpace } from "../../util";
 import { ptrToStr } from "../../util/ptrToStr";
 import { deserializeArbitrary } from "./arbitrary";
 
 export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): JSON.Obj {
-  const out = new JSON.Obj();
+  const out = changetype<JSON.Obj>(dst || changetype<usize>(new JSON.Obj()));
 
   let keyStart: usize = 0;
   let keyEnd: usize = 0;
@@ -14,7 +14,12 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
   let lastIndex: usize = 0;
 
   while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
-  while (srcEnd > srcStart && isSpace(load<u16>(srcEnd - 2))) srcEnd -= 2;
+  while (srcEnd > srcStart && isSpace(load<u16>(srcEnd - 2))) srcEnd -= 2; // would like to optimize this later
+
+  if (srcStart - srcEnd == 0)
+    throw new Error("Input string had zero length or was all whitespace");
+  if (load<u16>(srcStart) != BRACE_LEFT) throw new Error("Expected '{' at start of object at position " + (srcEnd - srcStart).toString());
+  if (load<u16>(srcEnd - 2) != BRACE_RIGHT) throw new Error("Expected '}' at end of object at position " + (srcEnd - srcStart).toString());
 
   srcStart += 2;
   while (srcStart < srcEnd) {
@@ -24,13 +29,10 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
         if (isKey) {
           keyStart = lastIndex;
           keyEnd = srcStart;
-          // console.log("Key: " + ptrToStr(keyStart, keyEnd));
+          // console.log("Key: " + ptrToStr(lastIndex, srcStart));
           // console.log("Next: " + String.fromCharCode(load<u16>(srcStart + 2)));
-          srcStart += 2;
-          // while (isSpace((code = load<u16>((srcStart += 2))))) {
-          //   /* empty */
-          // }
-          // if (code !== COLON) throw new Error("Expected ':' after key at position " + (srcStart - srcPtr).toString());
+          while (isSpace((code = load<u16>((srcStart += 2))))) { }
+          if (code !== COLON) throw new Error("Expected ':' after key at position " + (srcEnd - srcStart).toString());
           isKey = false;
         } else {
           // console.log("Got key start");
@@ -81,10 +83,13 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
         srcStart += 2;
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
-          if (code == BRACE_RIGHT) {
+          if (code == QUOTE) {
+            srcStart += 2;
+            while (!(load<u16>(srcStart) == QUOTE && load<u16>(srcStart - 2) != BACK_SLASH)) srcStart += 2;
+          } else if (code == BRACE_RIGHT) {
             if (--depth == 0) {
               // console.log("Value (object): " + ptrToStr(lastIndex, srcStart + 2));
-              out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(lastIndex, srcStart += 2, dst));
+              out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(lastIndex, (srcStart += 2), dst));
               // console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
               keyStart = 0;
               // while (isSpace(load<u16>(srcStart))) {
@@ -104,7 +109,7 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
           if (code == BRACKET_RIGHT) {
             if (--depth == 0) {
               // console.log("Value (array): " + ptrToStr(lastIndex, srcStart + 2));
-              out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(lastIndex, srcStart += 2, dst));
+              out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(lastIndex, (srcStart += 2), dst));
               // console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
               keyStart = 0;
               // while (isSpace(load<u16>((srcStart += 2)))) {
@@ -118,7 +123,7 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
       } else if (code == CHAR_T) {
         if (load<u64>(srcStart) == 28429475166421108) {
           // console.log("Value (bool): " + ptrToStr(srcStart, srcStart + 8));
-          out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(lastIndex, srcStart += 8, dst));
+          out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(srcStart, (srcStart += 8), dst));
           // while (isSpace(load<u16>((srcStart += 2)))) {
           //   /* empty */
           // }
@@ -129,7 +134,7 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
       } else if (code == CHAR_F) {
         if (load<u64>(srcStart, 2) == 28429466576093281) {
           // console.log("Value (bool): " + ptrToStr(srcStart, srcStart + 10));
-          out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(lastIndex, srcStart += 10, dst));
+          out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(srcStart, (srcStart += 10), dst));
           // while (isSpace(load<u16>((srcStart += 2)))) {
           //   /* empty */
           // }
@@ -140,7 +145,7 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
       } else if (code == CHAR_N) {
         if (load<u64>(srcStart) == 30399761348886638) {
           // console.log("Value (null): " + ptrToStr(srcStart, srcStart + 8));
-          out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(lastIndex, srcStart += 8, dst));
+          out.set(ptrToStr(keyStart, keyEnd), deserializeArbitrary(srcStart, (srcStart += 8), dst));
           // while (isSpace(load<u16>((srcStart += 2)))) {
           /* empty */
           // }
@@ -148,6 +153,10 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
           // console.log("Next: " + String.fromCharCode(load<u16>(srcStart)));
           keyStart = 0;
         }
+      } else if (isSpace(code)) {
+        srcStart += 2;
+      } else {
+        throw new Error("Unexpected character in JSON object '" + String.fromCharCode(code) + "' at position " + (srcEnd - srcStart).toString());
       }
     }
   }

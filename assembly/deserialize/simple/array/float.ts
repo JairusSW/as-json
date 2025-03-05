@@ -1,5 +1,5 @@
 import { isSpace } from "../../../util";
-import { COMMA, BRACE_RIGHT, BRACKET_RIGHT } from "../../../custom/chars";
+import { COMMA, BRACKET_RIGHT } from "../../../custom/chars";
 import { JSON } from "../../..";
 
 export function deserializeFloatArray<T extends number[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
