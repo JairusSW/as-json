@@ -1,5 +1,9 @@
 # Change Log
 
+## 2025-03-04 - 1.0.0-beta.15
+
+- fix: deserialize custom should take in string
+
 ## 2025-03-04 - 1.0.0-beta.14
 
 - fix: reference to nonexistent variable during custom deserialization layer 2
