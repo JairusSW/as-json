@@ -1,5 +1,13 @@
 # Change Log
 
+## 2025-03-04 - 1.0.0-beta.14
+
+- fix: reference to nonexistent variable during custom deserialization layer 2
+
+## 2025-03-04 - 1.0.0-beta.13
+
+- fix: forgot to actually build the transform
+
 ## 2025-03-04 - 1.0.0-beta.12
 
 - fix: build transform
