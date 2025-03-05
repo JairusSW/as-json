@@ -483,7 +483,7 @@ class JSONTransform extends Visitor {
     super.visitSource(node);
   }
   addRequiredImports(node: Source): void {
-    const bsImport = this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "bs"));
+    const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs"));
     if (bsImport) {
       const txt = `import { bs } from "as-bs";`;
       if (!this.bsImport) {
@@ -498,7 +498,7 @@ class JSONTransform extends Visitor {
       }
     }
 
-    if (!this.imports.find((i) => i.declarations.find((d) => d.foreignName.text == "JSON"))) {
+    if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = path.dirname(__filename);
 
