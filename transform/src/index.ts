@@ -797,7 +797,3 @@ function sizeof(type: string): number {
   else if (type == "bool" || type == "boolean") return 10;
   else return 0;
 }
-
-function allPrimitive(schema: Schema): boolean {
-  return !schema.members.some((p) => p.byteSize == 0);
-}

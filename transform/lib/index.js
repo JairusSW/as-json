@@ -312,7 +312,7 @@ class JSONTransform extends Visitor {
                 DESERIALIZE += `${indent}switch (load<u32>(keyStart)) {\n`;
             else if (memberLen == 6)
                 DESERIALIZE += `${indent}let code = load<u64>(keyStart) & 0x0000FFFFFFFFFFFF;\n`;
-            else if (memberLen == 6)
+            else if (memberLen == 8)
                 DESERIALIZE += `${indent}let code = load<u64>(keyStart);\n`;
             else
                 DESERIALIZE += toMemCDecl(memberLen, indent);
@@ -705,8 +705,5 @@ function sizeof(type) {
         return 10;
     else
         return 0;
-}
-function allPrimitive(schema) {
-    return !schema.members.some((p) => p.byteSize == 0);
 }
 //# sourceMappingURL=index.js.map
