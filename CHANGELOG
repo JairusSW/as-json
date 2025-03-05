@@ -1,5 +1,9 @@
 # Change Log
 
+## 2025-03-04 - 1.0.0-beta.12
+
+- fix: build transform
+
 ## 2025-03-04 - 1.0.0-beta.11
 
 - fix: wrongly assumed pointer types within arbitrary deserialization
