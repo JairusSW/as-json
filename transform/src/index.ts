@@ -352,7 +352,7 @@ class JSONTransform extends Visitor {
       if (memberLen == 2) DESERIALIZE += `${indent}switch (load<u16>(keyStart)) {\n`;
       else if (memberLen == 4) DESERIALIZE += `${indent}switch (load<u32>(keyStart)) {\n`;
       else if (memberLen == 6) DESERIALIZE += `${indent}let code = load<u64>(keyStart) & 0x0000FFFFFFFFFFFF;\n`;
-      else if (memberLen == 6) DESERIALIZE += `${indent}let code = load<u64>(keyStart);\n`;
+      else if (memberLen == 8) DESERIALIZE += `${indent}let code = load<u64>(keyStart);\n`;
       else DESERIALIZE += toMemCDecl(memberLen, indent);
       for (let i = 0; i < memberGroup.length; i++) {
         const member = memberGroup[i];
