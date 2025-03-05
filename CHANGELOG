@@ -1,5 +1,10 @@
 # Change Log
 
+## 2025-03-04 - 1.0.0-beta.11
+
+- fix: wrongly assumed pointer types within arbitrary deserialization
+- fix: wrong pointer type being passed during map deserialization
+
 ## 2025-03-04 - 1.0.0-beta.10
 
 - fix: transform not generating the right load operations for keys
