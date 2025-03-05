@@ -1,5 +1,11 @@
 # Change Log
 
+## 2025-03-04 - 1.0.0-beta.10
+
+- fix: transform not generating the right load operations for keys
+- fix: whitespace not working in objects or struct deserialization
+- fix: JSON.Raw not working when deserializing as Map<string, JSON.Raw>
+
 ## 2025-03-03 - 1.0.0-beta.9
 
 - rename: change libs folder to lib
