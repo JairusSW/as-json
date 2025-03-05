@@ -588,7 +588,7 @@ export namespace JSON {
         // @ts-ignore: Defined by transform
         if (isDefined(type.__INITIALIZE)) changetype<nonnull<T>>(out).__INITIALIZE();
         // @ts-ignore
-        return changetype<nonnull<T>>(out).__DESERIALIZE_CUSTOM(srcStart, srcEnd);
+        return changetype<nonnull<T>>(out).__DESERIALIZE_CUSTOM(ptrToStr(srcStart, srcEnd));
         // @ts-ignore: Defined by transform
       } else if (isDefined(type.__DESERIALIZE)) {
         return deserializeStruct<T>(srcStart, srcEnd, dst);
