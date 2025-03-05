@@ -1,17 +1,17 @@
-import { CHAR_E, CHAR_F, CHAR_T } from "../../../custom/chars";
-
 export function deserializeBooleanArray<T extends boolean[]>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = dst ? changetype<T>(dst) : instantiate<T>();
+  srcStart += 2; // skip [
   while (srcStart < srcEnd) {
-    const code = load<u16>(srcStart);
-    if (code == CHAR_T && load<u16>(srcStart, 8) == CHAR_E) {
+    const block = load<u64>(srcStart);
+    if (block == 28429475166421108) {
       out.push(true);
       srcStart += 10;
-    } else if (code == CHAR_F && load<u16>(srcStart, 10) == CHAR_E) {
+    } else if (block == 32370086184550502 && load<u16>(srcStart, 8) == 101) {
       out.push(false);
       srcStart += 12;
+    } else {
+      srcStart += 2;
     }
-    srcStart += 2;
   }
   return out;
 }

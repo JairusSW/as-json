@@ -64,9 +64,9 @@ describe("Should deserialize structs with whitespace", () => {
   ).toBe('{"x":3.4,"y":1.2,"z":8.3}');
 });
 
-describe("Should serialize Suite struct", () => {
+// describe("Should serialize Suite struct", () => {
 
-});
+// });
 
 @json
 class BaseObject {

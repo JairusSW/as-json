@@ -13,8 +13,9 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
   let depth = 0;
   let lastIndex: usize = 0;
 
-  // while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
-  // while (srcEnd > srcStart && isSpace(load<u16>(srcEnd))) srcEnd -= 2;
+  while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
+  while (srcEnd > srcStart && isSpace(load<u16>(srcEnd - 2))) srcEnd -= 2;
+
   srcStart += 2;
   while (srcStart < srcEnd) {
     let code = load<u16>(srcStart); // while (isSpace(code)) code = load<u16>(srcStart += 2);

@@ -1,6 +1,5 @@
 import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T, COLON } from "../../custom/chars";
 import { isSpace } from "../../util";
-import { ptrToStr } from "../../util/ptrToStr";
 
 export function deserializeStruct<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<nonnull<T>>(dst || __new(offsetof<T>(), idof<T>()));
@@ -22,7 +21,6 @@ export function deserializeStruct<T>(srcStart: usize, srcEnd: usize, dst: usize)
   if (load<u16>(srcStart) != BRACE_LEFT) throw new Error("Expected '{' at start of object at position " + (srcEnd - srcStart).toString());
   if (load<u16>(srcEnd - 2) != BRACE_RIGHT) throw new Error("Expected '}' at end of object at position " + (srcEnd - srcStart).toString());
 
-  console.log(ptrToStr(srcStart, srcEnd))
   srcStart += 2;
   while (srcStart < srcEnd) {
     let code = load<u16>(srcStart); // while (isSpace(code)) code = load<u16>(srcStart += 2);

@@ -12,7 +12,7 @@ export function deserializeStringArray(srcStart: usize, srcEnd: usize, dst: usiz
         inString = true;
         lastPos = srcStart;
       } else if (load<u16>(srcStart - 2) != BACK_SLASH) {
-        out.push(JSON.__deserialize<string>(lastPos, srcStart));
+        out.push(JSON.__deserialize<string>(lastPos, srcStart + 2));
         inString = false;
       }
     }
