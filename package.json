@@ -12,6 +12,7 @@
     "@types/node": "^22.13.1",
     "as-bench": "JairusSW/as-bench",
     "as-console": "^7.0.0",
+    "as-test": "^0.4.0-beta.3",
     "assemblyscript": "^0.27.34",
     "assemblyscript-prettier": "^3.0.1",
     "prettier": "^3.5.0",
