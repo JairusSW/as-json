@@ -6,7 +6,7 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-beta.17
+    AssemblyScript - v1.0.0
   </pre>
 </h5>
 
@@ -31,7 +31,7 @@ JSON is the de-facto serialization format of modern web applications, but its se
 ## 💾 Installation
 
 ```bash
-npm install json-as@1.0.0-beta.17
+npm install json-as@1.0.0
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
