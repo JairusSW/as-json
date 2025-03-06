@@ -1,3 +1,4 @@
+import { bs } from "../../../lib/as-bs";
 import { QUOTE } from "../../custom/chars";
 import { bytes } from "../../util/bytes";
 

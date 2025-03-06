@@ -1,4 +1,5 @@
 /// <reference path="./index.d.ts" />
+import { bs } from "../lib/as-bs";
 
 import { serializeString } from "./serialize/simple/string";
 import { serializeArray } from "./serialize/simple/array";

@@ -1,3 +1,4 @@
+import { bs } from "../../../lib/as-bs";
 /**
  * Serialize a bool to type string
  * @param data data to serialize

@@ -420,17 +420,21 @@ class JSONTransform extends Visitor {
         super.visitSource(node);
     }
     addRequiredImports(node) {
+        const filePath = fileURLToPath(import.meta.url);
+        const fileDir = path.dirname(filePath);
         const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs"));
+        let bsPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../lib/as-bs.ts"));
+        if (!bsPath.startsWith(".") && !bsPath.startsWith("/"))
+            bsPath = "./" + bsPath;
         if (bsImport) {
-            const txt = `import { bs } from "as-bs";`;
-            if (!this.bsImport) {
-                this.bsImport = txt;
-                if (process.env["JSON_DEBUG"])
-                    console.log("Added as-bs import: " + txt + "\n");
-            }
+            const txt = `import { bs } from "${bsPath}";`;
+            bsImport.path = Node.createStringLiteralExpression(bsPath, bsImport.path.range);
+            bsImport.internalPath = bsPath;
+            if (process.env["JSON_DEBUG"])
+                console.log("Modified as-bs import: " + txt + "\n");
         }
         else {
-            const txt = `import { bs } from "as-bs";`;
+            const txt = `import { bs } from "${bsPath}";`;
             if (!this.bsImport) {
                 this.bsImport = txt;
                 if (process.env["JSON_DEBUG"])
@@ -438,9 +442,7 @@ class JSONTransform extends Visitor {
             }
         }
         if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
-            const __filename = fileURLToPath(import.meta.url);
-            const __dirname = path.dirname(__filename);
-            let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../assembly/index.ts"));
+            let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts"));
             if (!relativePath.startsWith(".") && !relativePath.startsWith("/"))
                 relativePath = "./" + relativePath;
             const txt = `import { JSON } from "${relativePath}";`;

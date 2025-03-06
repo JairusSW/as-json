@@ -1,3 +1,4 @@
+import { bs } from "../../../lib/as-bs";
 import { JSON } from "../..";
 import { serializeArray } from "./array";
 import { serializeBool } from "./bool";
