@@ -2,6 +2,7 @@ import { JSON } from "..";
 import { describe, expect } from "./lib";
 import { bytes } from "../util";
 
+
 @json
 class Point {
   x: f64 = 0.0;
@@ -10,10 +11,12 @@ class Point {
     this.x = x;
     this.y = y;
   }
+
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
+
   @deserializer
   deserializer(data: string): Point {
     const dataSize = bytes(data);
@@ -23,16 +26,12 @@ class Point {
     const x = data.slice(1, c);
     const y = data.slice(c + 1, data.length - 1);
 
-    return new Point(
-      f64.parse(x),
-      f64.parse(y)
-    );
+    return new Point(f64.parse(x), f64.parse(y));
   }
 }
 
-
 describe("Should serialize using custom serializers", () => {
-  expect(JSON.stringify<Point>(new Point(1,2))).toBe("(1.0,2.0)");
+  expect(JSON.stringify<Point>(new Point(1, 2))).toBe("(1.0,2.0)");
 });
 
 describe("Should deserialize using custom deserializers", () => {

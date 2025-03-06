@@ -34,9 +34,7 @@ const vec = {
 let data;
 
 const bench = new Bench({ time: 1000 })
-  .add("serialize vec3", () =>
-    data = JSON.stringify(vec)
-  )
+  .add("serialize vec3", () => (data = JSON.stringify(vec)))
   .add("deserialize vec3", () => {
     data = JSON.parse('{"x":3,"y":1,"z":8}');
   })
@@ -44,7 +42,7 @@ const bench = new Bench({ time: 1000 })
     data = JSON.stringify("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()-_=+{[}]|\\:;\"'?/>.<,'\"}");
   })
   .add("deserialize alphabet string", () => {
-    data = JSON.parse('"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()-_=+{[}]|\\\\:;\\"\'?/>.<,\'\\"}"')
+    data = JSON.parse('"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()-_=+{[}]|\\\\:;\\"\'?/>.<,\'\\"}"');
   }) /*
     .add("parse float", () => {
         data = JSON.parse("1.2345")

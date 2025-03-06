@@ -10,8 +10,7 @@ export function deserializeStructArray<T extends unknown[]>(srcStart: usize, src
   while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
   while (srcEnd > srcStart && isSpace(load<u16>(srcEnd - 2))) srcEnd -= 2;
 
-  if (srcStart - srcEnd == 0)
-    throw new Error("Input string had zero length or was all whitespace");
+  if (srcStart - srcEnd == 0) throw new Error("Input string had zero length or was all whitespace");
 
   if (load<u16>(srcStart) != BRACKET_LEFT) throw new Error("Expected '[' at start of object at position " + (srcEnd - srcStart).toString());
   if (load<u16>(srcEnd - 2) != BRACKET_RIGHT) throw new Error("Expected ']' at end of object at position " + (srcEnd - srcStart).toString());
@@ -21,7 +20,7 @@ export function deserializeStructArray<T extends unknown[]>(srcStart: usize, src
     if (code == BRACE_LEFT && depth++ == 0) {
       lastIndex = srcStart;
     } else if (code == BRACE_RIGHT && --depth == 0) {
-      out.push(JSON.__deserialize<valueof<T>>(lastIndex, srcStart += 2));
+      out.push(JSON.__deserialize<valueof<T>>(lastIndex, (srcStart += 2)));
     }
     srcStart += 2;
   }

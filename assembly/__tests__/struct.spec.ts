@@ -53,15 +53,11 @@ describe("Should ignore properties decorated with @omit", () => {
 });
 
 describe("Should deserialize structs", () => {
-  expect(
-    JSON.stringify(JSON.parse<Vec3>('{"x":3.4,"y":1.2,"z":8.3}')),
-  ).toBe('{"x":3.4,"y":1.2,"z":8.3}');
+  expect(JSON.stringify(JSON.parse<Vec3>('{"x":3.4,"y":1.2,"z":8.3}'))).toBe('{"x":3.4,"y":1.2,"z":8.3}');
 });
 
 describe("Should deserialize structs with whitespace", () => {
-  expect(
-    JSON.stringify(JSON.parse<Vec3>('    {  "x"  :  3.4  ,  "y"  :  1.2    ,  "z"   :  8.3   }   ')),
-  ).toBe('{"x":3.4,"y":1.2,"z":8.3}');
+  expect(JSON.stringify(JSON.parse<Vec3>('    {  "x"  :  3.4  ,  "y"  :  1.2    ,  "z"   :  8.3   }   '))).toBe('{"x":3.4,"y":1.2,"z":8.3}');
 });
 
 // describe("Should serialize Suite struct", () => {
@@ -114,6 +110,7 @@ class ObjWithString {
 
 @json
 class ObjWithStrangeKey<T> {
+
   @alias('a\\\t"\x02b`c')
   data!: T;
 }

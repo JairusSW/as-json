@@ -423,7 +423,7 @@ export namespace JSON {
     // @ts-ignore: type
     private storage: Map<string, JSON.Value> = new Map<string, JSON.Value>();
 
-    constructor() { }
+    constructor() {}
 
     // @ts-ignore: decorator
     @inline get size(): i32 {
@@ -473,7 +473,6 @@ export namespace JSON {
       const out = changetype<JSON.Obj>(__new(offsetof<JSON.Obj>(), idof<JSON.Obj>()));
 
       if (value instanceof Map) {
-
       }
       return out;
     }
@@ -626,7 +625,13 @@ function deserializeBox<T>(srcStart: usize, srcEnd: usize, dst: usize, ty: T): T
   return JSON.__deserialize<T>(srcStart, srcEnd, dst);
 }
 
-export function toRaw(data: string): JSON.Raw { return new JSON.Raw(data) }
-export function fromRaw(data: JSON.Raw): string { return data.data }
+export function toRaw(data: string): JSON.Raw {
+  return new JSON.Raw(data);
+}
+export function fromRaw(data: JSON.Raw): string {
+  return data.data;
+}
 
-export function toBox<T>(data: T): JSON.Box<T> { return new JSON.Box<T>(data) }
+export function toBox<T>(data: T): JSON.Box<T> {
+  return new JSON.Box<T>(data);
+}

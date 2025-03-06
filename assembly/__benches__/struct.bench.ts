@@ -1,8 +1,8 @@
-import {JSON} from "..";
-import {Vec3} from "./schemas";
-import {bench} from "./bench";
+import { JSON } from "..";
+import { Vec3 } from "./schemas";
+import { bench } from "./bench";
 
-const vec: Vec3 = {x: 1, y: 2, z: 3};
+const vec: Vec3 = { x: 1, y: 2, z: 3 };
 
 bs.ensureSize(4096);
 bench(
@@ -13,7 +13,7 @@ bench(
     // bs.stackSize = 0;
     JSON.stringify(vec);
   },
-  25_000_000
+  25_000_000,
 );
 
 // bench("Deserialize Vector3", () => {

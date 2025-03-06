@@ -2,12 +2,14 @@ import { JSON } from ".";
 import { FoodMenuBodyOutput } from "./body_output";
 import { bytes } from "./util";
 
+
 @json
 class Obj {
   public a: string = "hello";
   public b: string = "world";
-  public c: string = "\"\t\f\u0000\u0001";
+  public c: string = '"\t\f\u0000\u0001';
 }
+
 
 @json
 class Vec3 {
@@ -16,8 +18,10 @@ class Vec3 {
   z: f32 = 0.0;
 }
 
+
 @json
 class Player {
+
   @alias("first name")
   firstName!: string;
   lastName!: string;
@@ -25,10 +29,12 @@ class Player {
   // Drop in a code block, function, or expression that evaluates to a boolean
   @omitif((self: Player) => self.age < 18)
   age!: i32;
+
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
 }
+
 
 @json
 class Point {
@@ -38,10 +44,12 @@ class Point {
     this.x = x;
     this.y = y;
   }
+
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
+
   @deserializer
   deserializer(data: string): Point | null {
     const dataSize = bytes(data);
@@ -51,17 +59,16 @@ class Point {
     const x = data.slice(1, c);
     const y = data.slice(c + 1, data.length - 1);
 
-    return new Point(
-      f64.parse(x),
-      f64.parse(y)
-    );
+    return new Point(f64.parse(x), f64.parse(y));
   }
 }
 
+
 @json
 class InnerObj<T> {
-  obj: T = instantiate<T>()
+  obj: T = instantiate<T>();
 }
+
 
 @json
 class ObjWithBracketString {
@@ -76,9 +83,9 @@ const player: Player = {
   pos: {
     x: 3.4,
     y: 1.2,
-    z: 8.3
+    z: 8.3,
   },
-  isVerified: true
+  isVerified: true,
 };
 
 const a1 = JSON.stringify("\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u0009\u000a\u000b\u000c\u000d\u000e\u000f\u000f\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f");
@@ -99,7 +106,7 @@ const a4 = new JSON.Obj();
 a4.set("x", 1.5);
 a4.set("y", 5.4);
 a4.set("z", 9.8);
-a4.set("obj", obj)
+a4.set("obj", obj);
 a4.set<boolean>("bool", false);
 
 console.log("a4: " + JSON.stringify(a4));
@@ -116,17 +123,17 @@ const a7 = JSON.parse<JSON.Value[]>('["string",true,3.14,{"x":1.0,"y":2.0,"z":3.
 
 console.log("a7: " + JSON.stringify(a7));
 
-const a8 = JSON.stringify(["hello", JSON.stringify("world"),"working?"]);
+const a8 = JSON.stringify(["hello", JSON.stringify("world"), "working?"]);
 
 console.log("a8: " + a8);
 
-const a9 = JSON.stringify<JSON.Raw>(JSON.Raw.from("\"hello world\""));
+const a9 = JSON.stringify<JSON.Raw>(JSON.Raw.from('"hello world"'));
 
 console.log("a9: " + a9);
 
 const m10 = new Map<string, JSON.Raw>();
-m10.set("hello", new JSON.Raw("\"world\""));
-m10.set("pos", new JSON.Raw("{\"x\":1.0,\"y\":2.0,\"z\":3.0}"));
+m10.set("hello", new JSON.Raw('"world"'));
+m10.set("pos", new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
 
 const a10 = JSON.stringify(m10);
 

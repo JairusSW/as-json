@@ -11,8 +11,8 @@ describe("Should deserialize JSON.Raw", () => {
 
 describe("Should serialize Map<string, JSON.Raw>", () => {
   const m1 = new Map<string, JSON.Raw>();
-  m1.set("hello", new JSON.Raw("\"world\""));
-  m1.set("pos", new JSON.Raw("{\"x\":1.0,\"y\":2.0,\"z\":3.0}"));
+  m1.set("hello", new JSON.Raw('"world"'));
+  m1.set("pos", new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
 
   expect(JSON.stringify(m1)).toBe('{"hello":"world","pos":{"x":1.0,"y":2.0,"z":3.0}}');
 });

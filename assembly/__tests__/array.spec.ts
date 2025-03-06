@@ -59,8 +59,8 @@ describe("Should serialize object arrays", () => {
 });
 
 describe("Should deserialize integer arrays", () => {
-  expect(JSON.stringify(JSON.parse<u32[]>("[0,100,101]"))).toBe('[0,100,101]');
-  expect(JSON.stringify(JSON.parse<u64[]>("[0,100,101]"))).toBe('[0,100,101]');
+  expect(JSON.stringify(JSON.parse<u32[]>("[0,100,101]"))).toBe("[0,100,101]");
+  expect(JSON.stringify(JSON.parse<u64[]>("[0,100,101]"))).toBe("[0,100,101]");
   expect(JSON.stringify(JSON.parse<i32[]>("[0,100,101,-100,-101]"))).toBe("[0,100,101,-100,-101]");
   expect(JSON.stringify(JSON.parse<i64[]>("[0,100,101,-100,-101]"))).toBe("[0,100,101,-100,-101]");
 });
@@ -76,7 +76,7 @@ describe("Should deserialize boolean arrays", () => {
 });
 
 describe("Should deserialize string arrays", () => {
-  expect(JSON.stringify(JSON.parse<string[]>("[\"string \\\"with random spa\\nces and \\nnewlines\\n\\n\\n\"]"))).toBe("[\"string \\\"with random spa\\nces and \\nnewlines\\n\\n\\n\"]");
+  expect(JSON.stringify(JSON.parse<string[]>('["string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"]'))).toBe('["string \\"with random spa\\nces and \\nnewlines\\n\\n\\n"]');
 });
 
 describe("Should deserialize nested integer arrays", () => {
@@ -93,12 +93,9 @@ describe("Should deserialize nested boolean arrays", () => {
 });
 
 describe("Should deserialize object arrays", () => {
-  expect(
-    JSON.stringify(JSON.parse<Vec3[]>(
-      '[{"x":3.4,"y":1.2,"z":8.3},{"x":3.4,"y":-2.1,"z":9.3}]'
-    )
-  )).toBe('[{"x":3.4,"y":1.2,"z":8.3},{"x":3.4,"y":-2.1,"z":9.3}]');
+  expect(JSON.stringify(JSON.parse<Vec3[]>('[{"x":3.4,"y":1.2,"z":8.3},{"x":3.4,"y":-2.1,"z":9.3}]'))).toBe('[{"x":3.4,"y":1.2,"z":8.3},{"x":3.4,"y":-2.1,"z":9.3}]');
 });
+
 
 @json
 class Vec3 {

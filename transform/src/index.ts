@@ -41,8 +41,8 @@ class JSONTransform extends Visitor {
     if (process.env["JSON_DEBUG"]) console.log("Created schema: " + this.schema.name);
 
     const members: FieldDeclaration[] = [...(node.members.filter((v) => v.kind === NodeKind.FieldDeclaration && v.flags !== CommonFlags.Static && v.flags !== CommonFlags.Private && v.flags !== CommonFlags.Protected && !v.decorators?.some((decorator) => (<IdentifierExpression>decorator.name).text === "omit")) as FieldDeclaration[])];
-    const serializers: MethodDeclaration[] = [...(node.members.filter((v) => v.kind === NodeKind.MethodDeclaration && v.decorators && v.decorators.some((e) => (<IdentifierExpression>e.name).text.toLowerCase() === "serializer")))] as MethodDeclaration[];
-    const deserializers: MethodDeclaration[] = [...(node.members.filter((v) => v.kind === NodeKind.MethodDeclaration && v.decorators && v.decorators.some((e) => (<IdentifierExpression>e.name).text.toLowerCase() === "deserializer")))] as MethodDeclaration[];
+    const serializers: MethodDeclaration[] = [...node.members.filter((v) => v.kind === NodeKind.MethodDeclaration && v.decorators && v.decorators.some((e) => (<IdentifierExpression>e.name).text.toLowerCase() === "serializer"))] as MethodDeclaration[];
+    const deserializers: MethodDeclaration[] = [...node.members.filter((v) => v.kind === NodeKind.MethodDeclaration && v.decorators && v.decorators.some((e) => (<IdentifierExpression>e.name).text.toLowerCase() === "deserializer"))] as MethodDeclaration[];
 
     if (serializers.length > 1) throwError("Multiple serializers detected for class " + node.name.text + " but schemas can only have one serializer!", serializers[1].range);
     if (deserializers.length > 1) throwError("Multiple deserializers detected for class " + node.name.text + " but schemas can only have one deserializer!", deserializers[1].range);
@@ -55,21 +55,12 @@ class JSONTransform extends Visitor {
       if (!serializer.signature.returnType || !(<NamedTypeNode>serializer.signature.returnType).name.identifier.text.includes("string")) throwError("Could not find valid return type for serializer in " + this.schema.name + "!. Set the return type to type 'string' and try again", serializer.signature.returnType.range);
 
       if (!serializer.decorators.some((v) => (<IdentifierExpression>v.name).text == "inline")) {
-        serializer.decorators.push(
-          Node.createDecorator(
-            Node.createIdentifierExpression(
-              "inline",
-              serializer.range
-            ),
-            null,
-            serializer.range
-          )
-        );
+        serializer.decorators.push(Node.createDecorator(Node.createIdentifierExpression("inline", serializer.range), null, serializer.range));
       }
       let SERIALIZER = "";
       SERIALIZER += "  @inline __SERIALIZE_CUSTOM(ptr: usize): void {\n";
       SERIALIZER += "    const data = this." + serializer.name.text + "(changetype<" + this.schema.name + ">(ptr));\n";
-      SERIALIZER += "    if (isNullable(data) && changetype<usize>(data) == <usize>0) throw new Error(\"Could not serialize data using custom serializer!\");\n";
+      SERIALIZER += '    if (isNullable(data) && changetype<usize>(data) == <usize>0) throw new Error("Could not serialize data using custom serializer!");\n';
       SERIALIZER += "    const dataSize = data.length << 1;\n";
       SERIALIZER += "    memory.copy(bs.offset, changetype<usize>(data), dataSize);\n";
       SERIALIZER += "    bs.offset += dataSize;\n";
@@ -90,21 +81,12 @@ class JSONTransform extends Visitor {
       if (!deserializer.signature.returnType || !((<NamedTypeNode>deserializer.signature.returnType).name.identifier.text.includes(this.schema.name) || (<NamedTypeNode>deserializer.signature.returnType).name.identifier.text.includes("this"))) throwError("Could not find valid return type for deserializer in " + this.schema.name + "!. Set the return type to type '" + this.schema.name + "' or 'this' and try again", deserializer.signature.returnType.range);
 
       if (!deserializer.decorators.some((v) => (<IdentifierExpression>v.name).text == "inline")) {
-        deserializer.decorators.push(
-          Node.createDecorator(
-            Node.createIdentifierExpression(
-              "inline",
-              deserializer.range
-            ),
-            null,
-            deserializer.range
-          )
-        );
+        deserializer.decorators.push(Node.createDecorator(Node.createIdentifierExpression("inline", deserializer.range), null, deserializer.range));
       }
       let DESERIALIZER = "";
       DESERIALIZER += "  @inline __DESERIALIZE_CUSTOM(data: string): " + this.schema.name + " {\n";
       DESERIALIZER += "    const d = this." + deserializer.name.text + "(data)";
-      DESERIALIZER += "    if (isNullable(d) && changetype<usize>(d) == <usize>0) throw new Error(\"Could not deserialize data using custom deserializer!\");\n";
+      DESERIALIZER += '    if (isNullable(d) && changetype<usize>(d) == <usize>0) throw new Error("Could not deserialize data using custom deserializer!");\n';
       DESERIALIZER += "    return d;\n";
       DESERIALIZER += "  }\n";
 
@@ -296,12 +278,7 @@ class JSONTransform extends Visitor {
           if (member.flags.get(PropertyFlags.OmitIf).kind == NodeKind.Function) {
             const arg = member.flags.get(PropertyFlags.OmitIf) as FunctionExpression;
             // @ts-ignore: type
-            arg.declaration.signature.parameters[0].type = Node.createNamedType(
-              Node.createSimpleTypeName("this", node.range),
-              null,
-              false,
-              node.range
-            );
+            arg.declaration.signature.parameters[0].type = Node.createNamedType(Node.createSimpleTypeName("this", node.range), null, false, node.range);
             // @ts-ignore: type
             arg.declaration.signature.returnType.name = Node.createSimpleTypeName("boolean", arg.declaration.signature.returnType.name.range);
             SERIALIZE += indent + `if (!(${toString(member.flags.get(PropertyFlags.OmitIf))})(this)) {\n`;
@@ -357,7 +334,7 @@ class JSONTransform extends Visitor {
       for (let i = 0; i < memberGroup.length; i++) {
         const member = memberGroup[i];
         const memberName = member.alias || member.name;
-        const dst = this.schemas.find(v => v.name == member.type) ? "ptr + offsetof<this>(\"" + member.name + "\") + 12" : "0";
+        const dst = this.schemas.find((v) => v.name == member.type) ? 'ptr + offsetof<this>("' + member.name + '") + 12' : "0";
         if (memberLen == 2) {
           DESERIALIZE += `${indent}  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
           DESERIALIZE += `${indent}    store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd, ${dst}), offsetof<this>(${JSON.stringify(member.name)}));\n`;
@@ -505,7 +482,6 @@ class JSONTransform extends Visitor {
     }
 
     if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
-
       let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts"));
 
       if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
@@ -549,37 +525,9 @@ class JSONTransform extends Visitor {
     return out;
   }
   isValidType(type: string, node: ClassDeclaration): boolean {
-    const validTypes = [
-      "string",
-      "u8",
-      "i8",
-      "u16",
-      "i16",
-      "u32",
-      "i32",
-      "u64",
-      "i64",
-      "f32",
-      "f64",
-      "bool",
-      "boolean",
-      "Date",
-      "JSON.Value",
-      "JSON.Obj",
-      "JSON.Raw",
-      "Value",
-      "Obj",
-      "Raw",
-      ...this.schemas.map((v) => v.name)
-    ];
+    const validTypes = ["string", "u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f32", "f64", "bool", "boolean", "Date", "JSON.Value", "JSON.Obj", "JSON.Raw", "Value", "Obj", "Raw", ...this.schemas.map((v) => v.name)];
 
-    const baseTypes = [
-      "Array",
-      "Map",
-      "Set",
-      "JSON.Box",
-      "Box"
-    ]
+    const baseTypes = ["Array", "Map", "Set", "JSON.Box", "Box"];
 
     if (node && node.isGeneric && node.typeParameters) validTypes.push(...node.typeParameters.map((v) => v.name.text));
     if (type.endsWith("| null")) {

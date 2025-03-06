@@ -10,8 +10,8 @@ import { deserializeString_SIMD } from "../deserialize/simd/string";
 const vec: Vec3 = {
   x: 1,
   y: 2,
-  z: 3
-}
+  z: 3,
+};
 
 bs.ensureSize(4096);
 // bench("Serialize Vector3", () => {
@@ -44,4 +44,4 @@ bench("Deserialize String", () => {
 
 bench("Deserialize String SIMD", () => {
   deserializeString_SIMD(srcStart, srcEnd, out);
-})
+});

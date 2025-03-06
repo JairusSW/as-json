@@ -2,10 +2,8 @@ import { JSON } from "..";
 import { describe, expect } from "./lib";
 
 describe("Should serialize Date", () => {
-  expect(JSON.stringify<Date>(new Date(0)))
-    .toBe('"1970-01-01T00:00:00.000Z"');
-  expect(JSON.stringify<Date>(new Date(1738618120525)))
-    .toBe('"2025-02-03T21:28:40.525Z"');
+  expect(JSON.stringify<Date>(new Date(0))).toBe('"1970-01-01T00:00:00.000Z"');
+  expect(JSON.stringify<Date>(new Date(1738618120525))).toBe('"2025-02-03T21:28:40.525Z"');
 });
 
 describe("Should deserialize booleans", () => {
@@ -17,7 +15,7 @@ describe("Should deserialize booleans", () => {
   // console.log("Minutes: " + date.getUTCMinutes().toString());
   // console.log("Seconds: " + date.getUTCSeconds().toString());
   // console.log("Milliseconds: " + date.getUTCMilliseconds().toString());
-    
+
   const date1 = JSON.parse<Date>('"1970-01-01T00:00:00.000Z"');
   expect(date1.getUTCFullYear().toString()).toBe("1970");
   expect(date1.getUTCMonth().toString()).toBe("0");
@@ -34,5 +32,5 @@ describe("Should deserialize booleans", () => {
   expect(date2.getUTCHours().toString()).toBe("21");
   expect(date2.getUTCMinutes().toString()).toBe("28");
   expect(date2.getUTCSeconds().toString()).toBe("40");
-  expect(date2.getUTCMilliseconds().toString()).toBe("525");  
+  expect(date2.getUTCMilliseconds().toString()).toBe("525");
 });

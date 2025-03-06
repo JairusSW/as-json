@@ -42,7 +42,7 @@ Add the `--transform` to your `asc` command (e.g. in package.json)
 
 Alternatively, add it to your `asconfig.json`
 
-```json
+```typescripton
 {
   "options": {
     "transform": ["json-as/transform"],
@@ -55,7 +55,7 @@ If you'd like to see the code that the transform generates, run with `JSON_DEBUG
 
 ## 🪄 Usage
 
-```js
+```typescript
 import { JSON } from "json-as";
 
 @json
@@ -109,7 +109,7 @@ This library allows selective omission of fields during serialization using the 
 
 This decorator excludes a field from serialization entirely.
 
-```js
+```typescript
 @json
 class Example {
   name!: string;
@@ -128,7 +128,7 @@ console.log(JSON.stringify(obj)); // { "name": "Visible" }
 
 This decorator omits a field only if its value is null.
 
-```js
+```typescript
 @json
 class Example {
   name!: string;
@@ -147,6 +147,7 @@ console.log(JSON.stringify(obj)); // { "name": "Present" }
 
 This decorator omits a field based on a custom predicate function.
 
+```typescript
 @json
 class Example {
   name!: string;
@@ -159,7 +160,7 @@ obj.name = "John";
 obj.age = 16;
 
 console.log(JSON.stringify(obj)); // { "name": "John" }
-```
+````
 
 If age were 18 or higher, it would be included in the serialization.
 
@@ -169,17 +170,17 @@ AssemblyScript doesn't support using nullable primitive types, so instead, json-
 
 For example, this schema won't compile in AssemblyScript:
 
-```js
+```typescript
 @json
 class Person {
   name!: string;
   age: i32 | null = null;
 }
-```
+````
 
 Instead, use `JSON.Box` to allow nullable primitives:
 
-```js
+```typescript
 @json
 class Person {
   name: string;
@@ -208,7 +209,7 @@ Here's a few examples:
 
 When dealing with arrays that have multiple types within them, eg. `["string",true,null,["array"]]`, use `JSON.Value[]`
 
-```js
+```typescript
 const a1 = JSON.parse<JSON.Value[]>('["string",true,null,["array"]]');
 console.log(JSON.stringify(a[0])); // "string"
 console.log(JSON.stringify(a[1])); // true
@@ -220,7 +221,7 @@ console.log(JSON.stringify(a[3])); // ["array"]
 
 When dealing with an object with an unknown structure, use the `JSON.Obj` type
 
-```js
+```typescript
 const o1 = JSON.parse<JSON.Obj>('{"a":3.14,"b":true,"c":[1,2,3],"d":{"x":1,"y":2,"z":3}}');
 
 console.log(o1.keys().join(" ")); // a b c d
@@ -240,7 +241,7 @@ More often, objects will be completely statically typed except for one or two va
 
 In such cases, `JSON.Value` can be used to handle fields that may hold different types at runtime.
 
-```js
+```typescript
 @json
 class DynamicObj {
   id: i32 = 0;
@@ -268,7 +269,7 @@ Sometimes its necessary to simply copy a string instead of serializing it.
 
 For example, the following data would typically be serialized as:
 
-```js
+```typescript
 const m1 = new Map<string, string>();
 m1.set('pos', '{"x":1.0,"y":2.0,"z":3.0}');
 
@@ -280,7 +281,7 @@ console.log("a1: " + a1);
 
 If, instead, one wanted to insert Raw JSON into an existing schema/data structure, they could make use of the JSON.Raw type to do so:
 
-```js
+```typescript
 const m1 = new Map<string, JSON.Raw>();
 m1.set('pos', new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
 
@@ -296,7 +297,7 @@ This library supports custom serialization and deserialization methods, which ca
 
 Here's an example of creating a custom data type called `Point` which serializes to `(x,y)`
 
-```js
+```typescript
 @json
 class Point {
   x: f64 = 0.0;
@@ -334,7 +335,7 @@ The deserializer function parses the string `(x,y)` back into a `Point` instance
 
 These functions are then wrapped before being consumed by the json-as library:
 
-```js
+```typescript
 @inline __SERIALIZE_CUSTOM(ptr: usize): void {
   const data = this.serializer(changetype<Point>(ptr));
   const dataSize = data.length << 1;

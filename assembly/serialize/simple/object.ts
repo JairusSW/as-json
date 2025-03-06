@@ -25,7 +25,7 @@ export function serializeObject(data: JSON.Obj): void {
   const keySize = bytes(firstKey);
   store<u16>(bs.offset, QUOTE);
   memory.copy(bs.offset + 2, changetype<usize>(firstKey), keySize);
-  store<u32>(bs.offset += keySize + 2, 3801122); // ":
+  store<u32>((bs.offset += keySize + 2), 3801122); // ":
   bs.offset += 4;
   JSON.__serialize(unchecked(values[0]));
 
@@ -34,7 +34,7 @@ export function serializeObject(data: JSON.Obj): void {
     const keySize = bytes(key);
     store<u32>(bs.offset, 2228268); // ,"
     memory.copy(bs.offset + 4, changetype<usize>(key), keySize);
-    store<u32>(bs.offset += keySize + 4, 3801122); // ":
+    store<u32>((bs.offset += keySize + 4), 3801122); // ":
     bs.offset += 4;
     JSON.__serialize(unchecked(values[i]));
   }

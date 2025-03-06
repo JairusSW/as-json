@@ -34,9 +34,9 @@ describe("Should deserialize floats", () => {
 
   expect(JSON.parse<f64>("0.000001").toString()).toBe("0.000001");
 
-  expect(JSON.parse<f64>("1e-7").toString()).toBe(1e-7.toString());
+  expect(JSON.parse<f64>("1e-7").toString()).toBe((1e-7).toString());
 
-  expect(JSON.parse<f64>("100000000000000000000.0").toString()).toBe(1e20.toString());
+  expect(JSON.parse<f64>("100000000000000000000.0").toString()).toBe((1e20).toString());
 
-  expect(JSON.parse<f64>("1e+21").toString()).toBe(1e21.toString());
+  expect(JSON.parse<f64>("1e+21").toString()).toBe((1e21).toString());
 });

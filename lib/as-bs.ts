@@ -5,7 +5,7 @@ import { OBJECT, TOTAL_OVERHEAD } from "rt/common";
  */
 export namespace bs {
   /** Current buffer pointer. */ // @ts-ignore
-  export let buffer: ArrayBuffer = new ArrayBuffer(32);//__new(32, idof<ArrayBuffer>());
+  export let buffer: ArrayBuffer = new ArrayBuffer(32); //__new(32, idof<ArrayBuffer>());
 
   /** Current offset within the buffer. */
   export let offset: usize = changetype<usize>(buffer);
@@ -28,10 +28,7 @@ export namespace bs {
       const deltaBytes = nextPowerOf2(size + 64);
       bufferSize += deltaBytes;
       // @ts-ignore: exists
-      const newPtr = changetype<ArrayBuffer>(__renew(
-        changetype<usize>(buffer),
-        bufferSize
-      ));
+      const newPtr = changetype<ArrayBuffer>(__renew(changetype<usize>(buffer), bufferSize));
       offset = offset + changetype<usize>(newPtr) - changetype<usize>(buffer);
       buffer = newPtr;
     }
@@ -49,10 +46,7 @@ export namespace bs {
       const deltaBytes = nextPowerOf2(size);
       bufferSize += deltaBytes;
       // @ts-ignore: exists
-      const newPtr = changetype<ArrayBuffer>(__renew(
-        changetype<usize>(buffer),
-        bufferSize
-      ));
+      const newPtr = changetype<ArrayBuffer>(__renew(changetype<usize>(buffer), bufferSize));
       offset = offset + changetype<usize>(newPtr) - changetype<usize>(buffer);
       buffer = newPtr;
     }
@@ -70,10 +64,7 @@ export namespace bs {
       const deltaBytes = nextPowerOf2(size + 64);
       bufferSize += deltaBytes;
       // @ts-ignore
-      const newPtr = changetype<ArrayBuffer>(__renew(
-        changetype<usize>(buffer),
-        bufferSize
-      ));
+      const newPtr = changetype<ArrayBuffer>(__renew(changetype<usize>(buffer), bufferSize));
       // if (buffer != newPtr) console.log("  Old: " + changetype<usize>(buffer).toString() + "\n  New: " + changetype<usize>(newPtr).toString());
       offset = offset + changetype<usize>(newPtr) - changetype<usize>(buffer);
       buffer = newPtr;

@@ -16,8 +16,7 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
   while (srcStart < srcEnd && isSpace(load<u16>(srcStart))) srcStart += 2;
   while (srcEnd > srcStart && isSpace(load<u16>(srcEnd - 2))) srcEnd -= 2; // would like to optimize this later
 
-  if (srcStart - srcEnd == 0)
-    throw new Error("Input string had zero length or was all whitespace");
+  if (srcStart - srcEnd == 0) throw new Error("Input string had zero length or was all whitespace");
   if (load<u16>(srcStart) != BRACE_LEFT) throw new Error("Expected '{' at start of object at position " + (srcEnd - srcStart).toString());
   if (load<u16>(srcEnd - 2) != BRACE_RIGHT) throw new Error("Expected '}' at end of object at position " + (srcEnd - srcStart).toString());
 
@@ -31,7 +30,7 @@ export function deserializeObject(srcStart: usize, srcEnd: usize, dst: usize): J
           keyEnd = srcStart;
           // console.log("Key: " + ptrToStr(lastIndex, srcStart));
           // console.log("Next: " + String.fromCharCode(load<u16>(srcStart + 2)));
-          while (isSpace((code = load<u16>((srcStart += 2))))) { }
+          while (isSpace((code = load<u16>((srcStart += 2))))) {}
           if (code !== COLON) throw new Error("Expected ':' after key at position " + (srcEnd - srcStart).toString());
           isKey = false;
         } else {
