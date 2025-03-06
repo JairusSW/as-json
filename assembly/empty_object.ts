@@ -1,3 +1,0 @@
-@json
-export class EmptyObject {
-}
