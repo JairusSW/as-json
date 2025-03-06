@@ -141,8 +141,9 @@ obj.name = "Present";
 obj.optionalField = null;
 
 console.log(JSON.stringify(obj)); // { "name": "Present" }
+```
 
-@omitif((self: this) => condition)
+**@omitif((self: this) => condition)**
 
 This decorator omits a field based on a custom predicate function.
 

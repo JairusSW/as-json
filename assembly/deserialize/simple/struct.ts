@@ -1,5 +1,6 @@
 import { BACK_SLASH, COMMA, CHAR_F, BRACE_LEFT, BRACKET_LEFT, CHAR_N, QUOTE, BRACE_RIGHT, BRACKET_RIGHT, CHAR_T, COLON } from "../../custom/chars";
 import { isSpace } from "../../util";
+import { ptrToStr } from "../../util/ptrToStr";
 
 export function deserializeStruct<T>(srcStart: usize, srcEnd: usize, dst: usize): T {
   const out = changetype<nonnull<T>>(dst || __new(offsetof<T>(), idof<T>()));
@@ -109,7 +110,10 @@ export function deserializeStruct<T>(srcStart: usize, srcEnd: usize, dst: usize)
         srcStart += 2;
         while (srcStart < srcEnd) {
           const code = load<u16>(srcStart);
-          if (code == BRACKET_RIGHT) {
+          if (code == QUOTE) {
+            srcStart += 2;
+            while (!(load<u16>(srcStart) == QUOTE && load<u16>(srcStart - 2) != BACK_SLASH)) srcStart += 2;
+          } else if (code == BRACKET_RIGHT) {
             if (--depth == 0) {
               // console.log("Value (array): " + ptrToStr(lastIndex, srcStart + 2));
               // @ts-ignore: exists
