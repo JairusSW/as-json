@@ -1,4 +1,5 @@
 import { JSON } from ".";
+import { FoodMenuBodyOutput } from "./body_output";
 import { bytes } from "./util";
 
 @json
@@ -138,3 +139,5 @@ console.log("a11: " + JSON.stringify(a11));
 const a12 = JSON.parse<InnerObj<ObjWithBracketString>>('{"obj":{"data":"hello} world"}}');
 
 console.log("a12: " + JSON.stringify(a12))
+
+const a13 = JSON.parse<NullableObj>(`{"nu}`)

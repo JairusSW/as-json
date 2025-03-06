@@ -575,6 +575,9 @@ export namespace JSON {
       return atoi<T>(srcStart, srcEnd);
     } else if (isFloat<T>()) {
       return deserializeFloat<T>(srcStart, srcEnd);
+    } else if (isNullable<T>() && srcEnd - srcStart == 8 && load<u64>(srcStart) == 30399761348886638) {
+      // @ts-ignore
+      return null;
     } else if (isString<T>()) {
       // @ts-ignore: type
       return deserializeString(srcStart, srcEnd, dst);

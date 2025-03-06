@@ -19,7 +19,8 @@ export function deserializeStruct<T>(srcStart: usize, srcEnd: usize, dst: usize)
 
   if (srcStart - srcEnd == 0)
     throw new Error("Input string had zero length or was all whitespace");
-  if (load<u16>(srcStart) != BRACE_LEFT) throw new Error("Expected '{' at start of object at position " + (srcEnd - srcStart).toString());
+
+  if (load<u16>(srcStart) != BRACE_LEFT)throw new Error("Expected '{' at start of object at position " + (srcEnd - srcStart).toString());
   if (load<u16>(srcEnd - 2) != BRACE_RIGHT) throw new Error("Expected '}' at end of object at position " + (srcEnd - srcStart).toString());
 
   srcStart += 2;
@@ -154,7 +155,7 @@ export function deserializeStruct<T>(srcStart: usize, srcEnd: usize, dst: usize)
         }
       } else if (code == CHAR_N) {
         if (load<u64>(srcStart) == 30399761348886638) {
-          // console.log("Value (null): " + ptrToStr(srcStart, srcStart + 8));
+          // console.log("Value (null): " + ptrToStr(srcStart, srcStart + 8).replaceAll(" ", "-"));
           // @ts-ignore: exists
           out.__DESERIALIZE(keyStart, keyEnd, srcStart, (srcStart += 8), changetype<usize>(out));
           // while (isSpace(load<u16>((srcStart += 2)))) {
