@@ -6,6 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
+import { realpathSync } from "fs";
 
 let indent = "  ";
 
@@ -470,9 +471,11 @@ class JSONTransform extends Visitor {
 
     if (bsImport) {
       const txt = `import { bs } from "${bsPath}";`;
-      bsImport.path = Node.createStringLiteralExpression(bsPath, bsImport.path.range);
-      bsImport.internalPath = bsPath;
-      if (process.env["JSON_DEBUG"]) console.log("Modified as-bs import: " + txt + "\n");
+      if (!this.bsImport && path.resolve(bsPath) != path.resolve(bsImport.path.value)) {
+        this.bsImport = txt;
+        node.statements.splice(node.statements.indexOf(bsImport), 1);
+        if (process.env["JSON_DEBUG"]) console.log("Modified as-bs import: " + txt + "\n");
+      }
     } else {
       const txt = `import { bs } from "${bsPath}";`;
       if (!this.bsImport) {
@@ -482,14 +485,14 @@ class JSONTransform extends Visitor {
     }
 
     if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
-      let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts"));
+      let jsonPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts")).replace(".ts", "");
 
-      if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
+      if (!jsonPath.startsWith(".") && !jsonPath.startsWith("/")) jsonPath = "./" + jsonPath;
       // if (!existsSync(relativePath)) {
       //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
       // }
 
-      const txt = `import { JSON } from "${relativePath}";`;
+      const txt = `import { JSON } from "${jsonPath}";`;
       if (!this.jsonImport) {
         this.jsonImport = txt;
         if (process.env["JSON_DEBUG"]) console.log("Added json-as import: " + txt + "\n");

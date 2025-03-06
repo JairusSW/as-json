@@ -16,6 +16,7 @@
     "assemblyscript": "^0.27.34",
     "assemblyscript-prettier": "^3.0.1",
     "prettier": "^3.5.0",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   },
   "bugs": {
@@ -57,7 +58,8 @@
   },
   "scripts": {
     "test": "bash ./run-tests.sh",
-    "build:bench": "rm -rf ./build/ && JSON_DEBUG=true asc --lib ./lib/ assembly/__benches__/string.bench.ts -o ./build/bench.wasm --textFile ./build/bench.wat --transform ./transform --optimizeLevel 3 --shrinkLevel 0 --converge --noAssert --uncheckedBehavior always --runtime stub --enable simd --enable bulk-memory",
+    "bench:as": "bash ./run-bench.as.sh",
+    "bench:js": "bash ./run-bench.js.sh",
     "build:test": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --runtime stub",
     "build:test:simd": "rm -rf ./build/ && JSON_DEBUG=true asc assembly/test.ts --transform ./transform -o ./build/test.wasm --textFile ./build/test.wat --optimizeLevel 3 --shrinkLevel 0 --enable simd",
     "test:wasmtime": "wasmtime ./build/test.wasm",

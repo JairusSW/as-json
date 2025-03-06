@@ -1,6 +1,6 @@
 # Change Log
 
-## UNRELEASED
+## 2025-03-06 - 1.0.0
 
 - fix: object with an object as a value containing a rhs bracket or brace would exit early [3b33e94](https://github.com/JairusSW/json-as/commit/3b33e9414dc04779d22d65272863372fcd7af4a6)
 - fix: objects containing properties with type Obj | null did not deserialize when using __deserialize

@@ -31,8 +31,8 @@ class JSONTransform extends Visitor {
         if (process.env["JSON_DEBUG"])
             console.log("Created schema: " + this.schema.name);
         const members = [...node.members.filter((v) => v.kind === 54 && v.flags !== 32 && v.flags !== 512 && v.flags !== 1024 && !v.decorators?.some((decorator) => decorator.name.text === "omit"))];
-        const serializers = [...(node.members.filter((v) => v.kind === 58 && v.decorators && v.decorators.some((e) => e.name.text.toLowerCase() === "serializer")))];
-        const deserializers = [...(node.members.filter((v) => v.kind === 58 && v.decorators && v.decorators.some((e) => e.name.text.toLowerCase() === "deserializer")))];
+        const serializers = [...node.members.filter((v) => v.kind === 58 && v.decorators && v.decorators.some((e) => e.name.text.toLowerCase() === "serializer"))];
+        const deserializers = [...node.members.filter((v) => v.kind === 58 && v.decorators && v.decorators.some((e) => e.name.text.toLowerCase() === "deserializer"))];
         if (serializers.length > 1)
             throwError("Multiple serializers detected for class " + node.name.text + " but schemas can only have one serializer!", serializers[1].range);
         if (deserializers.length > 1)
@@ -53,7 +53,7 @@ class JSONTransform extends Visitor {
             let SERIALIZER = "";
             SERIALIZER += "  @inline __SERIALIZE_CUSTOM(ptr: usize): void {\n";
             SERIALIZER += "    const data = this." + serializer.name.text + "(changetype<" + this.schema.name + ">(ptr));\n";
-            SERIALIZER += "    if (isNullable(data) && changetype<usize>(data) == <usize>0) throw new Error(\"Could not serialize data using custom serializer!\");\n";
+            SERIALIZER += '    if (isNullable(data) && changetype<usize>(data) == <usize>0) throw new Error("Could not serialize data using custom serializer!");\n';
             SERIALIZER += "    const dataSize = data.length << 1;\n";
             SERIALIZER += "    memory.copy(bs.offset, changetype<usize>(data), dataSize);\n";
             SERIALIZER += "    bs.offset += dataSize;\n";
@@ -80,7 +80,7 @@ class JSONTransform extends Visitor {
             let DESERIALIZER = "";
             DESERIALIZER += "  @inline __DESERIALIZE_CUSTOM(data: string): " + this.schema.name + " {\n";
             DESERIALIZER += "    const d = this." + deserializer.name.text + "(data)";
-            DESERIALIZER += "    if (isNullable(d) && changetype<usize>(d) == <usize>0) throw new Error(\"Could not deserialize data using custom deserializer!\");\n";
+            DESERIALIZER += '    if (isNullable(d) && changetype<usize>(d) == <usize>0) throw new Error("Could not deserialize data using custom deserializer!");\n';
             DESERIALIZER += "    return d;\n";
             DESERIALIZER += "  }\n";
             if (process.env["JSON_DEBUG"])
@@ -319,7 +319,7 @@ class JSONTransform extends Visitor {
             for (let i = 0; i < memberGroup.length; i++) {
                 const member = memberGroup[i];
                 const memberName = member.alias || member.name;
-                const dst = this.schemas.find(v => v.name == member.type) ? "ptr + offsetof<this>(\"" + member.name + "\") + 12" : "0";
+                const dst = this.schemas.find((v) => v.name == member.type) ? 'ptr + offsetof<this>("' + member.name + '") + 12' : "0";
                 if (memberLen == 2) {
                     DESERIALIZE += `${indent}  case ${memberName.charCodeAt(0)}: { // ${memberName}\n`;
                     DESERIALIZE += `${indent}    store<${member.type}>(ptr, JSON.__deserialize<${member.type}>(valStart, valEnd, ${dst}), offsetof<this>(${JSON.stringify(member.name)}));\n`;
@@ -423,15 +423,17 @@ class JSONTransform extends Visitor {
         const filePath = fileURLToPath(import.meta.url);
         const fileDir = path.dirname(filePath);
         const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs"));
-        let bsPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../lib/as-bs.ts"));
+        let bsPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../lib/as-bs.ts")).replace(".ts", "");
         if (!bsPath.startsWith(".") && !bsPath.startsWith("/"))
             bsPath = "./" + bsPath;
         if (bsImport) {
             const txt = `import { bs } from "${bsPath}";`;
-            bsImport.path = Node.createStringLiteralExpression(bsPath, bsImport.path.range);
-            bsImport.internalPath = bsPath;
-            if (process.env["JSON_DEBUG"])
-                console.log("Modified as-bs import: " + txt + "\n");
+            if (!this.bsImport && path.resolve(bsPath) != path.resolve(bsImport.path.value)) {
+                this.bsImport = txt;
+                node.statements.splice(node.statements.indexOf(bsImport), 1);
+                if (process.env["JSON_DEBUG"])
+                    console.log("Modified as-bs import: " + txt + "\n");
+            }
         }
         else {
             const txt = `import { bs } from "${bsPath}";`;
@@ -442,10 +444,10 @@ class JSONTransform extends Visitor {
             }
         }
         if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
-            let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts"));
-            if (!relativePath.startsWith(".") && !relativePath.startsWith("/"))
-                relativePath = "./" + relativePath;
-            const txt = `import { JSON } from "${relativePath}";`;
+            let jsonPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts")).replace(".ts", "");
+            if (!jsonPath.startsWith(".") && !jsonPath.startsWith("/"))
+                jsonPath = "./" + jsonPath;
+            const txt = `import { JSON } from "${jsonPath}";`;
             if (!this.jsonImport) {
                 this.jsonImport = txt;
                 if (process.env["JSON_DEBUG"])
@@ -483,36 +485,8 @@ class JSONTransform extends Visitor {
         return out;
     }
     isValidType(type, node) {
-        const validTypes = [
-            "string",
-            "u8",
-            "i8",
-            "u16",
-            "i16",
-            "u32",
-            "i32",
-            "u64",
-            "i64",
-            "f32",
-            "f64",
-            "bool",
-            "boolean",
-            "Date",
-            "JSON.Value",
-            "JSON.Obj",
-            "JSON.Raw",
-            "Value",
-            "Obj",
-            "Raw",
-            ...this.schemas.map((v) => v.name)
-        ];
-        const baseTypes = [
-            "Array",
-            "Map",
-            "Set",
-            "JSON.Box",
-            "Box"
-        ];
+        const validTypes = ["string", "u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f32", "f64", "bool", "boolean", "Date", "JSON.Value", "JSON.Obj", "JSON.Raw", "Value", "Obj", "Raw", ...this.schemas.map((v) => v.name)];
+        const baseTypes = ["Array", "Map", "Set", "JSON.Box", "Box"];
         if (node && node.isGeneric && node.typeParameters)
             validTypes.push(...node.typeParameters.map((v) => v.name.text));
         if (type.endsWith("| null")) {

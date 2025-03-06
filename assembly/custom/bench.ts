@@ -1,11 +1,18 @@
 export function bench(description: string, routine: () => void, ops: u64 = 1_000_000): void {
   console.log(" - Benchmarking " + description);
+  let warmup = ops >> 1;
+
+  while (warmup--) {
+    routine();
+  }
+
   const start = Date.now();
   let count = ops;
-  while (count != 0) {
+
+  while (count--) {
     routine();
-    count--;
   }
+
   const elapsed = Date.now() - start;
 
   let opsPerSecond = (ops * 1000) / elapsed;

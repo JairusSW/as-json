@@ -1,5 +1,4 @@
 import { JSON } from ".";
-import { FoodMenuBodyOutput } from "./body_output";
 import { bytes } from "./util";
 
 
