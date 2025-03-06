@@ -74,6 +74,7 @@ If you'd like to see the code that the transform generates, run with `JSON_DEBUG
 ```typescript
 import { JSON } from "json-as";
 
+
 @json
 class Vec3 {
   x: f32 = 0.0;
@@ -81,8 +82,10 @@ class Vec3 {
   z: f32 = 0.0;
 }
 
+
 @json
 class Player {
+
   @alias("first name")
   firstName!: string;
   lastName!: string;
@@ -90,6 +93,7 @@ class Player {
   // Drop in a code block, function, or expression that evaluates to a boolean
   @omitif((self: Player) => self.age < 18)
   age!: i32;
+
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
@@ -103,9 +107,9 @@ const player: Player = {
   pos: {
     x: 3.4,
     y: 1.2,
-    z: 8.3
+    z: 8.3,
   },
-  isVerified: true
+  isVerified: true,
 };
 
 const serialized = JSON.stringify<Player>(player);
@@ -126,9 +130,11 @@ This library allows selective omission of fields during serialization using the 
 This decorator excludes a field from serialization entirely.
 
 ```typescript
+
 @json
 class Example {
   name!: string;
+
   @omit
   secret!: string;
 }
@@ -145,9 +151,11 @@ console.log(JSON.stringify(obj)); // { "name": "Visible" }
 This decorator omits a field only if its value is null.
 
 ```typescript
+
 @json
 class Example {
   name!: string;
+
   @omitnull()
   optionalField!: string | null;
 }
@@ -164,9 +172,11 @@ console.log(JSON.stringify(obj)); // { "name": "Present" }
 This decorator omits a field based on a custom predicate function.
 
 ```typescript
+
 @json
 class Example {
   name!: string;
+
   @omitif((self: Example) => self.age < 18)
   age!: number;
 }
@@ -176,7 +186,7 @@ obj.name = "John";
 obj.age = 16;
 
 console.log(JSON.stringify(obj)); // { "name": "John" }
-````
+```
 
 If age were 18 or higher, it would be included in the serialization.
 
@@ -187,16 +197,18 @@ AssemblyScript doesn't support using nullable primitive types, so instead, json-
 For example, this schema won't compile in AssemblyScript:
 
 ```typescript
+
 @json
 class Person {
   name!: string;
   age: i32 | null = null;
 }
-````
+```
 
 Instead, use `JSON.Box` to allow nullable primitives:
 
 ```typescript
+
 @json
 class Person {
   name: string;
@@ -242,9 +254,10 @@ const o1 = JSON.parse<JSON.Obj>('{"a":3.14,"b":true,"c":[1,2,3],"d":{"x":1,"y":2
 
 console.log(o1.keys().join(" ")); // a b c d
 console.log(
-  o1.values()
-  .map<string>((v) => JSON.stringify(v))
-  .join(" ")
+  o1
+    .values()
+    .map<string>((v) => JSON.stringify(v))
+    .join(" "),
 ); // 3.14 true [1,2,3] {"x":1,"y":2,"z":3}
 
 const y = o1.get("d").get<JSON.Obj>().get<i32>();
@@ -258,6 +271,7 @@ More often, objects will be completely statically typed except for one or two va
 In such cases, `JSON.Value` can be used to handle fields that may hold different types at runtime.
 
 ```typescript
+
 @json
 class DynamicObj {
   id: i32 = 0;
@@ -287,7 +301,7 @@ For example, the following data would typically be serialized as:
 
 ```typescript
 const m1 = new Map<string, string>();
-m1.set('pos', '{"x":1.0,"y":2.0,"z":3.0}');
+m1.set("pos", '{"x":1.0,"y":2.0,"z":3.0}');
 
 const a1 = JSON.stringify(m1);
 console.log("a1: " + a1);
@@ -299,7 +313,7 @@ If, instead, one wanted to insert Raw JSON into an existing schema/data structur
 
 ```typescript
 const m1 = new Map<string, JSON.Raw>();
-m1.set('pos', new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
+m1.set("pos", new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
 
 const a1 = JSON.stringify(m1);
 console.log("a1: " + a1);
@@ -314,6 +328,7 @@ This library supports custom serialization and deserialization methods, which ca
 Here's an example of creating a custom data type called `Point` which serializes to `(x,y)`
 
 ```typescript
+
 @json
 class Point {
   x: f64 = 0.0;
@@ -323,10 +338,12 @@ class Point {
     this.y = y;
   }
 
+
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
+
 
   @deserializer
   deserializer(data: string): Point {
@@ -337,10 +354,7 @@ class Point {
     const x = data.slice(1, c);
     const y = data.slice(c + 1, data.length - 1);
 
-    return new Point(
-      f64.parse(x),
-      f64.parse(y)
-    );
+    return new Point(f64.parse(x), f64.parse(y));
   }
 }
 ```
@@ -370,9 +384,9 @@ This allows custom serialization while maintaining a generic interface for the l
 
 The `json-as` library has been optimized to achieve near-gigabyte-per-second JSON processing speeds through SIMD acceleration and highly efficient transformations. Below are some key performance benchmarks to give you an idea of how it performs.
 
-Note: the AssemblyScript benches are run using a *bump allocator* so that Garbage Collection does not interfere with results. Also note that ideally, I would use [d8](https://v8.dev/docs/d8), but until that is done, these results serve as a temporary performance comparison.
+Note: the AssemblyScript benches are run using a _bump allocator_ so that Garbage Collection does not interfere with results. Also note that ideally, I would use [d8](https://v8.dev/docs/d8), but until that is done, these results serve as a temporary performance comparison.
 
-**Table 1** - *AssemblyScript*
+**Table 1** - _AssemblyScript_
 
 | Test Case       | Size       | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
 | --------------- | ---------- | --------------------- | ----------------------- | -------------------- | ---------------------- |
@@ -382,7 +396,7 @@ Note: the AssemblyScript benches are run using a *bump allocator* so that Garbag
 | Medium Object   | 494 bytes  | 4,060,913 ops/s       | 1,396,160 ops/s         | 2,006 MB/s           | 689.7 MB/s             |
 | Large Object    | 3374 bytes | 614,754 ops/s         | 132,802 ops/s           | 2,074 MB/s           | 448.0 MB/s             |
 
-**Table 2** - *JavaScript*
+**Table 2** - _JavaScript_
 
 | Test Case       | Size       | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
 | --------------- | ---------- | --------------------- | ----------------------- | -------------------- | ---------------------- |

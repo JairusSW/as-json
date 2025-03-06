@@ -12,10 +12,12 @@ class Point {
     this.y = y;
   }
 
+
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
+
 
   @deserializer
   deserializer(data: string): Point {

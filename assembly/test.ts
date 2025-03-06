@@ -29,6 +29,7 @@ class Player {
   @omitif((self: Player) => self.age < 18)
   age!: i32;
 
+
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
@@ -44,10 +45,12 @@ class Point {
     this.y = y;
   }
 
+
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
+
 
   @deserializer
   deserializer(data: string): Point | null {

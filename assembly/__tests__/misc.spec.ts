@@ -30,6 +30,7 @@ class Player {
   @omitif((self: Player) => self.age < 18)
   age!: i32;
 
+
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;

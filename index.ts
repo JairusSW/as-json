@@ -1,1 +1,1 @@
-export * from "./assembly/"
+export * from "./assembly/";
