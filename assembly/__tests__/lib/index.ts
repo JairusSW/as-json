@@ -2,6 +2,10 @@ export function describe(description: string, routine: () => void): void {
   routine();
 }
 
+export function it(description: string, routine: () => void): void {
+  routine();
+}
+
 export function expect(left: string): Expectation {
   return new Expectation(left);
 }
