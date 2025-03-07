@@ -466,16 +466,13 @@ class JSONTransform extends Visitor {
 
     const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs"));
 
-    const bsPath = path.resolve(fileDir, "../../modules/as-bs.ts");
-    console.log("src: " + node.range.source.normalizedPath)
-    console.log("bsPath: " + bsPath)
+    const bsPath = path.resolve(fileDir, "../../modules/as-bs/");
     let bsRel = path.relative(path.dirname(node.range.source.normalizedPath), bsPath).replace(".ts", "");
-    console.log("bsRel: " + bsRel)
     if (!bsRel.startsWith(".") && !bsRel.startsWith("/")) bsRel = "./" + bsRel;
 
     if (bsImport) {
       const txt = `import { bs } from "${bsRel}";`;
-      if (!this.bsImport && path.resolve(bsRel) != path.resolve(bsImport.path.value)) {
+      if (!this.bsImport && path.dirname(path.resolve(bsRel)) != path.dirname(path.resolve(bsImport.path.value))) {
         this.bsImport = txt;
         node.statements.splice(node.statements.indexOf(bsImport), 1);
         if (process.env["JSON_DEBUG"]) console.log("Modified as-bs import: " + txt + "\n");
