@@ -466,18 +466,22 @@ class JSONTransform extends Visitor {
 
     const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs"));
 
-    let bsPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../lib/as-bs.ts")).replace(".ts", "");
-    if (!bsPath.startsWith(".") && !bsPath.startsWith("/")) bsPath = "./" + bsPath;
+    const bsPath = path.resolve(fileDir, "../../lib/as-bs.ts");
+    // console.log("src: " + node.range.source.normalizedPath)
+    // console.log("bsPath: " + bsPath)
+    let bsRel = path.relative(path.dirname(node.range.source.normalizedPath), bsPath).replace(".ts", "");
+    // console.log("bsRel: " + bsRel)
+    if (!bsRel.startsWith(".") && !bsRel.startsWith("/")) bsRel = "./" + bsRel;
 
     if (bsImport) {
-      const txt = `import { bs } from "${bsPath}";`;
-      if (!this.bsImport && path.resolve(bsPath) != path.resolve(bsImport.path.value)) {
+      const txt = `import { bs } from "${bsRel}";`;
+      if (!this.bsImport && path.resolve(bsRel) != path.resolve(bsImport.path.value)) {
         this.bsImport = txt;
         node.statements.splice(node.statements.indexOf(bsImport), 1);
         if (process.env["JSON_DEBUG"]) console.log("Modified as-bs import: " + txt + "\n");
       }
     } else {
-      const txt = `import { bs } from "${bsPath}";`;
+      const txt = `import { bs } from "${bsRel}";`;
       if (!this.bsImport) {
         this.bsImport = txt;
         if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
