@@ -53,7 +53,7 @@ npm install json-as@1.0.0-beta.18
 Add the `--transform` to your `asc` command (e.g. in package.json)
 
 ```bash
---transform json-as/transform --lib json-as/lib
+--transform json-as/transform
 ```
 
 Alternatively, add it to your `asconfig.json`
@@ -61,8 +61,7 @@ Alternatively, add it to your `asconfig.json`
 ```typescripton
 {
   "options": {
-    "transform": ["json-as/transform"],
-    "lib": ["json-as/lib"]
+    "transform": ["json-as/transform"]
   }
 }
 ```
