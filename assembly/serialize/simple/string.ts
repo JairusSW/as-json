@@ -1,4 +1,4 @@
-import { bs } from "../../../lib/as-bs";
+import { bs } from "../../../modules/as-bs";
 import { _intTo16 } from "../../custom/util";
 import { bytes } from "../../util/bytes";
 import { BACK_SLASH, QUOTE } from "../../custom/chars";

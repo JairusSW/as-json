@@ -1,4 +1,4 @@
-import { bs } from "../../../lib/as-bs";
+import { bs } from "../../../modules/as-bs";
 import { itoa_buffered } from "util/number";
 
 export function serializeInteger<T extends number>(data: T): void {

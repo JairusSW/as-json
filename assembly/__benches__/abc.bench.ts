@@ -1,5 +1,5 @@
 import { JSON } from "..";
-import { bs } from "../../lib/as-bs";
+import { bs } from "../../modules/as-bs";
 import { bench } from "../custom/bench";
 
 const v1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

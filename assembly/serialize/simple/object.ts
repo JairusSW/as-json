@@ -1,4 +1,4 @@
-import { bs } from "../../../lib/as-bs";
+import { bs } from "../../../modules/as-bs";
 import { JSON } from "../..";
 import { BRACE_LEFT, BRACE_RIGHT, QUOTE } from "../../custom/chars";
 import { bytes } from "../../util";
