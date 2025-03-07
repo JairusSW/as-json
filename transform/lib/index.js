@@ -423,7 +423,7 @@ class JSONTransform extends Visitor {
         const filePath = fileURLToPath(import.meta.url);
         const fileDir = path.dirname(filePath);
         const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs"));
-        const bsPath = path.resolve(fileDir, "../../modules/as-bs/");
+        const bsPath = path.resolve(fileDir, "../../assembly/lib/as-bs.ts");
         let bsRel = path.relative(path.dirname(node.range.source.normalizedPath), bsPath).replace(".ts", "");
         if (!bsRel.startsWith(".") && !bsRel.startsWith("/"))
             bsRel = "./" + bsRel;

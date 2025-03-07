@@ -1,4 +1,4 @@
-import { bs } from "../../../modules/as-bs";
+import { bs } from "../../lib/as-bs";
 import { dtoa_buffered } from "util/number";
 
 export function serializeFloat<T extends number>(data: T): void {

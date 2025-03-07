@@ -1,5 +1,0 @@
-{
-  "type": "module",
-  "types": "./index.ts",
-  "ascMain": "./index.ts"
-}
