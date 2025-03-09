@@ -1,4 +1,4 @@
-import { Source, Node, Tokenizer } from "assemblyscript/dist/assemblyscript.js";
+import { Node } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -6,6 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
+import { RangeTransform } from "./range.js";
 let indent = "  ";
 class JSONTransform extends Visitor {
     parser;
@@ -13,9 +14,7 @@ class JSONTransform extends Visitor {
     schema;
     sources = new Set();
     imports = [];
-    jsonImport = null;
-    bsImport = null;
-    newStmts = { simd: [] };
+    topStatements = [];
     visitClassDeclaration(node) {
         if (!node.decorators?.length)
             return;
@@ -428,32 +427,29 @@ class JSONTransform extends Visitor {
         if (!bsRel.startsWith(".") && !bsRel.startsWith("/"))
             bsRel = "./" + bsRel;
         if (bsImport) {
-            const txt = `import { bs } from "${bsRel}";`;
-            if (!this.bsImport && path.dirname(path.resolve(bsRel)) != path.dirname(path.resolve(bsImport.path.value))) {
-                this.bsImport = txt;
-                node.statements.splice(node.statements.indexOf(bsImport), 1);
-                if (process.env["JSON_DEBUG"])
-                    console.log("Modified as-bs import: " + txt + "\n");
-            }
         }
         else {
             const txt = `import { bs } from "${bsRel}";`;
-            if (!this.bsImport) {
-                this.bsImport = txt;
-                if (process.env["JSON_DEBUG"])
-                    console.log("Added as-bs import: " + txt + "\n");
-            }
+            const replacer = new RangeTransform(node);
+            const replaceNode = Node.createImportStatement([
+                Node.createImportDeclaration(Node.createIdentifierExpression("bs", node.range, false), Node.createIdentifierExpression("bs", node.range, false), node.range)
+            ], Node.createStringLiteralExpression(bsRel, node.range), node.range);
+            this.topStatements.push(replaceNode);
+            if (process.env["JSON_DEBUG"])
+                console.log("Added as-bs import: " + txt + "\n");
         }
         if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
-            let jsonPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts")).replace(".ts", "");
-            if (!jsonPath.startsWith(".") && !jsonPath.startsWith("/"))
-                jsonPath = "./" + jsonPath;
-            const txt = `import { JSON } from "${jsonPath}";`;
-            if (!this.jsonImport) {
-                this.jsonImport = txt;
-                if (process.env["JSON_DEBUG"])
-                    console.log("Added json-as import: " + txt + "\n");
-            }
+            let jsonRel = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts")).replace(".ts", "");
+            if (!jsonRel.startsWith(".") && !jsonRel.startsWith("/"))
+                jsonRel = "./" + jsonRel;
+            const txt = `import { JSON } from "${jsonRel}";`;
+            const replacer = new RangeTransform(node);
+            const replaceNode = Node.createImportStatement([
+                Node.createImportDeclaration(Node.createIdentifierExpression("JSON", node.range, false), Node.createIdentifierExpression("JSON", node.range, false), node.range)
+            ], Node.createStringLiteralExpression(jsonRel, node.range), node.range);
+            this.topStatements.push(replaceNode);
+            if (process.env["JSON_DEBUG"])
+                console.log("Added json-as import: " + txt + "\n");
         }
     }
     getStores(data, simd = false) {
@@ -461,14 +457,6 @@ class JSONTransform extends Visitor {
         const sizes = strToNum(data, simd);
         let offset = 0;
         for (const [size, num] of sizes) {
-            if (size == "v128") {
-                let index = this.newStmts.simd.findIndex((v) => v.includes(num));
-                let name = "SIMD_" + (index == -1 ? this.newStmts.simd.length : index);
-                if (index && !this.newStmts.simd.includes(`const ${name} = ${num};`))
-                    this.newStmts.simd.push(`const ${name} = ${num};`);
-                out.push("store<v128>(bs.offset, " + name + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 8));
-                offset += 16;
-            }
             if (size == "u64") {
                 out.push("store<u64>(bs.offset, " + num + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 4));
                 offset += 8;
@@ -521,29 +509,11 @@ export default class Transformer extends Transform {
         transformer.parser = parser;
         for (const source of sources) {
             transformer.imports = [];
+            transformer.topStatements = [];
             transformer.currentSource = source;
             transformer.visit(source);
-            if (transformer.newStmts.simd) {
-                const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.newStmts.simd.join("\n")));
-                parser.currentSource = tokenizer.source;
-                for (let i = 0; i < transformer.newStmts.simd.length; i++)
-                    source.statements.unshift(parser.parseTopLevelStatement(tokenizer));
-                parser.currentSource = source;
-                transformer.newStmts.simd = [];
-            }
-            if (transformer.jsonImport) {
-                const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.jsonImport));
-                parser.currentSource = tokenizer.source;
-                source.statements.unshift(parser.parseTopLevelStatement(tokenizer));
-                parser.currentSource = source;
-                transformer.jsonImport = null;
-            }
-            if (transformer.bsImport) {
-                const tokenizer = new Tokenizer(new Source(0, source.normalizedPath, transformer.bsImport));
-                parser.currentSource = tokenizer.source;
-                source.statements.unshift(parser.parseTopLevelStatement(tokenizer));
-                parser.currentSource = source;
-                transformer.bsImport = null;
+            if (transformer.topStatements.length) {
+                source.statements.unshift(...transformer.topStatements);
             }
         }
         const schemas = transformer.schemas;

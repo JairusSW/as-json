@@ -1,4 +1,4 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, CommonFlags, ImportStatement, Node, Tokenizer, SourceKind, NamedTypeNode, Range, FEATURE_SIMD, FunctionExpression, MethodDeclaration } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, CommonFlags, ImportStatement, Node, Tokenizer, SourceKind, NamedTypeNode, Range, FEATURE_SIMD, FunctionExpression, MethodDeclaration, Statement } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -6,8 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
-import { realpathSync } from "fs";
-
+import { RangeTransform } from "./range.js";
 let indent = "  ";
 
 class JSONTransform extends Visitor {
@@ -17,11 +16,7 @@ class JSONTransform extends Visitor {
   public sources = new Set<Source>();
   public imports: ImportStatement[] = [];
 
-  public jsonImport: string | null = null;
-  public bsImport: string | null = null;
-  public newStmts: {
-    simd: string[];
-  } = { simd: [] };
+  public topStatements: Statement[] = [];
 
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
@@ -471,33 +466,56 @@ class JSONTransform extends Visitor {
     if (!bsRel.startsWith(".") && !bsRel.startsWith("/")) bsRel = "./" + bsRel;
 
     if (bsImport) {
-      const txt = `import { bs } from "${bsRel}";`;
-      if (!this.bsImport && path.dirname(path.resolve(bsRel)) != path.dirname(path.resolve(bsImport.path.value))) {
-        this.bsImport = txt;
-        node.statements.splice(node.statements.indexOf(bsImport), 1);
-        if (process.env["JSON_DEBUG"]) console.log("Modified as-bs import: " + txt + "\n");
-      }
+      // const txt = `import { bs } from "${bsRel}";`;
+      // if (!this.bsImport && path.dirname(path.resolve(bsRel)) != path.dirname(path.resolve(bsImport.path.value))) {
+      //   this.bsImport = txt;
+      //   node.statements.splice(node.statements.indexOf(bsImport), 1);
+      //   if (process.env["JSON_DEBUG"]) console.log("Modified as-bs import: " + txt + "\n");
+      // }
     } else {
       const txt = `import { bs } from "${bsRel}";`;
-      if (!this.bsImport) {
-        this.bsImport = txt;
-        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
-      }
+      const replacer = new RangeTransform(node);
+      const replaceNode = Node.createImportStatement(
+        [
+          Node.createImportDeclaration(
+            Node.createIdentifierExpression("bs", node.range, false),
+            Node.createIdentifierExpression("bs", node.range, false),
+            node.range
+          )
+        ],
+        Node.createStringLiteralExpression(bsRel, node.range),
+        node.range
+      );
+
+      this.topStatements.push(replaceNode);
+      if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
     }
 
     if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
-      let jsonPath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts")).replace(".ts", "");
+      let jsonRel = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(fileDir, "../../assembly/index.ts")).replace(".ts", "");
 
-      if (!jsonPath.startsWith(".") && !jsonPath.startsWith("/")) jsonPath = "./" + jsonPath;
+      if (!jsonRel.startsWith(".") && !jsonRel.startsWith("/")) jsonRel = "./" + jsonRel;
       // if (!existsSync(relativePath)) {
       //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
       // }
 
-      const txt = `import { JSON } from "${jsonPath}";`;
-      if (!this.jsonImport) {
-        this.jsonImport = txt;
-        if (process.env["JSON_DEBUG"]) console.log("Added json-as import: " + txt + "\n");
-      }
+      const txt = `import { JSON } from "${jsonRel}";`;
+      const replacer = new RangeTransform(node);
+      const replaceNode = Node.createImportStatement(
+        [
+          Node.createImportDeclaration(
+            Node.createIdentifierExpression("JSON", node.range, false),
+            Node.createIdentifierExpression("JSON", node.range, false),
+            node.range
+          )
+        ],
+        Node.createStringLiteralExpression(jsonRel, node.range),
+        node.range
+      );
+      // replacer.visit(replaceNode);
+
+      this.topStatements.push(replaceNode);
+      if (process.env["JSON_DEBUG"]) console.log("Added json-as import: " + txt + "\n");
     }
   }
 
@@ -506,14 +524,14 @@ class JSONTransform extends Visitor {
     const sizes = strToNum(data, simd);
     let offset = 0;
     for (const [size, num] of sizes) {
-      if (size == "v128") {
-        // This could be put in its own file
-        let index = this.newStmts.simd.findIndex((v) => v.includes(num));
-        let name = "SIMD_" + (index == -1 ? this.newStmts.simd.length : index);
-        if (index && !this.newStmts.simd.includes(`const ${name} = ${num};`)) this.newStmts.simd.push(`const ${name} = ${num};`);
-        out.push("store<v128>(bs.offset, " + name + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 8));
-        offset += 16;
-      }
+      // if (size == "v128") {
+      //   // This could be put in its own file
+      //   let index = this.newStmts.simd.findIndex((v) => v.includes(num));
+      //   let name = "SIMD_" + (index == -1 ? this.newStmts.simd.length : index);
+      //   if (index && !this.newStmts.simd.includes(`const ${name} = ${num};`)) this.newStmts.simd.push(`const ${name} = ${num};`);
+      //   out.push("store<v128>(bs.offset, " + name + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 8));
+      //   offset += 16;
+      // }
       if (size == "u64") {
         out.push("store<u64>(bs.offset, " + num + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 4));
         offset += 8;
@@ -568,32 +586,13 @@ export default class Transformer extends Transform {
     for (const source of sources) {
       // console.log("Source: " + source.normalizedPath);
       transformer.imports = [];
+      transformer.topStatements = [];
       transformer.currentSource = source;
       // Ignore all lib and std. Visit everything else.
       transformer.visit(source);
 
-      if (transformer.newStmts.simd) {
-        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.newStmts.simd.join("\n")));
-        parser.currentSource = tokenizer.source;
-        for (let i = 0; i < transformer.newStmts.simd.length; i++) source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
-        parser.currentSource = source;
-        transformer.newStmts.simd = [];
-      }
-
-      if (transformer.jsonImport) {
-        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.jsonImport));
-        parser.currentSource = tokenizer.source;
-        source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
-        parser.currentSource = source;
-        transformer.jsonImport = null;
-      }
-
-      if (transformer.bsImport) {
-        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.bsImport));
-        parser.currentSource = tokenizer.source;
-        source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
-        parser.currentSource = source;
-        transformer.bsImport = null;
+      if (transformer.topStatements.length) {
+        source.statements.unshift(...transformer.topStatements);
       }
     }
     // Check that every parent and child class is hooked up correctly
