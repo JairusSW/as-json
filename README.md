@@ -6,13 +6,27 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-beta.17
+    AssemblyScript - v1.0.0-beta.18
   </pre>
 </h5>
 
 ## 📝 About
 
 JSON is the de-facto serialization format of modern web applications, but its serialization and deserialization remain a significant performance bottleneck, especially at scale. Traditional parsing approaches are computationally expensive, adding unnecessary overhead to both clients and servers. This library is designed to mitigate this by leveraging SIMD acceleration and highly optimized transformations.
+
+## 🚨 What's new in v1.0.0
+
+🔹Breaking changes to the way custom serializers/deserializers function (See Custom Serializers below)
+
+🔹Major performance improvements and addition of SIMD
+
+🔹Extremely low memory overhead compared to pre-1.x.x versions (great for serverless workloads)
+
+🔹Fixes to many major issues and newly discovered bugs
+
+🔹Full support for dynamic objects, arrays, and values
+
+🔹Full support for `JSON.Raw` type everywhere
 
 ## 📚 Contents
 
@@ -31,22 +45,22 @@ JSON is the de-facto serialization format of modern web applications, but its se
 ## 💾 Installation
 
 ```bash
-npm install json-as@1.0.0-beta.17
+npm install json-as@1.0.0-beta.18
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
 
 ```bash
---transform json-as/transform --lib json-as/lib
+--transform json-as/transform --lib ./node_modules/json-as/lib
 ```
 
 Alternatively, add it to your `asconfig.json`
 
-```json
+```typescripton
 {
   "options": {
     "transform": ["json-as/transform"],
-    "lib": ["json-as/lib"]
+    "lib": ["./node_modules/json-as/lib"]
   }
 }
 ```
@@ -55,8 +69,9 @@ If you'd like to see the code that the transform generates, run with `JSON_DEBUG
 
 ## 🪄 Usage
 
-```js
+```typescript
 import { JSON } from "json-as";
+
 
 @json
 class Vec3 {
@@ -65,8 +80,10 @@ class Vec3 {
   z: f32 = 0.0;
 }
 
+
 @json
 class Player {
+
   @alias("first name")
   firstName!: string;
   lastName!: string;
@@ -74,6 +91,7 @@ class Player {
   // Drop in a code block, function, or expression that evaluates to a boolean
   @omitif((self: Player) => self.age < 18)
   age!: i32;
+
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
@@ -87,9 +105,9 @@ const player: Player = {
   pos: {
     x: 3.4,
     y: 1.2,
-    z: 8.3
+    z: 8.3,
   },
-  isVerified: true
+  isVerified: true,
 };
 
 const serialized = JSON.stringify<Player>(player);
@@ -109,10 +127,12 @@ This library allows selective omission of fields during serialization using the 
 
 This decorator excludes a field from serialization entirely.
 
-```js
+```typescript
+
 @json
 class Example {
   name!: string;
+
   @omit
   secret!: string;
 }
@@ -128,10 +148,12 @@ console.log(JSON.stringify(obj)); // { "name": "Visible" }
 
 This decorator omits a field only if its value is null.
 
-```js
+```typescript
+
 @json
 class Example {
   name!: string;
+
   @omitnull()
   optionalField!: string | null;
 }
@@ -147,9 +169,12 @@ console.log(JSON.stringify(obj)); // { "name": "Present" }
 
 This decorator omits a field based on a custom predicate function.
 
+```typescript
+
 @json
 class Example {
   name!: string;
+
   @omitif((self: Example) => self.age < 18)
   age!: number;
 }
@@ -169,7 +194,8 @@ AssemblyScript doesn't support using nullable primitive types, so instead, json-
 
 For example, this schema won't compile in AssemblyScript:
 
-```js
+```typescript
+
 @json
 class Person {
   name!: string;
@@ -179,7 +205,8 @@ class Person {
 
 Instead, use `JSON.Box` to allow nullable primitives:
 
-```js
+```typescript
+
 @json
 class Person {
   name: string;
@@ -208,7 +235,7 @@ Here's a few examples:
 
 When dealing with arrays that have multiple types within them, eg. `["string",true,null,["array"]]`, use `JSON.Value[]`
 
-```js
+```typescript
 const a1 = JSON.parse<JSON.Value[]>('["string",true,null,["array"]]');
 console.log(JSON.stringify(a[0])); // "string"
 console.log(JSON.stringify(a[1])); // true
@@ -220,14 +247,15 @@ console.log(JSON.stringify(a[3])); // ["array"]
 
 When dealing with an object with an unknown structure, use the `JSON.Obj` type
 
-```js
+```typescript
 const o1 = JSON.parse<JSON.Obj>('{"a":3.14,"b":true,"c":[1,2,3],"d":{"x":1,"y":2,"z":3}}');
 
 console.log(o1.keys().join(" ")); // a b c d
 console.log(
-  o1.values()
-  .map<string>((v) => JSON.stringify(v))
-  .join(" ")
+  o1
+    .values()
+    .map<string>((v) => JSON.stringify(v))
+    .join(" "),
 ); // 3.14 true [1,2,3] {"x":1,"y":2,"z":3}
 
 const y = o1.get("d").get<JSON.Obj>().get<i32>();
@@ -240,7 +268,8 @@ More often, objects will be completely statically typed except for one or two va
 
 In such cases, `JSON.Value` can be used to handle fields that may hold different types at runtime.
 
-```js
+```typescript
+
 @json
 class DynamicObj {
   id: i32 = 0;
@@ -268,9 +297,9 @@ Sometimes its necessary to simply copy a string instead of serializing it.
 
 For example, the following data would typically be serialized as:
 
-```js
+```typescript
 const m1 = new Map<string, string>();
-m1.set('pos', '{"x":1.0,"y":2.0,"z":3.0}');
+m1.set("pos", '{"x":1.0,"y":2.0,"z":3.0}');
 
 const a1 = JSON.stringify(m1);
 console.log("a1: " + a1);
@@ -280,9 +309,9 @@ console.log("a1: " + a1);
 
 If, instead, one wanted to insert Raw JSON into an existing schema/data structure, they could make use of the JSON.Raw type to do so:
 
-```js
+```typescript
 const m1 = new Map<string, JSON.Raw>();
-m1.set('pos', new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
+m1.set("pos", new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
 
 const a1 = JSON.stringify(m1);
 console.log("a1: " + a1);
@@ -296,7 +325,8 @@ This library supports custom serialization and deserialization methods, which ca
 
 Here's an example of creating a custom data type called `Point` which serializes to `(x,y)`
 
-```js
+```typescript
+
 @json
 class Point {
   x: f64 = 0.0;
@@ -306,10 +336,12 @@ class Point {
     this.y = y;
   }
 
+
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
+
 
   @deserializer
   deserializer(data: string): Point {
@@ -320,10 +352,7 @@ class Point {
     const x = data.slice(1, c);
     const y = data.slice(c + 1, data.length - 1);
 
-    return new Point(
-      f64.parse(x),
-      f64.parse(y)
-    );
+    return new Point(f64.parse(x), f64.parse(y));
   }
 }
 ```
@@ -334,7 +363,7 @@ The deserializer function parses the string `(x,y)` back into a `Point` instance
 
 These functions are then wrapped before being consumed by the json-as library:
 
-```js
+```typescript
 @inline __SERIALIZE_CUSTOM(ptr: usize): void {
   const data = this.serializer(changetype<Point>(ptr));
   const dataSize = data.length << 1;
@@ -353,45 +382,27 @@ This allows custom serialization while maintaining a generic interface for the l
 
 The `json-as` library has been optimized to achieve near-gigabyte-per-second JSON processing speeds through SIMD acceleration and highly efficient transformations. Below are some key performance benchmarks to give you an idea of how it performs.
 
-### Raw Performance
+Note: the AssemblyScript benches are run using a _bump allocator_ so that Garbage Collection does not interfere with results. Also note that ideally, I would use [d8](https://v8.dev/docs/d8), but until that is done, these results serve as a temporary performance comparison.
 
-Simple
+**Table 1** - _AssemblyScript_
 
-| Test Case          | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
-| ------------------ | --------------------- | ----------------------- | -------------------- | ---------------------- |
-| Vector3 Object     | 32,642,320 ops/s      | 9,736,272 ops/s         | 1,240 MB/s           | 369 MB/s               |
-| Alphabet String    | 4,928,856 ops/s       | 7,567,360 ops/s         | 975 MB/s             | 1,498 MB/s             |
-| Small JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-| Medium JSON Object | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-| Large JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
+| Test Case       | Size       | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
+| --------------- | ---------- | --------------------- | ----------------------- | -------------------- | ---------------------- |
+| Vector3 Object  | 38 bytes   | 35,714,285 ops/s      | 35,435,552 ops/s        | 1,357 MB/s           | 1,348 MB/s             |
+| Alphabet String | 104 bytes  | 13,617,021 ops/s      | 18,390,804 ops/s        | 1,416 MB/s           | 1,986 MB/s             |
+| Small Object    | 88 bytes   | 24,242,424 ops/s      | 12,307,692 ops/s        | 2,133 MB/s           | 1,083 MB/s             |
+| Medium Object   | 494 bytes  | 4,060,913 ops/s       | 1,396,160 ops/s         | 2,006 MB/s           | 689.7 MB/s             |
+| Large Object    | 3374 bytes | 614,754 ops/s         | 132,802 ops/s           | 2,074 MB/s           | 448.0 MB/s             |
 
-SIMD
+**Table 2** - _JavaScript_
 
-| Test Case          | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
-| ------------------ | --------------------- | ----------------------- | -------------------- | ---------------------- |
-| Vector3 Object     | 32,642,320 ops/s      | 9,736,272 ops/s         | 1,240 MB/s           | 369 MB/s               |
-| Alphabet String    | 20,368,584 ops/s      | 28,467,424 ops/s        | 3,910 MB/s           | 5,636 MB/s             |
-| Small JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-| Medium JSON Object | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-| Large JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-
-JavaScript
-
-| Test Case          | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
-| ------------------ | --------------------- | ----------------------- | -------------------- | ---------------------- |
-| Vector3 Object     | 2,548,013 ops/s       | 1,942,440 ops/s         | 97 MB/s              | 73 MB/s                |
-| Alphabet String    | 3,221,556 ops/s       | 2,716,617 ops/s         | 624 MB/s             | 537 MB/s               |
-| Small JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-| Medium JSON Object | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-| Large JSON Object  | [Fill Value]          | [Fill Value]            | [Fill Value]         | [Fill Value]           |
-
-### Real-World Usage
-
-| Scenario         | JSON Size (kb) | Serialization Time (ops/s) | Deserialization Time (ops/s) | Throughput (GB/s) |
-| ---------------- | -------------- | -------------------------- | ---------------------------- | ----------------- |
-| Web API Response | [Fill Value]   | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
-| Database Entry   | [Fill Value]   | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
-| File Parsing     | [Fill Value]   | [Fill Value]               | [Fill Value]                 | [Fill Value]      |
+| Test Case       | Size       | Serialization (ops/s) | Deserialization (ops/s) | Serialization (MB/s) | Deserialization (MB/s) |
+| --------------- | ---------- | --------------------- | ----------------------- | -------------------- | ---------------------- |
+| Vector3 Object  | 38 bytes   | 8,791,209 ops/s       | 5,369,12 ops/s          | 357.4 MB/s           | 204.3 MB/s             |
+| Alphabet String | 104 bytes  | 13,793,103 ops/s      | 14,746,544 ops/s        | 1,416 MB/s           | 1,592 MB/s             |
+| Small Object    | 88 bytes   | 8,376,963 ops/s       | 4,968,944 ops/s         | 737.1 MB/s           | 437.2 MB/s             |
+| Medium Object   | 494 bytes  | 2,395,210 ops/s       | 1,381,693 ops/s         | 1,183 MB/s           | 682.5 MB/s             |
+| Large Object    | 3374 bytes | 222,222 ops/s         | 117,233 ops/s           | 749.7 MB/s           | 395.5 MB/s             |
 
 ## 📃 License
 
