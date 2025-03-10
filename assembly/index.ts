@@ -67,7 +67,7 @@ export namespace JSON {
         return out;
       }
       return data ? "true" : "false";
-    } else if (isInteger<T>() && nameof<T>() == "usize" && data == 0) {
+    } else if (isInteger<T>() && !isSigned<T>() && nameof<T>() == "usize" && data == 0) {
       if (out) {
         out = changetype<string>(__renew(changetype<usize>(out), 8));
         store<u64>(changetype<usize>(out), 30399761348886638);
@@ -234,11 +234,12 @@ export namespace JSON {
     U64 = 4,
     F32 = 5,
     F64 = 6,
-    Bool = 7,
-    String = 8,
-    Object = 9,
-    Array = 10,
-    Struct = 11,
+    Null = 7,
+    Bool = 8,
+    String = 9,
+    Object = 10,
+    Array = 12,
+    Struct = 13,
   }
 
   export class Raw {
@@ -298,6 +299,9 @@ export namespace JSON {
       if (isBoolean<T>()) {
         this.type = JSON.Types.Bool;
         store<T>(changetype<usize>(this), value, STORAGE);
+      } else if (isInteger<T>() && !isSigned<T>() && changetype<usize>(value) == 0 && nameof<T>() == "usize") {
+        this.type = JSON.Types.Null;
+        store<usize>(changetype<usize>(this), 0, STORAGE);
       } else if (value instanceof u8 || value instanceof i8) {
         this.type = JSON.Types.U8;
         store<T>(changetype<usize>(this), value, STORAGE);
