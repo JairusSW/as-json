@@ -6,7 +6,7 @@
 ██   ██      ██ ██    ██ ██  ██ ██       ██   ██      ██
  █████  ███████  ██████  ██   ████       ██   ██ ███████
  </span>
-    AssemblyScript - v1.0.0-beta.18
+    AssemblyScript - v1.0.0
   </pre>
 </h5>
 
@@ -45,22 +45,21 @@ JSON is the de-facto serialization format of modern web applications, but its se
 ## 💾 Installation
 
 ```bash
-npm install json-as@1.0.0-beta.18
+npm install json-as
 ```
 
 Add the `--transform` to your `asc` command (e.g. in package.json)
 
 ```bash
---transform json-as/transform --lib ./node_modules/json-as/lib
+--transform json-as/transform
 ```
 
 Alternatively, add it to your `asconfig.json`
 
-```typescripton
+```typescript
 {
   "options": {
-    "transform": ["json-as/transform"],
-    "lib": ["./node_modules/json-as/lib"]
+    "transform": ["json-as/transform"]
   }
 }
 ```
@@ -72,7 +71,6 @@ If you'd like to see the code that the transform generates, run with `JSON_DEBUG
 ```typescript
 import { JSON } from "json-as";
 
-
 @json
 class Vec3 {
   x: f32 = 0.0;
@@ -80,10 +78,8 @@ class Vec3 {
   z: f32 = 0.0;
 }
 
-
 @json
 class Player {
-
   @alias("first name")
   firstName!: string;
   lastName!: string;
@@ -91,7 +87,6 @@ class Player {
   // Drop in a code block, function, or expression that evaluates to a boolean
   @omitif((self: Player) => self.age < 18)
   age!: i32;
-
   @omitnull()
   pos!: Vec3 | null;
   isVerified!: boolean;
@@ -100,7 +95,7 @@ class Player {
 const player: Player = {
   firstName: "Jairus",
   lastName: "Tanaka",
-  lastActive: [2, 13, 2025],
+  lastActive: [3, 9, 2025],
   age: 18,
   pos: {
     x: 3.4,
@@ -108,7 +103,7 @@ const player: Player = {
     z: 8.3,
   },
   isVerified: true,
-};
+}
 
 const serialized = JSON.stringify<Player>(player);
 const deserialized = JSON.parse<Player>(serialized);
@@ -128,20 +123,18 @@ This library allows selective omission of fields during serialization using the 
 This decorator excludes a field from serialization entirely.
 
 ```typescript
-
 @json
 class Example {
   name!: string;
-
   @omit
-  secret!: string;
+  SSN!: string;
 }
 
 const obj = new Example();
-obj.name = "Visible";
-obj.secret = "Hidden";
+obj.name = "Jairus";
+obj.SSN = "123-45-6789";
 
-console.log(JSON.stringify(obj)); // { "name": "Visible" }
+console.log(JSON.stringify(obj)); // { "name": "Jairus" }
 ```
 
 **@omitnull**
@@ -149,20 +142,18 @@ console.log(JSON.stringify(obj)); // { "name": "Visible" }
 This decorator omits a field only if its value is null.
 
 ```typescript
-
 @json
 class Example {
   name!: string;
-
   @omitnull()
   optionalField!: string | null;
 }
 
 const obj = new Example();
-obj.name = "Present";
+obj.name = "Jairus";
 obj.optionalField = null;
 
-console.log(JSON.stringify(obj)); // { "name": "Present" }
+console.log(JSON.stringify(obj)); // { "name": "Jairus" }
 ```
 
 **@omitif((self: this) => condition)**
@@ -170,23 +161,25 @@ console.log(JSON.stringify(obj)); // { "name": "Present" }
 This decorator omits a field based on a custom predicate function.
 
 ```typescript
-
 @json
 class Example {
   name!: string;
-
-  @omitif((self: Example) => self.age < 18)
+  @omitif((self: Example) => self.age <= 18)
   age!: number;
 }
 
 const obj = new Example();
-obj.name = "John";
-obj.age = 16;
+obj.name = "Jairus";
+obj.age = 18;
 
-console.log(JSON.stringify(obj)); // { "name": "John" }
+console.log(JSON.stringify(obj)); // { "name": "Jairus" }
+
+obj.age = 99;
+
+console.log(JSON.stringify(obj)); // { "name": "Jairus", "age": 99 }
 ```
 
-If age were 18 or higher, it would be included in the serialization.
+If age were higher than 18, it would be included in the serialization.
 
 ### 🗳️ Using nullable primitives
 
@@ -195,7 +188,6 @@ AssemblyScript doesn't support using nullable primitive types, so instead, json-
 For example, this schema won't compile in AssemblyScript:
 
 ```typescript
-
 @json
 class Person {
   name!: string;
@@ -206,7 +198,6 @@ class Person {
 Instead, use `JSON.Box` to allow nullable primitives:
 
 ```typescript
-
 @json
 class Person {
   name: string;
@@ -216,11 +207,11 @@ class Person {
   }
 }
 
-const person = new Person("Bob");
-console.log(JSON.stringify(person)); // {"name":"Bob","age":null}
+const person = new Person("Jairus");
+console.log(JSON.stringify(person)); // {"name":"Jairus","age":null}
 
 person.age = new JSON.Box<i32>(18); // Set age to 18
-console.log(JSON.stringify(person)); // {"name":"Bob","age":18}
+console.log(JSON.stringify(person)); // {"name":"Jairus","age":18}
 ```
 
 ### 📤 Working with unknown or dynamic data
@@ -233,14 +224,13 @@ Here's a few examples:
 
 **Working with multi-type arrays**
 
-When dealing with arrays that have multiple types within them, eg. `["string",true,null,["array"]]`, use `JSON.Value[]`
+When dealing with arrays that have multiple types within them, eg. `["string",true,["array"]]`, use `JSON.Value[]`
 
 ```typescript
-const a1 = JSON.parse<JSON.Value[]>('["string",true,null,["array"]]');
+const a = JSON.parse<JSON.Value[]>('["string",true,["array"]]');
 console.log(JSON.stringify(a[0])); // "string"
 console.log(JSON.stringify(a[1])); // true
-console.log(JSON.stringify(a[2])); // null
-console.log(JSON.stringify(a[3])); // ["array"]
+console.log(JSON.stringify(a[2])); // ["array"]
 ```
 
 **Working with unknown objects**
@@ -248,17 +238,17 @@ console.log(JSON.stringify(a[3])); // ["array"]
 When dealing with an object with an unknown structure, use the `JSON.Obj` type
 
 ```typescript
-const o1 = JSON.parse<JSON.Obj>('{"a":3.14,"b":true,"c":[1,2,3],"d":{"x":1,"y":2,"z":3}}');
+const obj = JSON.parse<JSON.Obj>('{"a":3.14,"b":true,"c":[1,2,3],"d":{"x":1,"y":2,"z":3}}');
 
-console.log(o1.keys().join(" ")); // a b c d
-console.log(
-  o1
+console.log("Keys: " + obj.keys().join(" ")); // a b c d
+console.log("Values: " +
+  obj
     .values()
     .map<string>((v) => JSON.stringify(v))
     .join(" "),
 ); // 3.14 true [1,2,3] {"x":1,"y":2,"z":3}
 
-const y = o1.get("d").get<JSON.Obj>().get<i32>();
+const y = obj.get("d")!.get<JSON.Obj>().get("y")!;
 console.log('o1["d"]["y"] = ' + y.toString()); // o1["d"]["y"] = 2
 ```
 
@@ -269,7 +259,6 @@ More often, objects will be completely statically typed except for one or two va
 In such cases, `JSON.Value` can be used to handle fields that may hold different types at runtime.
 
 ```typescript
-
 @json
 class DynamicObj {
   id: i32 = 0;
@@ -298,11 +287,10 @@ Sometimes its necessary to simply copy a string instead of serializing it.
 For example, the following data would typically be serialized as:
 
 ```typescript
-const m1 = new Map<string, string>();
-m1.set("pos", '{"x":1.0,"y":2.0,"z":3.0}');
+const map = new Map<string, string>();
+map.set("pos", '{"x":1.0,"y":2.0,"z":3.0}');
 
-const a1 = JSON.stringify(m1);
-console.log("a1: " + a1);
+console.log(JSON.stringify(map));
 // {"pos":"{\"x\":1.0,\"y\":2.0,\"z\":3.0}"}
 // pos's value (Vec3) is contained within a string... ideally, it should be left alone
 ```
@@ -310,11 +298,10 @@ console.log("a1: " + a1);
 If, instead, one wanted to insert Raw JSON into an existing schema/data structure, they could make use of the JSON.Raw type to do so:
 
 ```typescript
-const m1 = new Map<string, JSON.Raw>();
-m1.set("pos", new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
+const map = new Map<string, JSON.Raw>();
+map.set("pos", new JSON.Raw('{"x":1.0,"y":2.0,"z":3.0}'));
 
-const a1 = JSON.stringify(m1);
-console.log("a1: " + a1);
+console.log(JSON.stringify(map));
 // {"pos":{"x":1.0,"y":2.0,"z":3.0}}
 // Now its properly formatted JSON where pos's value is of type Vec3 not string!
 ```
@@ -326,6 +313,7 @@ This library supports custom serialization and deserialization methods, which ca
 Here's an example of creating a custom data type called `Point` which serializes to `(x,y)`
 
 ```typescript
+import { bytes } from "json-as/assembly/util";
 
 @json
 class Point {
@@ -336,12 +324,10 @@ class Point {
     this.y = y;
   }
 
-
   @serializer
   serializer(self: Point): string {
     return `(${self.x},${self.y})`;
   }
-
 
   @deserializer
   deserializer(data: string): Point {
@@ -355,6 +341,14 @@ class Point {
     return new Point(f64.parse(x), f64.parse(y));
   }
 }
+
+const obj = new Point(3.5, -9.2);
+
+const serialized = JSON.stringify<Point>(obj);
+const deserialized = JSON.parse<Point>(serialized);
+
+console.log("Serialized    " + serialized);
+console.log("Deserialized  " + JSON.stringify(deserialized));
 ```
 
 The serializer function converts a `Point` instance into a string format `(x,y)`.
