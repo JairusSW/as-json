@@ -1,4 +1,4 @@
-import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, CommonFlags, ImportStatement, Node, Tokenizer, SourceKind, NamedTypeNode, Range, FEATURE_SIMD, FunctionExpression, MethodDeclaration } from "assemblyscript/dist/assemblyscript.js";
+import { ClassDeclaration, FieldDeclaration, IdentifierExpression, Parser, Source, NodeKind, CommonFlags, ImportStatement, Node, Tokenizer, SourceKind, NamedTypeNode, Range, FEATURE_SIMD, FunctionExpression, MethodDeclaration, Statement } from "assemblyscript/dist/assemblyscript.js";
 import { Transform } from "assemblyscript/dist/transform.js";
 import { Visitor } from "./visitor.js";
 import { SimpleParser, toString } from "./util.js";
@@ -6,7 +6,6 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
-import { existsSync } from "fs";
 
 let indent = "  ";
 
@@ -17,11 +16,7 @@ class JSONTransform extends Visitor {
   public sources = new Set<Source>();
   public imports: ImportStatement[] = [];
 
-  public jsonImport: string | null = null;
-  public bsImport: string | null = null;
-  public newStmts: {
-    simd: string[];
-  } = { simd: [] };
+  public topStatements: Statement[] = [];
 
   visitClassDeclaration(node: ClassDeclaration): void {
     if (!node.decorators?.length) return;
@@ -475,8 +470,6 @@ class JSONTransform extends Visitor {
   // }
   visitImportStatement(node: ImportStatement): void {
     super.visitImportStatement(node);
-    const source = this.parser.sources.find((src) => src.internalPath == node.internalPath);
-    if (!source) return;
     this.imports.push(node);
   }
   visitSource(node: Source): void {
@@ -495,25 +488,39 @@ class JSONTransform extends Visitor {
       path.resolve(fileDir, "../../")
     );
 
-    if (!existsSync(path.join(fileDir, pkgRel))) console.log("could not find " + pkgRel);//throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
-
     if (!pkgRel.startsWith(".") && !pkgRel.startsWith("/")) pkgRel = "./" + pkgRel;
-    pkgRel = pkgRel.replace(/^json-as\//, "json-as/");
+    pkgRel = pkgRel.replace(/^.*json-as/, "json-as");
 
     if (!bsImport) {
-      const txt = `import { bs } from "${path.join(pkgRel, "./lib/as-bs")}";`;
-      if (!this.bsImport) {
-        this.bsImport = txt;
-        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
-      }
+      const replaceNode = Node.createImportStatement(
+        [
+          Node.createImportDeclaration(
+            Node.createIdentifierExpression("bs", node.range, false),
+            null,
+            node.range
+          )
+        ],
+        Node.createStringLiteralExpression(path.join(pkgRel, "./lib/as-bs"), node.range),
+        node.range
+      );
+      this.topStatements.push(replaceNode);
+      if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + toString(replaceNode) + "\n");
     }
 
     if (!jsonImport) {
-      const txt = `import { JSON } from "${path.join(pkgRel, "./assembly/")}";`;
-      if (!this.jsonImport) {
-        this.jsonImport = txt;
-        if (process.env["JSON_DEBUG"]) console.log("Added json-as import: " + txt + "\n");
-      }
+      const replaceNode = Node.createImportStatement(
+        [
+          Node.createImportDeclaration(
+            Node.createIdentifierExpression("JSON", node.range, false),
+            null,
+            node.range
+          )
+        ],
+        Node.createStringLiteralExpression(path.join(pkgRel, "./assembly"), node.range),
+        node.range
+      );
+      this.topStatements.push(replaceNode);
+      if (process.env["JSON_DEBUG"]) console.log("Added json-as import: " + toString(replaceNode) + "\n");
     }
   }
 
@@ -522,14 +529,14 @@ class JSONTransform extends Visitor {
     const sizes = strToNum(data, simd);
     let offset = 0;
     for (const [size, num] of sizes) {
-      if (size == "v128") {
-        // This could be put in its own file
-        let index = this.newStmts.simd.findIndex((v) => v.includes(num));
-        let name = "SIMD_" + (index == -1 ? this.newStmts.simd.length : index);
-        if (index && !this.newStmts.simd.includes(`const ${name} = ${num};`)) this.newStmts.simd.push(`const ${name} = ${num};`);
-        out.push("store<v128>(bs.offset, " + name + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 8));
-        offset += 16;
-      }
+      // if (size == "v128") {
+      //   // This could be put in its own file
+      //   let index = this.newStmts.simd.findIndex((v) => v.includes(num));
+      //   let name = "SIMD_" + (index == -1 ? this.newStmts.simd.length : index);
+      //   if (index && !this.newStmts.simd.includes(`const ${name} = ${num};`)) this.newStmts.simd.push(`const ${name} = ${num};`);
+      //   out.push("store<v128>(bs.offset, " + name + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 8));
+      //   offset += 16;
+      // }
       if (size == "u64") {
         out.push("store<u64>(bs.offset, " + num + ", " + offset + "); // " + data.slice(offset >> 1, (offset >> 1) + 4));
         offset += 8;
@@ -616,28 +623,9 @@ export default class Transformer extends Transform {
       // Ignore all lib and std. Visit everything else.
       transformer.visit(source);
 
-      if (transformer.newStmts.simd) {
-        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.newStmts.simd.join("\n")));
-        parser.currentSource = tokenizer.source;
-        for (let i = 0; i < transformer.newStmts.simd.length; i++) source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
-        parser.currentSource = source;
-        transformer.newStmts.simd = [];
-      }
-
-      if (transformer.jsonImport) {
-        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.jsonImport));
-        parser.currentSource = tokenizer.source;
-        source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
-        parser.currentSource = source;
-        transformer.jsonImport = null;
-      }
-
-      if (transformer.bsImport) {
-        const tokenizer = new Tokenizer(new Source(SourceKind.User, source.normalizedPath, transformer.bsImport));
-        parser.currentSource = tokenizer.source;
-        source.statements.unshift(parser.parseTopLevelStatement(tokenizer)!);
-        parser.currentSource = source;
-        transformer.bsImport = null;
+      if (transformer.topStatements.length) {
+        source.statements.unshift(...transformer.topStatements);
+        transformer.topStatements = [];
       }
     }
     // Check that every parent and child class is hooked up correctly

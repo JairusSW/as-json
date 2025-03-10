@@ -1,1 +1,1 @@
-export * from "./assembly/index";
+export { JSON } from "./assembly/index";
