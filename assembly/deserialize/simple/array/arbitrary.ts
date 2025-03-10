@@ -1,6 +1,7 @@
 import { BACK_SLASH, BRACE_LEFT, BRACE_RIGHT, BRACKET_LEFT, BRACKET_RIGHT, CHAR_F, CHAR_N, CHAR_T, COMMA, QUOTE } from "../../../custom/chars";
 import { JSON } from "../../../";
 import { isSpace } from "util/string";
+import { ptrToStr } from "../../../util/ptrToStr";
 
 export function deserializeArbitraryArray(srcStart: usize, srcEnd: usize, dst: usize): JSON.Value[] {
   const out = changetype<JSON.Value[]>(dst || changetype<usize>(instantiate<JSON.Value[]>()));
@@ -120,12 +121,12 @@ export function deserializeArbitraryArray(srcStart: usize, srcEnd: usize, dst: u
       }
     } else if (code == CHAR_N) {
       if (load<u64>(srcStart) == 30399761348886638) {
+        console.log("Value (null): " + ptrToStr(srcStart, srcStart + 8));
         // @ts-ignore: type
-        out.push(JSON.__deserialize<JSON.Value>(lastIndex, (srcStart += 8)));
-        // console.log("Value (null): " + ptrToStr(srcStart - 8, srcStart));
-        while (isSpace(load<u16>((srcStart += 2)))) {
-          /* empty */
-        }
+        out.push(JSON.__deserialize<JSON.Value>(srcStart, (srcStart += 8)));
+        // while (isSpace(load<u16>((srcStart += 2)))) {
+        //   /* empty */
+        // }
       }
     }
     srcStart += 2;
