@@ -1,5 +1,6 @@
 /// <reference path="./index.d.ts" />
 
+import { bs } from "../lib/as-bs";
 import { serializeString } from "./serialize/simple/string";
 import { serializeArray } from "./serialize/simple/array";
 import { serializeMap } from "./serialize/simple/map";
@@ -514,8 +515,7 @@ export namespace JSON {
     }
   }
 
-  // @ts-ignore: inline
-  @inline export function __serialize<T>(src: T): void {
+  export function __serialize<T>(src: T): void {
     if (isBoolean<T>()) {
       serializeBool(src as bool);
     } else if (isInteger<T>() && nameof<T>() == "usize" && src == 0) {
@@ -565,8 +565,7 @@ export namespace JSON {
     }
   }
 
-  // @ts-ignore: inline
-  @inline export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
+  export function __deserialize<T>(srcStart: usize, srcEnd: usize, dst: usize = 0): T {
     if (isBoolean<T>()) {
       // @ts-ignore: type
       return deserializeBoolean(srcStart, srcEnd);

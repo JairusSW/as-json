@@ -1,3 +1,4 @@
+import { bs } from "../../../lib/as-bs";
 import { JSON } from "../..";
 import { BRACE_LEFT, BRACE_RIGHT, COLON, COMMA } from "../../custom/chars";
 

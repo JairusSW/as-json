@@ -6,6 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { Property, PropertyFlags, Schema } from "./types.js";
 import { getClasses, getImportedClass } from "./linker.js";
+import { existsSync } from "fs";
 
 let indent = "  ";
 
@@ -483,33 +484,32 @@ class JSONTransform extends Visitor {
     super.visitSource(node);
   }
   addRequiredImports(node: Source): void {
-    const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs"));
-    if (bsImport) {
-      const txt = `import { bs } from "as-bs";`;
-      if (!this.bsImport) {
-        this.bsImport = txt;
-        if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
-      }
-    } else {
-      const txt = `import { bs } from "as-bs";`;
+    const filePath = fileURLToPath(import.meta.url);
+    const fileDir = path.dirname(filePath);
+
+    const bsImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "bs" || d.name.text == "bs"));
+    const jsonImport = this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON" || d.name.text == "JSON"));
+
+    let pkgRel = path.relative(
+      path.dirname(node.range.source.normalizedPath),
+      path.resolve(fileDir, "../../")
+    );
+
+    if (!existsSync(path.join(fileDir, pkgRel))) console.log("could not find " + pkgRel);//throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
+
+    if (!pkgRel.startsWith(".") && !pkgRel.startsWith("/")) pkgRel = "./" + pkgRel;
+    pkgRel = pkgRel.replace(/^json-as\//, "json-as/");
+
+    if (!bsImport) {
+      const txt = `import { bs } from "${path.join(pkgRel, "./lib/as-bs")}";`;
       if (!this.bsImport) {
         this.bsImport = txt;
         if (process.env["JSON_DEBUG"]) console.log("Added as-bs import: " + txt + "\n");
       }
     }
 
-    if (!this.imports.find((i) => i.declarations?.find((d) => d.foreignName.text == "JSON"))) {
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-
-      let relativePath = path.relative(path.dirname(node.range.source.normalizedPath), path.resolve(__dirname, "../../assembly/index.ts"));
-
-      if (!relativePath.startsWith(".") && !relativePath.startsWith("/")) relativePath = "./" + relativePath;
-      // if (!existsSync(relativePath)) {
-      //   throw new Error("Could not find a valid json-as library to import from! Please add import { JSON } from \"path-to-json-as\"; in " + node.range.source.normalizedPath + "!");
-      // }
-
-      const txt = `import { JSON } from "${relativePath}";`;
+    if (!jsonImport) {
+      const txt = `import { JSON } from "${path.join(pkgRel, "./assembly/")}";`;
       if (!this.jsonImport) {
         this.jsonImport = txt;
         if (process.env["JSON_DEBUG"]) console.log("Added json-as import: " + txt + "\n");

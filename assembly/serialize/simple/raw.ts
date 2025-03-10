@@ -1,3 +1,4 @@
+import { bs } from "../../../lib/as-bs";
 import { JSON } from "../..";
 import { bytes } from "../../util";
 
