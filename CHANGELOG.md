@@ -1,8 +1,9 @@
 # Change Log
 
-## UNRELEASED
+## 2025-03-09 - 1.0.0
 
-
+- fix: relative paths pointing through node_modules would create a second Source
+- feat: move behavior of `--lib` into transform itself
 - fix: object with an object as a value containing a rhs bracket or brace would exit early [3b33e94](https://github.com/JairusSW/json-as/commit/3b33e9414dc04779d22d65272863372fcd7af4a6)
 
 ## 2025-03-04 - 1.0.0-beta.17
